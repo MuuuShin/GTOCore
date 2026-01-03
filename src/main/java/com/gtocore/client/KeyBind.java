@@ -1,10 +1,11 @@
 package com.gtocore.client;
 
-import com.gtocore.common.network.ClientMessage;
+import com.gtocore.config.GTOConfig;
 
 import com.gtolib.utils.ClientUtil;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 
@@ -15,13 +16,27 @@ import org.lwjgl.glfw.GLFW;
 public final class KeyBind {
 
     private static final KeyMapping flyingspeedKey = new KeyMap("key.gtocore.flyingspeed", InputConstants.KEY_X, 0);
-    public static final KeyMapping vajraKey = new KeyMap("key.gtocore.vajra", InputConstants.KEY_J, 1);
-    private static final KeyMapping driftKey = new KeyMap("key.gtocore.drift", InputConstants.KEY_I, 2);
+    private static final KeyMapping nightvisionKey = new KeyMap("key.gtocore.nightvision", InputConstants.KEY_Z, -1) {
+
+        @Override
+        public void setDown(boolean isDown) {
+            if (isDownOld != isDown && isDown && ClientUtil.getPlayer() != null) {
+                GTOConfig.set("nightVision", !GTOConfig.INSTANCE.nightVision);
+                ClientUtil.getPlayer().displayClientMessage(GTOConfig.INSTANCE.nightVision ?
+                        Component.translatable("metaarmor.message.nightvision.enabled") :
+                        Component.translatable("metaarmor.message.nightvision.disabled"), true);
+            }
+            super.setDown(isDown);
+        }
+    };
+    public static final KeyMapping vajraKey = new KeyMap("key.gtocore.vajra", InputConstants.KEY_J, 2);
+    private static final KeyMapping driftKey = new KeyMap("key.gtocore.drift", InputConstants.KEY_I, 3);
     public static final KeyMapping debugInspectKey = new KeyMapping("key.gtocore.debug_inspect",
             KeyConflictContext.GUI, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, "key.keybinding.gtocore");
 
     public static void init() {
         KeyMappingRegistry.register(flyingspeedKey);
+        KeyMappingRegistry.register(nightvisionKey);
         KeyMappingRegistry.register(vajraKey);
         KeyMappingRegistry.register(driftKey);
         KeyMappingRegistry.register(debugInspectKey);
@@ -29,7 +44,7 @@ public final class KeyBind {
 
     private static class KeyMap extends KeyMapping {
 
-        private boolean isDownOld;
+        boolean isDownOld;
         private final int type;
 
         KeyMap(String name, int keyCode, int type) {
@@ -40,8 +55,8 @@ public final class KeyBind {
         @Override
         public void setDown(boolean isDown) {
             super.setDown(isDown);
-            if (isDownOld != isDown && isDown && ClientUtil.getPlayer() != null) {
-                ClientMessage.send("key", buf -> buf.writeVarInt(type));
+            if (type >= 0 && isDownOld != isDown && isDown && ClientUtil.getPlayer() != null) {
+                KeyMessage.NETWORK_PACK.send(b -> b.writeVarInt(type));
             }
             isDownOld = isDown;
         }

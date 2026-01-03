@@ -16,7 +16,6 @@ import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -26,7 +25,7 @@ import net.minecraft.util.Mth;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -40,15 +39,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public final class RadiationHatchPartMachine extends MultiblockPartMachine implements IMachineLife, IRecipeCapabilityHolder {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(RadiationHatchPartMachine.class, MultiblockPartMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
     @Persisted
     private final NotifiableItemStackHandler inventory;
+    @Getter
     @Persisted
     private int radioactivity;
     @Persisted
@@ -101,14 +94,18 @@ public final class RadiationHatchPartMachine extends MultiblockPartMachine imple
             GTRecipeType[] recipeTypes = getDefinition().getRecipeTypes();
             if (recipeTypes != null) {
                 RecipeType recipeType = (RecipeType) recipeTypes[0];
-                Recipe recipe = recipeType.lookup().findRecipe(this);
-                if (recipe != null && RecipeRunner.handleRecipeIO(this, recipe, IO.IN, Collections.emptyMap())) {
-                    count = inventory.storage.getStackInSlot(0).getCount();
-                    initialRadioactivity = (int) ((recipe.data.getInt("radioactivity") - inhibitionDose) * (1 + ((double) count / 64)));
-                    initialTime = recipe.duration * (inhibitionDose + 200) / 200;
-                    time = initialTime;
-                    radioactivity = initialRadioactivity;
-                }
+                recipeType.findRecipe(this, r -> {
+                    var recipe = (Recipe) r;
+                    if (recipe != null && RecipeRunner.handleRecipeIO(this, recipe, IO.IN, Collections.emptyMap())) {
+                        count = inventory.storage.getStackInSlot(0).getCount();
+                        initialRadioactivity = (int) ((recipe.data.getInt("radioactivity") - inhibitionDose) * (1 + ((double) count / 64)));
+                        initialTime = recipe.duration * (inhibitionDose + 200) / 200;
+                        time = initialTime;
+                        radioactivity = initialRadioactivity;
+                        return true;
+                    }
+                    return false;
+                });
             }
         }
     }
@@ -131,7 +128,8 @@ public final class RadiationHatchPartMachine extends MultiblockPartMachine imple
 
     private void handleDisplayClick(String componentData, ClickData clickData) {
         if (!clickData.isRemote) {
-            inhibitionDose = Mth.clamp(inhibitionDose + ("Add".equals(componentData) ? 1 : -1), 0, 40);
+            var amount = clickData.isCtrlClick ? 40 : (clickData.isShiftClick ? 8 : 1);
+            inhibitionDose = Mth.clamp(inhibitionDose + ("Add".equals(componentData) ? amount : -amount), 0, 40);
         }
     }
 
@@ -145,17 +143,10 @@ public final class RadiationHatchPartMachine extends MultiblockPartMachine imple
         return false;
     }
 
-    public int getRadioactivity() {
-        return this.radioactivity;
-    }
-
     @Override
     public @Nullable RecipeHandlerList getCurrentHandlerList() {
         return currentHandlerList;
     }
-
-    @Override
-    public void setCurrentHandlerList(RecipeHandlerList list, GTRecipe recipe) {}
 
     @Override
     public Map<IO, List<RecipeHandlerList>> getCapabilitiesProxy() {

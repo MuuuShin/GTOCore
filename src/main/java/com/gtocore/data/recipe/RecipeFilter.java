@@ -2,22 +2,25 @@ package com.gtocore.data.recipe;
 
 import com.gtocore.data.recipe.ae2.AE2;
 import com.gtocore.data.recipe.generated.DyeRecipes;
+import com.gtocore.data.recipe.misc.SpaceStationRecipes;
 import com.gtocore.data.recipe.mod.FunctionalStorage;
 import com.gtocore.data.recipe.mod.ImmersiveAircraft;
+import com.gtocore.data.recipe.mod.ModularRouters;
+import com.gtocore.data.recipe.mod.Sophisticated;
 import com.gtocore.integration.Mods;
 
 import com.gtolib.GTOCore;
 import com.gtolib.utils.RLUtils;
 
 import com.gregtechceu.gtceu.data.recipe.configurable.RecipeRemoval;
-import com.gregtechceu.gtceu.utils.collection.OpenCacheHashSet;
 
 import net.minecraft.resources.ResourceLocation;
 
+import com.fast.fastcollection.OpenCacheHashSet;
 import com.kyanite.deeperdarker.DeeperDarker;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -25,12 +28,6 @@ import java.util.function.Predicate;
 import static com.gtocore.common.data.GTORecipeTypes.*;
 
 public final class RecipeFilter {
-
-    public static Predicate<ResourceLocation> JsonFilter;
-
-    public static Predicate<ResourceLocation> getFilter() {
-        return JsonFilter;
-    }
 
     public static void init() {
         MACERATOR_RECIPES.addFilter("macerate_wheat");
@@ -43,14 +40,16 @@ public final class RecipeFilter {
         CUTTER_RECIPES.addFilter("cut_glass_block_to_plate");
         ARC_FURNACE_RECIPES.addFilter("arc_carbon_dust");
         ASSEMBLER_RECIPES.addFilter("assemble_wood_frame"); // 与告示牌重复
+    }
 
-        List<Predicate<ResourceLocation>> filters = new ObjectArrayList<>();
+    public static Predicate<ResourceLocation> getJsonFilter() {
+        List<Predicate<ResourceLocation>> filters = new ArrayList<>();
         addFilter(filters);
-        Predicate<ResourceLocation> filter = filters.get(0);
+        Predicate<ResourceLocation> filter = filters.getFirst();
         for (int i = 1; i < filters.size(); i++) {
             filter = filter.or(filters.get(i));
         }
-        JsonFilter = filter;
+        return filter;
     }
 
     private static void addFilter(List<Predicate<ResourceLocation>> filters) {
@@ -65,12 +64,19 @@ public final class RecipeFilter {
 
     private static void initModFilter(Set<String> filters) {
         filters.add("itemfilters");
+        if (GTOCore.isEasy()) return;
+        if (Mods.COMPUTERCRAFT.isLoaded()) filters.add("computercraft");
+        if (Mods.SFM.isLoaded()) filters.add("sfm");
+        if (Mods.PIPEZ.isLoaded()) filters.add("pipez");
     }
 
     private static void initIdFilter(Set<ResourceLocation> filters) {
         ImmersiveAircraft.initJsonFilter(filters);
         FunctionalStorage.initJsonFilter(filters);
+        ModularRouters.initJsonFilter(filters);
         AE2.initJsonFilter(filters);
+        SpaceStationRecipes.initJsonFilter(filters);
+        Sophisticated.initJsonFilter(filters);
 
         String[] ore1 = new String[] { "coal", "redstone", "emerald", "diamond" };
         String[] ore2 = new String[] { "iron", "copper", "gold" };
@@ -163,6 +169,9 @@ public final class RecipeFilter {
         filters.add(RLUtils.fromNamespaceAndPath("mythicbotany", "blasting/elementium_ingot"));
         filters.add(RLUtils.fromNamespaceAndPath("mythicbotany", "alfsteel_pylon"));
         filters.add(RLUtils.fromNamespaceAndPath("mythicbotany", "gaia_pylon"));
+        filters.add(RLUtils.fromNamespaceAndPath("mythicbotany", "kvasir_mead"));
+
+        filters.add(RLUtils.bot("red_string"));
         filters.add(RLUtils.bot("pure_daisy/livingwood"));
         filters.add(RLUtils.bot("mana_infusion/manasteel"));
         filters.add(RLUtils.bot("mana_infusion/manasteel_block"));
@@ -172,8 +181,8 @@ public final class RecipeFilter {
         filters.add(RLUtils.bot("conversions/manasteel_from_nuggets"));
         filters.add(RLUtils.bot("conversions/manasteel_to_nuggets"));
         filters.add(RLUtils.bot("conversions/terrasteel_block_deconstruct"));
-        filters.add(RLUtils.bot("conversions/terrasteel_from_nuggets"));
-        filters.add(RLUtils.bot("conversions/terrasteel_to_nuggets"));
+        filters.add(RLUtils.bot("conversions/terrasteel_from_nugget"));
+        filters.add(RLUtils.bot("conversions/terrasteel_to_nugget"));
         filters.add(RLUtils.bot("conversions/elementium_block_deconstruct"));
         filters.add(RLUtils.bot("conversions/elementium_from_nuggets"));
         filters.add(RLUtils.bot("conversions/elementium_to_nuggets"));
@@ -301,6 +310,7 @@ public final class RecipeFilter {
         filters.add(DeeperDarker.rl("resonarium_chestplate_smithing"));
         filters.add(DeeperDarker.rl("resonarium_leggings_smithing"));
         filters.add(DeeperDarker.rl("resonarium_boots_smithing"));
+        filters.add(DeeperDarker.rl("resonarium_plate"));
 
         filters.add(RLUtils.mc("wooden_shovel"));
         filters.add(RLUtils.mc("wooden_pickaxe"));
@@ -318,32 +328,12 @@ public final class RecipeFilter {
         filters.add(RLUtils.mc("netherite_ingot"));
         filters.add(RLUtils.mc("netherite_scrap"));
         filters.add(RLUtils.mc("netherite_scrap_from_blasting"));
-        filters.add(RLUtils.mc("infinity_nugget"));
-        filters.add(RLUtils.mc("infinity_ingot"));
-        filters.add(RLUtils.mc("infinity_ingot_from_infinity_nugget"));
-        filters.add(RLUtils.mc("infinity_block_from_infinity_ingot"));
-        filters.add(RLUtils.mc("crystal_matrix_ingot"));
-        filters.add(RLUtils.mc("double_compressed_crafting_table"));
-        filters.add(RLUtils.mc("compressed_crafting_table"));
-        filters.add(RLUtils.mc("crystal_matrix"));
-        filters.add(RLUtils.mc("neutron_pile"));
-        filters.add(RLUtils.mc("neutron_pile_from_ingots"));
-        filters.add(RLUtils.mc("neutron_ingot_from_nuggets"));
-        filters.add(RLUtils.mc("neutron_ingot_from_neutron_block"));
-        filters.add(RLUtils.mc("neutron_nugget"));
-        filters.add(RLUtils.mc("neutron"));
-        filters.add(RLUtils.mc("diamond_lattice_block"));
-        filters.add(RLUtils.mc("diamond_lattice"));
 
-        filters.add(RLUtils.avaritia("enhancement_core"));
-        filters.add(RLUtils.avaritia("infinity_catalyst"));
-        filters.add(RLUtils.avaritia("crystal_matrix_ingot"));
-        filters.add(RLUtils.avaritia("diamond_lattice"));
-        filters.add(RLUtils.avaritia("botania_mana_tablet"));
-        filters.add(RLUtils.avaritia("eio_creative_power"));
-        filters.add(RLUtils.avaritia("botania_creative_pool"));
-        filters.add(RLUtils.avaritia("compressed_chest"));
-        filters.add(RLUtils.avaritia("infinity_catalyst_eternal"));
+        filters.add(RLUtils.mc("dragon_egg"));
+        filters.add(RLUtils.mc("crying_obsidian"));
+        filters.add(RLUtils.mc("echo_shard"));
+        filters.add(RLUtils.mc("dragon_breath"));
+        filters.add(RLUtils.mc("reinforced_deepslate"));
 
         filters.add(RLUtils.ad("refining/fuel_from_refining_oil"));
         filters.add(RLUtils.ad("oxygen_loading/oxygen_from_oxygen_loading_oxygen"));
@@ -415,105 +405,6 @@ public final class RecipeFilter {
         filters.add(RLUtils.ad("rocket_nose_cone"));
         filters.add(RLUtils.ad("gas_tank"));
 
-        filters.add(RLUtils.eio("darksteel_upgrade"));
-        filters.add(RLUtils.eio("iron_ingot_from_blasting"));
-        filters.add(RLUtils.eio("iron_ingot_from_smelting"));
-        filters.add(RLUtils.eio("gold_ingot_from_blasting"));
-        filters.add(RLUtils.eio("gold_ingot_from_smelting"));
-        filters.add(RLUtils.eio("copper_ingot_from_blasting"));
-        filters.add(RLUtils.eio("copper_ingot_from_smelting"));
-        filters.add(RLUtils.eio("wood_gear_corner"));
-        filters.add(RLUtils.eio("wood_gear"));
-        filters.add(RLUtils.eio("iron_gear"));
-        filters.add(RLUtils.eio("energized_gear"));
-        filters.add(RLUtils.eio("vibrant_gear"));
-        filters.add(RLUtils.eio("dark_bimetal_gear"));
-        filters.add(RLUtils.eio("pulsating_crystal"));
-        filters.add(RLUtils.eio("vibrant_crystal"));
-        filters.add(RLUtils.eio("stick"));
-        filters.add(RLUtils.eio("sag_milling/ender_crystal"));
-        filters.add(RLUtils.eio("sag_milling/precient_crystal"));
-        filters.add(RLUtils.eio("sag_milling/pulsating_crystal"));
-        filters.add(RLUtils.eio("sag_milling/vibrant_crystal"));
-        filters.add(RLUtils.eio("sag_milling/soularium"));
-        filters.add(RLUtils.eio("alloy_smelting/energetic_alloy_ingot"));
-        filters.add(RLUtils.eio("alloy_smelting/vibrant_alloy_ingot"));
-        filters.add(RLUtils.eio("alloy_smelting/dark_steel_ingot"));
-        filters.add(RLUtils.eio("alloy_smelting/end_steel_ingot"));
-        filters.add(RLUtils.eio("sag_milling/ender_pearl"));
-
-        if (!GTOCore.isSimple()) {
-
-            filters.add(RLUtils.eio("copper_alloy_block"));
-            filters.add(RLUtils.eio("copper_alloy_ingot"));
-            filters.add(RLUtils.eio("copper_alloy_nugget"));
-            filters.add(RLUtils.eio("copper_alloy_nugget_to_ingot"));
-            filters.add(RLUtils.eio("energetic_alloy_block"));
-            filters.add(RLUtils.eio("energetic_alloy_ingot"));
-            filters.add(RLUtils.eio("energetic_alloy_nugget"));
-            filters.add(RLUtils.eio("energetic_alloy_nugget_to_ingot"));
-            filters.add(RLUtils.eio("vibrant_alloy_block"));
-            filters.add(RLUtils.eio("vibrant_alloy_ingot"));
-            filters.add(RLUtils.eio("vibrant_alloy_nugget"));
-            filters.add(RLUtils.eio("vibrant_alloy_nugget_to_ingot"));
-            filters.add(RLUtils.eio("redstone_alloy_block"));
-            filters.add(RLUtils.eio("redstone_alloy_ingot"));
-            filters.add(RLUtils.eio("redstone_alloy_nugget"));
-            filters.add(RLUtils.eio("redstone_alloy_nugget_to_ingot"));
-            filters.add(RLUtils.eio("conductive_alloy_block"));
-            filters.add(RLUtils.eio("conductive_alloy_ingot"));
-            filters.add(RLUtils.eio("conductive_alloy_nugget"));
-            filters.add(RLUtils.eio("conductive_alloy_nugget_to_ingot"));
-            filters.add(RLUtils.eio("pulsating_alloy_block"));
-            filters.add(RLUtils.eio("pulsating_alloy_ingot"));
-            filters.add(RLUtils.eio("pulsating_alloy_nugget"));
-            filters.add(RLUtils.eio("pulsating_alloy_nugget_to_ingot"));
-            filters.add(RLUtils.eio("dark_steel_block"));
-            filters.add(RLUtils.eio("dark_steel_ingot"));
-            filters.add(RLUtils.eio("dark_steel_nugget"));
-            filters.add(RLUtils.eio("dark_steel_nugget_to_ingot"));
-            filters.add(RLUtils.eio("soularium_block"));
-            filters.add(RLUtils.eio("soularium_ingot"));
-            filters.add(RLUtils.eio("soularium_nugget"));
-            filters.add(RLUtils.eio("soularium_nugget_to_ingot"));
-            filters.add(RLUtils.eio("end_steel_block"));
-            filters.add(RLUtils.eio("end_steel_ingot"));
-            filters.add(RLUtils.eio("end_steel_nugget"));
-            filters.add(RLUtils.eio("end_steel_nugget_to_ingot"));
-
-            filters.add(RLUtils.sp("backpack"));
-            filters.add(RLUtils.sp("pickup_upgrade"));
-            filters.add(RLUtils.sp("filter_upgrade"));
-            filters.add(RLUtils.sp("advanced_pickup_upgrade"));
-            filters.add(RLUtils.sp("advanced_filter_upgrade"));
-            filters.add(RLUtils.sp("magnet_upgrade"));
-            filters.add(RLUtils.sp("advanced_magnet_upgrade"));
-            filters.add(RLUtils.sp("advanced_magnet_upgrade_from_basic"));
-            filters.add(RLUtils.sp("compacting_upgrade"));
-            filters.add(RLUtils.sp("advanced_compacting_upgrade"));
-            filters.add(RLUtils.sp("void_upgrade"));
-            filters.add(RLUtils.sp("advanced_void_upgrade"));
-            filters.add(RLUtils.sp("pump_upgrade"));
-            filters.add(RLUtils.sp("advanced_pump_upgrade"));
-            filters.add(RLUtils.sp("battery_upgrade"));
-            filters.add(RLUtils.sp("tank_upgrade"));
-            filters.add(RLUtils.sp("refill_upgrade"));
-            filters.add(RLUtils.sp("advanced_refill_upgrade"));
-            filters.add(RLUtils.sp("inception_upgrade"));
-            filters.add(RLUtils.sp("auto_smelting_upgrade"));
-            filters.add(RLUtils.sp("auto_smoking_upgrade"));
-            filters.add(RLUtils.sp("auto_smoking_upgrade_from_auto_smelting_upgrade"));
-            filters.add(RLUtils.sp("auto_blasting_upgrade"));
-            filters.add(RLUtils.sp("auto_blasting_upgrade_from_auto_smelting_upgrade"));
-            filters.add(RLUtils.sp("stack_upgrade_starter_tier"));
-            filters.add(RLUtils.sp("stack_upgrade_tier_1"));
-            filters.add(RLUtils.sp("stack_upgrade_tier_1_from_starter"));
-            filters.add(RLUtils.sp("stack_upgrade_tier_2"));
-            filters.add(RLUtils.sp("stack_upgrade_tier_3"));
-            filters.add(RLUtils.sp("stack_upgrade_tier_4"));
-            filters.add(RLUtils.sp("stack_upgrade_omega_tier"));
-        }
-
         filters.add(RLUtils.fd("wheat_dough_from_water"));
         filters.add(RLUtils.fd("wheat_dough_from_eggs"));
         filters.add(RLUtils.fd("bread_from_smelting"));
@@ -538,6 +429,9 @@ public final class RecipeFilter {
         filters.add(RLUtils.fd("straw"));
         filters.add(RLUtils.fd("paper_from_tree_bark"));
         filters.add(RLUtils.fd("cooking_pot"));
+        filters.add(RLUtils.fd("book_from_canvas"));
+        filters.add(RLUtils.fd("scaffolding_from_canvas"));
+        filters.add(RLUtils.fd("painting_from_canvas"));
         filters.add(RLUtils.mc("red_dye"));
         filters.add(RLUtils.mc("book_from_canvas"));
         filters.add(RLUtils.mc("painting_from_canvas"));
@@ -548,8 +442,7 @@ public final class RecipeFilter {
         filters.add(RLUtils.fromNamespaceAndPath("farmersrespite", "black_tea_leaves_sack"));
         filters.add(RLUtils.fromNamespaceAndPath("farmersrespite", "coffee_beans_sack"));
 
-        filters.add(RLUtils.fromNamespaceAndPath("avaritia", "neutron_gear"));
-        if (Mods.biomeswevegone()) {
+        if (Mods.BIOMESWEVEGONE.isLoaded()) {
             DyeRecipes.BWG.forEach((k, v) -> {
                 filters.add(RLUtils.fromNamespaceAndPath("minecraft", k + "_dye_from_bwg_dye_tag"));
                 if (v) filters.add(RLUtils.fromNamespaceAndPath("minecraft", k + "_dye_from_bwg_2_dye_tag"));

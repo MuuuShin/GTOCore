@@ -1,6 +1,7 @@
 package com.gtocore.common.machine.multiblock.electric.processing;
 
 import com.gtocore.common.data.GTORecipeTypes;
+import com.gtocore.common.machine.multiblock.electric.space.spacestaion.AbstractSpaceStation;
 
 import com.gtolib.api.GTOValues;
 import com.gtolib.api.gui.ParallelConfigurator;
@@ -30,9 +31,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -74,8 +73,12 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
             GTRecipeTypes.ORE_WASHER_RECIPES,
             GTRecipeTypes.CHEMICAL_RECIPES,
             GTRecipeTypes.FLUID_SOLIDFICATION_RECIPES,
+            GTRecipeTypes.AUTOCLAVE_RECIPES,
             GTRecipeTypes.ALLOY_SMELTER_RECIPES,
             GTRecipeTypes.ARC_FURNACE_RECIPES,
+            GTRecipeTypes.CANNER_RECIPES,
+            GTRecipeTypes.BREWING_RECIPES,
+            GTRecipeTypes.ELECTROMAGNETIC_SEPARATOR_RECIPES,
             GTORecipeTypes.ARC_GENERATOR_RECIPES,
             GTORecipeTypes.LOOM_RECIPES,
             GTORecipeTypes.LAMINATOR_RECIPES,
@@ -90,14 +93,6 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
             c.append(Component.translatable("gtceu." + r.registryName.getPath()));
         }
         return c;
-    }
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            ProcessingPlantMachine.class, StorageMultiblockMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Nullable
@@ -131,14 +126,14 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
     }
 
     @Override
-    protected boolean beforeWorking(@Nullable Recipe recipe) {
+    protected boolean beforeWorking(Recipe recipe) {
         if (mismatched || isEmpty()) return false;
         return super.beforeWorking(recipe);
     }
 
     @Nullable
     @Override
-    protected Recipe getRealRecipe(@NotNull Recipe recipe) {
+    protected Recipe getRealRecipe(Recipe recipe) {
         if (!mismatched && !isEmpty()) {
             return RecipeModifierFunction.overclocking(this, recipe, false, 0.9, 0.8, 0.5);
         }
@@ -210,7 +205,7 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
     }
 
     @Override
-    public long getParallelLong() {
+    public long getParallel() {
         return customParallelTrait.getParallel();
     }
 
@@ -221,7 +216,7 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
 
     @Override
     public void setCleanroom(@Nullable ICleanroomProvider provider) {
-        if (provider instanceof CleanroomMachine) super.setCleanroom(provider);
+        if (provider instanceof CleanroomMachine || provider instanceof AbstractSpaceStation) super.setCleanroom(provider);
     }
 
     @Override

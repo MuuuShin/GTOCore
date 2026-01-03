@@ -2,18 +2,18 @@ package com.gtocore.common.machine.multiblock.part;
 
 import com.gtocore.common.data.GTOItems;
 
-import com.gtolib.api.machine.part.ItemHatchPartMachine;
+import com.gtolib.api.machine.part.WorkableItemPartMachine;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiController;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Item;
 
 import com.google.common.collect.ImmutableMap;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import java.util.Map;
 
@@ -21,7 +21,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class SpoolHatchPartMachine extends ItemHatchPartMachine implements IInteractedMachine {
+public final class SpoolHatchPartMachine extends WorkableItemPartMachine implements IInteractedMachine {
 
     public static final Map<Item, Integer> SPOOL;
 
@@ -35,9 +35,6 @@ public final class SpoolHatchPartMachine extends ItemHatchPartMachine implements
         SPOOL = spoolBuilder.build();
     }
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            SpoolHatchPartMachine.class, ItemHatchPartMachine.MANAGED_FIELD_HOLDER);
-
     @Persisted
     private boolean isWorking;
 
@@ -46,20 +43,14 @@ public final class SpoolHatchPartMachine extends ItemHatchPartMachine implements
     }
 
     @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    @Override
-    public boolean beforeWorking(IWorkableMultiController controller) {
+    public boolean beforeWorking(IWorkableMultiController controller, GTRecipe recipe) {
         isWorking = true;
-        return super.beforeWorking(controller);
+        return true;
     }
 
     @Override
-    public boolean afterWorking(IWorkableMultiController controller) {
+    public void afterWorking(IWorkableMultiController controller) {
         isWorking = false;
-        return super.afterWorking(controller);
     }
 
     @Override

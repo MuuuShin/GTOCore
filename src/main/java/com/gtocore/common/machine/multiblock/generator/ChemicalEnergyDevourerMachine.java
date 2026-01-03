@@ -3,7 +3,7 @@ package com.gtocore.common.machine.multiblock.generator;
 import com.gtocore.client.forge.ForgeClientEvent;
 import com.gtocore.common.machine.multiblock.part.InfiniteIntakeHatchPartMachine;
 
-import com.gtolib.api.machine.feature.multiblock.IHighlightMachine;
+import com.gtolib.api.machine.feature.multiblock.ICustomHighlightMachine;
 import com.gtolib.api.machine.multiblock.ElectricMultiblockMachine;
 import com.gtolib.api.recipe.Recipe;
 import com.gtolib.api.recipe.modifier.ParallelLogic;
@@ -14,7 +14,6 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.fluids.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
-import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfiguratorButton;
 import com.gregtechceu.gtceu.api.gui.fancy.TooltipsPanel;
 import com.gregtechceu.gtceu.api.machine.ConditionalSubscriptionHandler;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
@@ -33,7 +32,6 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -42,9 +40,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class ChemicalEnergyDevourerMachine extends ElectricMultiblockMachine implements IHighlightMachine {
+public final class ChemicalEnergyDevourerMachine extends ElectricMultiblockMachine implements ICustomHighlightMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(ChemicalEnergyDevourerMachine.class, ElectricMultiblockMachine.MANAGED_FIELD_HOLDER);
     private static final FluidStack DINITROGEN_TETROXIDE_STACK = GTMaterials.DinitrogenTetroxide.getFluid(480);
     private static final FluidStack LIQUID_OXYGEN_STACK = GTMaterials.Oxygen.getFluid(FluidStorageKeys.LIQUID, 320);
     private static final FluidStack LUBRICANT_STACK = GTMaterials.Lubricant.getFluid(10);
@@ -62,7 +59,7 @@ public final class ChemicalEnergyDevourerMachine extends ElectricMultiblockMachi
     public ChemicalEnergyDevourerMachine(MetaMachineBlockEntity holder) {
         super(holder);
         this.tank = new NotifiableFluidTank(this, 1, 512000, IO.IN, IO.NONE);
-        tankSubs = new ConditionalSubscriptionHandler(this, this::intake, () -> isFormed && !isIntakesObstructed());
+        tankSubs = new ConditionalSubscriptionHandler(this, this::intake, 20, () -> isFormed && !isIntakesObstructed());
     }
 
     @Override
@@ -78,20 +75,13 @@ public final class ChemicalEnergyDevourerMachine extends ElectricMultiblockMachi
     }
 
     private void intake() {
-        if (getOffsetTimer() % 20 == 0) {
-            var fluid = InfiniteIntakeHatchPartMachine.AIR_MAP.get(getLevel().dimension().location());
-            if (fluid == null) {
-                tankSubs.unsubscribe();
-                return;
-            }
-            tank.fillInternal(new FluidStack(fluid, 64000), IFluidHandler.FluidAction.EXECUTE);
-            tankSubs.updateSubscription();
+        var fluid = InfiniteIntakeHatchPartMachine.AIR_MAP.get(getLevel().dimension().location());
+        if (fluid == null) {
+            tankSubs.unsubscribe();
+            return;
         }
-    }
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
+        tank.fillInternal(new FluidStack(fluid, 64000), IFluidHandler.FluidAction.EXECUTE);
+        tankSubs.updateSubscription();
     }
 
     @Override
@@ -143,7 +133,7 @@ public final class ChemicalEnergyDevourerMachine extends ElectricMultiblockMachi
     protected Recipe getRealRecipe(Recipe recipe) {
         var EUt = recipe.getOutputEUt();
         if (EUt > 0 && notConsumableFluid(LUBRICANT_STACK) && !isIntakesObstructed()) {
-            recipe = ParallelLogic.accurateParallel(this, recipe, getOverclockVoltage() / EUt);
+            recipe = ParallelLogic.accurateContentParallel(this, recipe, getOverclockVoltage() / EUt);
             if (recipe == null) return null;
             if (isOxygenBoosted && isDinitrogenTetroxideBoosted) {
                 recipe.setOutputEUt(EUt * recipe.parallels * 4);
@@ -209,21 +199,17 @@ public final class ChemicalEnergyDevourerMachine extends ElectricMultiblockMachi
     }
 
     @Override
-    public List<BlockPos> getHighlightPos() {
-        return List.of();
+    public List<Component> getHighlightText() {
+        return List.of(Component.translatable("gtocore.machine.highlight_obstruction"));
     }
 
     @Override
-    public void attachHighlightConfigurators(ConfiguratorPanel configuratorPanel) {
-        configuratorPanel.attachConfigurators(new IFancyConfiguratorButton.Toggle(
-                GuiTextures.LIGHT_ON, GuiTextures.LIGHT_ON, () -> false,
-                (clickData, pressed) -> {
-                    if (clickData.isRemote && this.isFormed() && this.self().getLevel() != null) {
-                        ForgeClientEvent.CUstomHighlightNeeds.computeIfAbsent(
-                                new ForgeClientEvent.HighlightNeed(highlightStartPos, highlightEndPos, ChatFormatting.GOLD.getColor()),
-                                k -> 400);
-                    }
-                })
-                .setTooltipsSupplier(pressed -> List.of(Component.translatable("gtocore.machine.highlight_obstruction"))));
+    public List<ForgeClientEvent.HighlightNeed> getCustomHighlights() {
+        return List.of(new ForgeClientEvent.HighlightNeed(highlightStartPos, highlightEndPos, ChatFormatting.GOLD.getColor()));
+    }
+
+    @Override
+    public int getHighlightMilliseconds() {
+        return 20000;
     }
 }

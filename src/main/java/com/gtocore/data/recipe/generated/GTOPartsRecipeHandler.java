@@ -21,6 +21,7 @@ import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
+import com.gregtechceu.gtceu.common.data.GTRecipeCategories;
 import com.gregtechceu.gtceu.common.item.tool.CoatedTurbineRotorBehaviour;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
@@ -592,7 +593,6 @@ final class GTOPartsRecipeHandler {
         ItemStack stack = ChemicalHelper.get(turbineBlade, material);
         if (stack.isEmpty()) return;
         int mass = (int) material.getMass();
-        // noinspection ConstantConditions
 
         ASSEMBLER_RECIPES.recipeBuilder("assemble_" + material.getName() + "_turbine_blade")
                 .inputItems(stack.copyWithCount(8))
@@ -600,6 +600,22 @@ final class GTOPartsRecipeHandler {
                 .outputItems(turbineRotor, material)
                 .duration(200)
                 .EUt(400)
+                .save();
+
+        MACERATOR_RECIPES.recipeBuilder("macerate_" + material.getName() + "_turbine_blade")
+                .inputItems(turbineRotor, material)
+                .outputItems(dustSmall, material, 2)
+                .duration(mass << 4)
+                .category(GTRecipeCategories.MACERATOR_RECYCLING)
+                .EUt(30)
+                .save();
+
+        MACERATOR_RECIPES.recipeBuilder("macerate_" + material.getName() + "_turbine_blade_coated")
+                .inputItems(turbineRotorCoated, material)
+                .outputItems(dustSmall, material, 2)
+                .duration(mass << 4)
+                .category(GTRecipeCategories.MACERATOR_RECYCLING)
+                .EUt(30)
                 .save();
 
         FORMING_PRESS_RECIPES.recipeBuilder("press_" + material.getName() + "_turbine_rotor")
@@ -620,8 +636,8 @@ final class GTOPartsRecipeHandler {
             ELECTROPLATING_RECIPES.recipeBuilder("electroplate_%s_%s_turbine_rotor".formatted(material.getName(), plating.getName()))
                     .inputItems(turbineRotor, material)
                     .inputItems(plateDouble, plating, 5)
-                    .inputFluids(DistilledWater.getFluid(1000))
-                    .inputFluids(electrolyteMaterial.getFluid(250))
+                    .inputFluids(DistilledWater, 1000)
+                    .inputFluids(electrolyteMaterial, 250)
                     .outputItems(rotorStack)
                     .outputFluids(wasteMaterial.getFluid(1000))
                     .category(GTORecipeCategories.ROTOR_PLATING)
@@ -702,7 +718,7 @@ final class GTOPartsRecipeHandler {
         ItemStack data = GTOItems.DATA_DISC.get().getDisc(motorEnclosureStack);
 
         SCANNER_RECIPES.recipeBuilder(material.getName() + "_motor_enclosure")
-                .inputItems(GTOItems.DATA_DISC.asItem())
+                .inputItems(GTOItems.DATA_DISC)
                 .inputItems(motorEnclosureStack)
                 .outputItems(data)
                 .EUt((long) GTOUtils.getVoltageMultiplier(material) << 4)
@@ -740,7 +756,7 @@ final class GTOPartsRecipeHandler {
         ItemStack data = GTOItems.DATA_DISC.get().getDisc(pumpBarrelStack);
 
         SCANNER_RECIPES.recipeBuilder(material.getName() + "_pump_barrel")
-                .inputItems(GTOItems.DATA_DISC.asItem())
+                .inputItems(GTOItems.DATA_DISC)
                 .inputItems(pumpBarrelStack)
                 .outputItems(data)
                 .EUt((long) GTOUtils.getVoltageMultiplier(material) << 4)
@@ -778,7 +794,7 @@ final class GTOPartsRecipeHandler {
         ItemStack data = GTOItems.DATA_DISC.get().getDisc(pistonHousingStack);
 
         SCANNER_RECIPES.recipeBuilder(material.getName() + "_piston_housing")
-                .inputItems(GTOItems.DATA_DISC.asItem())
+                .inputItems(GTOItems.DATA_DISC)
                 .inputItems(pistonHousingStack)
                 .outputItems(data)
                 .EUt((long) GTOUtils.getVoltageMultiplier(material) << 4)
@@ -817,7 +833,7 @@ final class GTOPartsRecipeHandler {
         ItemStack data = GTOItems.DATA_DISC.get().getDisc(emitterBasesStack);
 
         SCANNER_RECIPES.recipeBuilder(material.getName() + "_emitter_base")
-                .inputItems(GTOItems.DATA_DISC.asItem())
+                .inputItems(GTOItems.DATA_DISC)
                 .inputItems(emitterBasesStack)
                 .outputItems(data)
                 .EUt((long) GTOUtils.getVoltageMultiplier(material) << 4)
@@ -855,7 +871,7 @@ final class GTOPartsRecipeHandler {
         ItemStack data = GTOItems.DATA_DISC.get().getDisc(sensorCasingStack);
 
         SCANNER_RECIPES.recipeBuilder(material.getName() + "_sensor_casing")
-                .inputItems(GTOItems.DATA_DISC.asItem())
+                .inputItems(GTOItems.DATA_DISC)
                 .inputItems(sensorCasingStack)
                 .outputItems(data)
                 .EUt((long) GTOUtils.getVoltageMultiplier(material) << 4)
@@ -893,7 +909,7 @@ final class GTOPartsRecipeHandler {
         ItemStack data = GTOItems.DATA_DISC.get().getDisc(fieldGeneratorCasingStack);
 
         SCANNER_RECIPES.recipeBuilder(material.getName() + "_field_generator_casing")
-                .inputItems(GTOItems.DATA_DISC.asItem())
+                .inputItems(GTOItems.DATA_DISC)
                 .inputItems(fieldGeneratorCasingStack)
                 .outputItems(data)
                 .EUt((long) GTOUtils.getVoltageMultiplier(material) << 4)
@@ -914,7 +930,7 @@ final class GTOPartsRecipeHandler {
         ItemStack stack = ChemicalHelper.get(CATALYST, material);
         if (stack.isEmpty()) return;
         ASSEMBLER_RECIPES.recipeBuilder(material.getName() + "_catalyst")
-                .inputItems(GTOItems.CATALYST_BASE.asItem())
+                .inputItems(GTOItems.CATALYST_BASE)
                 .inputItems(dust, material, 16)
                 .outputItems(stack)
                 .duration((int) material.getMass() << 2)
@@ -924,10 +940,10 @@ final class GTOPartsRecipeHandler {
     }
 
     private static void processroughBlank(Material material) {
-        ItemStack stack = ChemicalHelper.get(ROUGH_BLANK, material);
-        if (stack.isEmpty()) return;
-        ItemStack stack1 = ChemicalHelper.get(block, material);
         ItemStack stack2 = ChemicalHelper.get(BRICK, material);
+        if (stack2.isEmpty()) return;
+        ItemStack stack = ChemicalHelper.get(ROUGH_BLANK, material);
+        ItemStack stack1 = ChemicalHelper.get(block, material);
         SINTERING_FURNACE_RECIPES.recipeBuilder(material.getName() + "_rough_blank")
                 .inputItems(stack)
                 .outputItems(stack1)
@@ -965,7 +981,7 @@ final class GTOPartsRecipeHandler {
 
         AUTOCLAVE_RECIPES.recipeBuilder("%s_seed".formatted(material.getName()))
                 .inputItems(stack1)
-                .inputFluids(DistilledWater.getFluid(800))
+                .inputFluids(DistilledWater, 800)
                 .outputItems(stack)
                 .duration((int) (material.getMass() << 2))
                 .EUt(7)

@@ -14,10 +14,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+@Getter
 public final class DroneBehavior extends ElectricStats {
 
     private final int range;
@@ -45,8 +47,8 @@ public final class DroneBehavior extends ElectricStats {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {}
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    public void appendTooltips(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+        super.appendTooltips(stack, level, tooltipComponents, isAdvanced);
         tooltipComponents.add(Component.translatable("gui.ae2.WirelessRange", range));
         if (stack.getOrCreateTag().getInt("work") > 0) {
             tooltipComponents.add(Component.translatable("gtceu.multiblock.large_miner.working"));
@@ -63,9 +65,5 @@ public final class DroneBehavior extends ElectricStats {
             }
         }
         return null;
-    }
-
-    public int getRange() {
-        return this.range;
     }
 }

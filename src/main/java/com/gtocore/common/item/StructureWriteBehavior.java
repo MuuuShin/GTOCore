@@ -4,10 +4,7 @@ import com.gtocore.common.data.GTOBlocks;
 
 import com.gtolib.GTOCore;
 import com.gtolib.api.pattern.DebugBlockPattern;
-import com.gtolib.utils.ItemUtils;
-import com.gtolib.utils.RegistriesUtils;
-import com.gtolib.utils.StringIndex;
-import com.gtolib.utils.StringUtils;
+import com.gtolib.utils.*;
 
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.item.ComponentItem;
@@ -42,6 +39,7 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -92,7 +90,7 @@ public final class StructureWriteBehavior implements IItemUIFactory {
         if (getPos(playerInventoryHolder.getHeld()) != null && playerInventoryHolder.getPlayer() instanceof ServerPlayer player) {
             if (BLOCK_MAP == null) {
                 BLOCK_MAP = ImmutableMap.<Block, BiConsumer<StringBuilder, Character>>builder()
-                        .put(net.minecraft.world.level.block.Blocks.OAK_LOG, (b, c) -> b.append("controller(blocks(definition.get())))"))
+                        .put(net.minecraft.world.level.block.Blocks.OAK_LOG, (b, c) -> b.append("controller(definition))"))
                         .put(net.minecraft.world.level.block.Blocks.DIRT, (b, c) -> b.append("heatingCoils())"))
                         .put(net.minecraft.world.level.block.Blocks.WHITE_WOOL, (b, c) -> b.append("air())"))
                         .put(net.minecraft.world.level.block.Blocks.GLASS, (b, c) -> b.append("GTOPredicates.glass())"))
@@ -121,11 +119,7 @@ public final class StructureWriteBehavior implements IItemUIFactory {
             RelativeDirection[] dirs = DebugBlockPattern.getDir(direction);
             blockPattern.changeDir(dirs[0], dirs[1], dirs[2]);
             builder.append("\n.block(").append(convertBlockToString(RegistriesUtils.getBlock(part), part, StringUtils.decompose(part), true)).append(")\n");
-            builder.append(".pattern(definition -> FactoryBlockPattern.start(definition)\n");
-            for (int i = 0; i < blockPattern.pattern.length; i++) {
-                String[] strings = blockPattern.pattern[i];
-                builder.append(".aisle(\"%s\")\n".formatted(Joiner.on("\", \"").join(strings)));
-            }
+            builder.append(".pattern(definition -> MultiBlockFileReader.start(definition)\n");
             blockPattern.legend.forEach((b, c) -> {
                 if (c.equals(' ')) return;
                 if (BLOCK_MAP.containsKey(b)) {
@@ -153,6 +147,12 @@ public final class StructureWriteBehavior implements IItemUIFactory {
             });
             if (blockPattern.hasAir) builder.append(".where(' ', any())\n");
             builder.append(".build())\n");
+            FileUtils.saveToFile(blockPattern.pattern, new File(GTOCore.getFile(), "structure_pattern.mbs"), FileUtils.Serialize.array(FileUtils.Serialize.array(FileUtils.Serializer.STRING)));
+            FileUtils.saveToFile(builder.toString(), new File(GTOCore.getFile(), "structure_pattern.txt"), FileUtils.Serializer.TXT_STRING);
+            for (int i = 0; i < blockPattern.pattern.length; i++) {
+                String[] strings = blockPattern.pattern[i];
+                builder.append(".aisle(\"%s\")\n".formatted(Joiner.on("\", \"").join(strings)));
+            }
             GTOCore.LOGGER.info(builder.toString());
         }
     }

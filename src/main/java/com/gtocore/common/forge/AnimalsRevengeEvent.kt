@@ -1,6 +1,7 @@
 package com.gtocore.common.forge
 
 import com.gtocore.api.misc.AnimalsRevengeAttackGoal
+import com.gtocore.common.data.GTOLoots
 import com.gtocore.config.GTOConfig
 
 import net.minecraft.core.RegistryAccess
@@ -8,11 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.Mob
-import net.minecraft.world.entity.MobCategory
-import net.minecraft.world.entity.PathfinderMob
+import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -30,20 +27,13 @@ import net.minecraftforge.event.level.LevelEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 
 import com.gregtechceu.gtceu.api.machine.TickableSubscription
-import com.gregtechceu.gtceu.utils.GTUtil
 import com.gregtechceu.gtceu.utils.TaskHandler
 import com.gtolib.api.annotation.DataGeneratorScanned
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.*
 
-import java.util.UUID
+import java.util.*
 import kotlin.math.max
 
 @DataGeneratorScanned
@@ -116,8 +106,8 @@ object AnimalsRevengeEvent {
     private fun triggerCannibalismEffect(serverLevel: ServerLevel, player: ServerPlayer, eaten: ItemStack) {
         if (!ensureLootCache(serverLevel)) return
 
-        val radius = max(1, GTOConfig.INSTANCE.cannibalismRadius)
-        val damage = max(0.0f, GTOConfig.INSTANCE.cannibalismDamage)
+        val radius = max(1, GTOConfig.INSTANCE.mobConfig.cannibalismRadius)
+        val damage = max(0.0f, GTOConfig.INSTANCE.mobConfig.cannibalismDamage)
         if (damage <= 0.0f) return
 
         val center: Vec3 = player.position().add(0.0, 0.1, 0.0)
@@ -145,7 +135,7 @@ object AnimalsRevengeEvent {
                     }
                     holder[0]?.unsubscribe()
                 }
-            }, GTUtil.NOOP, 1)
+            }, 0, 1)
         }
     }
 
@@ -167,7 +157,7 @@ object AnimalsRevengeEvent {
             tag.putBoolean("gtocore_temp_aggressive", true)
             pm.goalSelector.addGoal(
                 1,
-                AnimalsRevengeAttackGoal(pm, 1.2, 1.6, 20, max(1.0f, GTOConfig.INSTANCE.cannibalismDamage)),
+                AnimalsRevengeAttackGoal(pm, 1.2, 1.6, 20, max(1.0f, GTOConfig.INSTANCE.mobConfig.cannibalismDamage)),
             )
             pm.targetSelector.addGoal(1, NearestAttackableTargetGoal(pm, ServerPlayer::class.java, true))
         }
@@ -209,7 +199,7 @@ object AnimalsRevengeEvent {
                     lootCacheBuilt = true
                     if (cont.isActive) cont.resume(Unit) {}
                 }
-            }, GTUtil.NOOP, 1)
+            }, 0, 1)
 
             cont.invokeOnCancellation { subHolder[0]?.unsubscribe() }
         }
@@ -228,9 +218,11 @@ object AnimalsRevengeEvent {
             .create(LootContextParamSets.ENTITY)
 
         repeat(32) {
+            GTOLoots.modifyLoot = false
             for (stack in table.getRandomItems(params)) {
                 if (!stack.isEmpty) result.add(stack.item)
             }
+            GTOLoots.modifyLoot = true
         }
         return result
     }
@@ -271,7 +263,7 @@ object AnimalsRevengeEvent {
             // 烹饪派生
             fillCookedOutputs(level.recipeManager, level.registryAccess(), base, derived)
             // 合成派生（允许使用由基础烹饪得到的物品）
-            val cookedFromBase = ObjectOpenHashSet<Item>(derived)
+            val cookedFromBase = ObjectOpenHashSet(derived)
             cookedFromBase.removeAll(base)
             fillCraftingOutputs(level.recipeManager, level.registryAccess(), base, cookedFromBase, derived)
         }

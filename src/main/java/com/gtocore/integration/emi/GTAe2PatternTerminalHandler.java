@@ -4,6 +4,7 @@ import com.gtocore.integration.emi.multipage.MultiblockInfoEmiRecipe;
 
 import com.gtolib.api.ae2.IPatterEncodingTermMenu;
 import com.gtolib.api.recipe.RecipeBuilder;
+import com.gtolib.utils.ClientUtil;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -15,11 +16,11 @@ import net.minecraft.world.inventory.Slot;
 
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
+import appeng.integration.modules.emi.EmiStackHelper;
 import appeng.integration.modules.jeirei.EncodingHelper;
 import appeng.integration.modules.jeirei.TransferHelper;
 import appeng.menu.me.common.GridInventoryEntry;
 import appeng.menu.me.items.PatternEncodingTermMenu;
-import com.hepdd.ae2emicraftingforge.client.helper.mapper.EmiStackHelper;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
@@ -33,13 +34,11 @@ import dev.emi.emi.recipe.EmiStonecuttingRecipe;
 import dev.emi.emi.screen.RecipeScreen;
 import vazkii.botania.client.integration.emi.BotaniaEmiRecipe;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.hepdd.ae2emicraftingforge.client.helper.rendering.Rendering.getInnerBounds;
-import static com.hepdd.ae2emicraftingforge.client.helper.rendering.Rendering.isInputSlot;
+import static appeng.integration.modules.emi.AbstractRecipeHandler.getInnerBounds;
+import static appeng.integration.modules.emi.AbstractRecipeHandler.isInputSlot;
 
 final class GTAe2PatternTerminalHandler<T extends PatternEncodingTermMenu> implements EmiRecipeHandler<T> {
 
@@ -71,7 +70,7 @@ final class GTAe2PatternTerminalHandler<T extends PatternEncodingTermMenu> imple
         var anyCraftable = recipe.getInputs().stream()
                 .anyMatch(ing -> isCraftable(craftableKeys, ing));
         var gatheredTooltip = anyCraftable ? TransferHelper.createEncodingTooltip(true) : new ArrayList<Component>();
-        gatheredTooltip.addAll(getCatalystTooltip());
+        gatheredTooltip.addAll(getCatalystTooltip(recipe));
         return gatheredTooltip.stream()
                 .map(Component::getVisualOrderText)
                 .map(ClientTooltipComponent::create)
@@ -102,11 +101,20 @@ final class GTAe2PatternTerminalHandler<T extends PatternEncodingTermMenu> imple
         poseStack.popPose();
     }
 
-    private static List<Component> getCatalystTooltip() {
-        return List.of(
-                Component.translatable("gtocore.ae.appeng.me2in1.emi.catalyst").withStyle(ChatFormatting.AQUA),
-                Component.translatable("gtocore.ae.appeng.me2in1.emi.catalyst.fill").withStyle(ChatFormatting.GREEN),
-                Component.translatable("gtocore.ae.appeng.me2in1.emi.catalyst.virtual").withStyle(ChatFormatting.DARK_GREEN));
+    private static List<Component> getCatalystTooltip(EmiRecipe emiRecipe) {
+        if (emiRecipe instanceof MultiblockInfoEmiRecipe recipe) {
+            if (recipe.definition.getSubPatternFactory() != null) {
+                return List.of(
+                        Component.translatable("gtocore.ae.appeng.me2in1.emi.multiblock.sub").withStyle(ChatFormatting.GREEN),
+                        Component.translatable("gtocore.ae.appeng.me2in1.emi.multiblock.sub.all").withStyle(ChatFormatting.DARK_GREEN));
+            }
+            return Collections.emptyList();
+        } else {
+            return List.of(
+                    Component.translatable("gtocore.ae.appeng.me2in1.emi.catalyst").withStyle(ChatFormatting.AQUA),
+                    Component.translatable("gtocore.ae.appeng.me2in1.emi.catalyst.fill").withStyle(ChatFormatting.GREEN),
+                    Component.translatable("gtocore.ae.appeng.me2in1.emi.catalyst.virtual").withStyle(ChatFormatting.DARK_GREEN));
+        }
     }
 
     private static boolean isCraftable(Set<AEKey> craftableKeys, EmiIngredient ingredient) {
@@ -124,12 +132,15 @@ final class GTAe2PatternTerminalHandler<T extends PatternEncodingTermMenu> imple
     @Override
     public boolean craft(EmiRecipe recipe, EmiCraftContext<T> context) {
         T menu = context.getScreenHandler();
+        ((IPatterEncodingTermMenu) menu).gtolib$addUUID(ClientUtil.getUUID());
         if (isCrafting(recipe)) {
             EncodingHelper.encodeCraftingRecipe(menu, recipe.getBackingRecipe(), GTEmiEncodingHelper.ofInputs(recipe), i -> true);
         } else {
             if (recipe instanceof GTEMIRecipe gtemiRecipe && RecipeBuilder.RECIPE_MAP.containsKey(gtemiRecipe.getId())) {
                 ((IPatterEncodingTermMenu) menu).gtolib$addRecipe(gtemiRecipe.getId().toString());
-            } else((IPatterEncodingTermMenu) menu).gtolib$addRecipe("");
+            } else {
+                ((IPatterEncodingTermMenu) menu).gtolib$addRecipe("");
+            }
             EncodingHelper.encodeProcessingRecipe(menu,
                     GTEmiEncodingHelper.ofInputs(recipe),
                     ofOutputs(recipe));

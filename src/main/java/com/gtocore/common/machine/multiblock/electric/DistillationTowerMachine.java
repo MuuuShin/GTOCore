@@ -1,8 +1,9 @@
 package com.gtocore.common.machine.multiblock.electric;
 
 import com.gtolib.api.machine.multiblock.ElectricMultiblockMachine;
+import com.gtolib.api.machine.trait.IEnhancedRecipeLogic;
 import com.gtolib.api.machine.trait.InaccessibleInfiniteTank;
-import com.gtolib.api.recipe.AsyncRecipeOutputTask;
+import com.gtolib.api.misc.AsyncTask;
 import com.gtolib.api.recipe.Recipe;
 import com.gtolib.api.recipe.RecipeRunner;
 import com.gtolib.api.recipe.ingredient.FastFluidIngredient;
@@ -14,6 +15,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
@@ -26,7 +28,6 @@ import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.templates.VoidFluidHandler;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.*;
 
@@ -56,10 +57,10 @@ public class DistillationTowerMachine extends ElectricMultiblockMachine {
     public void onStructureFormed() {
         super.onStructureFormed();
         final int startY = getPos().getY() + 1;
-        List<IMultiPart> parts = getParts().stream().filter(part -> PartAbility.EXPORT_FLUIDS.isApplicable(part.self().getBlockState().getBlock())).filter(part -> part.self().getPos().getY() >= startY).toList();
+        List<IWorkableMultiPart> parts = Arrays.stream(getParts()).filter(IWorkableMultiPart.class::isInstance).map(IWorkableMultiPart.class::cast).filter(part -> PartAbility.EXPORT_FLUIDS.isApplicable(part.self().getBlockState().getBlock())).filter(part -> part.self().getPos().getY() >= startY).toList();
         if (!parts.isEmpty()) {
             int maxY = parts.get(parts.size() - 1).self().getPos().getY();
-            fluidOutputs = new ObjectArrayList<>(maxY - startY);
+            fluidOutputs = new ArrayList<>(maxY - startY);
             int outputIndex = 0;
             for (int y = startY; y <= maxY; ++y) {
                 if (parts.size() <= outputIndex) {
@@ -92,7 +93,7 @@ public class DistillationTowerMachine extends ElectricMultiblockMachine {
         super.onStructureInvalid();
     }
 
-    private static final class DistillationTowerLogic extends RecipeLogic {
+    private static final class DistillationTowerLogic extends RecipeLogic implements IEnhancedRecipeLogic {
 
         @Persisted
         private GTRecipe workingRecipe = null;
@@ -156,7 +157,7 @@ public class DistillationTowerMachine extends ElectricMultiblockMachine {
                 return handleIO;
             }
             if (getMachine().isDualMEOutput(recipe)) {
-                AsyncRecipeOutputTask.addAsyncLogic(this, () -> output((Recipe) recipe));
+                AsyncTask.addAsyncTask(this, () -> output((Recipe) recipe));
             } else {
                 output((Recipe) recipe);
             }

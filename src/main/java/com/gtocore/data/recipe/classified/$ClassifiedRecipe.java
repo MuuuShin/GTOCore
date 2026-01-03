@@ -12,14 +12,15 @@ public final class $ClassifiedRecipe {
         DissolutionTreatment.init();
         VacuumDrying.init();
         FlotatingBeneficiation.init();
+        SpaceDebrisCollection.init();
         AlloySmelter.init();
         AtomicEnergyExcitation.init();
         FuelRefining.init();
         NanoForge.init();
         NanitesIntegratedProcessingCenter.init();
         PetrochemicalPlant.init();
+        PigmentMixing.init();
         UltimateMaterialForge.init();
-        GravitationShockburst.init();
         BedrockDrillingRig.init();
         QuantumForceTransformer.init();
         NeutronCompressor.init();
@@ -96,8 +97,6 @@ public final class $ClassifiedRecipe {
         AlloyBlast.init();
         Extruder.init();
         Brewing.init();
-        CreateAggregation.init();
-        DoorOfCreate.init();
         HeatExchanger.init();
         DragonEggCopier.init();
         LavaFurnace.init();
@@ -106,10 +105,12 @@ public final class $ClassifiedRecipe {
         RocketAssembler.init();
         AlchemyCauldron.init();
         PolymerizationReactor.init();
+        MicrogravityNanofabrication.init();
         Unpacker.init();
         WaterPurificationPlant.init();
         PhysicalVaporDeposition.init();
         ChemicalVaporDepositio.init();
+        SuperMaterialForge.init();
         ElectricCooking.init();
         Crystallization.init();
         BiochemicalExtraction.init();

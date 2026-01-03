@@ -1,14 +1,18 @@
 package com.gtocore.mixin.ae2.stacks;
 
 import com.gtolib.IFluid;
+import com.gtolib.api.ae2.stacks.IAEFluidKey;
+import com.gtolib.api.misc.IMapValueCache;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 
 import appeng.api.stacks.AEFluidKey;
+import com.fast.recipesearch.IntLongMap;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,15 +20,14 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(AEFluidKey.class)
-public class AEFluidKeyMixin {
+public class AEFluidKeyMixin implements IAEFluidKey {
 
     @Shadow(remap = false)
     @Final
     private Fluid fluid;
 
     @Shadow(remap = false)
-    @Final
-    private @Nullable CompoundTag tag;
+    private @Nullable FluidStack readOnlyStack;
 
     /**
      * @author .
@@ -35,7 +38,33 @@ public class AEFluidKeyMixin {
         if (tag == null || tag.isEmpty()) {
             return ((IFluid) fluid).gtolib$getAEKey();
         }
-        return AEFluidKeyInvoker.of(fluid, tag.copy());
+        return IMapValueCache.FLUID_KEY_CACHE.get(new FluidStack(fluid, 1, tag));
+    }
+
+    /**
+     * @author .
+     * @reason .
+     */
+    @Overwrite(remap = false)
+    public static AEFluidKey of(Fluid fluid) {
+        return ((IFluid) fluid).gtolib$getAEKey();
+    }
+
+    /**
+     * @author .
+     * @reason .
+     */
+    @Overwrite(remap = false)
+    public static @Nullable AEFluidKey of(FluidStack fluidVariant) {
+        if (fluidVariant.isEmpty()) {
+            return null;
+        }
+        var fluid = fluidVariant.getFluid();
+        var tag = fluidVariant.getTag();
+        if (tag == null || tag.isEmpty()) {
+            return ((IFluid) fluid).gtolib$getAEKey();
+        }
+        return IMapValueCache.FLUID_KEY_CACHE.get(fluidVariant);
     }
 
     /**
@@ -49,7 +78,7 @@ public class AEFluidKeyMixin {
         if (tag == null || tag.isEmpty()) {
             return ((IFluid) fluid).gtolib$getAEKey();
         }
-        return AEFluidKeyInvoker.of(fluid, tag);
+        return IMapValueCache.FLUID_KEY_CACHE.get(new FluidStack(fluid, 1, tag));
     }
 
     /**
@@ -61,27 +90,13 @@ public class AEFluidKeyMixin {
         return ((IFluid) fluid).gtolib$getIdLocation();
     }
 
-    /**
-     * @author .
-     * @reason .
-     */
-    @Overwrite(remap = false)
-    public CompoundTag toTag() {
-        CompoundTag result = new CompoundTag();
-        result.putString("id", ((IFluid) fluid).gtolib$getIdString());
-        if (tag != null) {
-            result.put("tag", tag.copy());
-        }
-        return result;
+    @Override
+    public void gtolib$setReadOnlyStack(FluidStack stack) {
+        readOnlyStack = stack;
     }
 
-    /**
-     * @author .
-     * @reason .
-     */
-    @Overwrite(remap = false)
-    public String toString() {
-        String idString = ((IFluid) fluid).gtolib$getIdString();
-        return tag == null ? idString : idString + " (+tag)";
+    @Override
+    public void gtolib$convert(long amount, IntLongMap map) {
+        map.add(((IFluid) fluid).gtolib$getMapFluid(), amount);
     }
 }

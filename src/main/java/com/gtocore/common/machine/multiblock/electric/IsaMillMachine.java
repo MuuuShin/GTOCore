@@ -13,8 +13,8 @@ import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -43,18 +43,20 @@ public final class IsaMillMachine extends ElectricMultiblockMachine {
     }
 
     @Override
-    protected boolean beforeWorking(@Nullable Recipe recipe) {
+    protected boolean beforeWorking(Recipe recipe) {
+        if (!super.beforeWorking(recipe)) return false;
         CustomItemStackHandler storage = ballHatchPartMachine.getInventory().storage;
         ItemStack item = storage.getStackInSlot(0);
         int tier = BallHatchPartMachine.GRINDBALL.getOrDefault(item.getItem(), 0);
-        if (recipe != null && tier == recipe.data.getInt("grindball")) {
-            int damage = item.getDamageValue() + MathUtil.saturatedCast(recipe.parallels);
+        if (tier == recipe.data.getInt("grindball")) {
+            var level = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, item) + 1;
+            int damage = item.getDamageValue() + MathUtil.saturatedCast(recipe.parallels / level) + 1;
             if (damage < item.getMaxDamage()) {
                 item.setDamageValue(damage);
             } else {
                 storage.setStackInSlot(0, ItemStack.EMPTY);
             }
-            return super.beforeWorking(recipe);
+            return true;
         }
         setIdleReason(IdleReason.GRIND_BALL);
         return false;

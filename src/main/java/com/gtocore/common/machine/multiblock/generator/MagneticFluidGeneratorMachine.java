@@ -1,16 +1,15 @@
 package com.gtocore.common.machine.multiblock.generator;
 
-import com.gtocore.common.machine.multiblock.part.WirelessEnergyHatchPartMachine;
-
 import com.gtolib.api.GTOValues;
+import com.gtolib.api.machine.impl.part.WirelessEnergyHatchPartMachine;
 import com.gtolib.api.machine.multiblock.TierCasingMultiblockMachine;
 import com.gtolib.api.recipe.Recipe;
 import com.gtolib.api.recipe.modifier.ParallelLogic;
 import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.feature.ITieredMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.EnergyHatchPartMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.LaserHatchPartMachine;
 
@@ -35,7 +34,7 @@ public final class MagneticFluidGeneratorMachine extends TierCasingMultiblockMac
             outputTier = laserHatchPartMachine.getTier();
             laser = true;
         } else if (part instanceof EnergyHatchPartMachine || part instanceof WirelessEnergyHatchPartMachine) {
-            outputTier = ((TieredIOPartMachine) part).getTier();
+            outputTier = ((ITieredMachine) part).getTier();
         }
     }
 

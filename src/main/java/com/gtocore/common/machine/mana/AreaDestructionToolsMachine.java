@@ -14,6 +14,7 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
+import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTItems;
@@ -28,10 +29,8 @@ import appeng.core.definitions.AEItems;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -39,10 +38,7 @@ import static com.gtocore.common.item.CoordinateCardBehavior.getStoredCoordinate
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AreaDestructionToolsMachine extends MetaMachine implements IFancyUIMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            AreaDestructionToolsMachine.class, MetaMachine.MANAGED_FIELD_HOLDER);
+public class AreaDestructionToolsMachine extends MetaMachine implements IFancyUIMachine, IMachineLife {
 
     @Persisted
     private final NotifiableItemStackHandler inventory;
@@ -71,6 +67,9 @@ public class AreaDestructionToolsMachine extends MetaMachine implements IFancyUI
                 else if (item == GTItems.SHAPE_MOLD_CYLINDER.asItem()) model = 2;
                 else if (item == GTItems.SHAPE_MOLD_BLOCK.asItem()) model = 3;
                 else if (item == AEItems.SINGULARITY.asItem()) model = 4;
+                else if (item == GTOItems.INDUSTRIAL_COMPONENTS[3][2].asItem()) explosiveEnergy += 5000L * stack.getCount();
+                else if (item == GTOItems.INDUSTRIAL_COMPONENTS[3][1].asItem()) explosiveEnergy += 1000L * stack.getCount();
+                else if (item == GTOItems.INDUSTRIAL_COMPONENTS[3][0].asItem()) explosiveEnergy += 200L * stack.getCount();
                 else if (item == GTBlocks.INDUSTRIAL_TNT.asItem()) explosiveEnergy += 30L * stack.getCount();
                 else if (item == GTOBlocks.NUKE_BOMB.asItem()) explosiveEnergy += 2048L * stack.getCount();
                 else if (item == GTOBlocks.NAQUADRIA_CHARGE.asItem()) explosiveEnergy += 3200L * stack.getCount();
@@ -94,15 +93,14 @@ public class AreaDestructionToolsMachine extends MetaMachine implements IFancyUI
     }
 
     @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    @Override
     public void onLoad() {
         super.onLoad();
         inventory.notifyListeners();
+    }
+
+    @Override
+    public void onMachineRemoved() {
+        clearInventory(inventory.storage);
     }
 
     private void triggerExplosion() {

@@ -1,5 +1,6 @@
 package com.gtocore.common.machine.multiblock.electric.space;
 
+import com.gtocore.client.hud.Configurator;
 import com.gtocore.common.data.GTOItems;
 import com.gtocore.common.data.GTOMaterials;
 
@@ -16,6 +17,8 @@ import com.gtolib.utils.RegistriesUtils;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
+import com.gregtechceu.gtceu.api.gui.GuiTextures;
+import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
@@ -27,7 +30,6 @@ import net.minecraftforge.fluids.FluidStack;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import earth.terrarium.adastra.common.registry.ModFluids;
 import earth.terrarium.adastra.common.registry.ModItems;
 import org.jetbrains.annotations.NotNull;
@@ -40,9 +42,6 @@ import java.util.Map;
 @DataGeneratorScanned
 public final class SatelliteControlCenterMachine extends ElectricMultiblockMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            SatelliteControlCenterMachine.class, ElectricMultiblockMachine.MANAGED_FIELD_HOLDER);
-
     @RegisterLanguage(en = "Selected planet: ", cn = "已选择的星球：")
     private static final String PLANET = "gtocore.satellite_control_center.planet";
 
@@ -51,6 +50,13 @@ public final class SatelliteControlCenterMachine extends ElectricMultiblockMachi
 
     @RegisterLanguage(en = "The required fuel: ", cn = "需要的燃料：")
     private static final String FUEL = "gtocore.satellite_control_center.fuel";
+
+    @RegisterLanguage(cn = "建造空间站", en = "Build Space Station")
+    private static final String BUILD_SPACE_STATION = "gtocore.satellite_control_center.emi.space_station";
+    @RegisterLanguage(cn = "在该星球建造空间站时，", en = "When building a space station on this planet,")
+    public static final String BUILD_SPACE_STATION_DESC_1 = "gtocore.satellite_control_center.emi.space_station.desc.1";
+    @RegisterLanguage(cn = "需要将这些材料带入太空中。", en = "you need to bring these materials into space.")
+    public static final String BUILD_SPACE_STATION_DESC_2 = "gtocore.satellite_control_center.emi.space_station.desc.2";
 
     private boolean launch;
 
@@ -62,6 +68,15 @@ public final class SatelliteControlCenterMachine extends ElectricMultiblockMachi
     }
 
     @Override
+    public void attachConfigurators(@NotNull ConfiguratorPanel configuratorPanel) {
+        super.attachConfigurators(configuratorPanel);
+        Configurator c;
+        configuratorPanel.attachConfigurators(
+                c = new Configurator(GuiTextures.LIGHT_ON, GuiTextures.LIGHT_OFF));
+        if (isRemote()) c.setHudInstance("adastra_hud");
+    }
+
+    @Override
     public void customText(@NotNull List<Component> textList) {
         super.customText(textList);
         var buttonText = Component.translatable(PLANET).append(Component.translatable(Wrapper.LIST[index].getKey()));
@@ -70,7 +85,7 @@ public final class SatelliteControlCenterMachine extends ElectricMultiblockMachi
         buttonText.append(" ");
         buttonText.append(ComponentPanelWidget.withButton(Component.literal("[+]"), "add"));
         textList.add(buttonText);
-        textList.add(Component.translatable("tooltip.avaritia.tier", Wrapper.LIST[index].getTier()));
+        textList.add(Component.translatable("ars_nouveau.tier", Wrapper.LIST[index].getTier()));
         Item item = getRocket(Wrapper.LIST[index].getTier());
         if (item != null) {
             textList.add(Component.translatable(ROCKET).append(item.getDescription()));
@@ -114,12 +129,6 @@ public final class SatelliteControlCenterMachine extends ElectricMultiblockMachi
     @Override
     public RecipeLogic createRecipeLogic(Object @NotNull... args) {
         return new CustomRecipeLogic(this, this::getRecipe, true);
-    }
-
-    @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     public static Dimension[] getPlanets() {

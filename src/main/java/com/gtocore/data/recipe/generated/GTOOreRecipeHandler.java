@@ -32,6 +32,7 @@ import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.data.chemical.material.info.MaterialFlags.HIGH_SIFTER_OUTPUT;
 import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.*;
+import static com.gtocore.api.data.material.GTOMaterialFlags.DISABLE_GEM_RECIPES;
 import static com.gtocore.common.data.GTORecipeTypes.*;
 
 public final class GTOOreRecipeHandler {
@@ -73,7 +74,7 @@ public final class GTOOreRecipeHandler {
                 .EUt(16);
 
         int fc = Math.max(1, crushedStack.getCount() / 2);
-        var out = material.hasProperty(PropertyKey.GEM) && !gem.isIgnored(material) ?
+        var out = material.hasProperty(PropertyKey.GEM) && !gem.isIgnored(material) && !material.hasFlag(DISABLE_GEM_RECIPES) ?
                 ChemicalHelper.get(gem, material, fc) : crushedStack.copyWithCount(fc);
         forge_builder.outputItems(out);
         forge_builder.save();
@@ -81,7 +82,7 @@ public final class GTOOreRecipeHandler {
         ToolHelper.HAMMER_DROP.put(tag, out);
 
         Material byproductMaterial = property.getOreByProduct(0, material);
-        ItemStack byproductStack = ChemicalHelper.get(gem, byproductMaterial).isEmpty() ?
+        ItemStack byproductStack = ChemicalHelper.get(gem, byproductMaterial).isEmpty() || material.hasFlag(DISABLE_GEM_RECIPES) ?
                 ChemicalHelper.get(dust, byproductMaterial) : ChemicalHelper.get(gem, byproductMaterial);
 
         Material smeltingMaterial = property.getDirectSmeltResult().isNull() ? material : property.getDirectSmeltResult();
@@ -176,7 +177,7 @@ public final class GTOOreRecipeHandler {
             opBuilder3.save();
 
             // 4 破碎-洗矿-筛选-离心
-            if (material.hasProperty(PropertyKey.GEM)) {
+            if (material.hasProperty(PropertyKey.GEM) && !material.hasFlag(DISABLE_GEM_RECIPES)) {
                 ItemStack exquisiteStack = ChemicalHelper.get(gemExquisite, material);
                 ItemStack flawlessStack = ChemicalHelper.get(gemFlawless, material);
                 ItemStack gemStack = ChemicalHelper.get(gem, material);
@@ -276,7 +277,7 @@ public final class GTOOreRecipeHandler {
                 opBuilder6.save();
 
                 // 7 破碎-浸洗-筛选-离心
-                if (material.hasProperty(PropertyKey.GEM)) {
+                if (material.hasProperty(PropertyKey.GEM) && !material.hasFlag(DISABLE_GEM_RECIPES)) {
                     ItemStack exquisiteStack = ChemicalHelper.get(gemExquisite, material);
                     ItemStack flawlessStack = ChemicalHelper.get(gemFlawless, material);
                     ItemStack gemStack = ChemicalHelper.get(gem, material);
@@ -328,16 +329,33 @@ public final class GTOOreRecipeHandler {
                 }
             }
 
-            ItemStack ingotStack = material.hasProperty(PropertyKey.INGOT) ? ChemicalHelper.get(ingot, smeltingMaterial) :
-                    material.hasProperty(PropertyKey.GEM) ? ChemicalHelper.get(gem, smeltingMaterial) :
-                            ChemicalHelper.get(dust, smeltingMaterial);
+            crushedAmount = Math.max(crushedAmount / 2, 1);
 
-            ingotStack.setCount(crushedStack.getCount());
+            ItemStack ingotStack = smeltingMaterial.hasProperty(PropertyKey.INGOT) ? ChemicalHelper.get(ingot, smeltingMaterial, crushedAmount) :
+                    material.hasProperty(PropertyKey.GEM) && !material.hasFlag(DISABLE_GEM_RECIPES) ? ChemicalHelper.get(gem, smeltingMaterial, crushedAmount) :
+                            ChemicalHelper.get(dust, smeltingMaterial, crushedAmount);
 
             if (!ingotStack.isEmpty() && doesMaterialUseNormalFurnace(smeltingMaterial) && !TagPrefix.ore.isIgnored(material)) {
                 float xp = Math.round(((1 + oreTypeMultiplier * 0.5f) * 0.5f - 0.05f) * 10.0f) / 10.0f;
                 VanillaRecipeHelper.addSmeltingRecipe(material.getName(), tag, ingotStack, xp);
                 VanillaRecipeHelper.addBlastingRecipe(material.getName(), tag, ingotStack, xp);
+                if (material.hasProperty(PropertyKey.GEM)) {
+                    AUTOCLAVE_RECIPES.builder("ore2_" + material.getName())
+                            .inputItems(crushedPurified.getItemTags(material)[0])
+                            .outputItems(ingotStack)
+                            .inputFluids(GTMaterials.DistilledWater, GTOCore.isExpert() ? 20 : 10)
+                            .EUt(GTOCore.isExpert() ? 8 : 2)
+                            .duration(100)
+                            .save();
+                    AUTOCLAVE_RECIPES.builder("ore1_" + material.getName())
+                            .inputItems(crushedPurified.getItemTags(material)[0])
+                            .outputItems(ingotStack)
+                            .inputFluids(Water, 500)
+                            .EUt(GTOCore.isExpert() ? 16 : 8)
+                            .duration(400)
+                            .save();
+                }
+
             }
         }
     }
@@ -350,9 +368,6 @@ public final class GTOOreRecipeHandler {
         int dur = (int) Math.max(6, Math.sqrt(mass) * oreTypeMultiplier * 2 / 3);
         ItemStack crushedStack = ChemicalHelper.get(crushed, material, Math.max(1, property.getOreMultiplier() * oreTypeMultiplier / 2));
         Material smeltingMaterial = property.getDirectSmeltResult().isNull() ? material : property.getDirectSmeltResult();
-        ItemStack ingotStack = material.hasProperty(PropertyKey.INGOT) ? ChemicalHelper.get(ingot, smeltingMaterial, property.getOreMultiplier()) :
-                material.hasProperty(PropertyKey.GEM) ? ChemicalHelper.get(gem, smeltingMaterial, property.getOreMultiplier()) :
-                        ChemicalHelper.get(dust, smeltingMaterial, property.getOreMultiplier());
 
         if (crushedStack.isEmpty()) return;
 
@@ -360,7 +375,7 @@ public final class GTOOreRecipeHandler {
                 .inputItems(stack)
                 .duration((dur << 2) / 5).EUt(16);
         int fc = Math.max(1, crushedStack.getCount() / 2);
-        var out = material.hasProperty(PropertyKey.GEM) && !gem.isIgnored(material) ? ChemicalHelper.get(gem, material, fc) : crushedStack.copyWithCount(fc);
+        var out = material.hasProperty(PropertyKey.GEM) && !gem.isIgnored(material) && !material.hasFlag(DISABLE_GEM_RECIPES) ? ChemicalHelper.get(gem, material, fc) : crushedStack.copyWithCount(fc);
         builder.outputItems(out);
         builder.save();
 
@@ -372,8 +387,8 @@ public final class GTOOreRecipeHandler {
                 .EUt(30).duration(dur);
 
         Material byproductMaterial = property.getOreByProduct(0, material);
-        ItemStack byproductStack = ChemicalHelper.get(gem, byproductMaterial);
-        if (byproductStack.isEmpty()) byproductStack = ChemicalHelper.get(dust, byproductMaterial);
+        ItemStack byproductStack = ChemicalHelper.get(gem, byproductMaterial).isEmpty() || material.hasFlag(DISABLE_GEM_RECIPES) ?
+                ChemicalHelper.get(dust, byproductMaterial) : ChemicalHelper.get(gem, byproductMaterial);
         builder2.chancedOutput(byproductStack, 1000, 300);
 
         for (MaterialStack secondaryMaterial : ore.secondaryMaterials()) {
@@ -446,7 +461,7 @@ public final class GTOOreRecipeHandler {
         opBuilder3.save();
 
         // 4 破碎-洗矿-筛选-离心
-        if (material.hasProperty(PropertyKey.GEM)) {
+        if (material.hasProperty(PropertyKey.GEM) && !material.hasFlag(DISABLE_GEM_RECIPES)) {
             ItemStack exquisiteStack = ChemicalHelper.get(gemExquisite, material);
             ItemStack flawlessStack = ChemicalHelper.get(gemFlawless, material);
             ItemStack gemStack = ChemicalHelper.get(gem, material);
@@ -505,7 +520,7 @@ public final class GTOOreRecipeHandler {
             opBuilder6.save();
 
             // 7 破碎-浸洗-筛选-离心
-            if (material.hasProperty(PropertyKey.GEM)) {
+            if (material.hasProperty(PropertyKey.GEM) && !material.hasFlag(DISABLE_GEM_RECIPES)) {
                 ItemStack exquisiteStack = ChemicalHelper.get(gemExquisite, material);
                 ItemStack flawlessStack = ChemicalHelper.get(gemFlawless, material);
                 ItemStack gemStack = ChemicalHelper.get(gem, material);
@@ -526,6 +541,10 @@ public final class GTOOreRecipeHandler {
                 opBuilder7.save();
             }
         }
+
+        ItemStack ingotStack = smeltingMaterial.hasProperty(PropertyKey.INGOT) ? ChemicalHelper.get(ingot, smeltingMaterial, property.getOreMultiplier()) :
+                material.hasProperty(PropertyKey.GEM) && !material.hasFlag(DISABLE_GEM_RECIPES) ? ChemicalHelper.get(gem, smeltingMaterial, property.getOreMultiplier()) :
+                        ChemicalHelper.get(dust, smeltingMaterial, property.getOreMultiplier());
 
         if (!ingotStack.isEmpty() && doesMaterialUseNormalFurnace(smeltingMaterial) && !TagPrefix.rawOre.isIgnored(material)) {
             float xp = Math.round(((1 + property.getOreMultiplier() * 0.33f) / 3) * 10.0f) / 10.0f;
@@ -577,13 +596,13 @@ public final class GTOOreRecipeHandler {
         ORE_WASHER_RECIPES.recipeBuilder(material.getName() + "_crushed_ore_to_purified_ore_fast")
                 .inputItems(stack)
                 .circuitMeta(2)
-                .inputFluids(Water.getFluid(100))
+                .inputFluids(Water, 100)
                 .outputItems(crushedPurifiedOre)
                 .duration(8).EUt(4).save();
 
         ORE_WASHER_RECIPES.recipeBuilder(material.getName() + "_crushed_ore_to_purified_ore")
                 .inputItems(stack)
-                .inputFluids(Water.getFluid(1000))
+                .inputFluids(Water, 1000)
                 .circuitMeta(1)
                 .outputItems(crushedPurifiedOre)
                 .chancedOutput(TagPrefix.dust, byproductMaterial, 3333, 0)
@@ -592,7 +611,7 @@ public final class GTOOreRecipeHandler {
 
         ORE_WASHER_RECIPES.recipeBuilder(material.getName() + "_crushed_ore_to_purified_ore_distilled")
                 .inputItems(stack)
-                .inputFluids(DistilledWater.getFluid(100))
+                .inputFluids(DistilledWater, 100)
                 .outputItems(crushedPurifiedOre)
                 .chancedOutput(TagPrefix.dust, byproductMaterial, 3333, 0)
                 .outputItems(TagPrefix.dust, GTMaterials.Stone)
@@ -685,7 +704,7 @@ public final class GTOOreRecipeHandler {
                     .save();
         }
 
-        if (material.hasProperty(PropertyKey.GEM)) {
+        if (material.hasProperty(PropertyKey.GEM) && !material.hasFlag(DISABLE_GEM_RECIPES)) {
             ItemStack exquisiteStack = ChemicalHelper.get(gemExquisite, material);
             ItemStack flawlessStack = ChemicalHelper.get(gemFlawless, material);
             ItemStack gemStack = ChemicalHelper.get(gem, material);
@@ -754,7 +773,7 @@ public final class GTOOreRecipeHandler {
         ORE_WASHER_RECIPES.recipeBuilder(material.getName() + "_dirty_dust_to_dust")
                 .inputItems(stack)
                 .circuitMeta(2)
-                .inputFluids(Water.getFluid(100))
+                .inputFluids(Water, 100)
                 .outputItems(dustStack)
                 .duration(8).EUt(4).save();
 
@@ -799,7 +818,7 @@ public final class GTOOreRecipeHandler {
         ORE_WASHER_RECIPES.recipeBuilder(material.getName() + "_pure_dust_to_dust")
                 .inputItems(stack)
                 .circuitMeta(2)
-                .inputFluids(Water.getFluid(100))
+                .inputFluids(Water, 100)
                 .outputItems(dustStack)
                 .duration(8).EUt(4).save();
 

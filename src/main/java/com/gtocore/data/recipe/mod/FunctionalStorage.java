@@ -1,16 +1,18 @@
 package com.gtocore.data.recipe.mod;
 
+import com.gtocore.api.data.tag.GTOTagPrefix;
 import com.gtocore.common.data.GTOMaterials;
+import com.gtocore.integration.Mods;
 
 import com.gtolib.GTOCore;
 import com.gtolib.utils.RLUtils;
 import com.gtolib.utils.RegistriesUtils;
 import com.gtolib.utils.TagUtils;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.common.data.GTItems;
+import com.gregtechceu.gtceu.common.data.GTMachines;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
@@ -23,7 +25,7 @@ import java.util.Set;
 public final class FunctionalStorage {
 
     public static void init() {
-        if (GTCEu.isModLoaded("functionalstorage")) {
+        if (Mods.FUNCTIONALSTORAGE.isLoaded()) {
             VanillaRecipeHelper.addShapedRecipe(GTOCore.id("copper_upgrade"), RegistriesUtils.getItemStack("functionalstorage:copper_upgrade"),
                     "AAA",
                     "BCD",
@@ -52,34 +54,53 @@ public final class FunctionalStorage {
                     "AAA",
                     "BCB",
                     "AAA",
-                    'A', new MaterialEntry(TagPrefix.plate, GTMaterials.Steel), 'B', new MaterialEntry(TagPrefix.pipeLargeFluid, GTMaterials.Steel), 'C', RegistriesUtils.getItemStack("enderio:pressurized_fluid_tank"));
+                    'A', new MaterialEntry(TagPrefix.plate, GTMaterials.Steel), 'B', new MaterialEntry(TagPrefix.pipeLargeFluid, GTMaterials.Steel), 'C', GTMachines.STEEL_DRUM);
 
             VanillaRecipeHelper.addShapedRecipe(GTOCore.id("fluid_2"), RegistriesUtils.getItemStack("functionalstorage:fluid_2", 2),
                     "ABA",
                     "CDC",
                     "ABA",
-                    'A', new MaterialEntry(TagPrefix.plate, GTMaterials.Steel), 'B', RegistriesUtils.getItemStack("enderio:pressurized_fluid_tank"), 'C', new MaterialEntry(TagPrefix.pipeLargeFluid, GTMaterials.Steel), 'D', RegistriesUtils.getItemStack("enderio:fluid_tank"));
+                    'A', new MaterialEntry(TagPrefix.plate, GTMaterials.Steel), 'B', GTMachines.STEEL_DRUM, 'C', new MaterialEntry(TagPrefix.pipeLargeFluid, GTMaterials.Steel), 'D', GTMachines.BRONZE_DRUM);
 
             VanillaRecipeHelper.addShapedRecipe(GTOCore.id("fluid_4"), RegistriesUtils.getItemStack("functionalstorage:fluid_4", 4),
                     "ABA",
                     "BCB",
                     "ABA",
-                    'A', RegistriesUtils.getItemStack("enderio:pressurized_fluid_tank"), 'B', new MaterialEntry(TagPrefix.pipeLargeFluid, GTMaterials.Steel), 'C', RegistriesUtils.getItemStack("enderio:fluid_tank"));
+                    'A', GTMachines.STEEL_DRUM, 'B', new MaterialEntry(TagPrefix.pipeLargeFluid, GTMaterials.Steel), 'C', GTMachines.BRONZE_DRUM);
             VanillaRecipeHelper.addShapedRecipe(GTOCore.id("storage_controller"), RegistriesUtils.getItemStack("functionalstorage:storage_controller"),
                     "ABA",
                     "CDC",
                     "CBC",
-                    'A', GTItems.FLUID_REGULATOR_LV.asStack(), 'B', GTItems.ROBOT_ARM_LV.asStack(), 'C', CustomTags.LV_CIRCUITS, 'D', TagUtils.createTag("functionalstorage:drawer"));
+                    'A', GTItems.FLUID_REGULATOR_LV.asItem(), 'B', GTItems.ROBOT_ARM_LV.asItem(), 'C', CustomTags.LV_CIRCUITS, 'D', TagUtils.createItemTag("functionalstorage:drawer"));
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("framed_storage_controller"), RegistriesUtils.getItemStack("functionalstorage:framed_storage_controller"),
+                    " A ",
+                    "ABA",
+                    " A ",
+                    'A', new MaterialEntry(GTOTagPrefix.nugget, GTMaterials.Iron), 'B', RegistriesUtils.getItemStack("functionalstorage:storage_controller"));
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("framed_controller_extension"), RegistriesUtils.getItemStack("functionalstorage:framed_controller_extension"),
+                    " A ",
+                    "ABA",
+                    " A ",
+                    'A', new MaterialEntry(GTOTagPrefix.nugget, GTMaterials.Iron), 'B', RegistriesUtils.getItemStack("functionalstorage:controller_extension"));
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("storage_controller_ex"), RegistriesUtils.getItemStack("functionalstorage:controller_extension"),
+                    "ABA",
+                    "CDC",
+                    "CBC",
+                    'A', GTItems.FLUID_REGULATOR_MV.asItem(), 'B', GTItems.ROBOT_ARM_MV.asItem(), 'C', CustomTags.MV_CIRCUITS, 'D', TagUtils.createItemTag("functionalstorage:drawer"));
         }
     }
 
     public static void initJsonFilter(Set<ResourceLocation> filters) {
-        if (GTCEu.isModLoaded("functionalstorage")) {
+        if (GTOCore.isEasy()) return;
+        if (Mods.FUNCTIONALSTORAGE.isLoaded()) {
             filters.add(RLUtils.functionalstorage("copper_upgrade"));
             filters.add(RLUtils.functionalstorage("fluid_1"));
             filters.add(RLUtils.functionalstorage("fluid_2"));
             filters.add(RLUtils.functionalstorage("fluid_4"));
             filters.add(RLUtils.functionalstorage("storage_controller"));
+            filters.add(RLUtils.functionalstorage("framed_storage_controller"));
+            filters.add(RLUtils.functionalstorage("controller_extension"));
+            filters.add(RLUtils.functionalstorage("framed_controller_extension"));
             filters.add(RLUtils.functionalstorage("gold_upgrade"));
             filters.add(RLUtils.functionalstorage("diamond_upgrade"));
             filters.add(RLUtils.functionalstorage("netherite_upgrade"));

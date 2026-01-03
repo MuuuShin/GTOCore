@@ -15,7 +15,6 @@ import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockDisplayText;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,8 +39,8 @@ public class AnalysisAndResearchCenterMachine extends ElectricMultiblockMachine 
         super.onStructureFormed();
         for (IMultiPart part : getParts()) {
             if (part instanceof AnalyzeHolderMachine analyzeHolder) {
-                // 修改这里：检查是否面向上方 (Direction.UP)
-                if (analyzeHolder.getFrontFacing() != Direction.UP) {
+                // 修改这里：检查是否面与机器方向相同
+                if (analyzeHolder.getFrontFacing() != getFrontFacing()) {
                     onStructureInvalid();
                     return;
                 }
@@ -51,7 +50,7 @@ public class AnalysisAndResearchCenterMachine extends ElectricMultiblockMachine 
                 mode = 1;
             }
             if (part instanceof ResearchHolderMachine researchHolder) {
-                if (researchHolder.getFrontFacing() != Direction.UP) {
+                if (researchHolder.getFrontFacing() != getFrontFacing()) {
                     onStructureInvalid();
                     return;
                 }
@@ -61,7 +60,7 @@ public class AnalysisAndResearchCenterMachine extends ElectricMultiblockMachine 
             }
         }
 
-        // 必须同时有扫描部件和计算提供者
+        // 必须有扫描部件
         if (mode == 0) {
             onStructureInvalid();
         }
@@ -112,17 +111,10 @@ public class AnalysisAndResearchCenterMachine extends ElectricMultiblockMachine 
         // 1. 获取所有物品输出
         List<Content> itemOutputs = recipe.outputs.get(ItemRecipeCapability.CAP);
 
-        // 2. 计算总概率权重
-        int totalWeight = 0;
-        for (Content content : itemOutputs) {
-            if (content.chance > 0) totalWeight += content.chance;
-        }
-
         // 3. 加权随机选择一个输出
-        int random = GTValues.RNG.nextInt(totalWeight);
+        int random = GTValues.RNG.nextInt(10000);
         int cumulative = 0;
-        Content selectedContent = null;
-
+        Content selectedContent = itemOutputs.getLast();
         for (Content content : itemOutputs) {
             if (content.chance <= 0) continue;
             cumulative += content.chance;
@@ -132,16 +124,12 @@ public class AnalysisAndResearchCenterMachine extends ElectricMultiblockMachine 
             }
         }
 
-        // 4. 创建新的唯一输出列表
+        // 3. 创建新的唯一输出列表
         if (selectedContent != null) {
-            // 深拷贝选中的内容并设置概率为100%
-            Object selectedStack = (selectedContent.content);
-            Content newContent = new Content(selectedStack, 10000, 10000, 0);
-            // 创建只包含选中物品的新输出列表
+            Object selectedStack = selectedContent.content;
+            Content newContent = new Content(selectedStack, 10000, 0);
             List<Content> newOutputs = Collections.singletonList(newContent);
-            // 清空其他输出类型
             recipe.outputs.clear();
-            // 替换原始输出为新的唯一输出
             recipe.outputs.put(ItemRecipeCapability.CAP, newOutputs);
         }
 

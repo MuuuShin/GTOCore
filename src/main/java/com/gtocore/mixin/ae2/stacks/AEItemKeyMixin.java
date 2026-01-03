@@ -3,9 +3,9 @@ package com.gtocore.mixin.ae2.stacks;
 import com.gtolib.IItem;
 import com.gtolib.api.ae2.stacks.IAEItemKey;
 import com.gtolib.api.misc.IMapValueCache;
+import com.gtolib.api.recipe.lookup.MapIngredient;
 import com.gtolib.utils.RLUtils;
 
-import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,10 +17,9 @@ import net.minecraft.world.level.ItemLike;
 
 import appeng.api.stacks.AEItemKey;
 import appeng.core.AELog;
+import com.fast.recipesearch.IntLongMap;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(AEItemKey.class)
 public abstract class AEItemKeyMixin implements IAEItemKey {
@@ -40,6 +39,9 @@ public abstract class AEItemKeyMixin implements IAEItemKey {
 
     @Shadow(remap = false)
     private @Nullable ItemStack readOnlyStack;
+
+    @Unique
+    private int[] gtocore$is;
 
     /**
      * @author .
@@ -99,12 +101,11 @@ public abstract class AEItemKeyMixin implements IAEItemKey {
             var item = BuiltInRegistries.ITEM.getOptional(RLUtils.parse(tag.getString("id"))).orElseThrow(() -> new IllegalArgumentException("Unknown item id."));
             if (item == Items.AIR) return null;
             var extraTag = tag.contains("tag") ? tag.getCompound("tag") : null;
-            var extraCaps = tag.contains("caps") ? tag.getCompound("caps") : null;
-            if ((extraTag == null || extraTag.isEmpty()) && (extraCaps == null || extraCaps.isEmpty())) {
+            if (extraTag == null || extraTag.isEmpty()) {
                 return ((IItem) item).gtolib$getAEKey();
             }
-            var stack = new ItemStack(item, 1, extraCaps);
-            if (extraTag != null) stack.setTag(extraTag);
+            var stack = new ItemStack(item, 1);
+            stack.setTag(extraTag);
             return IMapValueCache.ITEM_KEY_CACHE.get(stack);
         } catch (Exception e) {
             AELog.debug("Tried to load an invalid item key from NBT: %s", tag, e);
@@ -142,11 +143,6 @@ public abstract class AEItemKeyMixin implements IAEItemKey {
         return IMapValueCache.ITEM_KEY_CACHE.get(stack);
     }
 
-    @Redirect(method = "toTag", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/DefaultedRegistry;getKey(Ljava/lang/Object;)Lnet/minecraft/resources/ResourceLocation;", remap = true), remap = false)
-    private <T> ResourceLocation gtolib$getKey(DefaultedRegistry instance, T t) {
-        return ((IItem) t).gtolib$getIdLocation();
-    }
-
     /**
      * @author .
      * @reason .
@@ -165,5 +161,17 @@ public abstract class AEItemKeyMixin implements IAEItemKey {
     @Override
     public void gtolib$setReadOnlyStack(ItemStack stack) {
         readOnlyStack = stack;
+    }
+
+    @Override
+    public void gtolib$convert(long amount, IntLongMap map) {
+        if (gtocore$is == null) {
+            var m = new IntLongMap();
+            MapIngredient.ITEM_CONVERTER.convert(getReadOnlyStack(), 1, m);
+            gtocore$is = m.toIntArray();
+        }
+        for (var i : gtocore$is) {
+            map.add(i, amount);
+        }
     }
 }

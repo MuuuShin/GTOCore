@@ -2,6 +2,7 @@ package com.gtocore.data.recipe.classified;
 
 import com.gtocore.common.data.GTOItems;
 import com.gtocore.common.data.GTOMaterials;
+import com.gtocore.common.data.GTORecipeCategories;
 
 import com.gtolib.utils.ItemUtils;
 
@@ -19,7 +20,9 @@ import net.minecraft.world.item.Items;
 
 import java.util.Map;
 
+import static com.gregtechceu.gtceu.common.data.GTMaterials.Nitrogen;
 import static com.gtocore.common.data.GTOItems.*;
+import static com.gtocore.common.data.GTORecipeTypes.ATOMIZATION_CONDENSATION_RECIPES;
 import static com.gtocore.common.data.GTORecipeTypes.FLUID_SOLIDFICATION_RECIPES;
 
 final class FluidSolidfication {
@@ -27,15 +30,15 @@ final class FluidSolidfication {
     public static void init() {
         FLUID_SOLIDFICATION_RECIPES.recipeBuilder("memory_foam_block")
                 .notConsumable(GTItems.SHAPE_MOLD_BLOCK.asItem())
-                .inputFluids(GTOMaterials.ViscoelasticPolyurethaneFoam.getFluid(1000))
-                .outputItems(GTOItems.MEMORY_FOAM_BLOCK.asItem())
+                .inputFluids(GTOMaterials.ViscoelasticPolyurethaneFoam, 1000)
+                .outputItems(GTOItems.MEMORY_FOAM_BLOCK)
                 .EUt(30)
                 .duration(60)
                 .save();
 
         FLUID_SOLIDFICATION_RECIPES.recipeBuilder("lumin_essence_dust")
                 .inputItems(TagPrefix.dust, GTOMaterials.HighEnergyMixture, 2)
-                .inputFluids(GTMaterials.PhosphoricAcid.getFluid(2000))
+                .inputFluids(GTMaterials.PhosphoricAcid, 2000)
                 .outputItems(TagPrefix.dust, GTOMaterials.LuminEssence)
                 .EUt(480)
                 .duration(200)
@@ -43,16 +46,16 @@ final class FluidSolidfication {
 
         FLUID_SOLIDFICATION_RECIPES.recipeBuilder("pellet_antimatter")
                 .notConsumable(GTOItems.BALL_FIELD_SHAPE.asItem())
-                .inputFluids(GTOMaterials.Antimatter.getFluid(1000))
-                .outputItems(GTOItems.PELLET_ANTIMATTER.asItem())
+                .inputFluids(GTOMaterials.Antimatter, 1000)
+                .outputItems(GTOItems.PELLET_ANTIMATTER)
                 .EUt(491520)
                 .duration(800)
                 .save();
 
         FLUID_SOLIDFICATION_RECIPES.recipeBuilder("kevlar_fiber")
                 .notConsumable(GTItems.SHAPE_MOLD_NUGGET.asItem())
-                .inputFluids(GTOMaterials.LiquidCrystalKevlar.getFluid(72))
-                .outputItems(GTOItems.KEVLAR_FIBER.asItem())
+                .inputFluids(GTOMaterials.LiquidCrystalKevlar, 72)
+                .outputItems(GTOItems.KEVLAR_FIBER)
                 .EUt(30)
                 .duration(800)
                 .cleanroom(CleanroomType.CLEANROOM)
@@ -60,7 +63,7 @@ final class FluidSolidfication {
 
         FLUID_SOLIDFICATION_RECIPES.recipeBuilder("xenoxene_crystal_dust")
                 .inputItems(TagPrefix.dust, GTMaterials.Perlite, 3)
-                .inputFluids(GTOMaterials.XenoxeneMixture.getFluid(1000))
+                .inputFluids(GTOMaterials.XenoxeneMixture, 1000)
                 .outputItems(TagPrefix.dust, GTOMaterials.XenoxeneCrystal, 3)
                 .EUt(1920)
                 .duration(200)
@@ -74,16 +77,19 @@ final class FluidSolidfication {
                 .duration(400)
                 .save();
 
-        FLUID_SOLIDFICATION_RECIPES.recipeBuilder("superheavy_mix")
+        ATOMIZATION_CONDENSATION_RECIPES.recipeBuilder("superheavy_mix")
                 .outputItems(TagPrefix.dust, GTOMaterials.SuperheavyMix)
-                .inputFluids(GTOMaterials.SuperheavyMix.getFluid(144))
+                .outputFluids(Nitrogen.getFluid(144 * 857))
+                .inputFluids(GTOMaterials.HighPressureNitrogen.getFluid(144 * 1000))
+                .inputFluids(GTOMaterials.SuperheavyMix, 144)
                 .EUt(122880)
                 .duration(800)
+                .category(GTORecipeCategories.CONDENSE_FLUID_TO_DUST)
                 .save();
 
         FLUID_SOLIDFICATION_RECIPES.recipeBuilder("honey_block")
                 .notConsumable(GTItems.SHAPE_MOLD_BLOCK.asItem())
-                .inputFluids(GTOMaterials.Honey.getFluid(1000))
+                .inputFluids(GTOMaterials.Honey, 1000)
                 .outputItems(Items.HONEY_BLOCK)
                 .EUt(30)
                 .duration(20)

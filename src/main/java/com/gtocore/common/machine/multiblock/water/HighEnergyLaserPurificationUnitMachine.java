@@ -2,12 +2,12 @@ package com.gtocore.common.machine.multiblock.water;
 
 import com.gtocore.common.machine.multiblock.part.IndicatorHatchPartMachine;
 
-import com.gtolib.api.data.chemical.GTOChemicalHelper;
-import com.gtolib.api.machine.part.ItemHatchPartMachine;
+import com.gtolib.api.machine.part.ItemPartMachine;
 import com.gtolib.api.recipe.RecipeRunner;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
+import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.MarkerMaterials;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
@@ -17,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import java.util.List;
 
@@ -27,25 +26,17 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public final class HighEnergyLaserPurificationUnitMachine extends WaterPurificationUnitMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            HighEnergyLaserPurificationUnitMachine.class, WaterPurificationUnitMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
     private static final List<Item> LENS = List.of(
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Red),
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Orange),
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Brown),
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Yellow),
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Green),
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Cyan),
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Blue),
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Purple),
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Magenta),
-            GTOChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Pink));
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Red),
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Orange),
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Brown),
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Yellow),
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Green),
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Cyan),
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Blue),
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Purple),
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Magenta),
+            ChemicalHelper.getItem(TagPrefix.lens, MarkerMaterials.Color.Pink));
 
     @Persisted
     private int index;
@@ -66,7 +57,7 @@ public final class HighEnergyLaserPurificationUnitMachine extends WaterPurificat
     private long inputCount;
 
     private IndicatorHatchPartMachine indicatorHatchPartMachine;
-    private ItemHatchPartMachine itemHatchPartMachine;
+    private ItemPartMachine ItemPartMachine;
 
     public HighEnergyLaserPurificationUnitMachine(MetaMachineBlockEntity holder) {
         super(holder, 32);
@@ -77,8 +68,8 @@ public final class HighEnergyLaserPurificationUnitMachine extends WaterPurificat
         super.onPartScan(part);
         if (indicatorHatchPartMachine == null && part instanceof IndicatorHatchPartMachine lensSensorPart) {
             indicatorHatchPartMachine = lensSensorPart;
-        } else if (itemHatchPartMachine == null && part instanceof ItemHatchPartMachine itemHatchPart) {
-            itemHatchPartMachine = itemHatchPart;
+        } else if (ItemPartMachine == null && part instanceof ItemPartMachine itemHatchPart) {
+            ItemPartMachine = itemHatchPart;
         }
     }
 
@@ -86,15 +77,15 @@ public final class HighEnergyLaserPurificationUnitMachine extends WaterPurificat
     public void onStructureInvalid() {
         super.onStructureInvalid();
         indicatorHatchPartMachine = null;
-        itemHatchPartMachine = null;
+        ItemPartMachine = null;
     }
 
     @Override
     public void customText(List<Component> textList) {
         super.customText(textList);
         if (getRecipeLogic().isWorking()) {
-            textList.add(Component.translatable("gui.enderio.sag_mill_chance", chance));
-            textList.add(Component.translatable("tooltip.avaritia.num_items", LENS.get(index).getDescription()));
+            textList.add(Component.translatable("gtceu.jei.ore_vein_diagram.chance", chance));
+            textList.add(Component.translatable("attributeslib.gui.current", LENS.get(index).getDescription()));
         }
     }
 
@@ -132,7 +123,7 @@ public final class HighEnergyLaserPurificationUnitMachine extends WaterPurificat
     }
 
     private boolean match() {
-        return itemHatchPartMachine.getInventory().storage.getStackInSlot(0).is(LENS.get(index));
+        return ItemPartMachine.getInventory().storage.getStackInSlot(0).is(LENS.get(index));
     }
 
     @Override

@@ -58,8 +58,8 @@ public final class GCYMRecipes {
         ASSEMBLER_RECIPES.recipeBuilder("crushing_wheels")
                 .inputItems(gearSmall, TungstenCarbide, 2)
                 .inputItems(gear, Ultimet, 3)
-                .inputItems(CASING_SECURE_MACERATION.asStack())
-                .inputItems(ELECTRIC_MOTOR_IV.asStack())
+                .inputItems(CASING_SECURE_MACERATION.asItem())
+                .inputItems(ELECTRIC_MOTOR_IV.asItem())
                 .outputItems(CRUSHING_WHEELS.asStack(ConfigHolder.INSTANCE.recipes.casingsPerCraft))
                 .duration(50).EUt(16)
                 .save();
@@ -67,8 +67,8 @@ public final class GCYMRecipes {
         ASSEMBLER_RECIPES.recipeBuilder("slicing_blades")
                 .inputItems(plate, TungstenCarbide, 2)
                 .inputItems(gear, Ultimet, 3)
-                .inputItems(CASING_SHOCK_PROOF.asStack())
-                .inputItems(ELECTRIC_MOTOR_IV.asStack())
+                .inputItems(CASING_SHOCK_PROOF.asItem())
+                .inputItems(ELECTRIC_MOTOR_IV.asItem())
                 .outputItems(SLICING_BLADES.asStack(ConfigHolder.INSTANCE.recipes.casingsPerCraft))
                 .duration(50).EUt(16)
                 .save();
@@ -76,7 +76,7 @@ public final class GCYMRecipes {
         ASSEMBLER_RECIPES.recipeBuilder("electrolytic_cell")
                 .inputItems(wireGtDouble, Platinum, 4)
                 .inputItems(cableGtSingle, Tungsten, 1)
-                .inputItems(CASING_NONCONDUCTING.asStack())
+                .inputItems(CASING_NONCONDUCTING.asItem())
                 .inputItems(CustomTags.IV_CIRCUITS)
                 .outputItems(ELECTROLYTIC_CELL.asStack(ConfigHolder.INSTANCE.recipes.casingsPerCraft))
                 .duration(50).EUt(16)
@@ -86,7 +86,7 @@ public final class GCYMRecipes {
                 .inputItems(ring, MolybdenumDisilicide, 32)
                 .inputItems(foil, Graphene, 16)
                 .inputFluids(HSLASteel, L)
-                .outputItems(MOLYBDENUM_DISILICIDE_COIL_BLOCK.asStack(1))
+                .outputItems(MOLYBDENUM_DISILICIDE_COIL_BLOCK.asItem(), 1)
                 .duration(500).EUt(1920)
                 .save();
 
@@ -201,6 +201,7 @@ public final class GCYMRecipes {
         MIXER_RECIPES.recipeBuilder("molybdenum_disilicide")
                 .inputItems(dust, Molybdenum)
                 .inputItems(dust, Silicon, 2)
+                .circuitMeta(2)
                 .outputItems(dust, MolybdenumDisilicide, 3)
                 .duration(180).EUt(VA[EV])
                 .save();
@@ -252,7 +253,7 @@ public final class GCYMRecipes {
                 .inputItems(TagPrefix.dust, GTMaterials.Zinc)
                 .inputItems(TagPrefix.dust, GTMaterials.Iron, 4)
                 .circuitMeta(6)
-                .inputFluids(GTMaterials.Oxygen.getFluid(8000))
+                .inputFluids(GTMaterials.Oxygen, 8000)
                 .outputFluids(GTMaterials.NickelZincFerrite.getFluid(GTValues.L * 6))
                 .duration(2400 * 3 / 4)
                 .EUt(GTValues.VA[GTValues.MV])

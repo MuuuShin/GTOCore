@@ -29,7 +29,6 @@ import net.minecraft.world.level.material.Fluids;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -40,14 +39,6 @@ import static com.gtolib.api.GTOValues.GRAVITON_FLOW_TIER;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class GodForgeMachine extends NoEnergyMultiblockMachine implements ITierCasingMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            GodForgeMachine.class, NoEnergyMultiblockMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     @DescSynced
     @Persisted
@@ -175,7 +166,7 @@ public final class GodForgeMachine extends NoEnergyMultiblockMachine implements 
 
     public static BlockPattern getBlockPattern(MultiblockMachineDefinition definition) {
         return MultiBlockFileReader.start(definition)
-                .where('~', Predicates.controller(Predicates.blocks(definition.get())))
+                .where('~', Predicates.controller(definition))
                 .where(' ', Predicates.any())
                 .where('A', Predicates.blocks(GTOBlocks.TRANSCENDENTALLY_AMPLIFIED_MAGNETIC_CONFINEMENT_CASING.get()).or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(1)))
                 .where('B', Predicates.blocks(GTOBlocks.SINGULARITY_REINFORCED_STELLAR_SHIELDING_CASING.get()))

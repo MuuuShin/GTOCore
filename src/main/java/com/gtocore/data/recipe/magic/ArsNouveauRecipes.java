@@ -1,5 +1,6 @@
 package com.gtocore.data.recipe.magic;
 
+import com.gtocore.common.data.GTOBlocks;
 import com.gtocore.common.data.GTOItems;
 import com.gtocore.common.data.GTOMaterials;
 import com.gtocore.data.recipe.builder.ars.EnchantingApparatusRecipeBuilder;
@@ -7,11 +8,12 @@ import com.gtocore.data.recipe.builder.ars.ImbuementRecipeBuilder;
 import com.gtocore.data.tag.Tags;
 
 import com.gtolib.GTOCore;
-import com.gtolib.api.data.chemical.GTOChemicalHelper;
 import com.gtolib.utils.RegistriesUtils;
 
+import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.common.data.GCYMBlocks;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
@@ -42,10 +44,10 @@ public final class ArsNouveauRecipes {
     public static void init() {
         // 灌注室
         {
-            ImbuementRecipe("opal_gem", Ingredient.of(GTOChemicalHelper.getItem(gem, Opal)), new ItemStack(ItemsRegistry.SOURCE_GEM), 500, new Ingredient[0]);
-            ImbuementRecipe("olivine_gem", Ingredient.of(GTOChemicalHelper.getItem(gem, Olivine)), new ItemStack(ItemsRegistry.SOURCE_GEM), 500, new Ingredient[0]);
-            ImbuementRecipe("opal_gem_block", Ingredient.of(GTOChemicalHelper.getItem(block, Opal)), new ItemStack(BlockRegistry.SOURCE_GEM_BLOCK.asItem()), 4000, new Ingredient[0]);
-            ImbuementRecipe("olivine_gem_block", Ingredient.of(GTOChemicalHelper.getItem(block, Olivine)), new ItemStack(BlockRegistry.SOURCE_GEM_BLOCK.asItem()), 4000, new Ingredient[0]);
+            ImbuementRecipe("opal_gem", Ingredient.of(ChemicalHelper.getItem(gem, Opal)), new ItemStack(ItemsRegistry.SOURCE_GEM), 500, new Ingredient[0]);
+            ImbuementRecipe("olivine_gem", Ingredient.of(ChemicalHelper.getItem(gem, Olivine)), new ItemStack(ItemsRegistry.SOURCE_GEM), 500, new Ingredient[0]);
+            ImbuementRecipe("opal_gem_block", Ingredient.of(ChemicalHelper.getItem(block, Opal)), new ItemStack(BlockRegistry.SOURCE_GEM_BLOCK.asItem()), 4000, new Ingredient[0]);
+            ImbuementRecipe("olivine_gem_block", Ingredient.of(ChemicalHelper.getItem(block, Olivine)), new ItemStack(BlockRegistry.SOURCE_GEM_BLOCK.asItem()), 4000, new Ingredient[0]);
 
             ImbuementRecipe("fertilizer_dye", Ingredient.of(Items.BONE_MEAL), new ItemStack(BotaniaItems.fertilizer), 500, new Ingredient[0]);
 
@@ -72,11 +74,11 @@ public final class ArsNouveauRecipes {
                     new Ingredient[] { Ingredient.of(BotaniaBlocks.livingrock), Ingredient.of(BotaniaBlocks.livingrock), Ingredient.of(BotaniaBlocks.livingrock), Ingredient.of(BotaniaBlocks.livingrock),
                             Ingredient.of(BotaniaBlocks.livingrock), Ingredient.of(BotaniaBlocks.livingrock) });
             EnchantingApparatusRecipe("terra_plate", Ingredient.of(BotaniaBlocks.manasteelBlock), new ItemStack(BotaniaBlocks.terraPlate), 10000, false,
-                    new Ingredient[] { Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)),
-                            Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)) });
+                    new Ingredient[] { Ingredient.of(ChemicalHelper.getItem(block, Runerock)), Ingredient.of(ChemicalHelper.getItem(block, Runerock)), Ingredient.of(ChemicalHelper.getItem(block, Runerock)),
+                            Ingredient.of(ChemicalHelper.getItem(block, Runerock)), Ingredient.of(ChemicalHelper.getItem(block, Runerock)), Ingredient.of(ChemicalHelper.getItem(block, Runerock)) });
             EnchantingApparatusRecipe("alfheim_portal", Ingredient.of(BotaniaBlocks.livingwood), new ItemStack(BotaniaBlocks.alfPortal), 10000, false,
-                    new Ingredient[] { Ingredient.of(BotaniaBlocks.manasteelBlock), Ingredient.of(BotaniaBlocks.terrasteelBlock), Ingredient.of(GTOChemicalHelper.getItem(block, GTOMaterials.InfusedGold)), Ingredient.of(GTOChemicalHelper.getItem(block, GTOMaterials.Thaumium)),
-                            Ingredient.of(BotaniaBlocks.manasteelBlock), Ingredient.of(BotaniaBlocks.terrasteelBlock), Ingredient.of(GTOChemicalHelper.getItem(block, GTOMaterials.InfusedGold)), Ingredient.of(GTOChemicalHelper.getItem(block, GTOMaterials.Thaumium)) });
+                    new Ingredient[] { Ingredient.of(BotaniaBlocks.manasteelBlock), Ingredient.of(BotaniaBlocks.terrasteelBlock), Ingredient.of(ChemicalHelper.getItem(block, GTOMaterials.InfusedGold)), Ingredient.of(ChemicalHelper.getItem(block, GTOMaterials.Thaumium)),
+                            Ingredient.of(BotaniaBlocks.manasteelBlock), Ingredient.of(BotaniaBlocks.terrasteelBlock), Ingredient.of(ChemicalHelper.getItem(block, GTOMaterials.InfusedGold)), Ingredient.of(ChemicalHelper.getItem(block, GTOMaterials.Thaumium)) });
 
             EnchantingApparatusRecipe("mana_pylon", Ingredient.of(BotaniaItems.manaDiamond), new ItemStack(BotaniaBlocks.manaPylon), 10000, false,
                     new Ingredient[] { Ingredient.of(BotaniaItems.manaSteel), Ingredient.of(BotaniaItems.manaSteel), Ingredient.of(Items.GOLD_INGOT), Ingredient.of(Items.GOLD_INGOT),
@@ -85,21 +87,21 @@ public final class ArsNouveauRecipes {
                     new Ingredient[] { Ingredient.of(BotaniaItems.terrasteel), Ingredient.of(BotaniaItems.terrasteel), Ingredient.of(BotaniaItems.terrasteel), Ingredient.of(BotaniaBlocks.forestEye),
                             Ingredient.of(BotaniaItems.terrasteel), Ingredient.of(BotaniaItems.terrasteel), Ingredient.of(BotaniaItems.terrasteel), Ingredient.of(BotaniaBlocks.forestEye) });
             EnchantingApparatusRecipe("alfsteel_pylon", Ingredient.of(BotaniaBlocks.naturaPylon), RegistriesUtils.getItemStack("mythicbotany:alfsteel_pylon"), 10000, false,
-                    new Ingredient[] { Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
-                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
-                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
-                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")) });
+                    new Ingredient[] { Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
+                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
+                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
+                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")) });
             EnchantingApparatusRecipe("gaia_pylon", Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_pylon")), new ItemStack(BotaniaBlocks.gaiaPylon.asItem()), 10000, false,
-                    new Ingredient[] { Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
-                            Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
-                            Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
-                            Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering) });
+                    new Ingredient[] { Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
+                            Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
+                            Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
+                            Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering) });
 
-            EnchantingApparatusRecipe("enchanting_laureril_ingot", Ingredient.of(GTOChemicalHelper.getItem(plate, Runerock)), new ItemStack(GTOChemicalHelper.getItem(ingot, Laureril)), 10000, false,
-                    new Ingredient[] { Ingredient.of(GTOChemicalHelper.getItem(ingot, Thaumium)), Ingredient.of(GTOChemicalHelper.getItem(ingot, WhiteWax)), Ingredient.of(GTOChemicalHelper.getItem(ingot, InfusedGold)), Ingredient.of(GTOChemicalHelper.getItem(ingot, Herbs)) });
-            EnchantingApparatusRecipe("enchanting_quicksilver_ingot", Ingredient.of(GTOChemicalHelper.getItem(plate, Runerock)), new ItemStack(GTOChemicalHelper.getItem(ingot, Quicksilver)), 10000, false,
-                    new Ingredient[] { Ingredient.of(ExtraBotanyItems.spiritFuel), Ingredient.of(ItemsRegistry.EARTH_ESSENCE), Ingredient.of(GTOChemicalHelper.getItem(ingot, Thaumium)), Ingredient.of(ExtraBotanyItems.theChaos), Ingredient.of(ItemsRegistry.AIR_ESSENCE), Ingredient.of(GTOChemicalHelper.getItem(ingot, WhiteWax)),
-                            Ingredient.of(ExtraBotanyItems.nightmareFuel), Ingredient.of(ItemsRegistry.WATER_ESSENCE), Ingredient.of(GTOChemicalHelper.getItem(ingot, AstralSilver)), Ingredient.of(ExtraBotanyItems.theOrigin), Ingredient.of(ItemsRegistry.FIRE_ESSENCE), Ingredient.of(GTOChemicalHelper.getItem(ingot, Gaia)) });
+            EnchantingApparatusRecipe("enchanting_laureril_ingot", Ingredient.of(ChemicalHelper.getItem(plate, Runerock)), new ItemStack(ChemicalHelper.getItem(ingot, Laureril)), 10000, false,
+                    new Ingredient[] { Ingredient.of(ChemicalHelper.getItem(ingot, Thaumium)), Ingredient.of(ChemicalHelper.getItem(ingot, WhiteWax)), Ingredient.of(ChemicalHelper.getItem(ingot, InfusedGold)), Ingredient.of(ChemicalHelper.getItem(ingot, Herbs)) });
+            EnchantingApparatusRecipe("enchanting_quicksilver_ingot", Ingredient.of(ChemicalHelper.getItem(plate, Runerock)), new ItemStack(ChemicalHelper.getItem(ingot, Quicksilver)), 10000, false,
+                    new Ingredient[] { Ingredient.of(ExtraBotanyItems.spiritFuel), Ingredient.of(ItemsRegistry.EARTH_ESSENCE), Ingredient.of(ChemicalHelper.getItem(ingot, Thaumium)), Ingredient.of(ExtraBotanyItems.theChaos), Ingredient.of(ItemsRegistry.AIR_ESSENCE), Ingredient.of(ChemicalHelper.getItem(ingot, WhiteWax)),
+                            Ingredient.of(ExtraBotanyItems.nightmareFuel), Ingredient.of(ItemsRegistry.WATER_ESSENCE), Ingredient.of(ChemicalHelper.getItem(ingot, AstralSilver)), Ingredient.of(ExtraBotanyItems.theOrigin), Ingredient.of(ItemsRegistry.FIRE_ESSENCE), Ingredient.of(ChemicalHelper.getItem(ingot, Gaia)) });
 
             EnchantingApparatusRecipe("enchanting_starbuncle_shards", Ingredient.of(ItemsRegistry.STARBUNCLE_SHARD), new ItemStack(ItemsRegistry.STARBUNCLE_SHARD, 4), 10000, false,
                     new Ingredient[] { Ingredient.of(ItemsRegistry.CONJURATION_ESSENCE), Ingredient.of(ItemsRegistry.EARTH_ESSENCE), Ingredient.of(ItemsRegistry.FIRE_ESSENCE) });
@@ -125,7 +127,7 @@ public final class ArsNouveauRecipes {
             EnchantingApparatusRecipe("enchanting_conjuration_essence", Ingredient.of(ItemsRegistry.SOURCE_GEM), new ItemStack(ItemsRegistry.CONJURATION_ESSENCE), 5000, false,
                     new Ingredient[] { Ingredient.of(Items.BOOK), Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.STARBUNCLE_SHARD), Ingredient.of(RegistriesUtils.getItemStack("gtocore:aether_bucket")) });
 
-            EnchantingApparatusRecipe("wilden_slate", Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), new ItemStack(GTOItems.WILDEN_SLATE, 9), 10000, false,
+            EnchantingApparatusRecipe("wilden_slate", Ingredient.of(ChemicalHelper.getItem(block, Runerock)), new ItemStack(GTOItems.WILDEN_SLATE, 9), 10000, false,
                     new Ingredient[] { Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.WILDEN_SPIKE), Ingredient.of(ItemsRegistry.WILDEN_WING), Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.WILDEN_SPIKE),
                             Ingredient.of(ItemsRegistry.WILDEN_WING), Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.WILDEN_SPIKE), Ingredient.of(ItemsRegistry.WILDEN_WING), Ingredient.of(ItemsRegistry.WILDEN_TRIBUTE) });
 
@@ -133,15 +135,25 @@ public final class ArsNouveauRecipes {
                     new Ingredient[] { Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE),
                             Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), });
 
+            EnchantingApparatusRecipe("the_origin_casing", Ingredient.of(ExtraBotanyItems.theOrigin), new ItemStack(GTOBlocks.THE_ORIGIN_CASING, 4), 10000, false,
+                    new Ingredient[] { Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel),
+                            Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel) });
+            EnchantingApparatusRecipe("the_end_casing", Ingredient.of(ExtraBotanyItems.theEnd), new ItemStack(GTOBlocks.THE_END_CASING, 4), 10000, false,
+                    new Ingredient[] { Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel),
+                            Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel) });
+            EnchantingApparatusRecipe("the_chaos_casing", Ingredient.of(ExtraBotanyItems.theChaos), new ItemStack(GTOBlocks.THE_CHAOS_CASING, 4), 10000, false,
+                    new Ingredient[] { Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel),
+                            Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel) });
+
         }
 
         // 多方块灌注室 + 附魔核心
         {
             // 灌注室
-            MultiblockImbuementRecipe(1, false, "opal_gem", Ingredient.of(GTOChemicalHelper.getItem(gem, Opal)), new ItemStack(ItemsRegistry.SOURCE_GEM), 500, new Ingredient[0], new FluidStack[0]);
-            MultiblockImbuementRecipe(1, false, "olivine_gem", Ingredient.of(GTOChemicalHelper.getItem(gem, Olivine)), new ItemStack(ItemsRegistry.SOURCE_GEM), 500, new Ingredient[0], new FluidStack[0]);
-            MultiblockImbuementRecipe(1, false, "opal_gem_block", Ingredient.of(GTOChemicalHelper.getItem(block, Opal)), new ItemStack(BlockRegistry.SOURCE_GEM_BLOCK.asItem()), 4000, new Ingredient[0], new FluidStack[0]);
-            MultiblockImbuementRecipe(1, false, "olivine_gem_block", Ingredient.of(GTOChemicalHelper.getItem(block, Olivine)), new ItemStack(BlockRegistry.SOURCE_GEM_BLOCK.asItem()), 4000, new Ingredient[0], new FluidStack[0]);
+            MultiblockImbuementRecipe(1, false, "opal_gem", Ingredient.of(ChemicalHelper.getItem(gem, Opal)), new ItemStack(ItemsRegistry.SOURCE_GEM), 500, new Ingredient[0], new FluidStack[0]);
+            MultiblockImbuementRecipe(1, false, "olivine_gem", Ingredient.of(ChemicalHelper.getItem(gem, Olivine)), new ItemStack(ItemsRegistry.SOURCE_GEM), 500, new Ingredient[0], new FluidStack[0]);
+            MultiblockImbuementRecipe(1, false, "opal_gem_block", Ingredient.of(ChemicalHelper.getItem(block, Opal)), new ItemStack(BlockRegistry.SOURCE_GEM_BLOCK.asItem()), 4000, new Ingredient[0], new FluidStack[0]);
+            MultiblockImbuementRecipe(1, false, "olivine_gem_block", Ingredient.of(ChemicalHelper.getItem(block, Olivine)), new ItemStack(BlockRegistry.SOURCE_GEM_BLOCK.asItem()), 4000, new Ingredient[0], new FluidStack[0]);
 
             // 特殊箭头配方
             MultiblockImbuementRecipe(1, false, "pierce_arrow", Ingredient.of(ItemTags.ARROWS), new ItemStack(ItemsRegistry.PIERCE_ARROW.get()), 100,
@@ -298,12 +310,12 @@ public final class ArsNouveauRecipes {
                             Ingredient.of(BotaniaBlocks.livingrock), Ingredient.of(BotaniaBlocks.livingrock) },
                     new FluidStack[0]);
             MultiblockImbuementRecipe(5, true, "terra_plate", Ingredient.of(BotaniaBlocks.manasteelBlock), new ItemStack(BotaniaBlocks.terraPlate), 10000,
-                    new Ingredient[] { Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)),
-                            Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)) },
+                    new Ingredient[] { Ingredient.of(ChemicalHelper.getItem(block, Runerock)), Ingredient.of(ChemicalHelper.getItem(block, Runerock)), Ingredient.of(ChemicalHelper.getItem(block, Runerock)),
+                            Ingredient.of(ChemicalHelper.getItem(block, Runerock)), Ingredient.of(ChemicalHelper.getItem(block, Runerock)), Ingredient.of(ChemicalHelper.getItem(block, Runerock)) },
                     new FluidStack[0]);
             MultiblockImbuementRecipe(5, true, "alfheim_portal", Ingredient.of(BotaniaBlocks.livingwood), new ItemStack(BotaniaBlocks.alfPortal), 10000,
-                    new Ingredient[] { Ingredient.of(BotaniaBlocks.manasteelBlock), Ingredient.of(BotaniaBlocks.terrasteelBlock), Ingredient.of(GTOChemicalHelper.getItem(block, GTOMaterials.InfusedGold)), Ingredient.of(GTOChemicalHelper.getItem(block, GTOMaterials.Thaumium)),
-                            Ingredient.of(BotaniaBlocks.manasteelBlock), Ingredient.of(BotaniaBlocks.terrasteelBlock), Ingredient.of(GTOChemicalHelper.getItem(block, GTOMaterials.InfusedGold)), Ingredient.of(GTOChemicalHelper.getItem(block, GTOMaterials.Thaumium)) },
+                    new Ingredient[] { Ingredient.of(BotaniaBlocks.manasteelBlock), Ingredient.of(BotaniaBlocks.terrasteelBlock), Ingredient.of(ChemicalHelper.getItem(block, GTOMaterials.InfusedGold)), Ingredient.of(ChemicalHelper.getItem(block, GTOMaterials.Thaumium)),
+                            Ingredient.of(BotaniaBlocks.manasteelBlock), Ingredient.of(BotaniaBlocks.terrasteelBlock), Ingredient.of(ChemicalHelper.getItem(block, GTOMaterials.InfusedGold)), Ingredient.of(ChemicalHelper.getItem(block, GTOMaterials.Thaumium)) },
                     new FluidStack[0]);
 
             MultiblockImbuementRecipe(5, true, "mana_pylon", Ingredient.of(BotaniaItems.manaDiamond), new ItemStack(BotaniaBlocks.manaPylon), 10000,
@@ -315,23 +327,23 @@ public final class ArsNouveauRecipes {
                             Ingredient.of(BotaniaItems.terrasteel), Ingredient.of(BotaniaItems.terrasteel), Ingredient.of(BotaniaItems.terrasteel), Ingredient.of(BotaniaBlocks.forestEye) },
                     new FluidStack[0]);
             MultiblockImbuementRecipe(5, true, "alfsteel_pylon", Ingredient.of(BotaniaBlocks.naturaPylon), RegistriesUtils.getItemStack("mythicbotany:alfsteel_pylon"), 10000,
-                    new Ingredient[] { Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
-                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
-                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
-                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")) },
+                    new Ingredient[] { Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
+                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
+                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")),
+                            Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(BotaniaBlocks.lightRelayDefault), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Herbs)), Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_ingot")) },
                     new FluidStack[0]);
             MultiblockImbuementRecipe(5, true, "gaia_pylon", Ingredient.of(RegistriesUtils.getItemStack("mythicbotany:alfsteel_pylon")), new ItemStack(BotaniaBlocks.gaiaPylon.asItem()), 10000,
-                    new Ingredient[] { Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
-                            Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
-                            Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
-                            Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(GTOChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering) },
+                    new Ingredient[] { Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
+                            Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
+                            Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering),
+                            Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Laureril)), Ingredient.of(ChemicalHelper.getItem(ingot, GTOMaterials.Gaiasteel)), Ingredient.of(BotaniaBlocks.shimmerrock), Ingredient.of(BotaniaBlocks.dreamwoodGlimmering) },
                     new FluidStack[0]);
 
-            MultiblockImbuementRecipe(5, true, "enchanting_laureril_ingot", Ingredient.of(GTOChemicalHelper.getItem(plate, Runerock)), new ItemStack(GTOChemicalHelper.getItem(ingot, Laureril)), 10000,
-                    new Ingredient[] { Ingredient.of(GTOChemicalHelper.getItem(ingot, Thaumium)), Ingredient.of(GTOChemicalHelper.getItem(ingot, WhiteWax)), Ingredient.of(GTOChemicalHelper.getItem(ingot, InfusedGold)), Ingredient.of(GTOChemicalHelper.getItem(ingot, Herbs)) }, new FluidStack[0]);
-            MultiblockImbuementRecipe(5, true, "enchanting_quicksilver_ingot", Ingredient.of(GTOChemicalHelper.getItem(plate, Runerock)), new ItemStack(GTOChemicalHelper.getItem(ingot, Quicksilver)), 10000,
-                    new Ingredient[] { Ingredient.of(ExtraBotanyItems.spiritFuel), Ingredient.of(ItemsRegistry.EARTH_ESSENCE), Ingredient.of(GTOChemicalHelper.getItem(ingot, Thaumium)), Ingredient.of(ExtraBotanyItems.theChaos), Ingredient.of(ItemsRegistry.AIR_ESSENCE), Ingredient.of(GTOChemicalHelper.getItem(ingot, WhiteWax)),
-                            Ingredient.of(ExtraBotanyItems.nightmareFuel), Ingredient.of(ItemsRegistry.WATER_ESSENCE), Ingredient.of(GTOChemicalHelper.getItem(ingot, AstralSilver)), Ingredient.of(ExtraBotanyItems.theOrigin), Ingredient.of(ItemsRegistry.FIRE_ESSENCE), Ingredient.of(GTOChemicalHelper.getItem(ingot, Gaia)) },
+            MultiblockImbuementRecipe(5, true, "enchanting_laureril_ingot", Ingredient.of(ChemicalHelper.getItem(plate, Runerock)), new ItemStack(ChemicalHelper.getItem(ingot, Laureril)), 10000,
+                    new Ingredient[] { Ingredient.of(ChemicalHelper.getItem(ingot, Thaumium)), Ingredient.of(ChemicalHelper.getItem(ingot, WhiteWax)), Ingredient.of(ChemicalHelper.getItem(ingot, InfusedGold)), Ingredient.of(ChemicalHelper.getItem(ingot, Herbs)) }, new FluidStack[0]);
+            MultiblockImbuementRecipe(5, true, "enchanting_quicksilver_ingot", Ingredient.of(ChemicalHelper.getItem(plate, Runerock)), new ItemStack(ChemicalHelper.getItem(ingot, Quicksilver)), 10000,
+                    new Ingredient[] { Ingredient.of(ExtraBotanyItems.spiritFuel), Ingredient.of(ItemsRegistry.EARTH_ESSENCE), Ingredient.of(ChemicalHelper.getItem(ingot, Thaumium)), Ingredient.of(ExtraBotanyItems.theChaos), Ingredient.of(ItemsRegistry.AIR_ESSENCE), Ingredient.of(ChemicalHelper.getItem(ingot, WhiteWax)),
+                            Ingredient.of(ExtraBotanyItems.nightmareFuel), Ingredient.of(ItemsRegistry.WATER_ESSENCE), Ingredient.of(ChemicalHelper.getItem(ingot, AstralSilver)), Ingredient.of(ExtraBotanyItems.theOrigin), Ingredient.of(ItemsRegistry.FIRE_ESSENCE), Ingredient.of(ChemicalHelper.getItem(ingot, Gaia)) },
                     new FluidStack[0]);
 
             MultiblockImbuementRecipe(5, true, "enchanting_starbuncle_shards", Ingredient.of(ItemsRegistry.STARBUNCLE_SHARD), new ItemStack(ItemsRegistry.STARBUNCLE_SHARD, 4), 10000,
@@ -358,7 +370,7 @@ public final class ArsNouveauRecipes {
             MultiblockImbuementRecipe(5, true, "enchanting_conjuration_essence", Ingredient.of(ItemsRegistry.SOURCE_GEM), new ItemStack(ItemsRegistry.CONJURATION_ESSENCE), 5000,
                     new Ingredient[] { Ingredient.of(Items.BOOK), Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.STARBUNCLE_SHARD) }, new FluidStack[] { Aether.getFluid(GAS, 1000) });
 
-            MultiblockImbuementRecipe(5, true, "wilden_slate", Ingredient.of(GTOChemicalHelper.getItem(block, Runerock)), new ItemStack(GTOItems.WILDEN_SLATE, 9), 10000,
+            MultiblockImbuementRecipe(5, true, "wilden_slate", Ingredient.of(ChemicalHelper.getItem(block, Runerock)), new ItemStack(GTOItems.WILDEN_SLATE, 9), 10000,
                     new Ingredient[] { Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.WILDEN_SPIKE), Ingredient.of(ItemsRegistry.WILDEN_WING), Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.WILDEN_SPIKE),
                             Ingredient.of(ItemsRegistry.WILDEN_WING), Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.WILDEN_SPIKE), Ingredient.of(ItemsRegistry.WILDEN_WING), Ingredient.of(ItemsRegistry.WILDEN_TRIBUTE) },
                     new FluidStack[0]);
@@ -367,24 +379,41 @@ public final class ArsNouveauRecipes {
                     new Ingredient[] { Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE),
                             Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), Ingredient.of(Tags.ENCHANTMENT_ESSENCE), Ingredient.of(Tags.AFFIX_ESSENCE), },
                     new FluidStack[0]);
+
+            MultiblockImbuementRecipe(5, true, "the_origin_casing", Ingredient.of(ExtraBotanyItems.theOrigin), new ItemStack(GTOBlocks.THE_ORIGIN_CASING, 4), 10000,
+                    new Ingredient[] { Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel),
+                            Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel) },
+                    new FluidStack[0]);
+            MultiblockImbuementRecipe(5, true, "the_end_casing", Ingredient.of(ExtraBotanyItems.theEnd), new ItemStack(GTOBlocks.THE_END_CASING, 4), 10000,
+                    new Ingredient[] { Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel),
+                            Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel) },
+                    new FluidStack[0]);
+            MultiblockImbuementRecipe(5, true, "the_chaos_casing", Ingredient.of(ExtraBotanyItems.theChaos), new ItemStack(GTOBlocks.THE_CHAOS_CASING, 4), 10000,
+                    new Ingredient[] { Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel),
+                            Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE), Ingredient.of(GCYMBlocks.CASING_STRESS_PROOF), Ingredient.of(ExtraBotanyItems.spiritFuel) },
+                    new FluidStack[0]);
+
         }
 
         // 多方块特供配方
         {
             MultiblockImbuementRecipe2(5, true, "enchanting_earth_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.EARTH_ESSENCE, 64), 4000,
-                    new Ingredient[] { Ingredient.of(Items.IRON_INGOT), Ingredient.of(ItemTags.DIRT), Ingredient.of(ForgeTags.SEEDS) }, new FluidStack[] { Gnome.getFluid(LIQUID, 100) });
+                    new Ingredient[] { Ingredient.of(Items.IRON_INGOT), Ingredient.of(ItemTags.DIRT), Ingredient.of(ForgeTags.SEEDS) }, new FluidStack[] { Gnome.getFluid(LIQUID, 500) });
             MultiblockImbuementRecipe2(5, true, "enchanting_air_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.AIR_ESSENCE, 64), 4000,
-                    new Ingredient[] { Ingredient.of(Items.FEATHER), Ingredient.of(ItemTags.ARROWS), Ingredient.of(ItemsRegistry.WILDEN_WING) }, new FluidStack[] { Sylph.getFluid(LIQUID, 100) });
+                    new Ingredient[] { Ingredient.of(Items.FEATHER), Ingredient.of(ItemTags.ARROWS), Ingredient.of(ItemsRegistry.WILDEN_WING) }, new FluidStack[] { Sylph.getFluid(LIQUID, 500) });
             MultiblockImbuementRecipe2(5, true, "enchanting_water_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.WATER_ESSENCE, 64), 4000,
-                    new Ingredient[] { Ingredient.of(Items.KELP), Ingredient.of(Items.SNOW_BLOCK) }, new FluidStack[] { Undine.getFluid(LIQUID, 100), Water.getFluid(1000) });
+                    new Ingredient[] { Ingredient.of(Items.KELP), Ingredient.of(Items.SNOW_BLOCK) }, new FluidStack[] { Undine.getFluid(LIQUID, 500), Water.getFluid(1000) });
             MultiblockImbuementRecipe2(5, true, "enchanting_fire_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.FIRE_ESSENCE, 64), 4000,
-                    new Ingredient[] { Ingredient.of(Items.FLINT_AND_STEEL), Ingredient.of(Items.GUNPOWDER), Ingredient.of(Items.TORCH) }, new FluidStack[] { Salamander.getFluid(LIQUID, 100) });
+                    new Ingredient[] { Ingredient.of(Items.FLINT_AND_STEEL), Ingredient.of(Items.GUNPOWDER), Ingredient.of(Items.TORCH) }, new FluidStack[] { Salamander.getFluid(LIQUID, 500) });
             MultiblockImbuementRecipe2(5, true, "enchanting_manipulation_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.MANIPULATION_ESSENCE, 64), 4000,
-                    new Ingredient[] { Ingredient.of(Items.STONE_BUTTON), Ingredient.of(Items.REDSTONE), Ingredient.of(Items.CLOCK) }, new FluidStack[] { Aether.getFluid(LIQUID, 100) });
+                    new Ingredient[] { Ingredient.of(Items.STONE_BUTTON), Ingredient.of(Items.REDSTONE), Ingredient.of(Items.CLOCK) }, new FluidStack[] { Aether.getFluid(LIQUID, 500) });
             MultiblockImbuementRecipe2(5, true, "enchanting_abjuration_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.ABJURATION_ESSENCE, 64), 4000,
-                    new Ingredient[] { Ingredient.of(Items.SUGAR), Ingredient.of(Items.FERMENTED_SPIDER_EYE) }, new FluidStack[] { Aether.getFluid(LIQUID, 100), Milk.getFluid(1000) });
+                    new Ingredient[] { Ingredient.of(Items.SUGAR), Ingredient.of(Items.FERMENTED_SPIDER_EYE) }, new FluidStack[] { Aether.getFluid(LIQUID, 500), Milk.getFluid(1000) });
             MultiblockImbuementRecipe2(5, true, "enchanting_conjuration_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.CONJURATION_ESSENCE, 64), 4000,
-                    new Ingredient[] { Ingredient.of(Items.BOOK), Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.STARBUNCLE_SHARD) }, new FluidStack[] { Aether.getFluid(LIQUID, 100) });
+                    new Ingredient[] { Ingredient.of(Items.BOOK), Ingredient.of(ItemsRegistry.WILDEN_HORN), Ingredient.of(ItemsRegistry.STARBUNCLE_SHARD) }, new FluidStack[] { Aether.getFluid(LIQUID, 500) });
+
+            MultiblockImbuementRecipe2(1, false, "gaia_core_dust", ChemicalHelper.get(dust, GaiaCore, 16), new ItemStack(GTOItems.GAIA_CORE), 10000,
+                    new Ingredient[] { Ingredient.of(BotaniaItems.lifeEssence), Ingredient.of(BotaniaItems.lifeEssence), Ingredient.of(BotaniaItems.lifeEssence), Ingredient.of(BotaniaItems.lifeEssence) }, new FluidStack[0]);
 
         }
 
@@ -668,7 +697,7 @@ public final class ArsNouveauRecipes {
         var build = INFUSER_CORE_RECIPES.builder(id);
         if (!model) {
             build
-                    .inputItems(input, 4)
+                    .inputItems(input)
                     .outputItems(output.copyWithCount(output.getCount() << 2))
                     .circuitMeta(circuitMeta)
                     .duration(400)

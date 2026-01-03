@@ -3,8 +3,6 @@ package com.gtocore.mixin.ae2.gui;
 import com.gtolib.api.ae2.gui.hooks.IStylelessCompositeWidget;
 import com.gtolib.api.ae2.gui.hooks.IWidgetsGetter;
 
-import com.gregtechceu.gtceu.utils.collection.O2OOpenCacheHashMap;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.renderer.Rect2i;
@@ -15,6 +13,7 @@ import appeng.client.Point;
 import appeng.client.gui.AEBaseScreen;
 import appeng.client.gui.ICompositeWidget;
 import appeng.client.gui.WidgetContainer;
+import com.fast.fastcollection.O2OOpenCacheHashMap;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
@@ -63,7 +62,7 @@ public class WidgetContainerMixin implements IWidgetsGetter {
     private final Map<String, IStylelessCompositeWidget> gtolib$compositeStylelessWidgets = new O2OOpenCacheHashMap<>();
 
     @Inject(method = "add(Ljava/lang/String;Lappeng/client/gui/ICompositeWidget;)V",
-            at = @At(value = "HEAD"),
+            at = @At("HEAD"),
             remap = false,
             cancellable = true)
     private void gtolib$addCompositeWidget(String id, ICompositeWidget widget, CallbackInfo ci) {
@@ -79,7 +78,7 @@ public class WidgetContainerMixin implements IWidgetsGetter {
     }
 
     @Inject(method = "populateScreen",
-            at = @At(value = "HEAD"),
+            at = @At("HEAD"),
             remap = false)
     private void gtolib$populateScreen(Consumer<AbstractWidget> addWidget, Rect2i bounds, AEBaseScreen<?> screen, CallbackInfo ci) {
         // For composite widgets, just position them. Positions for these widgets are generally relative to the dialog

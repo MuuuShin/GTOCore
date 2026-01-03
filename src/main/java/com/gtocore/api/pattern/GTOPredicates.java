@@ -4,7 +4,6 @@ import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.common.block.MEStorageCoreBlock;
 import com.gtocore.common.block.WirelessEnergyUnitBlock;
 import com.gtocore.common.data.GTOBlocks;
-import com.gtocore.common.data.GTOMachines;
 import com.gtocore.common.data.machines.ManaMachine;
 
 import com.gtolib.utils.FunctionContainer;
@@ -12,9 +11,11 @@ import com.gtolib.utils.GTOUtils;
 
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.capability.recipe.EURecipeCapability;
+import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IRotorHolderMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
+import com.gregtechceu.gtceu.api.pattern.BlockPattern;
 import com.gregtechceu.gtceu.api.pattern.MultiblockState;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
@@ -28,10 +29,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import vazkii.botania.common.block.block_entity.mana.ManaPoolBlockEntity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,10 +43,16 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static com.gregtechceu.gtceu.api.machine.multiblock.PartAbility.INPUT_LASER;
+import static com.gregtechceu.gtceu.api.pattern.Predicates.abilities;
 import static com.gtocore.common.block.BlockMap.*;
 import static com.gtolib.api.GTOValues.*;
 
 public final class GTOPredicates {
+
+    public static TraceabilityPredicate module(MachineDefinition... definition) {
+        return Predicates.blocks(Blocks.BARRIER).or(Predicates.air().setPreviewCount(0)).or(Predicates.blocks(Arrays.stream(definition).map(MachineDefinition::get).toArray(MetaMachineBlock[]::new)).setPreviewCount(0));
+    }
 
     public static TraceabilityPredicate glass() {
         return tierBlock(GLASSMAP, GLASS_TIER);
@@ -64,6 +74,10 @@ public final class GTOPredicates {
         return Predicates.blocks(LIGHT);
     }
 
+    public static TraceabilityPredicate hermeticCasing() {
+        return tierBlock(HERMETIC_CASING, hermetic_casing);
+    }
+
     public static TraceabilityPredicate autoIOAbilities(GTRecipeType... recipeType) {
         return Predicates.autoAbilities(recipeType, false, false, true, true, true, true);
     }
@@ -83,7 +97,7 @@ public final class GTOPredicates {
     }
 
     public static TraceabilityPredicate autoGCYMAbilities(GTRecipeType... recipeType) {
-        return Predicates.autoAbilities(recipeType, false, false, true, true, true, true).or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(8).setPreviewCount(1)).or(Predicates.abilities(GTOPartAbility.ACCELERATE_HATCH).setMaxGlobalLimited(1)).or(Predicates.blocks(ManaMachine.MANA_AMPLIFIER_HATCH.getBlock()).setMaxGlobalLimited(1));
+        return Predicates.autoAbilities(recipeType, false, false, true, true, true, true).or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(8).setPreviewCount(1)).or(Predicates.abilities(GTOPartAbility.ACCELERATE_HATCH).setMaxGlobalLimited(1)).or(Predicates.blocks(ManaMachine.MANA_AMPLIFIER_HATCH.get(), ManaMachine.ME_MANA_AMPLIFIER_HATCH.get()).setMaxGlobalLimited(1));
     }
 
     public static TraceabilityPredicate autoAccelerateAbilities(GTRecipeType... recipeType) {
@@ -91,7 +105,15 @@ public final class GTOPredicates {
     }
 
     public static TraceabilityPredicate autoThreadLaserAbilities(GTRecipeType... recipeType) {
-        return autoLaserAbilities(recipeType).or(Predicates.abilities(GTOPartAbility.THREAD_HATCH).setMaxGlobalLimited(1)).or(Predicates.abilities(GTOPartAbility.OVERCLOCK_HATCH).setMaxGlobalLimited(1)).or(Predicates.abilities(GTOPartAbility.ACCELERATE_HATCH).setMaxGlobalLimited(1)).or(Predicates.blocks(GTOMachines.WIRELESS_ENERGY_INTERFACE_HATCH.getBlock()).setMaxGlobalLimited(1));
+        return autoLaserAbilities(recipeType).or(Predicates.abilities(GTOPartAbility.THREAD_HATCH).setMaxGlobalLimited(1)).or(Predicates.abilities(GTOPartAbility.OVERCLOCK_HATCH).setMaxGlobalLimited(1)).or(Predicates.abilities(GTOPartAbility.ACCELERATE_HATCH).setMaxGlobalLimited(1));
+    }
+
+    public static TraceabilityPredicate autoSpaceMachineAbilities(GTRecipeType... recipeType) {
+        return autoGCYMAbilities(recipeType)
+                .or(abilities(INPUT_LASER).setMaxGlobalLimited(2))
+                .or(Predicates.abilities(GTOPartAbility.THREAD_HATCH).setMaxGlobalLimited(1))
+                .or(Predicates.abilities(GTOPartAbility.OVERCLOCK_HATCH).setMaxGlobalLimited(1))
+                .or(Predicates.abilities(GTOPartAbility.ACCELERATE_HATCH).setMaxGlobalLimited(1));
     }
 
     public static TraceabilityPredicate tierBlock(Int2ObjectMap<Supplier<?>> map, String tierType) {
@@ -166,10 +188,10 @@ public final class GTOPredicates {
     }
 
     public static TraceabilityPredicate wirelessEnergyUnit() {
-        return containerBlock(() -> new FunctionContainer<>(new ArrayList<WirelessEnergyUnitBlock>(), (data, state) -> {
+        return containerBlock(() -> new FunctionContainer<>(new ArrayList<WirelessEnergyUnitBlock.BlockData>(), (data, state) -> {
             if (state.getBlockState().getBlock() instanceof WirelessEnergyUnitBlock block) {
-                data.add(block);
-            }
+                data.add(new WirelessEnergyUnitBlock.BlockData(block, state.getPos()));
+            } else data.add(new WirelessEnergyUnitBlock.BlockData(null, state.getPos()));
             return data;
         }), "wirelessEnergyUnit", WIRELESS_ENERGY_UNIT).setPreviewCount(1);
     }
@@ -180,7 +202,7 @@ public final class GTOPredicates {
             if (block == GTOBlocks.FISSION_FUEL_COMPONENT.get()) {
                 integer[0]++;
                 integer[2] += GTOUtils.adjacentBlock(side -> getBlockState(state, state.pos.relative(side)).getBlock(), GTOBlocks.FISSION_FUEL_COMPONENT.get());
-            } else if (block == GTOBlocks.FISSION_COOLER_COMPONENT.get() && GTOUtils.adjacentBlock(side -> getBlockState(state, state.pos.relative(side)).getBlock(), GTOBlocks.FISSION_FUEL_COMPONENT.get()) > 1) {
+            } else if (block == GTOBlocks.FISSION_COOLER_COMPONENT.get() && GTOUtils.adjacentBlock(side -> getBlockState(state, state.pos.relative(side)).getBlock(), GTOBlocks.FISSION_FUEL_COMPONENT.get()) > 0) {
                 integer[1]++;
                 integer[3] += GTOUtils.adjacentBlock(side -> getBlockState(state, state.pos.relative(side)).getBlock(), GTOBlocks.FISSION_COOLER_COMPONENT.get());
             }
@@ -206,5 +228,33 @@ public final class GTOPredicates {
 
     private static BlockState getBlockState(MultiblockState state, BlockPos pos) {
         return state.blockStateCache.computeIfAbsent(pos.asLong(), k -> state.world.getBlockState(pos));
+    }
+
+    public static TraceabilityPredicate recordPosition(String name, TraceabilityPredicate original) {
+        return new TraceabilityPredicate(original) {
+
+            @Override
+            public boolean test(MultiblockState blockWorldState) {
+                if (super.test(blockWorldState)) {
+                    blockWorldState.getMatchContext().getOrCreate(name, ObjectOpenHashSet::new).add(blockWorldState.getPos());
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean testOnly() {
+                return true;
+            }
+
+            @Override
+            public boolean isAir() {
+                return false;
+            }
+        };
+    }
+
+    static {
+        BlockPattern.addWhitelistBlockEntity(ManaPoolBlockEntity.class);
     }
 }

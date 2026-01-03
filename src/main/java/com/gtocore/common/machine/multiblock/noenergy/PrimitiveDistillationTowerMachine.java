@@ -26,6 +26,7 @@ import com.gregtechceu.gtceu.api.machine.ConditionalSubscriptionHandler;
 import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
@@ -33,6 +34,8 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
+import com.gregtechceu.gtceu.common.network.GTNetwork;
+import com.gregtechceu.gtceu.common.network.packets.SCPacketUpdateActiveBlock;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -40,7 +43,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -50,8 +53,7 @@ import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,14 +66,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockMachine implements IExplosionMachine, DummyEnergyMachine {
 
     private static final DummyContainer CONTAINER = new DummyContainer(120);
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(PrimitiveDistillationTowerMachine.class, NoEnergyMultiblockMachine.MANAGED_FIELD_HOLDER);
+
     @NotNull
     private List<IFluidHandler> fluidOutputs = Collections.emptyList();
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     @Override
     public Widget createUIWidget() {
@@ -82,16 +79,17 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
         return group;
     }
 
-    private static final ItemStack COAL = Items.COAL.getDefaultInstance();
-    private static final ItemStack COAL_BLOCK = Items.COAL_BLOCK.getDefaultInstance();
-    private static final ItemStack COAL_DUST = ChemicalHelper.get(TagPrefix.dust, GTMaterials.Coal);
+    private static final Item COAL_DUST = ChemicalHelper.getItem(TagPrefix.dust, GTMaterials.Coal);
+    @Getter
     @Persisted
     @DescSynced
     @RequireRerender
     private int heat = 298;
+    @Getter
     @DescSynced
     @RequireRerender
     private WaterState waterState = WaterState.NO_WATER;
+    @Getter
     @DescSynced
     @RequireRerender
     private int waterLevel = 0; // Used for rendering water level in the machine
@@ -101,10 +99,11 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
     private long time;
     private final ConditionalSubscriptionHandler tickSubs;
     private SensorPartMachine sensorMachine;
+    private boolean activated;
 
     public PrimitiveDistillationTowerMachine(MetaMachineBlockEntity holder) {
         super(holder);
-        tickSubs = new ConditionalSubscriptionHandler(this, this::tickUpdate, this::shouldTick);
+        tickSubs = new ConditionalSubscriptionHandler(this, this::tickUpdate, 0, this::shouldTick);
     }
 
     private boolean shouldTick() {
@@ -178,8 +177,9 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
      * 如果机器当前未激活，将其状态设为激活并更新激活的区块。
      */
     private void activateMachine() {
+        if (activated) return;
         activated = true;
-        this.requestSync();
+        GTNetwork.NETWORK.sendToAll(new SCPacketUpdateActiveBlock(getMultiblockState().matchContext.vaBlocks, true));
     }
 
     /**
@@ -253,8 +253,10 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
      * 如果机器当前处于激活状态，则将其状态设为非激活，并更新相关的活动块标志。
      */
     private void deactivateMachine() {
-        activated = false;
-        this.requestSync();
+        if (activated) {
+            activated = false;
+            GTNetwork.NETWORK.sendToAll(new SCPacketUpdateActiveBlock(getMultiblockState().matchContext.vaBlocks, false));
+        }
     }
 
     /**
@@ -264,13 +266,13 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
      */
     private void checkAndRefuel(long offsetTimer) {
         if (isWorkingEnabled() && offsetTimer % 10 == 0) {
-            if (inputItem(COAL)) {
+            if (inputItem(Items.COAL, 1)) {
                 tier = TIER_INCREASE;
                 time += 1200;
-            } else if (inputItem(COAL_BLOCK)) {
+            } else if (inputItem(Items.COAL_BLOCK, 1)) {
                 tier = TIER_DECREASE;
                 time += 21600;
-            } else if (inputItem(COAL_DUST)) {
+            } else if (inputItem(COAL_DUST, 1)) {
                 tier = 4;
                 time += 500;
             }
@@ -356,10 +358,10 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
     public void onStructureFormed() {
         super.onStructureFormed();
         int startY = getPos().getY() + 1;
-        List<IMultiPart> parts = getParts().stream().filter(part -> PartAbility.EXPORT_FLUIDS.isApplicable(part.self().getBlockState().getBlock())).filter(part -> part.self().getPos().getY() >= startY).toList();
+        List<IWorkableMultiPart> parts = Arrays.stream(getParts()).filter(IWorkableMultiPart.class::isInstance).map(IWorkableMultiPart.class::cast).filter(part -> PartAbility.EXPORT_FLUIDS.isApplicable(part.self().getBlockState().getBlock())).filter(part -> part.self().getPos().getY() >= startY).toList();
         if (!parts.isEmpty()) {
             int maxY = parts.get(parts.size() - 1).self().getPos().getY();
-            fluidOutputs = new ObjectArrayList<>(maxY - startY);
+            fluidOutputs = new ArrayList<>(maxY - startY);
             int outputIndex = 0;
             for (int y = startY; y <= maxY; ++y) {
                 if (parts.size() <= outputIndex) {
@@ -406,24 +408,12 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
         return false;
     }
 
-    public WaterState getWaterState() {
-        return waterState;
-    }
-
     public static int getMaxHeat() {
         return EXPLOSION;
     }
 
     public static int getMaxWaterUsage() {
         return MAX_WATER_USAGE;
-    }
-
-    public int getHeat() {
-        return heat;
-    }
-
-    public int getWaterLevel() {
-        return waterLevel;
     }
 
     private static final class DistillationTowerLogic extends RecipeLogic {

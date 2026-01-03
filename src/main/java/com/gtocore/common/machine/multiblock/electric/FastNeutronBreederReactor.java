@@ -8,11 +8,9 @@ import com.gtocore.common.machine.multiblock.part.SensorPartMachine;
 
 import com.gtolib.api.machine.feature.multiblock.IStorageMultiblock;
 import com.gtolib.api.machine.multiblock.CustomParallelMultiblockMachine;
-import com.gtolib.api.machine.multiblock.ElectricMultiblockMachine;
 import com.gtolib.api.machine.trait.IEnhancedRecipeLogic;
 import com.gtolib.api.recipe.Recipe;
 import com.gtolib.utils.GTOUtils;
-import com.gtolib.utils.MachineUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
@@ -33,7 +31,6 @@ import net.minecraft.world.level.material.Fluid;
 import com.google.common.collect.ImmutableMap;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 
 public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine implements IStorageMultiblock, IExplosionMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(FastNeutronBreederReactor.class, ElectricMultiblockMachine.MANAGED_FIELD_HOLDER);
 
     @Persisted
     private final NotifiableItemStackHandler machineStorage;
@@ -56,11 +51,6 @@ public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine i
     private SensorPartMachine sensorNeutronFlux;
 
     private static final int MAX_TEMPERATURE = 2098;
-
-    @Override
-    public @NotNull ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     public FastNeutronBreederReactor(MetaMachineBlockEntity holder) {
         super(holder, true, h -> 2048);
@@ -95,8 +85,7 @@ public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine i
     }
 
     @Override
-    public boolean beforeWorking(@Nullable Recipe recipe) {
-        if (recipe == null) return true;
+    public boolean beforeWorking(@NotNull Recipe recipe) {
         recipeHeat = getRecipeHeat(recipe);
         return super.beforeWorking(recipe);
     }
@@ -131,11 +120,11 @@ public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine i
     @Override
     public void onLoad() {
         super.onLoad();
-        tickSubscription = subscribeServerTick(this::tick);
+        tickSubscription = subscribeServerTick(tickSubscription, this::tick, 20);
     }
 
     @Nullable
-    TickableSubscription tickSubscription;
+    private TickableSubscription tickSubscription;
 
     @Override
     public void onUnload() {
@@ -150,9 +139,9 @@ public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine i
     public void onPartScan(@NotNull IMultiPart part) {
         super.onPartScan(part);
         if (part instanceof SensorPartMachine sensorPartMachine) {
-            if (sensorPartMachine.getHolder().getBlockState().is(GTOMachines.HEAT_SENSOR.getBlock()))
+            if (sensorPartMachine.getHolder().getBlockState().is(GTOMachines.HEAT_SENSOR.get()))
                 sensorMachineTemp = sensorPartMachine;
-            else if (sensorPartMachine.getHolder().getBlockState().is(GTOMachines.NEUTRON_SENSOR.getBlock()))
+            else if (sensorPartMachine.getHolder().getBlockState().is(GTOMachines.NEUTRON_SENSOR.get()))
                 sensorNeutronFlux = sensorPartMachine;
         }
     }
@@ -193,14 +182,14 @@ public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine i
      * 三、中子通量为E（keV）时，在主机内放入N个铱中子反射板后，中子通量每秒增加 (EN)^0.5 keV；
      */
     private void tick() {
-        if (isFormed() && getOffsetTimer() % 20 == 0) {
+        if (isFormed()) {
 
-            MachineUtils.forEachInputItems(this, (stack) -> {
-                if (Wrapper.NEUTRON_SOURCES.containsKey(stack.getItem())) {
-                    neutronFluxkeV += (long) Wrapper.NEUTRON_SOURCES.get(stack.getItem()) * stack.getCount();
-                    stack.setCount(0);
+            fastForEachInputItems((stack, amount) -> {
+                var neutron_sources = Wrapper.NEUTRON_SOURCES.get(stack.getItem());
+                if (neutron_sources != null) {
+                    neutronFluxkeV += (long) neutron_sources * amount;
+                    inputItem(stack.getItem(), amount);
                 }
-                return false;
             });
             neutronFluxkeV = Math.max(0, neutronFluxkeV - 10);
 
@@ -209,12 +198,19 @@ public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine i
                 neutronFluxkeV += (long) Math.sqrt(neutronFluxkeV * reflectors);
             }
             temperature += (float) recipeHeat;
-            MachineUtils.forEachInputFluids(this, (fluidStack) -> {
-                if (Wrapper.COOLANTS.containsKey(fluidStack.getFluid())) {
-                    temperature -= Wrapper.COOLANTS.get(fluidStack.getFluid()) * fluidStack.getAmount();
-                    fluidStack.setAmount(0);
+            fastForEachInputFluids((stack, amount) -> {
+                var fluid = stack.getFluid();
+                var coolants = Wrapper.COOLANTS.get(fluid);
+                if (coolants != null && temperature > 298) {
+                    long processAmount = Math.min((long) Math.ceil((temperature - 298f) / coolants), amount);
+                    temperature -= processAmount * coolants;
+                    inputFluid(fluid, processAmount);
+                    long outputAmount = processAmount;
+                    if (fluid == GTMaterials.DistilledWater.getFluid()) {
+                        outputAmount = outputAmount * 160L;
+                    }
+                    outputFluid(Wrapper.COOLANT_OUTPUTS.get(fluid), outputAmount);
                 }
-                return false;
             });
             temperature = Math.max(298, temperature);
             if (temperature > MAX_TEMPERATURE) {
@@ -231,7 +227,7 @@ public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine i
     }
 
     private void meltDown() {
-        MachineUtils.outputItem(this, GTOItems.NUCLEAR_WASTE.asStack(1 + (int) (Math.random() * 4)));
+        outputItem(GTOItems.NUCLEAR_WASTE.asItem(), 1 + (int) (Math.random() * 4));
         var machine = self();
         var level = machine.getLevel();
         var pos = machine.getPos().relative(machine.getFrontFacing().getOpposite(), 6);
@@ -250,8 +246,9 @@ public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine i
 
     private static class Wrapper {
 
-        public static final Map<Item, Integer> NEUTRON_SOURCES;
-        public static final Map<Fluid, Integer> COOLANTS;
+        private static final Map<Item, Integer> NEUTRON_SOURCES;
+        private static final Map<Fluid, Integer> COOLANTS;
+        private static final Map<Fluid, Fluid> COOLANT_OUTPUTS;
         static {
             ImmutableMap.Builder<Item, Integer> builder = ImmutableMap.builder();
             builder.put(ChemicalHelper.get(TagPrefix.dust, GTMaterials.Graphite).getItem(), -1000);
@@ -266,6 +263,11 @@ public class FastNeutronBreederReactor extends CustomParallelMultiblockMachine i
             builder1.put(GTOMaterials.LiquidNitrogen.getFluid(), 4);
             builder1.put(GTMaterials.DistilledWater.getFluid(), 1);
             COOLANTS = builder1.build();
+            ImmutableMap.Builder<Fluid, Fluid> builder2 = ImmutableMap.builder();
+            builder2.put(GTMaterials.Helium.getFluid(FluidStorageKeys.LIQUID), GTMaterials.Helium.getFluid(FluidStorageKeys.GAS));
+            builder2.put(GTOMaterials.LiquidNitrogen.getFluid(), GTMaterials.Nitrogen.getFluid());
+            builder2.put(GTMaterials.DistilledWater.getFluid(), GTMaterials.Steam.getFluid());
+            COOLANT_OUTPUTS = builder2.build();
         }
     }
 }

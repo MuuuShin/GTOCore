@@ -2,13 +2,13 @@ package com.gtocore.mixin.gtm.machine;
 
 import com.gtolib.api.capability.IWirelessChargerInteraction;
 import com.gtolib.api.machine.feature.IElectricMachine;
-import com.gtolib.api.machine.multiblock.WirelessChargerMachine;
+import com.gtolib.api.machine.impl.WirelessChargerMachine;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
+import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.EnergyHatchPartMachine;
 
@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.UUID;
 
 @Mixin(EnergyHatchPartMachine.class)
-public class EnergyHatchPartMachineMixin extends TieredIOPartMachine implements IWirelessChargerInteraction, IElectricMachine {
+public class EnergyHatchPartMachineMixin extends WorkableTieredIOPartMachine implements IWirelessChargerInteraction, IElectricMachine {
 
     @Shadow(remap = false)
     @Final
@@ -42,7 +42,7 @@ public class EnergyHatchPartMachineMixin extends TieredIOPartMachine implements 
     @Inject(method = "onLoad", at = @At("TAIL"), remap = false)
     private void onLoad(CallbackInfo ci) {
         if (!isRemote()) {
-            gtolib$tickSubs = subscribeServerTick(gtolib$tickSubs, this::charge);
+            gtolib$tickSubs = subscribeServerTick(gtolib$tickSubs, () -> charge(gtolib$tickSubs), 20);
         }
     }
 

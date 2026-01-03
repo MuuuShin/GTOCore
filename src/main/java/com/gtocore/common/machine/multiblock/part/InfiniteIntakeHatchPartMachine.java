@@ -4,12 +4,11 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
+import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.common.recipe.condition.DimensionCondition;
 import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
-import com.gregtechceu.gtceu.utils.collection.O2OOpenCacheHashMap;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,19 +28,16 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
+import com.fast.fastcollection.O2OOpenCacheHashMap;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-public final class InfiniteIntakeHatchPartMachine extends TieredIOPartMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            InfiniteIntakeHatchPartMachine.class, TieredIOPartMachine.MANAGED_FIELD_HOLDER);
+public final class InfiniteIntakeHatchPartMachine extends WorkableTieredIOPartMachine {
 
     public static final Map<ResourceLocation, Fluid> AIR_MAP = new O2OOpenCacheHashMap<>();
 
@@ -137,7 +133,7 @@ public final class InfiniteIntakeHatchPartMachine extends TieredIOPartMachine {
 
     private void updateTankSubscription() {
         if (isWorkingEnabled() && isFrontFaceFree()) {
-            intakeSubs = subscribeServerTick(intakeSubs, this::intake);
+            intakeSubs = subscribeServerTick(intakeSubs, this::intake, 20);
             this.isWorking = true;
         } else {
             unsubscribe();
@@ -145,17 +141,15 @@ public final class InfiniteIntakeHatchPartMachine extends TieredIOPartMachine {
     }
 
     private void intake() {
-        if (getOffsetTimer() % 20 == 0) {
-            var fluid = AIR_MAP.get(getLevel().dimension().location());
-            if (fluid == null) {
-                unsubscribe();
-                return;
-            }
-            if (tank.fillInternal(new FluidStack(fluid, 8000), IFluidHandler.FluidAction.EXECUTE) == 0) {
-                unsubscribe();
-            } else {
-                updateTankSubscription();
-            }
+        var fluid = AIR_MAP.get(getLevel().dimension().location());
+        if (fluid == null) {
+            unsubscribe();
+            return;
+        }
+        if (tank.fillInternal(new FluidStack(fluid, 8000), IFluidHandler.FluidAction.EXECUTE) == 0) {
+            unsubscribe();
+        } else {
+            updateTankSubscription();
         }
     }
 
@@ -176,10 +170,5 @@ public final class InfiniteIntakeHatchPartMachine extends TieredIOPartMachine {
     public void setWorkingEnabled(boolean workingEnabled) {
         super.setWorkingEnabled(workingEnabled);
         updateTankSubscription();
-    }
-
-    @Override
-    public @NotNull ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 }

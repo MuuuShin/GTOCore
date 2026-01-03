@@ -4,9 +4,8 @@ import com.gtolib.api.machine.trait.IEnhancedRecipeLogic;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IExhaustVentMachine;
-import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiController;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
+import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableMultiblockPartMachine;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -21,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,9 +27,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SteamVentHatchMachine extends MultiblockPartMachine implements IExhaustVentMachine {
+public class SteamVentHatchMachine extends WorkableMultiblockPartMachine implements IExhaustVentMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(SteamVentHatchMachine.class, MultiblockPartMachine.MANAGED_FIELD_HOLDER);
     @Persisted
     private boolean needsVenting;
 
@@ -52,16 +49,9 @@ public class SteamVentHatchMachine extends MultiblockPartMachine implements IExh
     }
 
     @Override
-    public boolean afterWorking(IWorkableMultiController controller) {
+    public void afterWorking(IWorkableMultiController controller) {
         this.needsVenting = true;
         checkVenting();
-        return super.afterWorking(controller);
-    }
-
-    @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Override
@@ -82,14 +72,12 @@ public class SteamVentHatchMachine extends MultiblockPartMachine implements IExh
 
     @Override
     @Nullable
-    public GTRecipe modifyRecipe(GTRecipe recipe) {
+    public GTRecipe modifyRecipe(IWorkableMultiController controller, GTRecipe recipe) {
         if (needsVenting && isVentingBlocked()) {
-            for (var controller : getControllers()) {
-                ((IEnhancedRecipeLogic) ((IRecipeLogicMachine) controller).getRecipeLogic()).gtolib$setIdleReason(Component.translatable("gtceu.recipe_logic.condition_fails").append(": ").append(Component.translatable("recipe.condition.steam_vent.tooltip")));
-            }
+            ((IEnhancedRecipeLogic) controller.getRecipeLogic()).gtolib$setIdleReason(Component.translatable("gtceu.recipe_logic.condition_fails").append(": ").append(Component.translatable("recipe.condition.steam_vent.tooltip")));
             return null;
         }
-        return super.modifyRecipe(recipe);
+        return recipe;
     }
 
     @Override

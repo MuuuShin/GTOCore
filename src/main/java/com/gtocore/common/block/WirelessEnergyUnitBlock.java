@@ -6,12 +6,14 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
@@ -19,6 +21,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+@Getter
 public class WirelessEnergyUnitBlock extends Block {
 
     private final BigInteger capacity;
@@ -30,7 +33,7 @@ public class WirelessEnergyUnitBlock extends Block {
         var sec_base = 60 << 4 - GTOCore.difficulty;
         this.capacity = BigInteger.valueOf(GTValues.VEX[tier << 1]).divide(BigInteger.valueOf(GTOCore.difficulty))
                 .add(BigInteger.valueOf(GTValues.VEX[tier] * 20 * sec_base)).multiply(BigInteger.valueOf(tier));
-        int loss_tmp = GTOCore.isSimple() ? 0 : (GTValues.MAX - tier) << GTOCore.difficulty;
+        int loss_tmp = GTOCore.isEasy() ? 0 : (GTValues.MAX - tier) << GTOCore.difficulty;
         if (tier < 6) {
             loss_tmp += 10 * (GTOCore.difficulty << 2) / tier;
         }
@@ -48,17 +51,16 @@ public class WirelessEnergyUnitBlock extends Block {
         } else {
             tooltip.add(Component.translatable("tooltip.ad_astra.shift_description"));
         }
+        tooltip.add(Component.translatable("gtocore.machine.wireless_energy_unit.tooltip"));
     }
 
-    public BigInteger getCapacity() {
-        return this.capacity;
+    @Nullable
+    public static WirelessEnergyUnitBlock get(int tier) {
+        if (tier < 1 || tier > BlockMap.WIRELESS_ENERGY_UNIT.length + 1) {
+            return null;
+        }
+        return (WirelessEnergyUnitBlock) BlockMap.WIRELESS_ENERGY_UNIT[tier - 1];
     }
 
-    public int getLoss() {
-        return this.loss;
-    }
-
-    public int getTier() {
-        return this.tier;
-    }
+    public record BlockData(@Nullable WirelessEnergyUnitBlock block, BlockPos pos) {}
 }

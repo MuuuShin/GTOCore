@@ -27,7 +27,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,19 +49,11 @@ public final class PCBFactoryMachine extends StorageMultiblockMachine implements
 
     private static final Int2ObjectOpenHashMap<BlockPattern> PATTERNS = new Int2ObjectOpenHashMap<>(3, 0.9F);
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            PCBFactoryMachine.class, StorageMultiblockMachine.MANAGED_FIELD_HOLDER);
-
     @Persisted
     private int machineTier = 1;
 
     public PCBFactoryMachine(MetaMachineBlockEntity holder) {
         super(holder, 1, i -> ChemicalHelper.getPrefix(i.getItem()) == GTOTagPrefix.NANITES);
-    }
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Override
@@ -141,7 +132,7 @@ public final class PCBFactoryMachine extends StorageMultiblockMachine implements
                         .where('Q', blocks(GTOBlocks.PPS_CORROSION_RESISTANT_MECHANICAL_HOUSING.get()))
                         .where('R', blocks(GTOBlocks.HOLLOW_CASING.get()))
                         .where('S', blocks(GTBlocks.HERMETIC_CASING_ZPM.get()))
-                        .where('T', controller(blocks(definition.get())))
+                        .where('T', controller(definition))
                         .where(' ', any())
                         .build();
                 case 3 -> builder.aisle("               AAAAAAAAAAAAAAAAA               ", "                   A   A   A                   ", "                   A   A   A                   ", "               CCCCCCCCCCCCCCCCC               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ", "                                               ")
@@ -217,7 +208,7 @@ public final class PCBFactoryMachine extends StorageMultiblockMachine implements
                         .where('V', blocks(ChemicalHelper.getBlock(TagPrefix.frameGt, GTMaterials.Europium)))
                         .where('W', blocks(GTOBlocks.PPS_CORROSION_RESISTANT_MECHANICAL_HOUSING.get()))
                         .where('X', blocks(GTBlocks.HERMETIC_CASING_ZPM.get()))
-                        .where('Y', controller(blocks(definition.get())))
+                        .where('Y', controller(definition))
                         .where(' ', any())
                         .build();
                 default -> builder.aisle("    AAAAA    ", "             ", "             ", "             ", "             ", "             ", "             ", "             ", "             ", "             ", "             ", "             ", "             ", "             ", "    BBBBB    ", "      B      ")
@@ -247,7 +238,7 @@ public final class PCBFactoryMachine extends StorageMultiblockMachine implements
                         .where('H', blocks(ChemicalHelper.getBlock(TagPrefix.frameGt, GTMaterials.Europium)))
                         .where('I', blocks(GTOBlocks.PPS_CORROSION_RESISTANT_MECHANICAL_HOUSING.get()))
                         .where('J', blocks(GTBlocks.HERMETIC_CASING_ZPM.get()))
-                        .where('K', controller(blocks(definition.get())))
+                        .where('K', controller(definition))
                         .build();
             };
         });
@@ -260,7 +251,7 @@ public final class PCBFactoryMachine extends StorageMultiblockMachine implements
 
     @Override
     public List<BlockPattern> getMultiPattern() {
-        return List.of(getBlockPattern(0, getDefinition()), getBlockPattern(1, getDefinition()), getBlockPattern(2, getDefinition()));
+        return List.of(getBlockPattern(1, getDefinition()), getBlockPattern(2, getDefinition()), getBlockPattern(3, getDefinition()));
     }
 
     @Nullable

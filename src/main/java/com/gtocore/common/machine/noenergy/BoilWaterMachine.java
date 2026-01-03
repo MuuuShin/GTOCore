@@ -18,13 +18,11 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IReceiveHeatMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(BoilWaterMachine.class, SimpleNoEnergyMachine.MANAGED_FIELD_HOLDER);
     public static final int DrawWaterExplosionLine = 400;
     @Persisted
     private int temperature = 293;
@@ -74,7 +72,7 @@ public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IRe
     public void onLoad() {
         super.onLoad();
         if (!isRemote()) {
-            tickSubs = subscribeServerTick(tickSubs, this::tickUpdate);
+            tickSubs = subscribeServerTick(tickSubs, this::tickUpdate, 20);
         }
     }
 
@@ -104,12 +102,6 @@ public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IRe
     @Override
     public int getMaxTemperature() {
         return 600;
-    }
-
-    @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Override

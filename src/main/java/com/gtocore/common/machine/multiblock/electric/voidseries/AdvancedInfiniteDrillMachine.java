@@ -23,8 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import org.jetbrains.annotations.NotNull;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
@@ -35,20 +34,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public final class AdvancedInfiniteDrillMachine extends StorageMultiblockMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(AdvancedInfiniteDrillMachine.class, StorageMultiblockMachine.MANAGED_FIELD_HOLDER);
     private static final FluidStack DISTILLED_WATER = GTMaterials.DistilledWater.getFluid(20000);
     private static final FluidStack OXYGEN = GTMaterials.Oxygen.getFluid(FluidStorageKeys.LIQUID, 20000);
     private static final FluidStack HELIUM = GTMaterials.Helium.getFluid(FluidStorageKeys.LIQUID, 20000);
     private static final Map<Material, Integer> HEAT_MAP = Map.of(GTOMaterials.Neutron, 1);
 
-    @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
     private static final int RUNNING_HEAT = 2000;
     private static final int MAX_HEAT = 10000;
+    @Getter
     @Persisted
     private int currentHeat = 300;
     @Persisted
@@ -57,7 +50,7 @@ public final class AdvancedInfiniteDrillMachine extends StorageMultiblockMachine
 
     public AdvancedInfiniteDrillMachine(MetaMachineBlockEntity holder) {
         super(holder, 1, i -> ChemicalHelper.getPrefix(i.getItem()) == TagPrefix.toolHeadDrill);
-        heatSubs = new ConditionalSubscriptionHandler(this, this::heatUpdate, this::isFormed);
+        heatSubs = new ConditionalSubscriptionHandler(this, this::heatUpdate, 5, this::isFormed);
     }
 
     @Override
@@ -66,14 +59,15 @@ public final class AdvancedInfiniteDrillMachine extends StorageMultiblockMachine
     }
 
     private void heatUpdate() {
-        if (getOffsetTimer() % 5 != 0) return;
         heatSubs.updateSubscription();
 
         boolean isWorking = getRecipeLogic().isWorking();
-        boolean playerWantsToHeat = !isEmpty() && inputBlast();
+        int playerWantsToHeat = !isEmpty() ? inputBlast() : 0;
+        boolean heatedByPlayer = playerWantsToHeat > 0;
 
-        if (playerWantsToHeat && currentHeat < MAX_HEAT) {
-            currentHeat++;
+        if (heatedByPlayer && currentHeat < MAX_HEAT) {
+            playerWantsToHeat = Math.min(playerWantsToHeat, MAX_HEAT - currentHeat);
+            currentHeat += playerWantsToHeat;
         }
 
         if (isWorking && process <= 0) {
@@ -90,7 +84,7 @@ public final class AdvancedInfiniteDrillMachine extends StorageMultiblockMachine
             }
         }
 
-        if (!isWorking && !playerWantsToHeat) {
+        if (!isWorking && !heatedByPlayer) {
             currentHeat = Math.max(300, currentHeat - 1);
         }
 
@@ -161,8 +155,10 @@ public final class AdvancedInfiniteDrillMachine extends StorageMultiblockMachine
         return 0;
     }
 
-    private boolean inputBlast() {
-        return inputFluid(GTMaterials.Blaze.getFluid(getFluidConsume()));
+    private int inputBlast() {
+        if (inputFluid(GTMaterials.Blaze.getFluid(getFluidConsume()))) return 1;
+        if (inputFluid(GTOMaterials.BlazeCube.getFluid(getFluidConsume()))) return 1000;
+        return 0;
     }
 
     private int getFluidConsume() {
@@ -171,9 +167,5 @@ public final class AdvancedInfiniteDrillMachine extends StorageMultiblockMachine
 
     public boolean canRunnable() {
         return currentHeat >= RUNNING_HEAT;
-    }
-
-    public int getCurrentHeat() {
-        return this.currentHeat;
     }
 }

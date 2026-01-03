@@ -13,9 +13,13 @@ import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.utils.Position;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
 public class MonitorCustomInfo extends AbstractInfoProviderMonitor {
 
     private static final char FORMATTING_CODE = 167;
@@ -69,20 +73,12 @@ public class MonitorCustomInfo extends AbstractInfoProviderMonitor {
         return ((new WidgetGroup(0, 0, 200, 90))).addWidget(input).addWidget(textField).addWidget(formattingCodeInputButton).addWidget(panel);
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     @Override
     public DisplayComponentList provideInformation() {
         var infoList = super.provideInformation();
         infoList.addIfAbsent(
                 DisplayRegistry.CUSTOM_DISPLAY.id(),
-                Component.literal(getContent())
+                Component.literal(content)
                         .getVisualOrderText());
         return infoList;
     }

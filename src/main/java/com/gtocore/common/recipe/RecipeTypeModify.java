@@ -8,6 +8,7 @@ import com.gtocore.data.recipe.generated.GenerateDisassembly;
 
 import com.gtolib.api.capability.recipe.ManaRecipeCapability;
 import com.gtolib.api.recipe.ingredient.FastFluidIngredient;
+import com.gtolib.api.recipe.ingredient.FastSizedIngredient;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
@@ -57,6 +58,8 @@ public final class RecipeTypeModify {
         SIFTER_RECIPES.setMaxIOSize(1, 6, 1, 0);
 
         CHEMICAL_RECIPES.onRecipeBuild((r) -> {});
+
+        LARGE_CHEMICAL_RECIPES.getProxyRecipes().add(CHEMICAL_RECIPES);
 
         ASSEMBLY_LINE_RECIPES.onRecipeBuild(GenerateDisassembly::generateDisassembly);
 
@@ -163,7 +166,7 @@ public final class RecipeTypeModify {
             }
             list = builder.input.getOrDefault(ItemRecipeCapability.CAP, Collections.emptyList());
             if (!list.isEmpty()) {
-                Arrays.stream(ItemRecipeCapability.CAP.of(list.get(0).content).getItems()).forEach(stack -> SteamSolidBoilerMachine.FUEL_CACHE.add(stack.getItem()));
+                Arrays.stream(FastSizedIngredient.getInner(ItemRecipeCapability.CAP.of(list.get(0).content)).getItems()).forEach(stack -> SteamSolidBoilerMachine.FUEL_CACHE.add(stack.getItem()));
             }
         });
 

@@ -1,6 +1,6 @@
 package com.gtocore.mixin.ae2.gui;
 
-import com.gtocore.integration.ae.IConfirmLongMenu;
+import com.gtocore.integration.ae.hooks.IConfirmStartMenu;
 
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
@@ -17,6 +17,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -42,8 +43,9 @@ public abstract class CraftConfirmTableRendererMixin extends AbstractTableRender
                      value = "FIELD",
                      target = "Lappeng/core/localization/GuiText;FromStorage:Lappeng/core/localization/GuiText;",
                      shift = At.Shift.AFTER,
-                     by = 3))
-    private void gto$modifyGetEntryDescription(CraftingPlanSummaryEntry entry, CallbackInfoReturnable<List<Component>> cir, @Local List<Component> lines) {
+                     by = 3,
+                     opcode = Opcodes.GETSTATIC))
+    private void gto$modifyGetEntryDescription(CraftingPlanSummaryEntry entry, CallbackInfoReturnable<List<Component>> cir, @Local(name = "lines") List<Component> lines) {
         if (gto$cachedKeys == null) return;
         long storedTotal = gto$cachedKeys.get(entry.getWhat());
         if (storedTotal <= 0) return;
@@ -56,7 +58,7 @@ public abstract class CraftConfirmTableRendererMixin extends AbstractTableRender
 
     @WrapMethod(method = "getEntryDescription(Lappeng/menu/me/crafting/CraftingPlanSummaryEntry;)Ljava/util/List;", remap = false)
     private List<Component> gto$modifyGetEntryDescription2(CraftingPlanSummaryEntry entry, Operation<List<Component>> original) {
-        IClientRepo repo = (screen.getMenu()) instanceof IConfirmLongMenu.IConfirmLongStartMenu me ? me.gtocore$getClientRepo() : null;
+        IClientRepo repo = (screen.getMenu()) instanceof IConfirmStartMenu me ? me.gtocore$getClientRepo() : null;
         if (repo == null) return original.call(entry);
         gto$cachedKeys = new KeyCounter();
         repo.getAllEntries().stream().filter(e -> e.getWhat() != null && e.getStoredAmount() > 0)

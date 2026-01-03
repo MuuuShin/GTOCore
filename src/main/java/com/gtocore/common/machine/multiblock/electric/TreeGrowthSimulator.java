@@ -2,6 +2,8 @@ package com.gtocore.common.machine.multiblock.electric;
 
 import com.gtocore.data.IdleReason;
 
+import com.gtolib.api.annotation.DataGeneratorScanned;
+import com.gtolib.api.annotation.language.RegisterLanguage;
 import com.gtolib.api.machine.multiblock.StorageMultiblockMachine;
 import com.gtolib.api.recipe.Recipe;
 import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
@@ -20,13 +22,19 @@ import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+@DataGeneratorScanned
 public final class TreeGrowthSimulator extends StorageMultiblockMachine {
+
+    @RegisterLanguage(cn = "主产物产出%s%%", en = "Main Output %s%%")
+    private static final String MAIN = "gtocore.machine.main_output";
 
     private int output = 1;
     private float speed = 1;
@@ -61,13 +69,14 @@ public final class TreeGrowthSimulator extends StorageMultiblockMachine {
                 }
             }
             if (!isElectric || GTValues.RNG.nextInt(10) == 0) {
-                int damag = item.definition$getDamage(stack);
-                if (damag >= item.definition$getMaxDamage(stack)) {
+                int damage = stack.getDamageValue();
+                if (damage >= stack.getMaxDamage()) {
                     machineStorage.setStackInSlot(0, ItemStack.EMPTY);
                     setIdleReason(IdleReason.FELLING_TOOL);
                     return null;
                 }
-                item.definition$setDamage(stack, damag + 1);
+                var level = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack) + 1;
+                if (GTValues.RNG.nextInt() % level == 0) stack.setDamageValue(damage + 1);
             }
             recipe.duration = (int) (recipe.duration / speed);
             if (output > 1) {
@@ -108,7 +117,7 @@ public final class TreeGrowthSimulator extends StorageMultiblockMachine {
     @Override
     public void customText(@NotNull List<Component> textList) {
         super.customText(textList);
-        textList.add(Component.translatable("tooltip.enderio.grinding_ball_main_output", output * 100));
+        textList.add(Component.translatable(MAIN, output * 100));
         textList.add(Component.translatable("jade.horseStat.speed", "x " + FormattingUtil.formatNumbers(speed)));
     }
 }

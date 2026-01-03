@@ -15,7 +15,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import java.util.List;
 
@@ -24,14 +23,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class ResidualDecontaminantDegasserPurificationUnitMachine extends WaterPurificationUnitMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            ResidualDecontaminantDegasserPurificationUnitMachine.class, WaterPurificationUnitMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     private static final List<FluidStack> FLUIDS = List.of(
             GTMaterials.Helium.getFluid(FluidStorageKeys.LIQUID, 10000),
@@ -70,7 +61,7 @@ public final class ResidualDecontaminantDegasserPurificationUnitMachine extends 
         super.customText(textList);
         if (getRecipeLogic().isWorking()) {
             textList.add(Component.translatable("gtocore.machine.residual_decontaminant_degasser_purification_unit.fluids", fluidStack.getDisplayName()));
-            textList.add(Component.translatable("gui.enderio.sag_mill_chance", (successful && !failed) ? 100 : 0));
+            textList.add(Component.translatable("gtceu.jei.ore_vein_diagram.chance", (successful && !failed) ? 100 : 0));
         }
     }
 
@@ -93,18 +84,15 @@ public final class ResidualDecontaminantDegasserPurificationUnitMachine extends 
         if (!super.onWorking()) return false;
         if (!failed && getOffsetTimer() % 20 == 0) {
             IntHolder nonEmpty = new IntHolder(0);
-            forEachInputFluids(stack -> {
-                if (stack.getAmount() > 0) {
-                    if (stack.getFluid() == WaterPurificationPlantMachine.GradePurifiedWater6) return false;
-                    nonEmpty.value++;
-                    if (!fluidStack.isEmpty() && fluidStack.getFluid() == stack.getFluid() && fluidStack.getAmount() <= stack.getAmount()) {
-                        successful = true;
-                    } else {
-                        failed = true;
-                    }
-                    inputFluid(stack);
+            fastForEachInputFluids((stack, amount) -> {
+                if (stack.getFluid() == WaterPurificationPlantMachine.GradePurifiedWater6) return;
+                nonEmpty.value++;
+                if (!fluidStack.isEmpty() && fluidStack.getFluid() == stack.getFluid() && fluidStack.getAmount() <= amount) {
+                    successful = true;
+                } else {
+                    failed = true;
                 }
-                return false;
+                inputFluid(stack.getFluid(), amount);
             });
             if (fluidStack.isEmpty() && nonEmpty.value == 0) successful = true;
         }

@@ -9,15 +9,14 @@ import com.gtolib.utils.MachineUtils;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.utils.collection.OpenCacheHashSet;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import com.fast.fastcollection.OpenCacheHashSet;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,14 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 public final class DissolvingTankMachine extends ElectricMultiblockMachine implements IFluidRendererMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(DissolvingTankMachine.class, ElectricMultiblockMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     @DescSynced
     @RequireRerender
@@ -45,7 +36,7 @@ public final class DissolvingTankMachine extends ElectricMultiblockMachine imple
     }
 
     @Override
-    protected boolean beforeWorking(@Nullable Recipe recipe) {
+    protected boolean beforeWorking(@NotNull Recipe recipe) {
         cachedFluid = IFluidRendererMachine.getFluid(recipe);
         return super.beforeWorking(recipe);
     }
@@ -73,6 +64,9 @@ public final class DissolvingTankMachine extends ElectricMultiblockMachine imple
     @Nullable
     @Override
     protected Recipe getRealRecipe(@NotNull Recipe recipe) {
+        if (getSubFormedAmount() > 0) {
+            return RecipeModifierFunction.overclocking(this, RecipeModifierFunction.hatchParallel(this, recipe));
+        }
         List<Content> fluidList = recipe.inputs.getOrDefault(FluidRecipeCapability.CAP, null);
         FluidStack fluidStack1 = FluidRecipeCapability.CAP.of(fluidList.get(0).getContent()).getStacks()[0];
         FluidStack fluidStack2 = FluidRecipeCapability.CAP.of(fluidList.get(1).getContent()).getStacks()[0];

@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.integration.ae2.slot.IConfigurableSlot;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -12,6 +13,7 @@ import appeng.api.stacks.GenericStack;
 import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.utils.Position;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawStringSized;
@@ -19,13 +21,14 @@ import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawStringSized;
 class AmountSetWidget extends Widget {
 
     private int index = -1;
+    @Getter
     private final TextFieldWidget amountText;
     private final ConfigWidget parentWidget;
 
-    public AmountSetWidget(int x, int y, ConfigWidget widget) {
+    AmountSetWidget(int x, int y, ConfigWidget widget) {
         super(x, y, 80, 30);
         this.parentWidget = widget;
-        this.amountText = new TextFieldWidget(x + 3, y + 12, 65, 13, this::getAmountStr, this::setNewAmount).setNumbersOnly(0, Long.MAX_VALUE);
+        this.amountText = new TextFieldWidget(x + 8, y + 12, 60, 13, this::getAmountStr, this::setNewAmount).setNumbersOnly(0, Long.MAX_VALUE);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -76,11 +79,6 @@ class AmountSetWidget extends Widget {
         super.drawInBackground(graphics, mouseX, mouseY, partialTicks);
         Position position = getPosition();
         GuiTextures.BACKGROUND.draw(graphics, mouseX, mouseY, position.x, position.y, 80, 30);
-        drawStringSized(graphics, "Amount", position.x + 3, position.y + 3, 4210752, false, 1.0F, false);
-        GuiTextures.DISPLAY.draw(graphics, mouseX, mouseY, position.x + 3, position.y + 11, 65, 14);
-    }
-
-    public TextFieldWidget getAmountText() {
-        return this.amountText;
+        drawStringSized(graphics, I18n.get("ldlib.gui.editor.configurator.amount"), position.x + 25, position.y + 3, 4210752, false, 1.0F, false);
     }
 }

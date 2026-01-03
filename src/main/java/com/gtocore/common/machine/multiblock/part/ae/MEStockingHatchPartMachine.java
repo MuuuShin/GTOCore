@@ -4,6 +4,8 @@ import com.gtocore.common.machine.multiblock.part.ae.slots.ExportOnlyAEFluidList
 import com.gtocore.common.machine.multiblock.part.ae.slots.ExportOnlyAEFluidSlot;
 import com.gtocore.common.machine.multiblock.part.ae.slots.ExportOnlyAEStockingFluidList;
 
+import com.gtolib.GTOCore;
+
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
@@ -19,16 +21,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGrid;
+import appeng.api.networking.storage.IStorageService;
 import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
 import appeng.api.storage.MEStorage;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -39,9 +42,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MEStockingHatchPartMachine extends MEInputHatchPartMachine implements IMEStockingPart {
+public class MEStockingHatchPartMachine extends MEInputHatchPartMachine implements IMEStockingPart, IStorageService.UpdateRequester {
 
-    static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(MEStockingHatchPartMachine.class, MEInputHatchPartMachine.MANAGED_FIELD_HOLDER);
     private static final int CONFIG_SIZE = 16;
     @Persisted
     private boolean autoPull;
@@ -65,11 +67,6 @@ public class MEStockingHatchPartMachine extends MEInputHatchPartMachine implemen
     @Override
     protected ExportOnlyAEFluidList createTank() {
         return new ExportOnlyAEStockingFluidList(this, CONFIG_SIZE);
-    }
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     /////////////////////////////////
@@ -163,22 +160,26 @@ public class MEStockingHatchPartMachine extends MEInputHatchPartMachine implemen
 
         var queue = new PriorityQueue<>(CONFIG_SIZE, Comparator.comparingLong(GenericStack::amount));
 
-        for (var entry : counter) {
-            long amount = entry.getLongValue();
-            if (amount <= 0) continue;
-            var what = entry.getKey();
-            if (!(what instanceof AEFluidKey)) continue;
-            boolean free = queue.size() < CONFIG_SIZE;
-            if (!free && queue.peek().amount() >= amount) continue;
-            if (!test(what)) continue;
-            var stack = new GenericStack(what, amount);
-            if (testConfiguredInOtherPart(stack)) continue;
-            if (free) {
-                queue.offer(stack);
-            } else {
-                queue.poll();
-                queue.offer(stack);
+        try {
+            for (var entry : counter) {
+                long amount = entry.getLongValue();
+                if (amount <= 0) continue;
+                var what = entry.getKey();
+                if (!(what instanceof AEFluidKey)) continue;
+                boolean free = queue.size() < CONFIG_SIZE;
+                if (!free && queue.peek().amount() >= amount) continue;
+                if (!test(what)) continue;
+                var stack = new GenericStack(what, amount);
+                if (testConfiguredInOtherPart(stack)) continue;
+                if (free) {
+                    queue.offer(stack);
+                } else {
+                    queue.poll();
+                    queue.offer(stack);
+                }
             }
+        } catch (Exception e) {
+            GTOCore.LOGGER.error("exception in MEStockingHatchPartMachine.refreshList");
         }
 
         int index;
@@ -238,7 +239,10 @@ public class MEStockingHatchPartMachine extends MEInputHatchPartMachine implemen
         // if in auto-pull, no need to write actual configured slots, but still need to write the ghost circuit
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("AutoPull", true);
-        tag.putByte("GhostCircuit", (byte) IntCircuitBehaviour.getCircuitConfiguration(circuitInventory.getStackInSlot(0)));
+        tag.putBoolean("DistinctBuses", isDistinct());
+        if (!circuitInventory.storage.getStackInSlot(0).isEmpty()) {
+            tag.putByte("GhostCircuit", (byte) IntCircuitBehaviour.getCircuitConfiguration(circuitInventory.storage.getStackInSlot(0)));
+        }
         return tag;
     }
 
@@ -247,7 +251,14 @@ public class MEStockingHatchPartMachine extends MEInputHatchPartMachine implemen
         if (tag.getBoolean("AutoPull")) {
             // if being set to auto-pull, no need to read the configured slots
             this.setAutoPull(true);
-            circuitInventory.setStackInSlot(0, IntCircuitBehaviour.stack(tag.getByte("GhostCircuit")));
+            if (tag.contains("DistinctBuses")) {
+                setDistinct(tag.getBoolean("DistinctBuses"));
+            }
+            if (tag.contains("GhostCircuit")) {
+                circuitInventory.setStackInSlot(0, IntCircuitBehaviour.stack(tag.getByte("GhostCircuit")));
+            } else {
+                circuitInventory.setStackInSlot(0, ItemStack.EMPTY);
+            }
             return;
         }
         // set auto pull first to avoid issues with clearing the config after reading from the data stick

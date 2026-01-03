@@ -37,8 +37,10 @@ public final class CompoundExtremeCoolingMachine extends CrossRecipeMultiblockMa
 
     @Override
     public void setActiveRecipeType(int activeRecipeType) {
-        super.setActiveRecipeType(activeRecipeType);
-        updateCheck();
+        if (this.activeRecipeType != activeRecipeType) {
+            updateCheck();
+            super.setActiveRecipeType(activeRecipeType);
+        }
     }
 
     public static BlockPattern getBlockPattern(int tier, MultiblockMachineDefinition definition) {
@@ -79,7 +81,7 @@ public final class CompoundExtremeCoolingMachine extends CrossRecipeMultiblockMa
                                 .or(abilities(PARALLEL_HATCH).setMaxGlobalLimited(1))
                                 .or(abilities(MAINTENANCE).setExactLimit(1)))
                         .where('R', blocks(GTBlocks.CASING_TEMPERED_GLASS.get()))
-                        .where('S', controller(blocks(definition.get())));
+                        .where('S', controller(definition));
             } else {
                 builder.aisle("   GG     GG       GG     GG   ", "   GGIIIIIGG       GGIIIIIGG   ", "   GGJJJJJGG       GGJJJJJGG   ", "   GGIIIIIGG LLLLL GGIIIIIGG   ", "   GGKKKKKGG LLOLL GGKKKKKGG   ", "   GGIIIIIGG LLLLL GGIIIIIGG   ", "   GGJJJJJGG       GGJJJJJGG   ", "   GGIIIIIGG       GGIIIIIGG   ", "   GG     GG       GG     GG   ")
                         .aisle(" AAGGAAAAAGGLLLLLLLGGAAAAAGGAA ", " AAAAAAAAAAAAMMMMMAAAAAAAAAAAA ", " AAAAAAAAAAAAAAAAAAAAAAAAAAAAA ", " AAAAAAAAAAAAAAAAAAAAAAAAAAAAA ", " AAAAAAAAAAAAAAAAAAAAAAAAAAAAA ", " AAAAAAAAAAAAAAAAAAAAAAAAAAAAA ", " AAAAAAAAAAAAAAAAAAAAAAAAAAAAA ", " AAAAAAAAAAAAMMMMMAAAAAAAAAAAA ", " AAGGAAAAAGGLLLLLLLGGAAAAAGGAA ")
@@ -111,7 +113,7 @@ public final class CompoundExtremeCoolingMachine extends CrossRecipeMultiblockMa
                                 .or(abilities(MAINTENANCE).setExactLimit(1)))
                         .where('M', blocks(GTBlocks.CASING_TEMPERED_GLASS.get()))
                         .where('N', blocks(GTBlocks.FUSION_GLASS.get()))
-                        .where('O', controller(blocks(definition.get())));
+                        .where('O', controller(definition));
             }
             return builder.build();
         });
@@ -120,6 +122,11 @@ public final class CompoundExtremeCoolingMachine extends CrossRecipeMultiblockMa
     @Override
     public BlockPattern getPattern() {
         return getBlockPattern(getRecipeType() == GTORecipeTypes.PLASMA_CONDENSER_RECIPES ? 1 : 0, getDefinition());
+    }
+
+    @Override
+    public boolean disabledCombined() {
+        return getRecipeType() != GTORecipeTypes.PLASMA_CONDENSER_RECIPES;
     }
 
     @Override

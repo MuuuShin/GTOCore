@@ -2,7 +2,6 @@ package com.gtocore.common.machine.multiblock.part.ae;
 
 import com.gtocore.common.machine.multiblock.part.ae.slots.ExportOnlyAEItemList;
 import com.gtocore.common.machine.multiblock.part.ae.slots.ExportOnlyAEItemSlot;
-import com.gtocore.common.machine.multiblock.part.ae.slots.MECircuitHandler;
 import com.gtocore.common.machine.multiblock.part.ae.widget.AEItemConfigWidget;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
@@ -11,6 +10,7 @@ import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
 import com.gregtechceu.gtceu.api.machine.feature.IDataStickInteractable;
+import com.gregtechceu.gtceu.api.machine.trait.CircuitHandler;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
 
@@ -30,7 +30,6 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.Position;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -38,9 +37,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEInputBusPartMachine extends MEPartMachine implements IDataStickInteractable {
-
-    static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            MEInputBusPartMachine.class, MEPartMachine.Companion.getMANAGED_FIELD_HOLDER());
 
     private TickableSubscription autoIOSubs;
 
@@ -53,7 +49,7 @@ public class MEInputBusPartMachine extends MEPartMachine implements IDataStickIn
     public MEInputBusPartMachine(MetaMachineBlockEntity holder) {
         super(holder, IO.IN);
         aeItemHandler = createInventory();
-        circuitInventory = new MECircuitHandler(this);
+        circuitInventory = CircuitHandler.create(this);
     }
 
     /////////////////////////////////
@@ -76,11 +72,6 @@ public class MEInputBusPartMachine extends MEPartMachine implements IDataStickIn
     }
 
     @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    @Override
     public void onMainNodeStateChanged(IGridNodeListener.State reason) {
         super.onMainNodeStateChanged(reason);
         this.updateInventorySubscription();
@@ -91,8 +82,6 @@ public class MEInputBusPartMachine extends MEPartMachine implements IDataStickIn
     /////////////////////////////////
 
     private void autoIO() {
-        if (!this.shouldSyncME()) return;
-
         if (this.updateMEStatus()) {
             this.syncME();
             this.updateInventorySubscription();
@@ -129,7 +118,7 @@ public class MEInputBusPartMachine extends MEPartMachine implements IDataStickIn
 
     void updateInventorySubscription() {
         if (isWorkingEnabled() && getOnlineField()) {
-            autoIOSubs = subscribeServerTick(autoIOSubs, this::autoIO);
+            autoIOSubs = subscribeServerTick(autoIOSubs, this::autoIO, 40);
         } else if (autoIOSubs != null) {
             autoIOSubs.unsubscribe();
             autoIOSubs = null;
@@ -176,9 +165,9 @@ public class MEInputBusPartMachine extends MEPartMachine implements IDataStickIn
     public final InteractionResult onDataStickShiftUse(Player player, ItemStack dataStick) {
         if (!isRemote()) {
             CompoundTag tag = new CompoundTag();
-            tag.put("MEInputBus", writeConfigToTag());
+            tag.put(this.getConfigKey(), writeConfigToTag());
             dataStick.setTag(tag);
-            dataStick.setHoverName(Component.translatable("gtceu.machine.me.item_import.data_stick.name"));
+            dataStick.setHoverName(Component.translatable("gtceu.machine.me.import_part.data_stick.name", Component.translatable(this.getDefinition().getDescriptionId())));
             player.sendSystemMessage(Component.translatable("gtceu.machine.me.import_copy_settings"));
         }
         return InteractionResult.SUCCESS;
@@ -187,12 +176,12 @@ public class MEInputBusPartMachine extends MEPartMachine implements IDataStickIn
     @Override
     public final InteractionResult onDataStickUse(Player player, ItemStack dataStick) {
         CompoundTag tag = dataStick.getTag();
-        if (tag == null || !tag.contains("MEInputBus")) {
+        if (tag == null || !tag.contains(this.getConfigKey())) {
             return InteractionResult.PASS;
         }
 
         if (!isRemote()) {
-            readConfigFromTag(tag.getCompound("MEInputBus"));
+            readConfigFromTag(tag.getCompound(this.getConfigKey()));
             this.updateInventorySubscription();
             player.sendSystemMessage(Component.translatable("gtceu.machine.me.import_paste_settings"));
         }
@@ -206,6 +195,10 @@ public class MEInputBusPartMachine extends MEPartMachine implements IDataStickIn
     CompoundTag writeConfigToTag() {
         CompoundTag tag = new CompoundTag();
         CompoundTag configStacks = new CompoundTag();
+        tag.putBoolean("DistinctBuses", isDistinct());
+        if (!circuitInventory.storage.getStackInSlot(0).isEmpty()) {
+            tag.putByte("GhostCircuit", (byte) IntCircuitBehaviour.getCircuitConfiguration(circuitInventory.storage.getStackInSlot(0)));
+        }
         tag.put("ConfigStacks", configStacks);
         for (int i = 0; i < CONFIG_SIZE; i++) {
             var slot = this.aeItemHandler.getInventory()[i];
@@ -216,13 +209,18 @@ public class MEInputBusPartMachine extends MEPartMachine implements IDataStickIn
             CompoundTag stackTag = GenericStack.writeTag(config);
             configStacks.put(Integer.toString(i), stackTag);
         }
-        tag.putByte("GhostCircuit",
-                (byte) IntCircuitBehaviour.getCircuitConfiguration(circuitInventory.getStackInSlot(0)));
-        tag.putBoolean("DistinctBuses", isDistinct());
         return tag;
     }
 
     void readConfigFromTag(CompoundTag tag) {
+        if (tag.contains("DistinctBuses")) {
+            setDistinct(tag.getBoolean("DistinctBuses"));
+        }
+        if (tag.contains("GhostCircuit")) {
+            circuitInventory.setStackInSlot(0, IntCircuitBehaviour.stack(tag.getByte("GhostCircuit")));
+        } else {
+            circuitInventory.setStackInSlot(0, ItemStack.EMPTY);
+        }
         if (tag.contains("ConfigStacks")) {
             CompoundTag configStacks = tag.getCompound("ConfigStacks");
             for (int i = 0; i < CONFIG_SIZE; i++) {
@@ -235,11 +233,9 @@ public class MEInputBusPartMachine extends MEPartMachine implements IDataStickIn
                 }
             }
         }
-        if (tag.contains("GhostCircuit")) {
-            circuitInventory.setStackInSlot(0, IntCircuitBehaviour.stack(tag.getByte("GhostCircuit")));
-        }
-        if (tag.contains("DistinctBuses")) {
-            setDistinct(tag.getBoolean("DistinctBuses"));
-        }
+    }
+
+    private String getConfigKey() {
+        return this.getDefinition().getId().getPath();
     }
 }

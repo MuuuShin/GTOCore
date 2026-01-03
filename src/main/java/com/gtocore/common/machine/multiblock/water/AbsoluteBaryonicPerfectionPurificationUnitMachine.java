@@ -21,9 +21,8 @@ import net.minecraft.world.level.material.Fluid;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -31,14 +30,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AbsoluteBaryonicPerfectionPurificationUnitMachine extends WaterPurificationUnitMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            AbsoluteBaryonicPerfectionPurificationUnitMachine.class, WaterPurificationUnitMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     private static final List<Item> CATALYST = List.of(
             GTOItems.UP_QUARK_RELEASING_CATALYST.get(),
@@ -65,9 +56,9 @@ public final class AbsoluteBaryonicPerfectionPurificationUnitMachine extends Wat
     private boolean successful;
 
     @Persisted
-    private final List<ItemStack> outputs = new ObjectArrayList<>();
+    private final List<ItemStack> outputs = new ArrayList<>();
 
-    private final List<ItemBusPartMachine> busMachines = new ObjectArrayList<>();
+    private final List<ItemBusPartMachine> busMachines = new ArrayList<>();
 
     public AbsoluteBaryonicPerfectionPurificationUnitMachine(MetaMachineBlockEntity holder) {
         super(holder, 128);
@@ -78,7 +69,7 @@ public final class AbsoluteBaryonicPerfectionPurificationUnitMachine extends Wat
         super.customText(textList);
         if (getRecipeLogic().isWorking()) {
             textList.add(Component.translatable("gtocore.machine.absolute_baryonic_perfection_purification_unit.items", catalyst1.getDescription(), catalyst2.getDescription()));
-            textList.add(Component.translatable("gui.enderio.sag_mill_chance", successful ? 100 : 0));
+            textList.add(Component.translatable("gtceu.jei.ore_vein_diagram.chance", successful ? 100 : 0));
         }
     }
 

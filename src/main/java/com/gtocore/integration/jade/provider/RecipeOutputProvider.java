@@ -2,8 +2,8 @@ package com.gtocore.integration.jade.provider;
 
 import com.gtocore.common.data.GTORecipeTypes;
 
+import com.gtolib.api.machine.feature.multiblock.ICrossRecipeMachine;
 import com.gtolib.api.recipe.ContentBuilder;
-import com.gtolib.api.recipe.RecipeHelper;
 import com.gtolib.api.recipe.SeparateContent;
 import com.gtolib.api.recipe.ingredient.FastFluidIngredient;
 import com.gtolib.utils.FluidUtils;
@@ -18,7 +18,6 @@ import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.integration.jade.GTElementHelper;
 import com.gregtechceu.gtceu.integration.jade.provider.CapabilityBlockProvider;
-import com.gregtechceu.gtceu.utils.collection.O2LOpenCustomCacheHashMap;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -34,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 
+import com.fast.fastcollection.O2LOpenCustomCacheHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenCustomHashMap;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
@@ -62,16 +62,28 @@ public final class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLo
         if (recipeLogic.isWorking()) {
             data.putBoolean("Working", recipeLogic.isWorking());
             if (recipeLogic.machine.getRecipeType() == GTORecipeTypes.RANDOM_ORE_RECIPES) return;
-            var recipe = recipeLogic.getLastRecipe();
-            if (recipe == null) return;
-            Object2LongOpenCustomHashMap<Content> items = new O2LOpenCustomCacheHashMap<>(ContentBuilder.HASH_STRATEGY);
-            Object2LongOpenCustomHashMap<Content> fluids = new O2LOpenCustomCacheHashMap<>(ContentBuilder.HASH_STRATEGY);
-            for (Content content : recipe.outputs.getOrDefault(ItemRecipeCapability.CAP, Collections.emptyList())) {
-                items.addTo(content, ItemUtils.getSizedAmount(ItemRecipeCapability.CAP.of(content.content)));
-            }
+            Object2LongOpenCustomHashMap<SeparateContent> items = new O2LOpenCustomCacheHashMap<>(ContentBuilder.HASH_STRATEGY);
+            Object2LongOpenCustomHashMap<SeparateContent> fluids = new O2LOpenCustomCacheHashMap<>(ContentBuilder.HASH_STRATEGY);
+            if (recipeLogic.machine instanceof ICrossRecipeMachine recipeMachine && !recipeMachine.getThreads().isEmpty()) {
+                recipeMachine.getThreads().forEach(t -> {
+                    var recipe = t.getRecipe();
+                    for (Content content : recipe.outputs.getOrDefault(ItemRecipeCapability.CAP, Collections.emptyList())) {
+                        items.addTo(new SeparateContent(content.content, content.chance, content.tierChanceBoost, recipe.parallels), ItemUtils.getSizedAmount(ItemRecipeCapability.CAP.of(content.content)));
+                    }
+                    for (Content content : recipe.outputs.getOrDefault(FluidRecipeCapability.CAP, Collections.emptyList())) {
+                        fluids.addTo(new SeparateContent(content.content, content.chance, content.tierChanceBoost, recipe.parallels), FastFluidIngredient.getAmount(FluidRecipeCapability.CAP.of(content.content)));
+                    }
+                });
+            } else {
+                var recipe = recipeLogic.getLastRecipe();
+                if (recipe == null) return;
+                for (Content content : recipe.outputs.getOrDefault(ItemRecipeCapability.CAP, Collections.emptyList())) {
+                    items.addTo(new SeparateContent(content.content, content.chance, content.tierChanceBoost, recipe.parallels), ItemUtils.getSizedAmount(ItemRecipeCapability.CAP.of(content.content)));
+                }
 
-            for (Content content : recipe.outputs.getOrDefault(FluidRecipeCapability.CAP, Collections.emptyList())) {
-                fluids.addTo(content, FastFluidIngredient.getAmount(FluidRecipeCapability.CAP.of(content.content)));
+                for (Content content : recipe.outputs.getOrDefault(FluidRecipeCapability.CAP, Collections.emptyList())) {
+                    fluids.addTo(new SeparateContent(content.content, content.chance, content.tierChanceBoost, recipe.parallels), FastFluidIngredient.getAmount(FluidRecipeCapability.CAP.of(content.content)));
+                }
             }
             if (!items.isEmpty()) {
                 ListTag itemTags = new ListTag();
@@ -80,12 +92,12 @@ public final class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLo
                     var ingredient = ItemRecipeCapability.CAP.of(entry.getKey().content);
                     var stack = ItemUtils.getFirstSized(ingredient);
                     if (stack.isEmpty()) return;
-                    nbt.putLong("p", SeparateContent.getParallel(entry.getKey(), RecipeHelper.getParallel(recipe)));
+                    nbt.putLong("p", entry.getKey().parallel);
                     nbt.putInt("c", entry.getKey().chance);
                     nbt.putString("id", ItemUtils.getId(stack));
                     nbt.putLong("a", entry.getLongValue());
-                    if (stack.getTag() != null) {
-                        nbt.put("tag", stack.getTag().copy());
+                    if (stack.hasTag()) {
+                        nbt.put("tag", stack.getTag());
                     }
                     itemTags.add(nbt);
                 });
@@ -98,12 +110,12 @@ public final class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLo
                     var ingredient = FluidRecipeCapability.CAP.of(entry.getKey().content);
                     var stacks = FastFluidIngredient.getFluidStack(ingredient);
                     if (stacks.length == 0 || stacks[0].isEmpty()) return;
-                    nbt.putLong("p", SeparateContent.getParallel(entry.getKey(), RecipeHelper.getParallel(recipe)));
+                    nbt.putLong("p", entry.getKey().parallel);
                     nbt.putInt("c", entry.getKey().chance);
                     nbt.putString("FluidName", FluidUtils.getId(stacks[0].getFluid()));
                     nbt.putLong("a", entry.getLongValue());
                     if (stacks[0].getTag() != null) {
-                        nbt.put("tag", stacks[0].getTag().copy());
+                        nbt.put("tag", stacks[0].getTag());
                     }
                     fluidTags.add(nbt);
                 });
@@ -188,7 +200,7 @@ public final class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLo
     }
 
     private static Component getItemName(ItemStack stack) {
-        return ComponentUtils.wrapInSquareBrackets(stack.getItem().getDescription()).withStyle(ChatFormatting.WHITE);
+        return stack.getDisplayName().copy().withStyle(ChatFormatting.WHITE);
     }
 
     private static Component getFluidName(FluidStack stack) {

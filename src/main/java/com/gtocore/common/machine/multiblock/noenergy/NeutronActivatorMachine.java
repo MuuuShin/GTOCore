@@ -3,7 +3,6 @@ package com.gtocore.common.machine.multiblock.noenergy;
 import com.gtocore.common.machine.multiblock.part.NeutronAcceleratorPartMachine;
 import com.gtocore.common.machine.multiblock.part.SensorPartMachine;
 
-import com.gtolib.api.data.chemical.GTOChemicalHelper;
 import com.gtolib.api.gui.MagicProgressBarProWidget;
 import com.gtolib.api.machine.multiblock.NoEnergyMultiblockMachine;
 import com.gtolib.api.recipe.IdleReason;
@@ -15,6 +14,7 @@ import com.gtolib.utils.NumberUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
+import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.machine.ConditionalSubscriptionHandler;
 import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
@@ -30,10 +30,10 @@ import net.minecraft.world.item.Item;
 
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -42,43 +42,38 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public class NeutronActivatorMachine extends NoEnergyMultiblockMachine implements IExplosionMachine {
 
-    static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(NeutronActivatorMachine.class, NoEnergyMultiblockMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    private static final Item dustBeryllium = GTOChemicalHelper.getItem(TagPrefix.dust, GTMaterials.Beryllium);
-    private static final Item dustGraphite = GTOChemicalHelper.getItem(TagPrefix.dust, GTMaterials.Graphite);
+    private static final Item dustBeryllium = ChemicalHelper.getItem(TagPrefix.dust, GTMaterials.Beryllium);
+    private static final Item dustGraphite = ChemicalHelper.getItem(TagPrefix.dust, GTMaterials.Graphite);
     int height;
+    @Getter
     @Persisted
     protected int eV;
     private final ConditionalSubscriptionHandler neutronEnergySubs;
     private SensorPartMachine sensorMachine;
-    private final List<ItemBusPartMachine> busMachines = new ObjectArrayList<>(2);
-    private final List<NeutronAcceleratorPartMachine> acceleratorMachines = new ObjectArrayList<>(2);
+    private final List<ItemBusPartMachine> busMachines = new ArrayList<>(2);
+    private final List<NeutronAcceleratorPartMachine> acceleratorMachines = new ArrayList<>(2);
 
     public NeutronActivatorMachine(MetaMachineBlockEntity holder) {
         super(holder);
-        neutronEnergySubs = new ConditionalSubscriptionHandler(this, this::neutronEnergyUpdate, () -> isFormed || eV > 0);
+        neutronEnergySubs = new ConditionalSubscriptionHandler(this, this::neutronEnergyUpdate, 0, () -> isFormed || eV > 0);
     }
 
     @Override
     public void onPartScan(IMultiPart part) {
         super.onPartScan(part);
-        if (part instanceof ItemBusPartMachine itemBusPart) {
-            IO io = itemBusPart.getInventory().getHandlerIO();
-            if (io == IO.IN || io == IO.BOTH) {
-                busMachines.add(itemBusPart);
-                for (var handler : part.getRecipeHandlers()) {
-                    traitSubscriptions.add(handler.subscribe(this::absorptionUpdate));
+        switch (part) {
+            case ItemBusPartMachine itemBusPart -> {
+                IO io = itemBusPart.getInventory().getHandlerIO();
+                if (io == IO.IN || io == IO.BOTH) {
+                    busMachines.add(itemBusPart);
+                    for (var handler : itemBusPart.getRecipeHandlers()) {
+                        traitSubscriptions.add(handler.subscribe(this::absorptionUpdate));
+                    }
                 }
             }
-        } else if (part instanceof NeutronAcceleratorPartMachine neutronAccelerator) {
-            acceleratorMachines.add(neutronAccelerator);
-        } else if (part instanceof SensorPartMachine sensorPartMachine) {
-            sensorMachine = sensorPartMachine;
+            case NeutronAcceleratorPartMachine neutronAccelerator -> acceleratorMachines.add(neutronAccelerator);
+            case SensorPartMachine sensorPartMachine -> sensorMachine = sensorPartMachine;
+            default -> {}
         }
     }
 
@@ -193,9 +188,5 @@ public class NeutronActivatorMachine extends NoEnergyMultiblockMachine implement
         textList.add(Component.translatable("gtocore.machine.height", height));
         textList.add(Component.translatable("gtocore.machine.duration_multiplier.tooltip", FormattingUtil.formatNumbers(getEfficiencyFactor() * 100)).append("%"));
         progressBarPro.setProgressSupplier(() -> eV);
-    }
-
-    public int getEV() {
-        return this.eV;
     }
 }

@@ -7,10 +7,8 @@ import com.gregtechceu.gtceu.common.data.GTMaterials;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.plateDouble;
 import static com.gregtechceu.gtceu.common.data.GTItems.NEUTRON_REFLECTOR;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.*;
-import static com.gregtechceu.gtceu.common.data.GTMaterials.TinAlloy;
 import static com.gtocore.common.data.GTORecipeTypes.ELECTROPLATING_RECIPES;
 
 public class ElectroPlating {
@@ -20,8 +18,8 @@ public class ElectroPlating {
                 .inputItems(foil, Titanium, 16)
                 .notConsumable(foil, Platinum, 16)
                 .inputFluids(GTOMaterials.DiethyleneGlycol.getFluid(96 * 16))
-                .inputFluids(GTOMaterials.AmmoniumBifluorideSolution.getFluid(1600))
-                .inputFluids(GTMaterials.DistilledWater.getFluid(1600))
+                .inputFluids(GTOMaterials.AmmoniumBifluorideSolution, 1600)
+                .inputFluids(GTMaterials.DistilledWater, 1600)
                 .outputItems(dust, GTOMaterials.TitaniumNanotubePrecursor)
                 .outputFluids(GTOMaterials.DiethyleneGlycol.getFluid(72 * 16))
                 .outputFluids(GTMaterials.HydrofluoricAcid.getFluid(72 * 16))

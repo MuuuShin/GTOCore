@@ -28,8 +28,8 @@ class TierData {
             "战术级" to "Tactical",
             "原型级" to "Prototype",
         )
-        val MovementSpeedFunction: (Int) -> Double = { tier -> 0.1 * 0.1 * tier * 1.5 }
-        const val BlockReachFunction = 2
+        val MovementSpeedFunction: (Int) -> Double = { tier -> 0.1 * 0.1 * tier * 2.3 }
+        const val BlockReachFunction = 4
     }
 }
 enum class OrganType(val key: String, val cn: String, val slotCount: Int = 1) {
@@ -43,6 +43,9 @@ enum class OrganType(val key: String, val cn: String, val slotCount: Int = 1) {
     RightArm("right_arm", "右臂"),
     LeftLeg("left_leg", "左腿"),
     RightLeg("right_leg", "右腿"),
+    ;
+
+    fun getTranslationKey(): String = "gtocore.organ_type.${this.key}"
 //    Other("other", "其他"),
 }
 
@@ -68,8 +71,8 @@ sealed class OrganItemBase(properties: Properties, val organType: OrganType) :
     companion object {
         fun <T : OrganItemBase> registerOrganItem(id: String, organType: OrganType, resourceName: String, en: String, cn: String, itemFactory: (Properties, OrganType) -> T, onRegister: NonNullConsumer<T> = NonNullConsumer { }): ItemEntry<T> {
             val resourcePath = "item/organ/part/${organType.key}/$resourceName"
-            val tag = TagUtils.createTag(GTOCore.id("organ_${organType.key}"))
-            val itemBuilder = item(id, "器官 $cn", { p -> itemFactory(p.stacksTo(1).setNoRepair(), organType) })
+            val tag = TagUtils.createItemTag(GTOCore.id("organ_${organType.key}"))
+            val itemBuilder = item(id, "器官 $cn") { p -> itemFactory(p.stacksTo(1).setNoRepair(), organType) }
                 .lang("organ $en ")
                 .tag(tag)
                 .model { ctx, prov -> prov.generated(ctx, GTOCore.id(resourcePath)) }
@@ -83,9 +86,15 @@ sealed class OrganItemBase(properties: Properties, val organType: OrganType) :
             tooltipComponents.add(OrganTranslation.level(tier).get())
             if (tier >= 1) {
                 tooltipComponents.add(OrganTranslation.speedBoostInfo((1..tier).sumOf { TierData.MovementSpeedFunction(it) * 10 }.toFloat()).get())
-                tooltipComponents.add(OrganTranslation.nightVisionInfo.get())
             }
-            if (tier >= 2) tooltipComponents.add(OrganTranslation.blockReachInfo(2).get())
+            if (tier >= 1) {
+                tooltipComponents.add(OrganTranslation.armor(tier * 5).get())
+                tooltipComponents.add(OrganTranslation.armor_toughness(tier * 5).get())
+            }
+            if (tier >= 2) tooltipComponents.add(OrganTranslation.blockReachInfo(4).get())
+            if (tier >= 3) tooltipComponents.add(OrganTranslation.alwaysSaturation.get())
+            if (tier >= 2 && organType == OrganType.Liver) tooltipComponents.add(OrganTranslation.noPoisonAndWither.get())
+            if (tier >= 2 && organType == OrganType.Lung) tooltipComponents.add(OrganTranslation.breathUnderWater.get())
             if (tier >= 4) tooltipComponents.add(OrganTranslation.flightInfo.get())
 
             super.appendHoverText(stack, level, tooltipComponents, isAdvanced)

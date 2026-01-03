@@ -1,13 +1,7 @@
 package com.gtocore.api.misc
 
-import com.gtocore.common.data.translation.ComponentSlang
-import com.gtocore.common.data.translation.EnumTranslation
-import com.gtocore.common.data.translation.GTOItemTooltips
-import com.gtocore.common.data.translation.GTOMachineStories
-import com.gtocore.common.data.translation.GTOTarotArcanumTooltips
-import com.gtocore.common.data.translation.MachineSlang
-import com.gtocore.common.data.translation.MultiblockSlang
-import com.gtocore.common.data.translation.OrganTranslation
+import com.gtocore.common.data.translation.*
+import com.gtocore.data.recipe.research.AnalyzeData
 
 import kotlin.reflect.KProperty1
 
@@ -21,6 +15,7 @@ open class AutoInitialize<T> {
         MachineSlang.init()
         MultiblockSlang.init()
         GTOTarotArcanumTooltips.init()
+        AnalyzeData.init()
     }
     open fun init() {}
     init {

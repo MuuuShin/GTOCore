@@ -12,24 +12,20 @@ import appeng.api.stacks.KeyCounter;
 import appeng.blockentity.crafting.IMolecularAssemblerSupportedPattern;
 import appeng.crafting.pattern.EncodedPatternItem;
 import appeng.crafting.pattern.ProcessingPatternItem;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+@Setter
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MECraftPatternPartMachine extends MEPatternPartMachineKt<MECraftPatternPartMachine.InternalSlot> {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(MECraftPatternPartMachine.class, MEPatternPartMachineKt.Companion.getMANAGED_FIELD_HOLDER());
     private Runnable onContentsChanged = () -> {};
 
     public MECraftPatternPartMachine(MetaMachineBlockEntity holder) {
         super(holder, 72);
-    }
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Override
@@ -48,13 +44,21 @@ public class MECraftPatternPartMachine extends MEPatternPartMachineKt<MECraftPat
     }
 
     @Override
+    public boolean defaultShowInTravel() {
+        return false;
+    }
+
+    @Override
     public boolean canShared() {
         return false;
     }
 
     public static final class InternalSlot extends AbstractInternalSlot {
 
+        @Getter
         private ItemStack output;
+        @Setter
+        @Getter
         private long amount;
         private final MECraftPatternPartMachine machine;
 
@@ -104,21 +108,5 @@ public class MECraftPatternPartMachine extends MEPatternPartMachineKt<MECraftPat
         public Runnable getOnContentsChanged() {
             return machine.onContentsChanged;
         }
-
-        public ItemStack getOutput() {
-            return this.output;
-        }
-
-        public void setAmount(final long amount) {
-            this.amount = amount;
-        }
-
-        public long getAmount() {
-            return this.amount;
-        }
-    }
-
-    public void setOnContentsChanged(final Runnable onContentsChanged) {
-        this.onContentsChanged = onContentsChanged;
     }
 }

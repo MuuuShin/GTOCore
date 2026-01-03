@@ -18,23 +18,23 @@ final class SeparationRecipes {
     public static void init() {
         // Centrifuge
         CENTRIFUGE_RECIPES.recipeBuilder("refinery_gas_separation")
-                .inputFluids(RefineryGas.getFluid(8000))
+                .inputFluids(RefineryGas, 8000)
                 .outputFluids(Methane.getFluid(4000))
                 .outputFluids(LPG.getFluid(4000))
                 .duration(200).EUt(5).save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("butane_separation")
-                .inputFluids(Butane.getFluid(320))
+                .inputFluids(Butane, 320)
                 .outputFluids(LPG.getFluid(370))
                 .duration(20).EUt(5).save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("propane_separation")
-                .inputFluids(Propane.getFluid(320))
+                .inputFluids(Propane, 320)
                 .outputFluids(LPG.getFluid(290))
                 .duration(20).EUt(5).save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("nitration_mixture_separation")
-                .inputFluids(NitrationMixture.getFluid(2000))
+                .inputFluids(NitrationMixture, 2000)
                 .outputFluids(NitricAcid.getFluid(1000))
                 .outputFluids(SulfuricAcid.getFluid(1000))
                 .duration(192).EUt(VA[LV]).save();
@@ -80,14 +80,14 @@ final class SeparationRecipes {
         CENTRIFUGE_RECIPES.recipeBuilder("sticky_resin_separation").duration(400).EUt(5)
                 .inputItems(STICKY_RESIN)
                 .outputItems(dust, RawRubber, 3)
-                .chancedOutput(PLANT_BALL.asStack(), 1000, 850)
+                .chancedOutput(PLANT_BALL.asItem(), 1000, 850)
                 .outputFluids(Glue.getFluid(100))
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("rubber_log_separation").duration(200).EUt(20)
-                .inputItems(GTBlocks.RUBBER_LOG.asStack())
-                .chancedOutput(STICKY_RESIN.asStack(), 5000, 1200)
-                .chancedOutput(PLANT_BALL.asStack(), 3750, 900)
+                .inputItems(GTBlocks.RUBBER_LOG.asItem())
+                .chancedOutput(STICKY_RESIN.asItem(), 5000, 1200)
+                .chancedOutput(PLANT_BALL.asItem(), 3750, 900)
                 .chancedOutput(dust, Carbon, 2500, 600)
                 .chancedOutput(dust, Wood, 2500, 700)
                 .outputFluids(Methane.getFluid(60))
@@ -96,20 +96,20 @@ final class SeparationRecipes {
         // TODO Other kinds of dirt?
         CENTRIFUGE_RECIPES.recipeBuilder("dirt_separation").duration(250).EUt(VA[LV])
                 .inputItems(Blocks.DIRT.asItem())
-                .chancedOutput(PLANT_BALL.asStack(), 1250, 700)
+                .chancedOutput(PLANT_BALL.asItem(), 1250, 700)
                 .chancedOutput(new ItemStack(Blocks.SAND), 5000, 1200)
                 .chancedOutput(dust, Clay, 450, 100)
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("grass_block_separation").duration(250).EUt(VA[LV])
                 .inputItems(Blocks.GRASS_BLOCK.asItem())
-                .chancedOutput(PLANT_BALL.asStack(), 3000, 1200)
+                .chancedOutput(PLANT_BALL.asItem(), 3000, 1200)
                 .chancedOutput(new ItemStack(Blocks.SAND), 5000, 1200)
                 .chancedOutput(dust, Clay, 450, 100)
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("mycelium_separation").duration(650).EUt(VA[LV])
-                .inputItems(new ItemStack(Blocks.MYCELIUM))
+                .inputItems(Blocks.MYCELIUM)
                 .chancedOutput(new ItemStack(Blocks.RED_MUSHROOM), 2500, 900)
                 .chancedOutput(new ItemStack(Blocks.BROWN_MUSHROOM), 2500, 900)
                 .chancedOutput(new ItemStack(Blocks.SAND), 5000, 1200)
@@ -180,7 +180,7 @@ final class SeparationRecipes {
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("lava_separation").duration(80).EUt(80)
-                .inputFluids(Lava.getFluid(100))
+                .inputFluids(Lava, 100)
                 .chancedOutput(dust, SiliconDioxide, 1250, 80)
                 .chancedOutput(dust, Magnesia, 250, 70)
                 .chancedOutput(dust, Quicklime, 250, 70)
@@ -197,34 +197,34 @@ final class SeparationRecipes {
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("hydrogen_separation").duration(160).EUt(20)
-                .inputFluids(Hydrogen.getFluid(160))
+                .inputFluids(Hydrogen, 160)
                 .outputFluids(Deuterium.getFluid(40))
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("deuterium_separation").duration(160).EUt(80)
-                .inputFluids(Deuterium.getFluid(160))
+                .inputFluids(Deuterium, 160)
                 .outputFluids(Tritium.getFluid(40))
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("helium_separation").duration(160).EUt(80)
-                .inputFluids(Helium.getFluid(80))
+                .inputFluids(Helium, 80)
                 .outputFluids(Helium3.getFluid(5))
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("air_separation").duration(1600).EUt(VA[ULV])
-                .inputFluids(Air.getFluid(10000))
+                .inputFluids(Air, 10000)
                 .outputFluids(Nitrogen.getFluid(3900))
                 .outputFluids(Oxygen.getFluid(1000))
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("nether_air_separation").duration(1600).EUt(VA[MV])
-                .inputFluids(NetherAir.getFluid(10000))
+                .inputFluids(NetherAir, 10000)
                 .outputFluids(CarbonMonoxide.getFluid(3900))
                 .outputFluids(SulfurDioxide.getFluid(1000))
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("ender_air_separation").duration(1600).EUt(VA[HV])
-                .inputFluids(EnderAir.getFluid(10000))
+                .inputFluids(EnderAir, 10000)
                 .outputFluids(NitrogenDioxide.getFluid(3900))
                 .outputFluids(Deuterium.getFluid(1000))
                 .save();
@@ -275,15 +275,15 @@ final class SeparationRecipes {
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("salt_water_separation").duration(51).EUt(VA[LV])
-                .inputFluids(SaltWater.getFluid(1000))
+                .inputFluids(SaltWater, 1000)
                 .outputItems(dust, Salt, 2)
                 .outputFluids(Water.getFluid(1000))
                 .save();
 
         CENTRIFUGE_RECIPES.recipeBuilder("muddy_mangrove_roots")
-                .inputItems(new ItemStack(Blocks.MUDDY_MANGROVE_ROOTS))
-                .outputItems(new ItemStack(Blocks.MANGROVE_ROOTS))
-                .outputItems(new ItemStack(Blocks.MUD))
+                .inputItems(Blocks.MUDDY_MANGROVE_ROOTS)
+                .outputItems(Blocks.MANGROVE_ROOTS)
+                .outputItems(Blocks.MUD)
                 .duration(20).EUt(1).save();
 
         // Electrolyzer
@@ -294,7 +294,7 @@ final class SeparationRecipes {
                 .duration(150).EUt(VA[LV]).save();
 
         ELECTROLYZER_RECIPES.recipeBuilder("salt_water_electrolysis")
-                .inputFluids(SaltWater.getFluid(1000))
+                .inputFluids(SaltWater, 1000)
                 .outputItems(dust, SodiumHydroxide, 3)
                 .outputFluids(Chlorine.getFluid(1000))
                 .outputFluids(Hydrogen.getFluid(1000))
@@ -308,13 +308,13 @@ final class SeparationRecipes {
                 .duration(200).EUt(VA[LV]).save();
 
         ELECTROLYZER_RECIPES.recipeBuilder("water_electrolysis")
-                .inputFluids(Water.getFluid(1000))
+                .inputFluids(Water, 1000)
                 .outputFluids(Hydrogen.getFluid(2000))
                 .outputFluids(Oxygen.getFluid(1000))
                 .duration(1500).EUt(VA[LV]).save();
 
         ELECTROLYZER_RECIPES.recipeBuilder("distilled_water_electrolysis")
-                .inputFluids(DistilledWater.getFluid(1000))
+                .inputFluids(DistilledWater, 1000)
                 .outputFluids(Hydrogen.getFluid(2000))
                 .outputFluids(Oxygen.getFluid(1000))
                 .duration(1500).EUt(VA[LV]).save();
@@ -330,39 +330,39 @@ final class SeparationRecipes {
                 .duration(100).EUt(60).save();
 
         ELECTROLYZER_RECIPES.recipeBuilder("acetic_acid_electrolysis")
-                .inputFluids(AceticAcid.getFluid(2000))
+                .inputFluids(AceticAcid, 2000)
                 .outputFluids(Ethane.getFluid(1000))
                 .outputFluids(CarbonDioxide.getFluid(2000))
                 .outputFluids(Hydrogen.getFluid(2000))
                 .duration(512).EUt(60).save();
 
         ELECTROLYZER_RECIPES.recipeBuilder("chloromethane_electrolysis")
-                .inputFluids(Chloromethane.getFluid(2000))
+                .inputFluids(Chloromethane, 2000)
                 .outputFluids(Ethane.getFluid(1000))
                 .outputFluids(Chlorine.getFluid(2000))
                 .duration(400).EUt(60).save();
 
         ELECTROLYZER_RECIPES.recipeBuilder("acetone_electrolysis")
-                .inputFluids(Acetone.getFluid(2000))
+                .inputFluids(Acetone, 2000)
                 .outputItems(dust, Carbon, 3)
                 .outputFluids(Propane.getFluid(1000))
                 .outputFluids(Water.getFluid(2000))
                 .duration(480).EUt(60).save();
 
         ELECTROLYZER_RECIPES.recipeBuilder("butane_electrolysis")
-                .inputFluids(Butane.getFluid(1000))
+                .inputFluids(Butane, 1000)
                 .outputFluids(Butene.getFluid(1000))
                 .outputFluids(Hydrogen.getFluid(2000))
                 .duration(240).EUt(VA[MV]).save();
 
         ELECTROLYZER_RECIPES.recipeBuilder("butene_electrolysis")
-                .inputFluids(Butene.getFluid(1000))
+                .inputFluids(Butene, 1000)
                 .outputFluids(Butadiene.getFluid(1000))
                 .outputFluids(Hydrogen.getFluid(2000))
                 .duration(240).EUt(VA[MV]).save();
 
         ELECTROLYZER_RECIPES.recipeBuilder("propane_electrolysis")
-                .inputFluids(Propane.getFluid(1000))
+                .inputFluids(Propane, 1000)
                 .outputFluids(Propene.getFluid(1000))
                 .outputFluids(Hydrogen.getFluid(2000))
                 .duration(640).EUt(VA[MV]).save();
@@ -432,27 +432,27 @@ final class SeparationRecipes {
 
         EXTRACTOR_RECIPES.recipeBuilder("seed_oil_from_wheat_seeds")
                 .duration(32).EUt(2)
-                .inputItems(new ItemStack(Items.WHEAT_SEEDS))
+                .inputItems(Items.WHEAT_SEEDS)
                 .outputFluids(SeedOil.getFluid(10))
                 .save();
 
         EXTRACTOR_RECIPES.recipeBuilder("seed_oil_from_beetroot").duration(32).EUt(2)
-                .inputItems(new ItemStack(Items.BEETROOT_SEEDS))
+                .inputItems(Items.BEETROOT_SEEDS)
                 .outputFluids(SeedOil.getFluid(10))
                 .save();
 
         EXTRACTOR_RECIPES.recipeBuilder("seed_oil_from_melon").duration(32).EUt(2)
-                .inputItems(new ItemStack(Items.MELON_SEEDS, 1))
+                .inputItems(Items.MELON_SEEDS, 1)
                 .outputFluids(SeedOil.getFluid(3))
                 .save();
 
         EXTRACTOR_RECIPES.recipeBuilder("seed_oil_from_pumpkin").duration(32).EUt(2)
-                .inputItems(new ItemStack(Items.PUMPKIN_SEEDS, 1))
+                .inputItems(Items.PUMPKIN_SEEDS, 1)
                 .outputFluids(SeedOil.getFluid(6))
                 .save();
 
         EXTRACTOR_RECIPES.recipeBuilder("seed_oil_from_torchflower").duration(32).EUt(2)
-                .inputItems(new ItemStack(Items.TORCHFLOWER_SEEDS, 1))
+                .inputItems(Items.TORCHFLOWER_SEEDS, 1)
                 .outputFluids(SeedOil.getFluid(8))
                 .save();
 
@@ -488,7 +488,7 @@ final class SeparationRecipes {
 
         EXTRACTOR_RECIPES.recipeBuilder("wood_dust_extraction").duration(16).EUt(4)
                 .inputItems(dust, Wood)
-                .chancedOutput(PLANT_BALL.asStack(), 200, 30)
+                .chancedOutput(PLANT_BALL.asItem(), 200, 30)
                 .outputFluids(Creosote.getFluid(5))
                 .save();
 

@@ -1,10 +1,6 @@
 package com.gtocore.common.data;
 
-import com.gtocore.data.recipe.RecipeFilter;
-
 import com.gtolib.utils.RLUtils;
-
-import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -16,7 +12,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
-import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import dev.emi.emi.api.recipe.EmiRecipe;
 
 import java.util.Map;
@@ -30,12 +25,9 @@ public final class GTORecipes {
     public static Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> RECIPES_CACHE;
     public static Map<ResourceLocation, Recipe<?>> BYNAME_CACHE;
 
-    public static Map<GTRecipeType, Widget> EMI_RECIPE_WIDGETS;
-
     public static ImmutableSet<EmiRecipe> EMI_RECIPES;
 
     public static <C extends Container> Recipe<C> convert(Recipe<C> recipe) {
-        if (RecipeFilter.JsonFilter != null) RecipeFilter.JsonFilter = null;
         return recipe;
     }
 

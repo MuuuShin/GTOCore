@@ -17,7 +17,6 @@ import net.minecraft.world.level.material.Fluid;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import com.hepdd.gtmthings.utils.TeamUtil;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
@@ -32,7 +31,6 @@ public final class HarmonyMachine extends NoEnergyMultiblockMachine implements I
 
     private static final BigInteger BASE = BigInteger.valueOf(5277655810867200L);
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(HarmonyMachine.class, NoEnergyMultiblockMachine.MANAGED_FIELD_HOLDER);
     private static final Fluid HYDROGEN = GTMaterials.Hydrogen.getFluid();
     private static final Fluid HELIUM = GTMaterials.Helium.getFluid();
     private WirelessEnergyContainer WirelessEnergyContainerCache;
@@ -50,35 +48,28 @@ public final class HarmonyMachine extends NoEnergyMultiblockMachine implements I
 
     public HarmonyMachine(MetaMachineBlockEntity holder) {
         super(holder);
-        tickSubs = new ConditionalSubscriptionHandler(this, this::StartupUpdate, this::isFormed);
+        tickSubs = new ConditionalSubscriptionHandler(this, this::update, 20, this::isFormed);
     }
 
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    private void StartupUpdate() {
-        if (getOffsetTimer() % 20 == 0) {
-            oc = 0;
-            long[] a = getFluidAmount(HYDROGEN, HELIUM);
-            if (inputFluid(HYDROGEN, a[0])) {
-                hydrogen += a[0];
-            }
-            if (inputFluid(HELIUM, a[1])) {
-                helium += a[1];
-            }
-            if (notConsumableCircuit(4)) {
-                oc = 4;
-            } else if (notConsumableCircuit(3)) {
-                oc = 3;
-            } else if (notConsumableCircuit(2)) {
-                oc = 2;
-            } else if (notConsumableCircuit(1)) {
-                oc = 1;
-            }
-            tickSubs.updateSubscription();
+    private void update() {
+        oc = 0;
+        long[] a = getFluidAmount(HYDROGEN, HELIUM);
+        if (inputFluid(HYDROGEN, a[0])) {
+            hydrogen += a[0];
         }
+        if (inputFluid(HELIUM, a[1])) {
+            helium += a[1];
+        }
+        if (notConsumableCircuit(4)) {
+            oc = 4;
+        } else if (notConsumableCircuit(3)) {
+            oc = 3;
+        } else if (notConsumableCircuit(2)) {
+            oc = 2;
+        } else if (notConsumableCircuit(1)) {
+            oc = 1;
+        }
+        tickSubs.updateSubscription();
     }
 
     private BigInteger getStartupEnergy() {
@@ -122,7 +113,7 @@ public final class HarmonyMachine extends NoEnergyMultiblockMachine implements I
     @Override
     public void customText(List<Component> textList) {
         super.customText(textList);
-        textList.add(Component.translatable("tooltip.avaritia.tier", tier));
+        textList.add(Component.translatable("ars_nouveau.tier", tier));
         textList.add(Component.translatable("behaviour.lighter.uses", 16 + (tier << 2) - count));
         if (getUUID() != null) {
             var container = getWirelessEnergyContainer();

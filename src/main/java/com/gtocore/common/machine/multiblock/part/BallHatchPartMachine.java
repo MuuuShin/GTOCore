@@ -2,12 +2,13 @@ package com.gtocore.common.machine.multiblock.part;
 
 import com.gtocore.common.data.GTOItems;
 
-import com.gtolib.api.machine.part.ItemHatchPartMachine;
+import com.gtolib.api.machine.part.WorkableItemPartMachine;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiController;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.common.data.GTDamageTypes;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -24,15 +25,16 @@ import com.google.common.collect.ImmutableMap;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import lombok.Getter;
 
 import java.util.Map;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+@Getter
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class BallHatchPartMachine extends ItemHatchPartMachine implements IInteractedMachine {
+public final class BallHatchPartMachine extends WorkableItemPartMachine implements IInteractedMachine {
 
     public static final Map<Item, Integer> GRINDBALL;
 
@@ -43,7 +45,6 @@ public final class BallHatchPartMachine extends ItemHatchPartMachine implements 
         GRINDBALL = grindball.build();
     }
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(BallHatchPartMachine.class, ItemHatchPartMachine.MANAGED_FIELD_HOLDER);
     @Persisted
     @DescSynced
     @RequireRerender
@@ -63,20 +64,14 @@ public final class BallHatchPartMachine extends ItemHatchPartMachine implements 
     }
 
     @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    @Override
-    public boolean beforeWorking(IWorkableMultiController controller) {
+    public boolean beforeWorking(IWorkableMultiController controller, GTRecipe recipe) {
         isWorking = true;
-        return super.beforeWorking(controller);
+        return true;
     }
 
     @Override
-    public boolean afterWorking(IWorkableMultiController controller) {
+    public void afterWorking(IWorkableMultiController controller) {
         isWorking = false;
-        return super.afterWorking(controller);
     }
 
     @Override
@@ -93,9 +88,5 @@ public final class BallHatchPartMachine extends ItemHatchPartMachine implements 
         if (!isWorking) {
             super.onMachineRemoved();
         }
-    }
-
-    public boolean isWorking() {
-        return this.isWorking;
     }
 }

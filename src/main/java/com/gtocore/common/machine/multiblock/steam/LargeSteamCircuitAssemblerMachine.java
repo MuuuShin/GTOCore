@@ -1,13 +1,11 @@
 package com.gtocore.common.machine.multiblock.steam;
 
-import com.gtocore.common.machine.multiblock.part.LargeSteamHatchPartMachine;
-
 import com.gtolib.api.annotation.Scanned;
 import com.gtolib.api.annotation.dynamic.DynamicInitialValue;
 import com.gtolib.api.annotation.dynamic.DynamicInitialValueTypes;
 import com.gtolib.api.annotation.language.RegisterLanguage;
 import com.gtolib.api.recipe.Recipe;
-import com.gtolib.api.recipe.ingredient.FastSizedIngredient;
+import com.gtolib.utils.ItemUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
@@ -28,7 +26,6 @@ import net.minecraft.world.item.ItemStack;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -47,14 +44,14 @@ public final class LargeSteamCircuitAssemblerMachine extends BaseSteamMultiblock
                          typeKey = DynamicInitialValueTypes.KEY_MAX_PARALLEL,
                          en = "Max Parallels",
                          cn = "最大并行数",
-                         simpleValue = "8",
+                         easyValue = "8",
                          normalValue = "4",
                          expertValue = "4")
     private static int MAX_PARALLELS = 4;
     @DynamicInitialValue(
                          key = "gtceu.machine.multiblock.steam.large_circuit_assembler.reduction_duration",
                          typeKey = DynamicInitialValueTypes.KEY_MULTIPLY,
-                         simpleValue = "2",
+                         easyValue = "2",
                          normalValue = "4",
                          expertValue = "6",
                          cn = "增产模式耗时为普通的 : %s 倍",
@@ -65,7 +62,7 @@ public final class LargeSteamCircuitAssemblerMachine extends BaseSteamMultiblock
     @DynamicInitialValue(
                          key = "gtceu.machine.multiblock.steam.large_circuit_assembler.steam_cost",
                          typeKey = DynamicInitialValueTypes.KEY_MULTIPLY,
-                         simpleValue = "2",
+                         easyValue = "2",
                          normalValue = "4",
                          expertValue = "6",
                          cn = "增产模式蒸汽消耗为普通的 : %s 倍",
@@ -74,7 +71,7 @@ public final class LargeSteamCircuitAssemblerMachine extends BaseSteamMultiblock
     @DynamicInitialValue(
                          key = "gtceu.machine.multiblock.steam.large_circuit_assembler.multiply",
                          typeKey = DynamicInitialValueTypes.KEY_MULTIPLY,
-                         simpleValue = "4",
+                         easyValue = "4",
                          normalValue = "2",
                          expertValue = "2",
                          cn = "增产模式倍率为普通的 : %s 倍",
@@ -90,23 +87,14 @@ public final class LargeSteamCircuitAssemblerMachine extends BaseSteamMultiblock
                          enComment = """
                                  The amount of items needed to engrave the circuit before executing the corresponding circuit assembly recipe
                                  """,
-                         simpleValue = "8",
+                         easyValue = "8",
                          normalValue = "16",
                          expertValue = "32")
     private static int Engraving_needed_amount = 16;
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            LargeSteamCircuitAssemblerMachine.class, BaseSteamMultiblockMachine.MANAGED_FIELD_HOLDER);
-
     @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    @Override
-    public void onStructureFormed() {
-        super.onStructureFormed();
-        isOC = getParts().stream().anyMatch(LargeSteamHatchPartMachine.class::isInstance);
+    boolean oc() {
+        return true;
     }
 
     @Persisted
@@ -124,13 +112,13 @@ public final class LargeSteamCircuitAssemblerMachine extends BaseSteamMultiblock
     protected GTRecipe getRealRecipe(GTRecipe recipe) {
         if (count < Engraving_needed_amount) return null;
         Content content = recipe.outputs.get(ItemRecipeCapability.CAP).get(0);
-        if (FastSizedIngredient.getInner(ItemRecipeCapability.CAP.of(content.getContent())).getItems()[0].getItem() == item) {
+        if (ItemUtils.getFirstSized(ItemRecipeCapability.CAP.of(content.getContent())).getItem() == item) {
             if (isMultiMode) {
                 recipe.outputs.put(ItemRecipeCapability.CAP, List.of(content.copy(ItemRecipeCapability.CAP, ContentModifier.multiplier(PRODUCT_MULTIPLY))));
                 recipe = super.getRealRecipe(recipe);
                 if (recipe != null) {
                     recipe.duration = recipe.duration * RECIPE_DURATION_MULTIPLY;
-                    ((Recipe) recipe).setEut(recipe.getInputEUt() * COST_STEAM_MULTIPLY);
+                    ((Recipe) recipe).eut = recipe.getInputEUt() * COST_STEAM_MULTIPLY;
                 }
                 return recipe;
             } else {

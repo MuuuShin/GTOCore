@@ -1,16 +1,16 @@
 package com.gtocore.common.data.material;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.properties.OreProperty;
 import com.gregtechceu.gtceu.api.data.chemical.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 
 import appeng.core.definitions.AEBlocks;
 import appeng.core.definitions.AEItems;
-import com.enderio.base.common.init.EIOBlocks;
-import com.enderio.base.common.init.EIOItems;
 import com.hollingsworth.arsnouveau.setup.registry.BlockRegistry;
 import com.hollingsworth.arsnouveau.setup.registry.ItemsRegistry;
+import com.kyanite.deeperdarker.content.DDItems;
 import earth.terrarium.adastra.common.registry.ModBlocks;
 import earth.terrarium.adastra.common.registry.ModItems;
 import io.github.lounode.extrabotany.common.block.ExtraBotanyBlocks;
@@ -18,11 +18,12 @@ import io.github.lounode.extrabotany.common.item.ExtraBotanyItems;
 import vazkii.botania.common.block.BotaniaBlocks;
 import vazkii.botania.common.item.BotaniaItems;
 
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
+import static com.gregtechceu.gtceu.common.data.GTItems.CARBON_FIBERS;
+import static com.gregtechceu.gtceu.common.data.GTItems.CARBON_MESH;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.*;
+import static com.gtocore.api.data.tag.GTOTagPrefix.*;
+import static com.gtocore.common.data.GTOItems.*;
 import static com.gtocore.common.data.GTOMaterials.*;
-import static committee.nova.mods.avaritia.init.registry.ModBlocks.infinity;
-import static committee.nova.mods.avaritia.init.registry.ModItems.*;
 import static mythicbotany.register.ModBlocks.alfsteelBlock;
 import static mythicbotany.register.ModItems.alfsteelIngot;
 import static mythicbotany.register.ModItems.alfsteelNugget;
@@ -59,6 +60,14 @@ public final class MaterialIgnored {
         oreProp.getOreByProducts().clear();
         oreProp.setOreByProducts(Thorium, Neodymium, Bastnasite);
 
+        oreProp = GaiaCore.getProperty(PropertyKey.ORE);
+        oreProp.setOreByProducts(PerditioCrystal, NetherEmber, NetherEmber, Gaia);
+        oreProp.setWashedIn(FlowingCiphers, 500);
+
+        oreProp = NetherEmber.getProperty(PropertyKey.ORE);
+        oreProp.setOreByProducts(PerditioCrystal, GaiaCore, GaiaCore, NetherStar);
+        oreProp.setWashedIn(Undine, 500);
+
         TagPrefix.gem.setIgnored(Fluix, () -> AEItems.FLUIX_CRYSTAL);
         TagPrefix.block.setIgnored(Fluix, AEBlocks.FLUIX_BLOCK::block);
         TagPrefix.dust.setIgnored(Fluix, () -> AEItems.FLUIX_DUST);
@@ -66,6 +75,12 @@ public final class MaterialIgnored {
         TagPrefix.gem.setIgnored(CertusQuartz, () -> AEItems.CERTUS_QUARTZ_CRYSTAL);
         TagPrefix.block.setIgnored(CertusQuartz, AEBlocks.QUARTZ_BLOCK::block);
         TagPrefix.dust.setIgnored(CertusQuartz, () -> AEItems.CERTUS_QUARTZ_DUST);
+
+        TagPrefix.gem.setIgnored(SoulCrystal, () -> DDItems.SOUL_CRYSTAL::get);
+        TagPrefix.dust.setIgnored(SoulCrystal, () -> DDItems.SOUL_DUST::get);
+
+        TagPrefix.gem.setIgnored(Resonarium, () -> DDItems.RESONARIUM::get);
+        TagPrefix.plate.setIgnored(Resonarium, () -> DDItems.RESONARIUM_PLATE::get);
 
         TagPrefix.rawOre.setIgnored(Desh, ModItems.RAW_DESH);
         TagPrefix.rawOre.setIgnored(Ostrum, ModItems.RAW_OSTRUM);
@@ -133,122 +148,31 @@ public final class MaterialIgnored {
         TagPrefix.block.setIgnored(ElfGlass, () -> BotaniaBlocks.elfGlass);
         TagPrefix.block.setIgnored(BifrostPerm, () -> BotaniaBlocks.bifrostPerm);
 
-        TagPrefix.gear.setIgnored(Wood, () -> EIOItems.GEAR_WOOD);
-        TagPrefix.dust.setIgnored(Wheat, () -> EIOItems.FLOUR);
-        TagPrefix.dust.setIgnored(Coal, () -> EIOItems.POWDERED_COAL);
-        TagPrefix.dust.setIgnored(Iron, () -> EIOItems.POWDERED_IRON);
-        TagPrefix.dust.setIgnored(Gold, () -> EIOItems.POWDERED_GOLD);
-        TagPrefix.dust.setIgnored(Copper, () -> EIOItems.POWDERED_COPPER);
-        TagPrefix.dust.setIgnored(Tin, () -> EIOItems.POWDERED_TIN);
-        TagPrefix.dust.setIgnored(EnderPearl, () -> EIOItems.POWDERED_ENDER_PEARL);
-        TagPrefix.dust.setIgnored(Obsidian, () -> EIOItems.POWDERED_OBSIDIAN);
-        TagPrefix.dust.setIgnored(Cobalt, () -> EIOItems.POWDERED_COBALT);
-        TagPrefix.dust.setIgnored(Lapis, () -> EIOItems.POWDERED_LAPIS_LAZULI);
-        TagPrefix.dust.setIgnored(Soularium, () -> EIOItems.SOUL_POWDER);
-        TagPrefix.dust.setIgnored(NetherQuartz, () -> EIOItems.POWDERED_QUARTZ);
-
-        TagPrefix.ingot.setIgnored(CopperAlloy, () -> EIOItems.COPPER_ALLOY_INGOT);
-        TagPrefix.nugget.setIgnored(CopperAlloy, () -> EIOItems.COPPER_ALLOY_NUGGET);
-        TagPrefix.block.setIgnored(CopperAlloy, () -> EIOBlocks.COPPER_ALLOY_BLOCK);
-
-        TagPrefix.ingot.setIgnored(EnergeticAlloy, () -> EIOItems.ENERGETIC_ALLOY_INGOT);
-        TagPrefix.nugget.setIgnored(EnergeticAlloy, () -> EIOItems.ENERGETIC_ALLOY_NUGGET);
-        TagPrefix.block.setIgnored(EnergeticAlloy, () -> EIOBlocks.ENERGETIC_ALLOY_BLOCK);
-
-        TagPrefix.ingot.setIgnored(VibrantAlloy, () -> EIOItems.VIBRANT_ALLOY_INGOT);
-        TagPrefix.nugget.setIgnored(VibrantAlloy, () -> EIOItems.VIBRANT_ALLOY_NUGGET);
-        TagPrefix.block.setIgnored(VibrantAlloy, () -> EIOBlocks.VIBRANT_ALLOY_BLOCK);
-
-        TagPrefix.ingot.setIgnored(RedstoneAlloy, () -> EIOItems.REDSTONE_ALLOY_INGOT);
-        TagPrefix.nugget.setIgnored(RedstoneAlloy, () -> EIOItems.REDSTONE_ALLOY_NUGGET);
-        TagPrefix.block.setIgnored(RedstoneAlloy, () -> EIOBlocks.REDSTONE_ALLOY_BLOCK);
-
-        TagPrefix.ingot.setIgnored(ConductiveAlloy, () -> EIOItems.CONDUCTIVE_ALLOY_INGOT);
-        TagPrefix.nugget.setIgnored(ConductiveAlloy, () -> EIOItems.CONDUCTIVE_ALLOY_NUGGET);
-        TagPrefix.block.setIgnored(ConductiveAlloy, () -> EIOBlocks.CONDUCTIVE_ALLOY_BLOCK);
-
-        TagPrefix.ingot.setIgnored(PulsatingAlloy, () -> EIOItems.PULSATING_ALLOY_INGOT);
-        TagPrefix.nugget.setIgnored(PulsatingAlloy, () -> EIOItems.PULSATING_ALLOY_NUGGET);
-        TagPrefix.block.setIgnored(PulsatingAlloy, () -> EIOBlocks.PULSATING_ALLOY_BLOCK);
-
-        TagPrefix.ingot.setIgnored(DarkSteel, () -> EIOItems.DARK_STEEL_INGOT);
-        TagPrefix.nugget.setIgnored(DarkSteel, () -> EIOItems.DARK_STEEL_NUGGET);
-        TagPrefix.block.setIgnored(DarkSteel, () -> EIOBlocks.DARK_STEEL_BLOCK);
-
-        TagPrefix.ingot.setIgnored(Soularium, () -> EIOItems.SOULARIUM_INGOT);
-        TagPrefix.nugget.setIgnored(Soularium, () -> EIOItems.SOULARIUM_NUGGET);
-        TagPrefix.block.setIgnored(Soularium, () -> EIOBlocks.SOULARIUM_BLOCK);
-
-        TagPrefix.ingot.setIgnored(EndSteel, () -> EIOItems.END_STEEL_INGOT);
-        TagPrefix.nugget.setIgnored(EndSteel, () -> EIOItems.END_STEEL_NUGGET);
-        TagPrefix.block.setIgnored(EndSteel, () -> EIOBlocks.END_STEEL_BLOCK);
-
-        TagPrefix.ingot.setIgnored(CrystalMatrix, crystal_matrix_ingot);
-        /// to be added in future from {@link committee.nova.mods.avaritia_integration.init.registry.CoreReg }
-        // TagPrefix.nugget.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_nugget);
-        // plateDense.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_dense_plate);
-        // plate.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_plate);
-        // plateDouble.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_double_plate);
-        // rod.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_rod);
-        // rodLong.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_long_rod);
-        // gear.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_gear);
-        // ring.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_ring);
-        // spring.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_spring);
-        // screw.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_screw);
-        // dust.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_dust);
-        // bolt.setIgnored(CrystalMatrix, CoreReg.crystal_matrix_bolt);
-        //
-        ingot.setIgnored(BlazeCube, blaze_cube);
-        // nugget.setIgnored(BlazeCube, CoreReg.blaze_cube_nugget);
-        // block.setIgnored(BlazeCube, blaze_cube_block);
-        // plateDense.setIgnored(BlazeCube, CoreReg.blaze_cube_dense_plate);
-        // plate.setIgnored(BlazeCube, CoreReg.blaze_cube_plate);
-        // plateDouble.setIgnored(BlazeCube, CoreReg.blaze_cube_double_plate);
-        // rod.setIgnored(BlazeCube, CoreReg.blaze_cube_rod);
-        // rodLong.setIgnored(BlazeCube, CoreReg.blaze_cube_long_rod);
-        // gear.setIgnored(BlazeCube, CoreReg.blaze_cube_gear);
-        // ring.setIgnored(BlazeCube, CoreReg.blaze_cube_ring);
-        // spring.setIgnored(BlazeCube, CoreReg.blaze_cube_spring);
-        // screw.setIgnored(BlazeCube, CoreReg.blaze_cube_screw);
-        // dust.setIgnored(BlazeCube, CoreReg.blaze_cube_dust);
-        // bolt.setIgnored(BlazeCube, CoreReg.blaze_cube_bolt);
-
-        TagPrefix.ingot.setIgnored(Infinity, infinity_ingot);
-        TagPrefix.nugget.setIgnored(Infinity, infinity_nugget);
-        TagPrefix.block.setIgnored(Infinity, infinity);
-        TagPrefix.ingot.setIgnored(Neutron, neutron_ingot);
-        TagPrefix.nugget.setIgnored(Neutron, neutron_nugget);
-        // plateDense.setIgnored(Infinity, CoreReg.infinity_dense_plate);
-        // plate.setIgnored(Infinity, CoreReg.infinity_plate);
-        // plateDouble.setIgnored(Infinity, CoreReg.infinity_double_plate);
-        // rod.setIgnored(Infinity, CoreReg.infinity_rod);
-        // rodLong.setIgnored(Infinity, CoreReg.infinity_long_rod);
-        // gear.setIgnored(Infinity, CoreReg.infinity_gear);
-        // ring.setIgnored(Infinity, CoreReg.infinity_ring);
-        // spring.setIgnored(Infinity, CoreReg.infinity_spring);
-        // screw.setIgnored(Infinity, CoreReg.infinity_screw);
-        // dust.setIgnored(Infinity, CoreReg.infinity_dust);
-
-        TagPrefix.block.setIgnored(Neutron, committee.nova.mods.avaritia.init.registry.ModBlocks.neutron);
-        TagPrefix.ingot.setIgnored(Neutron, neutron_ingot);
-        TagPrefix.nugget.setIgnored(Neutron, neutron_nugget);
-        // bolt.setIgnored(Neutron, CoreReg.neutron_bolt);
-        // plateDense.setIgnored(Neutron, CoreReg.neutron_dense_plate);
-        // plate.setIgnored(Neutron, CoreReg.neutron_plate);
-        // plateDouble.setIgnored(Neutron, CoreReg.neutron_double_plate);
-        // rod.setIgnored(Neutron, CoreReg.neutron_rod);
-        // rodLong.setIgnored(Neutron, CoreReg.neutron_long_rod);
-        gear.setIgnored(Neutron, neutron_gear);
-        // dust.setIgnored(Neutron, CoreReg.neutron_dust);
-        // ring.setIgnored(Neutron, CoreReg.neutron_ring);
-        // spring.setIgnored(Neutron, CoreReg.neutron_spring);
-        // screw.setIgnored(Neutron, CoreReg.neutron_screw);
+        COIN.setIgnored(Neutron, () -> NEUTRON_COIN);
 
         ingot.setIgnored(Etrium, ModItems.ETRIUM_INGOT);
         nugget.setIgnored(Etrium, ModItems.ETRIUM_NUGGET);
         block.setIgnored(Etrium, ModBlocks.ETRIUM_BLOCK);
         plate.setIgnored(Etrium, ModItems.ETRIUM_PLATE);
         rod.setIgnored(Etrium, ModItems.ETRIUM_ROD);
+
+        FIBER_TOW.setIgnored(Carbon, () -> CARBON_FIBERS);
+        FIBER_MESH.setIgnored(Carbon, () -> CARBON_MESH);
+        FIBER.setIgnored(Kevlar, () -> KEVLAR_FIBER);
+        FIBER_MESH.setIgnored(Kevlar, () -> WOVEN_KEVLAR);
+        FIBER.setIgnored(BorosilicateGlass, () -> ChemicalHelper.get(wireFine, BorosilicateGlass).getItem());
+
+        NANO.setIgnored(SiliconCarbide, () -> ChemicalHelper.get(dust, NanoScaleSiliconCarbide).getItem());
+        NANO.setIgnored(Tungsten, () -> ChemicalHelper.get(dust, NanoScaleTungsten).getItem());
+        NANO.setIgnored(Alumina, () -> ChemicalHelper.get(dust, NanoScaleAlumina).getItem());
+        NANO.setIgnored(YttriumOxide, () -> ChemicalHelper.get(dust, NanoScaleYttria).getItem());
+        NANO.setIgnored(Niobium, () -> ChemicalHelper.get(dust, NanoScaleNiobium).getItem());
+        NANO.setIgnored(Zirconium, () -> ChemicalHelper.get(dust, NanoScaleZirconium).getItem());
+        NANO.setIgnored(Rhenium, () -> ChemicalHelper.get(dust, NanoScaleRhenium).getItem());
+        NANO.setIgnored(Molybdenum, () -> ChemicalHelper.get(dust, NanoScaleMolybdenum).getItem());
+        NANO.setIgnored(Aluminium, () -> ChemicalHelper.get(dust, NanoAluminum).getItem());
+
+        block.modifyMaterialAmount(Fluix, 4);
 
         if (GTCEu.isProd()) {
             TagPrefix.ingot.setIgnored(Alfsteel, () -> () -> alfsteelIngot);

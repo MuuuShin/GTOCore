@@ -17,16 +17,15 @@ import com.gregtechceu.gtceu.api.data.worldgen.generator.veins.VeinedVeinGenerat
 import com.gregtechceu.gtceu.common.data.GTBedrockFluids;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.data.GTOres;
-import com.gregtechceu.gtceu.utils.collection.O2IOpenCacheHashMap;
-import com.gregtechceu.gtceu.utils.collection.O2OOpenCacheHashMap;
-import com.gregtechceu.gtceu.utils.collection.OpenCacheHashSet;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.Level;
 
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import com.fast.fastcollection.O2OOpenCacheHashMap;
+import com.fast.fastcollection.OpenCacheHashSet;
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
 import java.util.*;
@@ -41,8 +40,9 @@ import static com.gtolib.api.data.GTOWorldGenLayers.ALL_LAYER;
 public final class GTOOres {
 
     private static final Map<ResourceLocation, MaterialSelector> RANDOM_ORES = new O2OOpenCacheHashMap<>();
-    public static final Map<ResourceLocation, Object2IntOpenHashMap<Material>> ALL_ORES = new O2OOpenCacheHashMap<>();
+    public static final Map<ResourceLocation, Reference2IntOpenHashMap<Material>> ALL_ORES = new O2OOpenCacheHashMap<>();
 
+    @SuppressWarnings("ConstantConditions")
     public static void init() {
         GTBedrockFluids.init();
         if (false) {
@@ -114,11 +114,10 @@ public final class GTOOres {
             .layer(ALL_LAYER)
             .dimensions(IO, PLUTO, BARNARDA_C, OTHERSIDE)
             .heightRangeUniform(10, 90)
-            .cuboidVeinGenerator(generator -> generator
-                    .top(b -> b.mat(Naquadah).size(2))
-                    .middle(b -> b.mat(Naquadah).size(3))
-                    .bottom(b -> b.mat(Naquadah).size(2))
-                    .spread(b -> b.mat(Plutonium239)))
+            .dikeVeinGenerator(generator -> generator
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(Plutonium239, 1, 10, 20))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(Naquadah, 3, 5, 35))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(Naquadah, 2, 15, 30)))
             .surfaceIndicatorGenerator(indicator -> indicator
                     .surfaceRock(Naquadah)
                     .placement(SurfaceIndicatorGenerator.IndicatorPlacement.ABOVE)));
@@ -128,13 +127,26 @@ public final class GTOOres {
             .layer(ALL_LAYER)
             .dimensions(MOON, TITAN, PLUTO, OTHERSIDE)
             .heightRangeUniform(30, 60)
-            .cuboidVeinGenerator(generator -> generator
-                    .top(b -> b.mat(Pitchblende).size(2))
-                    .middle(b -> b.mat(Pitchblende).size(3))
-                    .bottom(b -> b.mat(Pitchblende).size(2))
-                    .spread(b -> b.mat(Uraninite)))
+            .dikeVeinGenerator(generator -> generator
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(Uraninite, 2, 5, 30))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(Pitchblende, 3, 5, 35))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(Pitchblende, 2, 10, 30)))
             .surfaceIndicatorGenerator(indicator -> indicator
                     .surfaceRock(Pitchblende)
+                    .placement(SurfaceIndicatorGenerator.IndicatorPlacement.ABOVE)));
+
+    private static final GTOreDefinition BORAX_VEIN = create("borax_vein", vein -> vein
+            .clusterSize(UniformInt.of(32, 64)).density(0.25f).weight(30)
+            .layer(ALL_LAYER)
+            .dimensions(VENUS, MARS, CERES, OTHERSIDE)
+            .heightRangeUniform(30, 60)
+            .dikeVeinGenerator(generator -> generator
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(RockSalt, 1, 5, 30))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(Borax, 3, 5, 40))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(Salt, 1, 10, 30))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(Lepidolite, 1, 10, 30)))
+            .surfaceIndicatorGenerator(indicator -> indicator
+                    .surfaceRock(Borax)
                     .placement(SurfaceIndicatorGenerator.IndicatorPlacement.ABOVE)));
 
     private static final GTOreDefinition SCHEELITE_VEIN = create("scheelite_vein", vein -> vein
@@ -772,7 +784,7 @@ public final class GTOOres {
     private static final GTOreDefinition CRYSTAL_VEIN_WATER_FIRE = create("crystal_vein_water_fire", vein -> vein
             .clusterSize(UniformInt.of(20, 40)).density(0.95f).weight(20)
             .layer(ALL_LAYER)
-            .dimensions(OVERWORLD, OTHERSIDE)
+            .dimensions(OVERWORLD, ALFHEIM, OTHERSIDE)
             .heightRangeUniform(-50, 0)
             .dikeVeinGenerator(generator -> generator
                     .withBlock(new DikeVeinGenerator.DikeBlockDefinition(PerditioCrystal, 1, -60, 20))
@@ -786,7 +798,7 @@ public final class GTOOres {
     private static final GTOreDefinition CRYSTAL_VEIN_EARTH_WIND = create("crystal_vein_earth_wind", vein -> vein
             .clusterSize(UniformInt.of(20, 40)).density(0.95f).weight(20)
             .layer(ALL_LAYER)
-            .dimensions(OVERWORLD, OTHERSIDE)
+            .dimensions(OVERWORLD, ALFHEIM, OTHERSIDE)
             .heightRangeUniform(-50, 0)
             .dikeVeinGenerator(generator -> generator
                     .withBlock(new DikeVeinGenerator.DikeBlockDefinition(PerditioCrystal, 1, -60, 20))
@@ -797,11 +809,88 @@ public final class GTOOres {
                     .surfaceRock(PerditioCrystal)
                     .placement(SurfaceIndicatorGenerator.IndicatorPlacement.ABOVE)));
 
+    private static final GTOreDefinition MANA_STEEL_VEIN = create("mana_steel_vein", vein -> vein
+            .clusterSize(UniformInt.of(32, 64)).density(0.9f).weight(30)
+            .layer(ALL_LAYER)
+            .dimensions(ALFHEIM, OTHERSIDE)
+            .heightRangeTriangle(20, 100)
+            .veinedVeinGenerator(generator -> generator
+                    .oreBlock(new VeinedVeinGenerator.VeinBlockDefinition(ManaDiamond, 2))
+                    .oreBlock(new VeinedVeinGenerator.VeinBlockDefinition(SourceGem, 2))
+                    .oreBlock(new VeinedVeinGenerator.VeinBlockDefinition(Manasteel, 3))
+                    .rareBlock(new VeinedVeinGenerator.VeinBlockDefinition(PerditioCrystal, 1))
+                    .rareBlockChance(0.01f)
+                    .veininessThreshold(0.25f)
+                    .maxRichnessThreshold(0.35f)
+                    .minRichness(0.8f)
+                    .maxRichness(1.0f)
+                    .edgeRoundoffBegin(5)
+                    .maxEdgeRoundoff(0.1f))
+            .surfaceIndicatorGenerator(indicator -> indicator
+                    .surfaceRock(Manasteel)
+                    .placement(SurfaceIndicatorGenerator.IndicatorPlacement.ABOVE)));
+
+    private static final GTOreDefinition ELEMENTIUM_VEIN = create("elementium_vein", vein -> vein
+            .clusterSize(UniformInt.of(32, 64)).density(1.0F).weight(30)
+            .layer(ALL_LAYER)
+            .dimensions(ALFHEIM, OTHERSIDE)
+            .heightRangeTriangle(20, 100)
+            .veinedVeinGenerator(generator -> generator
+                    .oreBlock(new VeinedVeinGenerator.VeinBlockDefinition(Dragonstone, 2))
+                    .oreBlock(new VeinedVeinGenerator.VeinBlockDefinition(Elementium, 2))
+                    .oreBlock(new VeinedVeinGenerator.VeinBlockDefinition(InfusedGold, 3))
+                    .rareBlock(new VeinedVeinGenerator.VeinBlockDefinition(PerditioCrystal, 1))
+                    .rareBlockChance(0.01f)
+                    .veininessThreshold(0.25f)
+                    .maxRichnessThreshold(0.35f)
+                    .minRichness(0.6f)
+                    .maxRichness(1.0f)
+                    .edgeRoundoffBegin(5)
+                    .maxEdgeRoundoff(0.1f))
+            .surfaceIndicatorGenerator(indicator -> indicator
+                    .surfaceRock(Elementium)
+                    .placement(SurfaceIndicatorGenerator.IndicatorPlacement.ABOVE)));
+
+    private static final GTOreDefinition GAIA_CORE_VEIN = create("gaia_core_vein", vein -> vein
+            .clusterSize(UniformInt.of(48, 64)).density(0.9f).weight(15)
+            .layer(ALL_LAYER)
+            .dimensions(ALFHEIM, OTHERSIDE)
+            .heightRangeTriangle(-20, 60)
+            .veinedVeinGenerator(generator -> generator
+                    .oreBlock(new VeinedVeinGenerator.VeinBlockDefinition(GaiaCore, 4))
+                    .oreBlock(new VeinedVeinGenerator.VeinBlockDefinition(NetherEmber, 2))
+                    .oreBlock(new VeinedVeinGenerator.VeinBlockDefinition(Thaumium, 2))
+                    .rareBlock(new VeinedVeinGenerator.VeinBlockDefinition(PerditioCrystal, 1))
+                    .rareBlockChance(0.01f)
+                    .veininessThreshold(0.15f)
+                    .maxRichnessThreshold(0.5f)
+                    .minRichness(0.8f)
+                    .maxRichness(1.0f)
+                    .edgeRoundoffBegin(1)
+                    .maxEdgeRoundoff(0.05f))
+            .surfaceIndicatorGenerator(indicator -> indicator
+                    .surfaceRock(GaiaCore)
+                    .placement(SurfaceIndicatorGenerator.IndicatorPlacement.ABOVE)));
+
+    private static final GTOreDefinition ANIMA_TREE_LEYLINE = create("anima_tree_leyline", vein -> vein
+            .clusterSize(UniformInt.of(64, 521)).density(0.8f).weight(5)
+            .layer(ALL_LAYER)
+            .dimensions(ANCIENT_WORLD, ALFHEIM, OTHERSIDE)
+            .heightRangeUniform(-60, 100)
+            .dikeVeinGenerator(generator -> generator
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(RemnantSpiritStone, 3, 0, 100))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(SoulJadeCrystal, 3, -20, 80))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(StarBloodCrystal, 2, -40, 60))
+                    .withBlock(new DikeVeinGenerator.DikeBlockDefinition(OriginCoreCrystal, 2, -60, 0)))
+            .surfaceIndicatorGenerator(indicator -> indicator
+                    .surfaceRock(RemnantSpiritStone)
+                    .placement(SurfaceIndicatorGenerator.IndicatorPlacement.ABOVE)));
+
     private static GTOreDefinition create(String name, Consumer<GTOreDefinition> config) {
         ResourceLocation id = GTCEu.id(name);
         GTOreDefinition definition = GTOres.create(id, config);
         List<VeinGenerator.VeinEntry> entries = definition.veinGenerator().getAllEntries();
-        Object2IntOpenHashMap<Material> materialMap = new O2IOpenCacheHashMap<>();
+        Reference2IntOpenHashMap<Material> materialMap = new Reference2IntOpenHashMap<>();
         List<WeightedMaterial> materials = new ArrayList<>(entries.size());
         for (VeinGenerator.VeinEntry entry : entries) {
             Material material = entry.vein().right().orElse(null);
@@ -812,7 +901,7 @@ public final class GTOOres {
             }
         }
         for (ResourceKey<Level> dimension : definition.dimensionFilter()) {
-            Object2IntOpenHashMap<Material> materialIntegerMap = ALL_ORES.computeIfAbsent(dimension.location(), k -> new O2IOpenCacheHashMap<>());
+            var materialIntegerMap = ALL_ORES.computeIfAbsent(dimension.location(), k -> new Reference2IntOpenHashMap<>());
             materialMap.forEach((material, amount) -> materialIntegerMap.mergeInt(material, amount, Math::max));
             ALL_ORES.put(dimension.location(), materialIntegerMap);
         }
@@ -822,7 +911,7 @@ public final class GTOOres {
 
     public static Material selectMaterial(ResourceLocation dimension) {
         MaterialSelector selector = RANDOM_ORES.computeIfAbsent(dimension, k -> {
-            Object2IntOpenHashMap<Material> ores = ALL_ORES.get(k);
+            var ores = ALL_ORES.get(k);
             if (ores == null) return null;
             return new MaterialSelector(ores);
         });
@@ -836,11 +925,11 @@ public final class GTOOres {
         private final List<Integer> cumulativeWeights;
         private int totalWeight;
 
-        private MaterialSelector(Object2IntOpenHashMap<Material> materials) {
+        private MaterialSelector(Reference2IntOpenHashMap<Material> materials) {
             this.materialList = new ArrayList<>(materials.keySet());
             this.cumulativeWeights = new ArrayList<>();
             this.totalWeight = 0;
-            for (Integer weight : materials.values()) {
+            for (int weight : materials.values()) {
                 this.totalWeight += weight;
                 this.cumulativeWeights.add(this.totalWeight);
             }
@@ -911,7 +1000,7 @@ public final class GTOOres {
         int combinedWeight;
         float density;
 
-        public OreData(double totalOreWeight, int totalVeinWeight, int combinedWeight, float density) {
+        OreData(double totalOreWeight, int totalVeinWeight, int combinedWeight, float density) {
             this.totalOreWeight = totalOreWeight;
             this.totalVeinWeight = totalVeinWeight;
             this.combinedWeight = combinedWeight;

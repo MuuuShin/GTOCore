@@ -1,13 +1,10 @@
 package com.gtocore.mixin.gtm;
 
 import com.gtocore.common.data.GTORecipes;
-import com.gtocore.data.Data;
 import com.gtocore.data.loot.DungeonLoot;
 
-import com.gtolib.api.recipe.ingredient.CircuitIngredient;
 import com.gtolib.api.recipe.ingredient.FastSizedIngredient;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.data.chemical.material.registry.MaterialRegistry;
 import com.gregtechceu.gtceu.api.recipe.ingredient.FluidContainerIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntCircuitIngredient;
@@ -43,9 +40,6 @@ public class CommonProxyMixin {
     @Inject(method = "registerPackFinders", at = @At(value = "INVOKE", target = "Lcom/gregtechceu/gtceu/common/data/GTRecipes;recipeRemoval()V"), remap = false, cancellable = true)
     private void registerPackFinders(AddPackFindersEvent event, CallbackInfo ci) {
         if (!GTORecipes.cache) {
-            if (!GTCEu.isClientSide()) {
-                Data.init();
-            }
             DungeonLootLoader.init();
             DungeonLoot.init();
         }
@@ -62,7 +56,7 @@ public class CommonProxyMixin {
     public void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             CraftingHelper.register(SizedIngredient.TYPE, FastSizedIngredient.SERIALIZER);
-            CraftingHelper.register(IntCircuitIngredient.TYPE, CircuitIngredient.SERIALIZER);
+            CraftingHelper.register(IntCircuitIngredient.TYPE, IntCircuitIngredient.SERIALIZER);
             CraftingHelper.register(FluidContainerIngredient.TYPE, FluidContainerIngredient.SERIALIZER);
         });
     }

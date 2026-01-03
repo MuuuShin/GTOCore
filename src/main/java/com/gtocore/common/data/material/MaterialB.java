@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.fluids.FluidBuilder;
 
 import static com.gregtechceu.gtceu.api.data.chemical.material.info.MaterialFlags.*;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.*;
+import static com.gtocore.api.data.material.GTOMaterialFlags.*;
 import static com.gtocore.api.data.material.GTOMaterialIconSet.*;
 import static com.gtocore.common.data.GTOMaterials.*;
 import static com.gtolib.utils.register.MaterialsRegisterUtils.material;
@@ -2159,7 +2160,6 @@ public final class MaterialB {
                 .liquid()
                 .color(0xd5d54b)
                 .components(Hydrogen, 1, Phosphorus, 1, Fluorine, 6)
-                .flags(DISABLE_DECOMPOSITION)
                 .iconSet(DULL)
                 .buildAndRegister();
 
@@ -2713,7 +2713,7 @@ public final class MaterialB {
                 .flags(GTOMaterialFlags.GENERATE_SMALL_DUST)
                 .components(Yttrium, 2, Oxygen, 3)
                 .iconSet(GLASS)
-                .flags(DISABLE_DECOMPOSITION)
+                .flags(DISABLE_DECOMPOSITION, HAS_NANOSCALE_FORM)
                 .buildAndRegister();
 
         ZirconChlorinatingResidue = material("zircon_chlorinating_residue", "锆氯化反应残渣")
@@ -3071,6 +3071,13 @@ public final class MaterialB {
                 .fluid()
                 .components(TriniumCompound, 1)
                 .color(0xbae8e6)
+                .flags(DISABLE_DECOMPOSITION)
+                .iconSet(FLUID)
+                .buildAndRegister();
+
+        MetalCompoundParticleFront = material("metal_compound_particle_front", "富集金属复合物泡沫")
+                .fluid()
+                .color(0xc6d6e6)
                 .flags(DISABLE_DECOMPOSITION)
                 .iconSet(FLUID)
                 .buildAndRegister();
@@ -3655,7 +3662,7 @@ public final class MaterialB {
                 .dust()
                 .components(Aluminium, 2, Oxygen, 3)
                 .color(0x1d4759).iconSet(DULL)
-                .flags(DISABLE_DECOMPOSITION)
+                .flags(DISABLE_DECOMPOSITION, GENERATE_FIBER, HAS_NANOSCALE_FORM)
                 .buildAndRegister();
 
         CaesiumHydroxide = material("caesium_hydroxide", "氢氧化铯")
@@ -3691,6 +3698,16 @@ public final class MaterialB {
                 .components(Phosphorus, 4, Sulfur, 10)
                 .color(0xe7a123).iconSet(DULL)
                 .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+
+        DyeCarrierResin = material("dye_carrier_resin", "染料载体树脂")
+                .fluid()
+                .color(0xb8b8b8).iconSet(DULL)
+                .buildAndRegister();
+
+        EmulsifiedDyeCarrierResin = material("emulsified_dye_carrier_resin", "乳化染料载体树脂")
+                .fluid()
+                .color(0xa7a7a7).iconSet(DULL)
                 .buildAndRegister();
 
         StoneDustResidue = material("stone_dust_residue", "石头粉残渣")
@@ -4115,6 +4132,26 @@ public final class MaterialB {
                 .liquid(new FluidBuilder().temperature(7000))
                 .color(0x3c8d4f).iconSet(LIMPID)
                 .buildAndRegister();
+
+        MethylAcrylate = material("methyl_acrylate", "丙烯酸甲酯")
+                .fluid()
+                .color(0x3c8d4f).iconSet(LIMPID)
+                .buildAndRegister().setFormula("C4H6O2");
+        SilicaSol = material("silica_sol", "硅溶胶")
+                .fluid()
+                .color(0x8d3c4f).iconSet(LIMPID)
+                .buildAndRegister().setFormula("SiO2");
+        AluminumNitride = material("aluminum_nitride", "氮氧化铝")
+                .dust()
+                .components(Aluminium, 1, Nitrogen, 1)
+                .color(0x4f3c8d).iconSet(DULL)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        Polyacrylonitrile = material("polyacrylonitrile", "聚丙烯腈")
+                .polymer().fluid()
+                .flags(GENERATE_FOIL, GENERATE_PLATE)
+                .color(0x8f8d3c).iconSet(DULL)
+                .buildAndRegister().setFormula("(C3H3N)n");
 
         RedSlurry = material("red_slurry", "赤泥浆液")
                 .fluid()
@@ -4835,6 +4872,15 @@ public final class MaterialB {
                 .flags(GTOMaterialFlags.GENERATE_CERAMIC)
                 .buildAndRegister().setFormula("Al2O3");
 
+        ZirconiumDiboride = material("zirconium_diboride", "二硼化锆")
+                .dust()
+                .components(Zirconium, 1, Boron, 2)
+                .color(0x4e5166)
+                .temp(4492)
+                .iconSet(BRIGHT)
+                .flags(GENERATE_CERAMIC)
+                .buildAndRegister();
+
         BariumTitanateCeramic = material("barium_titanate_ceramic", "钛酸钡陶瓷")
                 .dust()
                 .color(0xffcbe2)
@@ -4845,10 +4891,10 @@ public final class MaterialB {
 
         TungstenTetraborideCeramics = material("tungsten_tetraboride_ceramics", "四硼化钨陶瓷")
                 .dust()
-                .color(0x1b1b1b)
+                .color(0xcee55a).secondaryColor(0x9cbf38)
                 .iconSet(BRIGHT)
                 .temp(4500)
-                .flags(GTOMaterialFlags.GENERATE_CERAMIC)
+                .flags(GTOMaterialFlags.GENERATE_CERAMIC, GENERATE_TINY_DUST, GTOMaterialFlags.GENERATE_MXene)
                 .buildAndRegister().setFormula("WB4");
 
         SilicaCeramic = material("silica_ceramic", "氧化硅岩陶瓷")
@@ -4877,19 +4923,27 @@ public final class MaterialB {
 
         ThuliumHexaborideCeramics = material("thulium_hexaboride_ceramics", "六硼化铥陶瓷")
                 .dust()
-                .color(0x2a2a2a)
+                .color(0x6cdcff).secondaryColor(0x3ab1ff)
                 .iconSet(BRIGHT)
                 .temp(12600)
-                .flags(GTOMaterialFlags.GENERATE_CERAMIC)
+                .flags(GTOMaterialFlags.GENERATE_CERAMIC, GENERATE_TINY_DUST, GTOMaterialFlags.GENERATE_MXene)
                 .buildAndRegister().setFormula("TmB6");
 
         SiliconNitrideCeramic = material("silicon_nitride_ceramic", "氮化硅陶瓷")
                 .dust()
-                .color(0x292824)
+                .color(0x29c824).secondaryColor(0x1b7a1b)
                 .temp(5400)
                 .iconSet(BRIGHT)
-                .flags(GTOMaterialFlags.GENERATE_CERAMIC)
+                .flags(GTOMaterialFlags.GENERATE_CERAMIC, GENERATE_TINY_DUST, GTOMaterialFlags.GENERATE_MXene)
                 .buildAndRegister().setFormula("Si3N4");
+
+        Titanium3Carbide = material("titanium3_carbide_ceramic", "碳化钛陶瓷")
+                .dust()
+                .color(0x6b423b).secondaryColor(0x4e2f2a)
+                .iconSet(BRIGHT)
+                .temp(5400)
+                .flags(GTOMaterialFlags.GENERATE_CERAMIC, GENERATE_TINY_DUST, GTOMaterialFlags.GENERATE_MXene)
+                .buildAndRegister().setFormula("Ti3C2");
 
         CobaltOxideCeramic = material("cobalt_oxide_ceramic", "氧化钴陶瓷")
                 .dust()
@@ -4925,10 +4979,10 @@ public final class MaterialB {
 
         TitaniumNitrideCeramic = material("titanium_nitride_ceramic", "氮化钛陶瓷")
                 .dust()
-                .color(0xd4ac4b)
+                .color(0xd4ac4b).secondaryColor(0x9c7a34)
                 .iconSet(BRIGHT)
                 .temp(3600)
-                .flags(GTOMaterialFlags.GENERATE_CERAMIC)
+                .flags(GTOMaterialFlags.GENERATE_CERAMIC, GENERATE_TINY_DUST, GTOMaterialFlags.GENERATE_MXene)
                 .buildAndRegister().setFormula("TiN");
 
         BoronCarbideCeramics = material("boron_carbide_ceramics", "碳化硼陶瓷")

@@ -9,9 +9,9 @@ import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 
 import static com.gtolib.api.GTOValues.COMPONENT_ASSEMBLY_CASING_TIER;
 
-public final class ComponentAssemblerMachine extends TierCasingMultiblockMachine {
+public class ComponentAssemblerMachine extends TierCasingMultiblockMachine {
 
-    private int maxCasingTier = GTValues.IV;
+    private int casingTier;
 
     public ComponentAssemblerMachine(MetaMachineBlockEntity holder) {
         super(holder, COMPONENT_ASSEMBLY_CASING_TIER);
@@ -20,18 +20,22 @@ public final class ComponentAssemblerMachine extends TierCasingMultiblockMachine
     @Override
     public void onStructureFormed() {
         super.onStructureFormed();
-        if (getSubFormedAmount() > 0) maxCasingTier = GTValues.UV;
+        if (getSubFormedAmount() > 0) {
+            casingTier = Math.min(GTValues.UV, getCasingTier(COMPONENT_ASSEMBLY_CASING_TIER));
+        } else {
+            casingTier = Math.min(GTValues.IV, getCasingTier(COMPONENT_ASSEMBLY_CASING_TIER));
+        }
     }
 
     @Override
     public void onStructureInvalid() {
         super.onStructureInvalid();
-        maxCasingTier = GTValues.IV;
+        casingTier = 0;
     }
 
     @Override
-    protected Recipe getRealRecipe(Recipe recipe) {
-        if (recipe.data.getInt(COMPONENT_ASSEMBLY_CASING_TIER) > maxCasingTier) {
+    public Recipe getRealRecipe(Recipe recipe) {
+        if (recipe.data.getInt(COMPONENT_ASSEMBLY_CASING_TIER) > casingTier) {
             setIdleReason(IdleReason.VOLTAGE_TIER_NOT_SATISFIES);
             return null;
         }

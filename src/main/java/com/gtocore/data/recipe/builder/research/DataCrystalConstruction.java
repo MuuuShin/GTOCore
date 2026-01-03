@@ -1,12 +1,7 @@
 package com.gtocore.data.recipe.builder.research;
 
-import com.gregtechceu.gtceu.common.data.GTItems;
-
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import static com.gregtechceu.gtceu.api.GTValues.LuV;
 import static com.gregtechceu.gtceu.api.GTValues.VA;
@@ -24,7 +19,7 @@ public final class DataCrystalConstruction {
     private ItemStack itemStack;
     private FluidStack fluidStack;
     private int dataTier;
-    private Item dataItem;
+    private ItemStack dataItem;
     private int dataCrystal;
 
     private final Boolean recipe;
@@ -39,28 +34,22 @@ public final class DataCrystalConstruction {
     }
 
     public DataCrystalConstruction input(ItemStack itemStack, int dataTier, int dataCrystal) {
+        if (fluidStack != null) fluidStack = null;
         this.itemStack = itemStack;
         this.dataTier = dataTier;
         this.dataCrystal = dataCrystal;
-        this.dataItem = DataCrystalMap.get(dataCrystal);
+        this.dataItem = getDataCrystalItem(dataCrystal);
         return this;
     }
 
     public DataCrystalConstruction input(FluidStack fluidStack, int dataTier, int dataCrystal) {
-        int amount = fluidStack.getAmount() / 1000 + (fluidStack.getAmount() % 1000 > 1 ? 1 : 0);
+        if (itemStack != null) itemStack = null;
+        int amount = (fluidStack.getAmount() + 999) / 1000;
         fluidStack.setAmount(amount * 1000);
         this.fluidStack = fluidStack;
         this.dataTier = dataTier;
         this.dataCrystal = dataCrystal;
-        this.dataItem = DataCrystalMap.get(dataCrystal);
-        ItemStack cell = GTItems.FLUID_CELL.asStack(amount);
-        CompoundTag fluidTag = cell.getOrCreateTag();
-        CompoundTag fluid = new CompoundTag();
-        fluid.putString("FluidName", ForgeRegistries.FLUIDS.getKey(fluidStack.getFluid()).toString());
-        fluid.putInt("Amount", 1000);
-        fluidTag.put("Fluid", fluid);
-        cell.setTag(fluidTag);
-        this.itemStack = cell;
+        this.dataItem = getDataCrystalItem(dataCrystal);
         return this;
     }
 
@@ -81,7 +70,7 @@ public final class DataCrystalConstruction {
 
     public DataCrystalConstruction CWUt(int cwut) {
         this.cwut = cwut;
-        this.totalCWU = cwut * 4000;
+        this.totalCWU = cwut * 800;
         return this;
     }
 
@@ -95,19 +84,23 @@ public final class DataCrystalConstruction {
         if (dataItem == null) throw new IllegalStateException("Missing data crystal");
         if (dataCrystal < 1 || dataCrystal > 5) throw new IllegalStateException("DataCrystal Out of index");
 
-        var dataStack = dataItem.getDefaultInstance();
-        if (fluidStack != null) {
-            ExResearchManager.writeScanningResearchToNBT(dataStack.getOrCreateTag(), fluidStack, dataTier, dataCrystal);
-        } else if (itemStack != null) {
+        var dataStack = dataItem;
+        String recipeId;
+        if (itemStack != null) {
             ExResearchManager.writeScanningResearchToNBT(dataStack.getOrCreateTag(), itemStack, dataTier, dataCrystal);
+            recipeId = itemStackToString(itemStack);
+        } else if (fluidStack != null) {
+            ExResearchManager.writeScanningResearchToNBT(dataStack.getOrCreateTag(), fluidStack, dataTier, dataCrystal);
+            recipeId = fluidStackToString(fluidStack);
         } else {
             throw new IllegalStateException("The scanned item or fluid is missing");
         }
 
         if (recipe == null) return;
         if (!recipe) {
-            SCANNER_RECIPES.recipeBuilder(itemStackToString(itemStack))
-                    .inputItems(getEmptyCrystal(dataCrystal))
+            if (itemStack == null) throw new IllegalStateException("The scanned recipe can only use item");
+            SCANNER_RECIPES.recipeBuilder(recipeId)
+                    .inputItems(EmptyDataCrystalList.get(dataCrystal))
                     .inputItems(itemStack)
                     .outputItems(dataStack)
                     .duration(duration)
@@ -116,11 +109,12 @@ public final class DataCrystalConstruction {
         } else {
             if (cwut > totalCWU) throw new IllegalStateException("Total CWU cannot be greater than CWU/t!");
             if (catalyst == null) throw new IllegalStateException("Catalyst input required");
-            CRYSTAL_SCAN_RECIPES.recipeBuilder(itemStackToString(itemStack))
+            var builder = CRYSTAL_SCAN_RECIPES.recipeBuilder(recipeId)
                     .notConsumable(catalyst)
-                    .inputItems(getEmptyCrystal(dataCrystal))
-                    .inputItems(itemStack)
-                    .outputItems(dataStack)
+                    .inputItems(EmptyDataCrystalList.get(dataCrystal));
+            if (itemStack != null) builder.inputItems(itemStack);
+            else builder.inputFluids(fluidStack);
+            builder.outputItems(dataStack)
                     .EUt(eut)
                     .CWUt(cwut)
                     .totalCWU(totalCWU)

@@ -1,9 +1,9 @@
 package com.gtocore.common.machine.multiblock.part.ae
 
-import com.gtocore.api.gui.ktflexible.InitFancyMachineUIWidget
-import com.gtocore.integration.ae.WirelessMachine
-import com.gtocore.integration.ae.WirelessMachinePersisted
-import com.gtocore.integration.ae.WirelessMachineRunTime
+import com.gtocore.api.gui.ktflexible.misc.InitFancyMachineUIWidget
+import com.gtocore.integration.ae.wireless.WirelessMachine
+import com.gtocore.integration.ae.wireless.WirelessMachinePersisted
+import com.gtocore.integration.ae.wireless.WirelessMachineRunTime
 
 import net.minecraft.MethodsReturnNonnullByDefault
 import net.minecraft.core.BlockPos
@@ -27,18 +27,16 @@ import com.gregtechceu.gtceu.api.gui.fancy.TabsWidget
 import com.gregtechceu.gtceu.api.item.tool.GTToolType
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart
-import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine
+import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder
 import com.gtolib.api.annotation.SyncedManager
 import com.gtolib.api.capability.ISync
 import com.gtolib.api.machine.feature.IMEPartMachine
-import com.gtolib.api.machine.feature.multiblock.IExtendedRecipeCapabilityHolder
-import com.gtolib.syncdata.SyncManagedFieldHolder
+import com.gtolib.api.network.SyncManagedFieldHolder
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
 import com.mojang.datafixers.util.Pair
 
 import java.util.*
@@ -47,7 +45,7 @@ import javax.annotation.ParametersAreNonnullByDefault
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 internal abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
-    TieredIOPartMachine(holder, GTValues.LuV, io),
+    WorkableTieredIOPartMachine(holder, GTValues.LuV, io),
     WirelessMachine,
     IMEPartMachine,
     ISync,
@@ -74,8 +72,7 @@ internal abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
     override fun onToolClick(toolType: MutableSet<GTToolType>, itemStack: ItemStack, context: UseOnContext): Pair<GTToolType?, InteractionResult?> {
         val result = super.onToolClick(toolType, itemStack, context)
         if (result.second == InteractionResult.PASS && toolType.contains(GTToolType.WIRE_CUTTER)) {
-            val player = context.player
-            if (player == null) return result
+            val player = context.player ?: return result
             return Pair.of<GTToolType?, InteractionResult?>(GTToolType.WIRE_CUTTER, onWireCutterClick(player, context.hand))
         }
         return result
@@ -110,31 +107,20 @@ internal abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
         if (isRemote) return
         onWirelessMachineLoad()
         getHandlerList().isDistinct = distinctField
-        getHandlerList().setColor(paintingColor)
+        getHandlerList().color = paintingColor
     }
 
     override fun getMainNode(): IManagedGridNode = nodeHolder.getMainNode()
 
-    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
-
     override fun onPaintingColorChanged(color: Int) {
-        for (c in getControllers()) {
-            if (c is IExtendedRecipeCapabilityHolder) {
-                c.arrangeDistinct()
-            }
-        }
+        handlerList.setColor(color, true)
     }
 
     override fun isDistinct(): Boolean = distinctField
 
     override fun setDistinct(isDistinct: Boolean) {
         this.distinctField = isDistinct
-        getHandlerList().isDistinct = isDistinct
-        for (controller in getControllers()) {
-            if (controller is IExtendedRecipeCapabilityHolder) {
-                controller.arrangeDistinct()
-            }
-        }
+        handlerList.setDistinctAndNotify(isDistinct)
     }
 
     override fun setOnline(isOnline: Boolean) {
@@ -162,16 +148,12 @@ internal abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
     }
 
     companion object {
-        val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
-            MEPartMachine::class.java,
-            TieredIOPartMachine.MANAGED_FIELD_HOLDER,
-        )
-        val sync = SyncManagedFieldHolder(MEPartMachine::class.java)
+        val syncFieldHolder = SyncManagedFieldHolder(MEPartMachine::class.java)
 
         const val CONFIG_SIZE: Int = 16
     }
 
-    override fun getSyncHolder(): SyncManagedFieldHolder = sync
+    override fun getSyncHolder(): SyncManagedFieldHolder = syncFieldHolder
 
     // ////////////////////////////////
     // ****** 无线连接设置 ******//
@@ -180,20 +162,30 @@ internal abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
         .widget(
             InitFancyMachineUIWidget(this, 176, 166) {
                 if (!isRemote) {
-                    syncDataToClientInServer()
+                    refreshCachesOnServer()
                 }
             },
         )
 
     @Persisted
     @DescSynced
-    override var wirelessMachinePersisted: WirelessMachinePersisted = createWirelessMachinePersisted()
+    var wirelessMachinePersisted: WirelessMachinePersisted = createWirelessMachinePersisted()
+
+    override fun getWirelessMachinePersisted0(): WirelessMachinePersisted? = wirelessMachinePersisted
+    override fun setWirelessMachinePersisted0(data: WirelessMachinePersisted) {
+        wirelessMachinePersisted = data
+    }
 
     @SyncedManager
-    override var wirelessMachineRunTime: WirelessMachineRunTime = createWirelessMachineRunTime()
+    var wirelessMachineRunTime: WirelessMachineRunTime = createWirelessMachineRunTime()
+
+    override fun getWirelessMachineRunTime0(): WirelessMachineRunTime = wirelessMachineRunTime
+    override fun setWirelessMachineRunTime0(data: WirelessMachineRunTime) {
+        wirelessMachineRunTime = data
+    }
+
     override fun attachSideTabs(sideTabs: TabsWidget) {
-        super<TieredIOPartMachine>.attachSideTabs(sideTabs)
-        sideTabs.attachSubTab(getSetupFancyUIProvider())
-        sideTabs.attachSubTab(getDetailFancyUIProvider())
+        super<WorkableTieredIOPartMachine>.attachSideTabs(sideTabs)
+        sideTabs.attachSubTab(setupFancyUIProvider)
     }
 }

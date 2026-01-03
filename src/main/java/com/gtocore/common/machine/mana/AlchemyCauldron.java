@@ -8,13 +8,11 @@ import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
-import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 
 import net.minecraft.util.Mth;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +20,6 @@ import static com.lowdragmc.lowdraglib.LDLib.random;
 
 public class AlchemyCauldron extends SimpleManaMachine implements IReceiveHeatMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(AlchemyCauldron.class, SimpleManaMachine.MANAGED_FIELD_HOLDER);
     @Persisted
     private int temperature = 293;
     private TickableSubscription tickSubs;
@@ -68,7 +65,7 @@ public class AlchemyCauldron extends SimpleManaMachine implements IReceiveHeatMa
     public void onLoad() {
         super.onLoad();
         if (!isRemote()) {
-            tickSubs = subscribeServerTick(tickSubs, this::tickUpdate);
+            tickSubs = subscribeServerTick(tickSubs, this::tickUpdate, 20);
         }
     }
 
@@ -91,23 +88,17 @@ public class AlchemyCauldron extends SimpleManaMachine implements IReceiveHeatMa
         return 1600;
     }
 
-    @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
     /**
      * 增强配方：添加概率输出项
      */
     private Recipe enhanceRecipe(Recipe recipe, int[] recipeParams) {
         int matchRate = calculateMatchRate(recipeParams);
         recipe.outputs.put(ItemRecipeCapability.CAP, recipe.getOutputContents(ItemRecipeCapability.CAP).stream().map(content -> {
-            if (content.chance < 11) return new Content(content.content, matchRate, ChanceLogic.getMaxChancedValue(), 0);
+            if (content.chance < 11) return new Content(content.content, matchRate, 0);
             else return content;
         }).toList());
         recipe.outputs.put(FluidRecipeCapability.CAP, recipe.getOutputContents(FluidRecipeCapability.CAP).stream().map(content -> {
-            if (content.chance < 11) return new Content(content.content, matchRate, ChanceLogic.getMaxChancedValue(), 0);
+            if (content.chance < 11) return new Content(content.content, matchRate, 0);
             else return content;
         }).toList());
         return recipe;

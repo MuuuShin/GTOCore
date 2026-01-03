@@ -14,19 +14,19 @@ import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.utils.ItemStackHashStrategy;
-import com.gregtechceu.gtceu.utils.collection.O2LOpenCustomCacheHashMap;
 
 import net.minecraft.world.item.ItemStack;
 
+import com.fast.fastcollection.O2LOpenCustomCacheHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenCustomHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SuperMolecularAssemblerMachine extends ElectricMultiblockMachine {
 
-    private final List<MECraftPatternPartMachine> partMachines = new ObjectArrayList<>();
+    private final List<MECraftPatternPartMachine> partMachines = new ArrayList<>();
 
     public SuperMolecularAssemblerMachine(MetaMachineBlockEntity holder) {
         super(holder);

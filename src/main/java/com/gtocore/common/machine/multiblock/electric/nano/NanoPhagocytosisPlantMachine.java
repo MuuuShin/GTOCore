@@ -13,11 +13,11 @@ import org.jetbrains.annotations.NotNull;
 public final class NanoPhagocytosisPlantMachine extends CrossRecipeMultiblockMachine {
 
     public NanoPhagocytosisPlantMachine(MetaMachineBlockEntity holder) {
-        super(holder, false, true, MachineUtils::getHatchParallelLong);
+        super(holder, false, true, MachineUtils::getHatchParallel);
     }
 
     @NotNull
     public RecipeType getRecipeType() {
-        return formedCount > 0 ? super.getRecipeType() : GTORecipeTypes.MACERATOR_RECIPES;
+        return formedAmount > 0 ? super.getRecipeType() : GTORecipeTypes.MACERATOR_RECIPES;
     }
 }

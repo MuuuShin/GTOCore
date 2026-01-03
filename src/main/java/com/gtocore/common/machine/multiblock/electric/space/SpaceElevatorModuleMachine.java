@@ -12,6 +12,7 @@ import com.gregtechceu.gtceu.utils.FormattingUtil;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -25,10 +26,7 @@ import static com.gtolib.api.GTOValues.POWER_MODULE_TIER;
 @MethodsReturnNonnullByDefault
 public class SpaceElevatorModuleMachine extends CustomParallelMultiblockMachine {
 
-    public SpaceElevatorMachine getSpaceElevatorMachine() {
-        return spaceElevatorMachine;
-    }
-
+    @Getter
     SpaceElevatorMachine spaceElevatorMachine;
 
     private final boolean powerModuleTier;
@@ -37,7 +35,7 @@ public class SpaceElevatorModuleMachine extends CustomParallelMultiblockMachine 
         this(holder, powerModuleTier, m -> ((SpaceElevatorModuleMachine) m).getSpaceElevatorTier() > 7 ? (int) Math.pow(((SpaceElevatorModuleMachine) m).isSuper() ? 8 : 4, ((SpaceElevatorModuleMachine) m).spaceElevatorMachine.getCasingTier(POWER_MODULE_TIER) - 1) : 0);
     }
 
-    public SpaceElevatorModuleMachine(MetaMachineBlockEntity holder, boolean powerModuleTier, ToLongFunction<CustomParallelMultiblockMachine> getParallel) {
+    SpaceElevatorModuleMachine(MetaMachineBlockEntity holder, boolean powerModuleTier, ToLongFunction<CustomParallelMultiblockMachine> getParallel) {
         super(holder, false, getParallel);
         this.powerModuleTier = powerModuleTier;
     }
@@ -53,15 +51,23 @@ public class SpaceElevatorModuleMachine extends CustomParallelMultiblockMachine 
         return spaceElevatorMachine instanceof SuperSpaceElevatorMachine;
     }
 
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        spaceElevatorMachine = null;
+    }
+
+    @Override
+    public void onStructureInvalid() {
+        super.onStructureInvalid();
+        spaceElevatorMachine = null;
+    }
+
     @Nullable
     @Override
     protected Recipe getRealRecipe(Recipe recipe) {
-        if (getSpaceElevatorTier() < 8) {
-            return null;
-        }
-        if (powerModuleTier && recipe.data.getInt(POWER_MODULE_TIER) > spaceElevatorMachine.getCasingTier(POWER_MODULE_TIER)) {
-            return null;
-        }
+        if (getSpaceElevatorTier() < 8) return null;
+        if (powerModuleTier && recipe.data.getInt(POWER_MODULE_TIER) > spaceElevatorMachine.getCasingTier(POWER_MODULE_TIER)) return null;
         return RecipeModifierFunction.overclocking(this, ParallelLogic.accurateParallel(this, recipe, getParallel()), false, 1, getDurationMultiplier(), 0.5);
     }
 
@@ -82,6 +88,10 @@ public class SpaceElevatorModuleMachine extends CustomParallelMultiblockMachine 
     }
 
     private double getDurationMultiplier() {
-        return Math.sqrt(1.0D / ((getSpaceElevatorTier() - GTValues.ZPM) * (isSuper() ? 2 : 1)));
+        double mul = 1;
+        if (spaceElevatorMachine != null) {
+            mul = spaceElevatorMachine.netMachineCache == null ? 1.0d : spaceElevatorMachine.netMachineCache.getDurationMultiplier();
+        }
+        return Math.sqrt(mul / ((getSpaceElevatorTier() - GTValues.ZPM) * (isSuper() ? 2 : 1)));
     }
 }

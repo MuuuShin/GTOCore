@@ -1,14 +1,28 @@
 package com.gtocore.integration;
 
-import com.gregtechceu.gtceu.GTCEu;
+import net.minecraftforge.fml.ModList;
 
-public final class Mods {
+import lombok.Getter;
 
-    public static boolean biomesoplenty() {
-        return GTCEu.isModLoaded("biomesoplenty");
-    }
+public enum Mods {
 
-    public static boolean biomeswevegone() {
-        return GTCEu.isModLoaded("biomeswevegone");
+    SFM("sfm"),
+    FARMERSDELIGHT("farmersdelight"),
+    MODULARROUTERS("modularrouters"),
+    COMPUTERCRAFT("computercraft"),
+    FUNCTIONALSTORAGE("functionalstorage"),
+    IMMERSIVE_AIRCRAFT("immersive_aircraft"),
+    CHISEL("chisel"),
+    SOPHISTICATEDBACKPACKS("sophisticatedbackpacks"),
+    BIOMESOPLENTY("biomesoplenty"),
+    BIOMESWEVEGONE("biomeswevegone"),
+    PIPEZ("pipez"),
+    FTBQUESTS("ftbquests");
+
+    @Getter
+    private final boolean loaded;
+
+    Mods(String modId) {
+        loaded = ModList.get().isLoaded(modId);
     }
 }

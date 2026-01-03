@@ -17,13 +17,11 @@ public class ProcessingPatternEncodingMixin {
     @Overwrite(remap = false)
     private static ListTag encodeStackList(GenericStack[] stacks) {
         ListTag tag = new ListTag();
-        boolean foundStack = false;
         for (var stack : stacks) {
             if (stack == null || stack.amount() == 0) continue;
             tag.add(GenericStack.writeTag(stack));
-            foundStack = true;
         }
-        Preconditions.checkArgument(foundStack, "List passed to pattern must contain at least one stack.");
+        Preconditions.checkArgument(!tag.isEmpty(), "List passed to pattern must contain at least one stack.");
         return tag;
     }
 }

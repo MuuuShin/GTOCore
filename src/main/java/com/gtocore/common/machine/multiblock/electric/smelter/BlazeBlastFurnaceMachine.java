@@ -2,6 +2,8 @@ package com.gtocore.common.machine.multiblock.electric.smelter;
 
 import com.gtolib.api.machine.multiblock.CoilCustomParallelMultiblockMachine;
 import com.gtolib.api.recipe.Recipe;
+import com.gtolib.api.recipe.modifier.ParallelLogic;
+import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
@@ -9,14 +11,14 @@ import com.gregtechceu.gtceu.common.data.GTMaterials;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.fluids.FluidStack;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public final class BlazeBlastFurnaceMachine extends CoilCustomParallelMultiblockMachine {
 
     private static final FluidStack BLAZE = GTMaterials.Blaze.getFluid(1);
 
     public BlazeBlastFurnaceMachine(MetaMachineBlockEntity holder) {
-        super(holder, true, true, true, m -> 64);
+        super(holder, false, true, true, m -> 64);
     }
 
     private boolean inputFluid() {
@@ -28,13 +30,21 @@ public final class BlazeBlastFurnaceMachine extends CoilCustomParallelMultiblock
     }
 
     @Override
+    public Recipe getRealRecipe(@NotNull Recipe recipe) {
+        recipe.duration = recipe.duration / 2;
+        recipe = ParallelLogic.accurateParallel(this, recipe, getParallel());
+        if (recipe == null) return null;
+        return RecipeModifierFunction.ebfOverclock(this, recipe);
+    }
+
+    @Override
     public boolean onWorking() {
         if (getOffsetTimer() % 20 == 0 && !inputFluid()) getRecipeLogic().setProgress(0);
         return super.onWorking();
     }
 
     @Override
-    protected boolean beforeWorking(@Nullable Recipe recipe) {
+    protected boolean beforeWorking(@NotNull Recipe recipe) {
         return super.beforeWorking(recipe) && inputFluid();
     }
 }

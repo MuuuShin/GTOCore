@@ -16,59 +16,59 @@ final class MixerRecipes {
 
     public static void init() {
         MIXER_RECIPES.recipeBuilder("nitration_mixture")
-                .inputFluids(NitricAcid.getFluid(1000))
-                .inputFluids(SulfuricAcid.getFluid(1000))
+                .inputFluids(NitricAcid, 1000)
+                .inputFluids(SulfuricAcid, 1000)
                 .outputFluids(NitrationMixture.getFluid(2000))
                 .duration(500).EUt(2).save();
 
         MIXER_RECIPES.recipeBuilder("glue_from_acetone")
-                .inputFluids(PolyvinylAcetate.getFluid(1000))
-                .inputFluids(Acetone.getFluid(1500))
+                .inputFluids(PolyvinylAcetate, 1000)
+                .inputFluids(Acetone, 1500)
                 .outputFluids(Glue.getFluid(2500))
                 .duration(50).EUt(VA[ULV]).save();
 
         MIXER_RECIPES.recipeBuilder("glue_from_methyl_acetate")
-                .inputFluids(PolyvinylAcetate.getFluid(1000))
-                .inputFluids(MethylAcetate.getFluid(1500))
+                .inputFluids(PolyvinylAcetate, 1000)
+                .inputFluids(MethylAcetate, 1500)
                 .outputFluids(Glue.getFluid(2500))
                 .duration(50).EUt(VA[ULV]).save();
 
         MIXER_RECIPES.recipeBuilder("salt_water")
                 .inputItems(dust, Salt, 2)
-                .inputFluids(Water.getFluid(1000))
+                .inputFluids(Water, 1000)
                 .outputFluids(SaltWater.getFluid(1000))
                 .duration(40).EUt(VA[ULV]).save();
 
         MIXER_RECIPES.recipeBuilder("cetane_diesel_from_biodiesel")
                 .inputItems(TagPrefix.dustTiny, GTOMaterials.Cetane)
-                .inputFluids(BioDiesel.getFluid(1000))
-                .inputFluids(Tetranitromethane.getFluid(40))
-                .outputFluids(CetaneBoostedDiesel.getFluid(750))
+                .inputFluids(BioDiesel, 1000)
+                .inputFluids(Tetranitromethane, 40)
+                .outputFluids(CetaneBoostedDiesel.getFluid(900))
                 .duration(20).EUt(VA[HV]).save();
 
         MIXER_RECIPES.recipeBuilder("cetane_diesel_from_diesel")
                 .inputItems(TagPrefix.dustTiny, GTOMaterials.Cetane)
-                .inputFluids(Diesel.getFluid(1000))
-                .inputFluids(Tetranitromethane.getFluid(20))
-                .outputFluids(CetaneBoostedDiesel.getFluid(1000))
+                .inputFluids(Diesel, 1000)
+                .inputFluids(Tetranitromethane, 20)
+                .outputFluids(CetaneBoostedDiesel.getFluid(1200))
                 .duration(20).EUt(VA[HV]).save();
 
         MIXER_RECIPES.recipeBuilder("rocket_fuel_from_oxygen")
-                .inputFluids(Oxygen.getFluid(1000))
-                .inputFluids(Dimethylhydrazine.getFluid(1000))
+                .inputFluids(Oxygen, 1000)
+                .inputFluids(Dimethylhydrazine, 1000)
                 .outputFluids(RocketFuel.getFluid(3000))
                 .duration(60).EUt(16).save();
 
         MIXER_RECIPES.recipeBuilder("diesel")
-                .inputFluids(LightFuel.getFluid(5000))
-                .inputFluids(HeavyFuel.getFluid(1000))
+                .inputFluids(LightFuel, 5000)
+                .inputFluids(HeavyFuel, 1000)
                 .outputFluids(Diesel.getFluid(6000))
                 .duration(16).EUt(VA[MV]).save();
 
         MIXER_RECIPES.recipeBuilder("concrete_from_clay")
                 .inputItems(dust, Clay)
                 .inputItems(dust, Stone, 3)
-                .inputFluids(Water.getFluid(500))
+                .inputFluids(Water, 500)
                 .outputFluids(Concrete.getFluid(576))
                 .duration(20).EUt(16).save();
 
@@ -76,7 +76,7 @@ final class MixerRecipes {
                 .inputItems(dust, Stone, 2)
                 .inputItems(dust, Calcite)
                 .inputItems(dust, Gypsum)
-                .inputFluids(Water.getFluid(1000))
+                .inputFluids(Water, 1000)
                 .outputFluids(Concrete.getFluid(1152))
                 .duration(40).EUt(16).save();
 
@@ -84,27 +84,27 @@ final class MixerRecipes {
                 .inputItems(dust, Stone, 2)
                 .inputItems(dust, Marble)
                 .inputItems(dust, Gypsum)
-                .inputFluids(Water.getFluid(1000))
+                .inputFluids(Water, 1000)
                 .outputFluids(Concrete.getFluid(1152))
                 .duration(40).EUt(16).save();
 
         MIXER_RECIPES.recipeBuilder("construction_foam")
-                .inputFluids(Concrete.getFluid(576))
+                .inputFluids(Concrete, 576)
                 .inputItems(dust, RawRubber)
                 .outputFluids(ConstructionFoam.getFluid(8000))
                 .duration(20).EUt(16).save();
 
         MIXER_RECIPES.recipeBuilder("drilling_fluid")
                 .inputItems(dust, Stone)
-                .inputFluids(Lubricant.getFluid(20))
-                .inputFluids(Water.getFluid(4980))
+                .inputFluids(Lubricant, 20)
+                .inputFluids(Water, 4980)
                 .outputFluids(DrillingFluid.getFluid(5000))
                 .duration(64).EUt(16).save();
 
         MIXER_RECIPES.recipeBuilder("drilling_fluid_distilled")
                 .inputItems(dust, Stone)
-                .inputFluids(Lubricant.getFluid(20))
-                .inputFluids(DistilledWater.getFluid(4980))
+                .inputFluids(Lubricant, 20)
+                .inputFluids(DistilledWater, 4980)
                 .outputFluids(DrillingFluid.getFluid(5000))
                 .duration(48).EUt(16).save();
 
@@ -413,12 +413,108 @@ final class MixerRecipes {
                 .outputItems(dust, Osmiridium, 4)
                 .save();
 
-        // MIXER_RECIPES.recipeBuilder("rhodium_plated_palladium").duration(400).EUt(VA[IV])
-        // .inputItems(dust, Palladium, 3)
-        // .inputItems(dust, Rhodium)
-        // .circuitMeta(1)
-        // .outputItems(dust, RhodiumPlatedPalladium, 4)
-        // .save();
+        MIXER_RECIPES.recipeBuilder("aluminum_alloy_2090").duration(19 * 45).EUt(VA[HV])
+                .inputItems(dust, Aluminium, 16)
+                .inputItems(dust, Lithium)
+                .inputItems(dust, Copper, 2)
+                .circuitMeta(19 % 32)
+                .outputItems(dust, GTOMaterials.AluminumAlloy2090, 19)
+                .save();
+        MIXER_RECIPES.recipeBuilder("aluminum_alloy_8090").duration(27 * 45).EUt(VA[HV])
+                .inputItems(dust, Aluminium, 20)
+                .inputItems(dust, Copper, 2)
+                .inputItems(dust, Magnesium)
+                .inputItems(dust, Lithium, 4)
+                .circuitMeta(27 % 32)
+                .outputItems(dust, GTOMaterials.AluminumAlloy8090, 27)
+                .save();
+        MIXER_RECIPES.recipeBuilder("aluminum_alloy_7050").duration(25 * 45).EUt(VA[HV])
+                .inputItems(dust, Aluminium, 20)
+                .inputItems(dust, Copper)
+                .inputItems(dust, Magnesium)
+                .inputItems(dust, Zinc, 3)
+                .circuitMeta(25 % 32)
+                .outputItems(dust, GTOMaterials.AluminumAlloy7050, 25)
+                .save();
+        MIXER_RECIPES.recipeBuilder("aluminum_alloy_5a06").duration(25 * 45).EUt(VA[HV])
+                .inputItems(dust, Aluminium, 20)
+                .inputItems(dust, Magnesium, 3)
+                .inputItems(dust, Manganese)
+                .inputItems(dust, Silicon)
+                .circuitMeta(25 % 32)
+                .outputItems(dust, GTOMaterials.AluminumAlloy5A06, 25)
+                .save();
+        MIXER_RECIPES.recipeBuilder("structural_steel_45").duration(53 * 45).EUt(VA[HV])
+                .inputItems(dust, Steel, 50)
+                .inputItems(dust, Chromium)
+                .inputItems(dust, Nickel)
+                .inputItems(dust, Manganese)
+                .circuitMeta(53 % 32)
+                .outputItems(dust, GTOMaterials.StructuralSteel45, 53)
+                .save();
+        MIXER_RECIPES.recipeBuilder("stainless_steel_420").duration(93 * 45).EUt(VA[HV])
+                .inputItems(dust, Steel, 80)
+                .inputItems(dust, Chromium, 12)
+                .inputItems(dust, Nickel)
+                .circuitMeta(93 % 32)
+                .outputItems(dust, GTOMaterials.StainlessSteel420, 93)
+                .save();
+        MIXER_RECIPES.recipeBuilder("stainless_steel_gc4").duration(20 * 45).EUt(VA[HV])
+                .inputItems(dust, Steel, 10)
+                .inputItems(dust, Chromium, 6)
+                .inputItems(dust, Manganese)
+                .inputItems(dust, Silicon)
+                .inputItems(dust, Molybdenum)
+                .inputItems(dust, Vanadium)
+                // .circuitMeta(20 % 32)
+                .outputItems(dust, GTOMaterials.StainlessSteelGC4, 20)
+                .save();
+        MIXER_RECIPES.recipeBuilder("titanium_ti64").duration(50 * 45).EUt(VA[HV])
+                .inputItems(dust, Titanium, 45)
+                .inputItems(dust, Aluminium, 3)
+                .inputItems(dust, Vanadium, 2)
+                .circuitMeta(50 % 32)
+                .outputItems(dust, GTOMaterials.TitaniumTi64, 50)
+                .save();
+        MIXER_RECIPES.recipeBuilder("stainless_steel_15_5ph").duration(81 * 45).EUt(VA[EV])
+                .inputItems(dust, Steel, 60)
+                .inputItems(dust, Copper, 4)
+                .inputItems(dust, Nichrome, 5)
+                .inputItems(dust, StainlessSteel, 10)
+                .inputItems(dust, Niobium)
+                .inputItems(dust, Silicon)
+                // .circuitMeta(81 % 32)
+                .outputItems(dust, GTOMaterials.StainlessSteel155Ph, 81)
+                .save();
+        MIXER_RECIPES.recipeBuilder("stainless_steel_316").duration(98 * 45).EUt(VA[EV])
+                .inputItems(dust, Steel, 64)
+                .inputItems(dust, Silicon)
+                .inputItems(dust, Manganese, 2)
+                .inputItems(dust, Chromium, 18)
+                .inputItems(dust, Nickel, 10)
+                .inputItems(dust, Molybdenum, 3)
+                // .circuitMeta(98 % 32)
+                .outputItems(dust, GTOMaterials.StainlessSteel316, 98)
+                .save();
+        MIXER_RECIPES.recipeBuilder("structural_steel_q690").duration(85 * 45).EUt(VA[EV])
+                .inputItems(dust, Steel, 80)
+                .inputItems(dust, Vanadium)
+                .inputItems(dust, Titanium, 2)
+                .inputItems(dust, Niobium)
+                .inputItems(dust, Aluminium)
+                .circuitMeta(85 % 32)
+                .outputItems(dust, GTOMaterials.StructuralSteelQ690, 85)
+                .save();
+        MIXER_RECIPES.recipeBuilder("inconel_x750").duration(52 * 45).EUt(VA[EV])
+                .inputItems(dust, Nickel, 35)
+                .inputItems(dust, Chromium, 9)
+                .inputItems(dust, Steel, 5)
+                .inputItems(dust, Tungsten)
+                .inputItems(dust, Molybdenum)
+                .inputItems(dust, Titanium)
+                // .circuitMeta(52 % 32)
+                .outputItems(dust, GTOMaterials.InconelX750, 52)
+                .save();
 
         MIXER_RECIPES.recipeBuilder("magnalium").duration(100).EUt(VA[ULV])
                 .inputItems(dust, Aluminium, 2)
@@ -475,8 +571,8 @@ final class MixerRecipes {
                 .inputItems(dust, Barium, 2)
                 .inputItems(dust, Calcium, 2)
                 .inputItems(dust, Copper, 3)
-                .inputFluids(Mercury.getFluid(1000))
-                .inputFluids(Oxygen.getFluid(8000))
+                .inputFluids(Mercury, 1000)
+                .inputFluids(Oxygen, 8000)
                 .circuitMeta(4)
                 .outputItems(dust, MercuryBariumCalciumCuprate, 16)
                 .save();
@@ -492,7 +588,7 @@ final class MixerRecipes {
                 .inputItems(dust, Samarium)
                 .inputItems(dust, Iron)
                 .inputItems(dust, Arsenic)
-                .inputFluids(Oxygen.getFluid(1000))
+                .inputFluids(Oxygen, 1000)
                 .circuitMeta(4)
                 .outputItems(dust, SamariumIronArsenicOxide, 4)
                 .save();
@@ -503,7 +599,7 @@ final class MixerRecipes {
                 .inputItems(dust, Barium, 2)
                 .inputItems(dust, Titanium)
                 .inputItems(dust, Copper, 7)
-                .inputFluids(Oxygen.getFluid(14000))
+                .inputFluids(Oxygen, 14000)
                 .circuitMeta(4)
                 .outputItems(dust, IndiumTinBariumTitaniumCuprate, 16)
                 .save();
@@ -530,7 +626,7 @@ final class MixerRecipes {
                 .inputItems(dust, Trinium, 2)
                 .inputItems(dust, Americium)
                 .inputItems(dust, Neutronium, 2)
-                .inputFluids(Oxygen.getFluid(8000))
+                .inputFluids(Oxygen, 8000)
                 .circuitMeta(4)
                 .outputItems(dust, RutheniumTriniumAmericiumNeutronate, 14)
                 .save();

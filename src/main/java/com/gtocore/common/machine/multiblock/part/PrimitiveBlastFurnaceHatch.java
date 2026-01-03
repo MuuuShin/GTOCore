@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -30,9 +29,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class PrimitiveBlastFurnaceHatch extends MultiblockPartMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(PrimitiveBlastFurnaceHatch.class,
-            MultiblockPartMachine.MANAGED_FIELD_HOLDER);
 
     private final ItemHandlerProxyTrait inputInventory, outputInventory;
     @Nullable
@@ -49,10 +45,6 @@ public final class PrimitiveBlastFurnaceHatch extends MultiblockPartMachine {
     //////////////////////////////////////
     // ***** Initialization ******//
     //////////////////////////////////////
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     @Override
     public void onUnload() {
@@ -114,7 +106,7 @@ public final class PrimitiveBlastFurnaceHatch extends MultiblockPartMachine {
 
     private void updateAutoIOSubscription() {
         if ((!outputInventory.isEmpty() && blockEntityDirectionCache.hasAdjacentItemHandler(getLevel(), getPos(), getFrontFacing()))) {
-            autoIOSubs = subscribeServerTick(autoIOSubs, this::autoIO);
+            autoIOSubs = subscribeServerTick(autoIOSubs, this::autoIO, 20);
         } else if (autoIOSubs != null) {
             autoIOSubs.unsubscribe();
             autoIOSubs = null;
@@ -122,10 +114,8 @@ public final class PrimitiveBlastFurnaceHatch extends MultiblockPartMachine {
     }
 
     private void autoIO() {
-        if (getOffsetTimer() % 20 == 0) {
-            outputInventory.exportToNearby(getFrontFacing());
-            updateAutoIOSubscription();
-        }
+        outputInventory.exportToNearby(getFrontFacing());
+        updateAutoIOSubscription();
     }
 
     //////////////////////////////////////

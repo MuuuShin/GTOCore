@@ -1,23 +1,23 @@
 package com.gtocore.client.forge;
 
 import com.gtocore.client.ClientCache;
+import com.gtocore.client.GTOClientCommands;
 import com.gtocore.client.Tooltips;
 import com.gtocore.client.renderer.RenderHelper;
-import com.gtocore.common.data.GTOCommands;
 import com.gtocore.common.data.GTOItems;
 import com.gtocore.common.item.StructureDetectBehavior;
 import com.gtocore.common.item.StructureWriteBehavior;
-import com.gtocore.common.network.ClientMessage;
+import com.gtocore.common.machine.multiblock.part.ae.widget.slot.AEPatternViewSlotWidgetKt;
 
 import com.gtolib.GTOCore;
 import com.gtolib.IItem;
 import com.gtolib.api.player.IEnhancedPlayer;
+import com.gtolib.api.player.PlayerData;
 import com.gtolib.utils.ItemUtils;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
-import com.gregtechceu.gtceu.utils.collection.O2IOpenCacheHashMap;
+import com.gregtechceu.gtceu.core.ILevel;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -27,21 +27,26 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import com.fast.fastcollection.O2IOpenCacheHashMap;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor;
 import com.hepdd.gtmthings.data.CustomItems;
-import com.mojang.blaze3d.vertex.*;
+import com.lowdragmc.lowdraglib.gui.modular.ModularUIGuiContainer;
+import com.mojang.blaze3d.vertex.PoseStack;
 import snownee.jade.util.Color;
 
 import java.util.Set;
@@ -67,7 +72,7 @@ public final class ForgeClientEvent {
             if (ClientCache.highlightTime > 0) {
                 ClientCache.highlightTime--;
             }
-            CUstomHighlightNeeds.object2IntEntrySet().fastForEach(
+            CUstomHighlightNeeds.clone().object2IntEntrySet().fastForEach(
                     entry -> {
                         int time = entry.getIntValue();
                         if (time > 0) {
@@ -118,7 +123,7 @@ public final class ForgeClientEvent {
         if (Minecraft.getInstance().player instanceof IEnhancedPlayer) {
             boolean isShiftDown = Screen.hasShiftDown();
             if (isShiftDown != lastShiftState) {
-                ClientMessage.send("shiftKeypress", buf -> buf.writeBoolean(isShiftDown));
+                PlayerData.SHIFT_KEY.send(buf -> buf.writeBoolean(isShiftDown));
                 lastShiftState = isShiftDown;
             }
         }
@@ -176,7 +181,7 @@ public final class ForgeClientEvent {
                         RenderHelper.highlightBlock(camera, poseStack, color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, entry.getKey().start, entry.getKey().end);
                     });
             if (ClientCache.machineNotFormedHighlight) {
-                MultiblockControllerMachine.HIGHLIGHT_CACHE.forEach(p -> {
+                ((ILevel) level).gtceu$getHighlightCache().forEach(p -> {
                     var pos = BlockPos.of(p);
                     RenderHelper.highlightBlock(camera, poseStack, 1, 0.1f, 0.1f, pos, pos);
                 });
@@ -185,8 +190,43 @@ public final class ForgeClientEvent {
     }
 
     @SubscribeEvent
+    public static void onScreenClosing(ScreenEvent.Closing event) {
+        if (event.getScreen() instanceof ModularUIGuiContainer gui) {
+            var p = gui.getMenu().getModularUI().getFlatWidgetCollection().stream()
+                    .filter(AEPatternViewSlotWidgetKt.class::isInstance)
+                    .map(AEPatternViewSlotWidgetKt.class::cast)
+                    .findFirst();
+            p.ifPresent(AEPatternViewSlotWidgetKt::onDestroy);
+        }
+    }
+
+    @SubscribeEvent
     public static void registerCommands(RegisterClientCommandsEvent evt) {
-        GTOCommands.initClient(evt.getDispatcher());
+        GTOClientCommands.init(evt.getDispatcher());
+    }
+
+    /**
+     * 高亮指定维度内两个坐标点之间的立方体区域
+     * 
+     * @param dimension     目标维度
+     * @param start         立方体对角点1
+     * @param end           立方体对角点2
+     * @param color         高亮颜色 (ARGB)
+     * @param durationTicks 持续时间(tick)，20 tick = 1秒，默认 1200 tick = 60秒
+     */
+    public static void highlightRegion(ResourceKey<Level> dimension, BlockPos start, BlockPos end, int color, int durationTicks) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return;
+        if (mc.level.dimension() != dimension) return;
+        ForgeClientEvent.HighlightNeed need = new ForgeClientEvent.HighlightNeed(start, end, color);
+        CUstomHighlightNeeds.put(need, durationTicks);
+    }
+
+    /**
+     * 手动解除某个区域的高亮
+     */
+    public static void stopHighlight(BlockPos start, BlockPos end) {
+        CUstomHighlightNeeds.object2IntEntrySet().removeIf(entry -> entry.getKey().start.equals(start) && entry.getKey().end.equals(end));
     }
 
     private static class Highlighting {

@@ -11,7 +11,7 @@ import com.gtolib.api.annotation.SyncedManager
 import com.gtolib.api.capability.ISync
 import com.gtolib.api.gui.ktflexible.button
 import com.gtolib.api.gui.ktflexible.root
-import com.gtolib.syncdata.SyncManagedFieldHolder
+import com.gtolib.api.network.SyncManagedFieldHolder
 import com.lowdragmc.lowdraglib.gui.widget.Widget
 
 import java.util.*
@@ -91,7 +91,7 @@ class SyncTesterMachine(holder: MetaMachineBlockEntity) :
         super.onUnload()
     }
 
-    override fun createUIWidget(): Widget? = root(176, 166) {
+    override fun createUIWidget(): Widget = root(176, 166) {
         vBox(width = availableWidth) {
             hBox(height = 20, { spacing = 4 }) {
                 button(text = { "客户端Int+=1" }, onClick = { ck ->

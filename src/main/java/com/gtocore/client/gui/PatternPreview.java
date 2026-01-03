@@ -43,6 +43,7 @@ import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.texture.ColorRectTexture;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
+import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
 import com.lowdragmc.lowdraglib.utils.BlockPosFace;
@@ -50,16 +51,15 @@ import com.lowdragmc.lowdraglib.utils.TrackedDummyWorld;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.emi.emi.screen.RecipeScreen;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongSet;
-import it.unimi.dsi.fastutil.longs.LongSets;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -81,10 +81,6 @@ public final class PatternPreview extends WidgetGroup {
     private PatternSlotWidget[] slotWidgets;
     private SlotWidget[] candidates;
 
-    private int getIndex() {
-        return index;
-    }
-
     private PatternPreview(MultiblockInfoEmiRecipe recipe, MultiblockMachineDefinition controllerDefinition) {
         super(0, 0, 160, 160);
         this.recipe = recipe;
@@ -105,25 +101,23 @@ public final class PatternPreview extends WidgetGroup {
         if (CACHE.containsKey(controllerDefinition)) {
             patterns = CACHE.get(controllerDefinition);
         } else {
-            MultiblockDefinition.Pattern[] pattern = MultiblockDefinition.of(controllerDefinition).getPatterns();
+            MultiblockDefinition definition = MultiblockDefinition.of(controllerDefinition);
+            MultiblockDefinition.Pattern[] pattern = definition.getPatterns();
             patterns = new MBPattern[pattern.length];
             for (int i = 0; i < pattern.length; i++) {
-                patterns[i] = initializePattern(pattern[i], i);
+                patterns[i] = initializePattern(definition, pattern[i], i);
             }
             CACHE.put(controllerDefinition, patterns);
-            MultiblockDefinition.of(controllerDefinition).clear();
+            definition.clear();
         }
-        addWidget(new ButtonWidget(138, 30, 18, 18, new GuiTextureGroup(ColorPattern.T_GRAY.rectTexture(), new TextTexture("1").setSupplier(() -> "P:" + index)), x -> {
-            index = (index + 1 >= patterns.length) ? 0 : index + 1;
-            setPage();
-        }).setHoverBorderTexture(1, -1));
-        addWidget(new ButtonWidget(138, 50, 18, 18, new GuiTextureGroup(ColorPattern.T_GRAY.rectTexture(), new TextTexture("1").setSupplier(() -> layer >= 0 ? "L:" + layer : "ALL")), cd -> updateLayer()).setHoverBorderTexture(1, -1));
+        addWidget(new ButtonWidget(138, 30, 18, 18, new GuiTextureGroup(ColorPattern.T_GRAY.rectTexture(), new TextTexture("1").setSupplier(() -> "P:" + index)), this::updatePatternIndex).setHoverBorderTexture(1, -1));
+        addWidget(new ButtonWidget(138, 50, 18, 18, new GuiTextureGroup(ColorPattern.T_GRAY.rectTexture(), new TextTexture("1").setSupplier(() -> layer >= 0 ? "L:" + layer : "ALL")), this::updateLayer).setHoverBorderTexture(1, -1));
         addWidget(new ButtonWidget(138, 70, 18, 18, new GuiTextureGroup(ColorPattern.T_GRAY.rectTexture(), new TextTexture("1").setSupplier(() -> isPartHighlighting ? "H:ON" : "H:OFF")), cd -> isPartHighlighting = !isPartHighlighting).setHoverBorderTexture(1, -1));
 
         sceneWidget.setAfterWorldRender((w) -> {
             if (!isPartHighlighting) return;
-            patterns[getIndex()].partsMap.forEach(
-                    (pos, predicate) -> {
+            patterns[index].partsSet.forEach(
+                    pos -> {
                         var poseStack = new PoseStack();
                         var pos0 = BlockPos.of(pos);
                         RenderSystem.disableDepthTest();
@@ -147,26 +141,65 @@ public final class PatternPreview extends WidgetGroup {
                     });
         });
         setPage();
+        recipe.patterns = patterns;
     }
 
-    private void updateLayer() {
+    private void updatePatternIndex(ClickData clickData) {
+        switch (clickData.button) {
+            case 0: // 鼠标左键: 增加 index
+                index = (index + 1 >= patterns.length) ? 0 : index + 1;
+                break;
+            case 1: // 鼠标右键: 减少 index
+                index = (index - 1 < 0) ? patterns.length - 1 : index - 1;
+                break;
+            case 2: // 鼠标中键: 复位 index 到 0
+                index = 0;
+                break;
+        }
+        setPage(); // 在改变 index 后更新页面
+    }
+
+    private void updateLayer(ClickData clickData) {
         MBPattern pattern = patterns[index];
-        if (layer + 1 >= -1 && layer + 1 <= pattern.maxY - pattern.minY) {
-            layer += 1;
-            if (pattern.controllerBase.isFormed()) {
-                onFormedSwitch(false);
-            }
-        } else {
-            layer = -1;
+        int maxLayerIndex = pattern.maxY - pattern.minY;
+
+        // 根据鼠标按键更新 layer 的值
+        switch (clickData.button) {
+            case 0: // 鼠标左键: 增加 layer (循环)
+                layer++;
+                if (layer > maxLayerIndex) {
+                    layer = -1; // 超出最大值，回到 "ALL"
+                }
+                break;
+            case 1: // 鼠标右键: 减少 layer (循环)
+                layer--;
+                if (layer < -1) {
+                    layer = maxLayerIndex; // 低于 "ALL"，回到最大值
+                }
+                break;
+            case 2: // 鼠标中键: 复位 layer
+                layer = -1; // 直接回到 "ALL"
+                break;
+        }
+
+        // 在 layer 值更新后，处理相关的状态切换逻辑
+        // 这段逻辑是从您原来的方法中平移过来的，现在它能正确处理所有情况
+        if (layer == -1) {
+            // 如果当前是 "ALL" 视图，且机器结构未显示为“已形成”，则切换
             if (!pattern.controllerBase.isFormed()) {
                 onFormedSwitch(true);
+            }
+        } else {
+            // 如果当前是单层视图，且机器结构显示为“已形成”，则切换
+            if (pattern.controllerBase.isFormed()) {
+                onFormedSwitch(false);
             }
         }
         setupScene(pattern);
     }
 
     private void setupScene(MBPattern pattern) {
-        LongStream longStream = pattern.blockMap.keySet().longStream();
+        LongStream longStream = pattern.predicateMap.keySet().longStream();
         if (pattern.controllerBase.isFormed()) {
             LongSet set = pattern.controllerBase.getMultiblockState().getMatchContext().getOrDefault("renderMask", LongSets.EMPTY_SET);
             if (!set.isEmpty()) {
@@ -198,7 +231,7 @@ public final class PatternPreview extends WidgetGroup {
             MBPattern pattern = patterns[index];
             setupScene(pattern);
             itemList = pattern.parts;
-            recipe.itemList = itemList;
+            recipe.i = index;
         } else {
             return;
         }
@@ -219,9 +252,9 @@ public final class PatternPreview extends WidgetGroup {
         IMultiController controllerBase = pattern.controllerBase;
         if (isFormed) {
             layer = -1;
-            loadControllerFormed(pattern.blockMap.keySet(), controllerBase, index);
+            loadControllerFormed(pattern.predicateMap.keySet(), controllerBase, index);
         } else {
-            sceneWidget.setRenderedCore(pattern.blockMap.keySet().longStream().mapToObj(BlockPos::of).toList(), null);
+            sceneWidget.setRenderedCore(pattern.predicateMap.keySet().longStream().mapToObj(BlockPos::of).toList(), null);
             controllerBase.onStructureInvalid();
         }
     }
@@ -275,6 +308,7 @@ public final class PatternPreview extends WidgetGroup {
         if (pattern != null && pattern.checkPatternAt(state, true)) {
             controllerBase.onStructureFormed();
         }
+        state.clearCache();
         if (controllerBase.isFormed()) {
             LongSet set = state.getMatchContext().getOrDefault("renderMask", LongSets.EMPTY_SET);
             if (!set.isEmpty()) {
@@ -287,10 +321,14 @@ public final class PatternPreview extends WidgetGroup {
         }
     }
 
-    private MBPattern initializePattern(MultiblockDefinition.Pattern pattern, int index) {
-        var blockMap = pattern.blockMap();
-        IMultiController controllerBase = pattern.multiController();
-        for (ObjectIterator<Long2ObjectMap.Entry<BlockInfo>> it = blockMap.long2ObjectEntrySet().fastIterator(); it.hasNext();) {
+    private MBPattern initializePattern(MultiblockDefinition definition, MultiblockDefinition.Pattern pattern, int index) {
+        var pair = pattern.initialize(definition, index);
+        var patternMap = pair.getSecond();
+        var pos = pair.getFirst();
+        Long2ReferenceOpenHashMap<BlockInfo> blockMap = new Long2ReferenceOpenHashMap<>(patternMap.values().stream().mapToInt(LongOpenHashSet::size).sum());
+        patternMap.forEach((b, i) -> i.forEach(p -> blockMap.put(p, b)));
+        IMultiController controllerBase = blockMap.get(pos.asLong()).getBlockEntity(pos) instanceof MetaMachineBlockEntity blockEntity ? blockEntity.metaMachine instanceof IMultiController controller ? controller : null : null;
+        for (var it = blockMap.long2ReferenceEntrySet().fastIterator(); it.hasNext();) {
             var entry = it.next();
             LEVEL.addBlock(BlockPos.of(entry.getLongKey()), entry.getValue());
         }
@@ -327,6 +365,9 @@ public final class PatternPreview extends WidgetGroup {
     @Override
     @OnlyIn(Dist.CLIENT)
     public boolean mouseWheelMove(double mouseX, double mouseY, double wheelDelta) {
+        if (scrollableWidgetGroup.isMouseOverElement(mouseX, mouseY)) {
+            return super.mouseWheelMove(mouseX, mouseY, wheelDelta);
+        }
         if (sceneWidget.isMouseOverElement(mouseX, mouseY)) {
             double rotationPitch = Math.toRadians(sceneWidget.getRotationPitch());
             double rotationYaw = Math.toRadians(sceneWidget.getRotationYaw());
@@ -336,7 +377,6 @@ public final class PatternPreview extends WidgetGroup {
             sceneWidget.setCenter(sceneWidget.getCenter().add(moveX, moveY, moveZ));
             return true;
         }
-
         return super.mouseWheelMove(mouseX, mouseY, wheelDelta);
     }
 
@@ -355,25 +395,22 @@ public final class PatternPreview extends WidgetGroup {
         super.drawInBackground(graphics, mouseX, mouseY, partialTicks);
     }
 
-    private static class MBPattern {
+    public static class MBPattern {
 
         @NotNull
-        private final List<ItemStack> parts;
+        public final List<ItemStack> parts;
         @NotNull
         private final Long2ObjectOpenHashMap<TraceabilityPredicate> predicateMap;
         @NotNull
-        private final Long2ObjectOpenHashMap<BlockInfo> blockMap;
-        @NotNull
         private final IMultiController controllerBase;
-        private final Long2ObjectOpenHashMap<TraceabilityPredicate> partsMap;
+        private final LongSet partsSet;
         private final int maxY;
         private final int minY;
         private final BlockPos center;
 
-        private MBPattern(@NotNull Long2ObjectOpenHashMap<BlockInfo> blockMap, @NotNull List<ItemStack> parts, @NotNull Long2ObjectOpenHashMap<TraceabilityPredicate> predicateMap, @NotNull IMultiController controllerBase) {
+        private MBPattern(@NotNull Long2ReferenceOpenHashMap<BlockInfo> blockMap, @NotNull List<ItemStack> parts, @NotNull Long2ObjectOpenHashMap<TraceabilityPredicate> predicateMap, @NotNull IMultiController controllerBase) {
             this.parts = parts;
-            this.blockMap = blockMap;
-            this.partsMap = new Long2ObjectOpenHashMap<>();
+            this.partsSet = new LongOpenHashSet();
             this.predicateMap = predicateMap;
             this.controllerBase = controllerBase;
             this.center = controllerBase.self().getPos();
@@ -386,18 +423,18 @@ public final class PatternPreview extends WidgetGroup {
                         .filter(s -> s.hasBlockEntity() &&
                                 s.getBlockEntity(BlockPos.of(entry.getLongKey())) instanceof MetaMachineBlockEntity mmbe &&
                                 mmbe.getMetaMachine() instanceof MultiblockPartMachine)
-                        .forEach(s -> partsMap.put(pos, predicate));
+                        .forEach(s -> partsSet.add(pos));
                 predicate.limited.stream()
                         .map(s -> s.blockInfo.get())
                         .filter(Objects::nonNull)
                         .filter(s -> s.hasBlockEntity() &&
                                 s.getBlockEntity(BlockPos.of(entry.getLongKey())) instanceof MetaMachineBlockEntity mmbe &&
                                 mmbe.getMetaMachine() instanceof MultiblockPartMachine)
-                        .forEach(s -> partsMap.put(pos, predicate));
+                        .forEach(s -> partsSet.add(pos));
             }
             int min = Integer.MAX_VALUE;
             int max = Integer.MIN_VALUE;
-            for (ObjectIterator<Long2ObjectMap.Entry<BlockInfo>> it = blockMap.long2ObjectEntrySet().fastIterator(); it.hasNext();) {
+            for (var it = blockMap.long2ReferenceEntrySet().fastIterator(); it.hasNext();) {
                 var y = BlockPos.getY(it.next().getLongKey());
                 min = Math.min(min, y);
                 max = Math.max(max, y);

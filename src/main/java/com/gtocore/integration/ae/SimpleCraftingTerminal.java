@@ -2,7 +2,6 @@ package com.gtocore.integration.ae;
 
 import com.gtolib.GTOCore;
 import com.gtolib.api.ae2.ExternalStorageCacheStrategy;
-import com.gtolib.utils.BlockCapabilityCache;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -27,7 +26,6 @@ import appeng.api.stacks.AEKeyType;
 import appeng.api.storage.IStorageMounts;
 import appeng.api.storage.IStorageProvider;
 import appeng.api.storage.MEStorage;
-import appeng.capabilities.Capabilities;
 import appeng.core.AppEng;
 import appeng.core.stats.AdvancementTriggers;
 import appeng.helpers.InterfaceLogicHost;
@@ -42,11 +40,10 @@ import appeng.menu.me.items.CraftingTermMenu;
 import appeng.parts.PartModel;
 import appeng.parts.reporting.AbstractTerminalPart;
 import appeng.util.inv.AppEngInternalInventory;
-import com.hollingsworth.arsnouveau.common.items.SpellBook;
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SimpleCraftingTerminal extends AbstractTerminalPart
@@ -62,7 +59,6 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
     private final AppEngInternalInventory craftingGrid = new AppEngInternalInventory(this, 9);
 
     private final StorageBusInventory handler = new StorageBusInventory(NullInventory.of());
-    private BlockCapabilityCache<MEStorage> adjacentStorageAccessor;
     @Nullable
     private Map<AEKeyType, ExternalStorageStrategy> externalStorageStrategies;
     private int tick;
@@ -78,14 +74,8 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
 
     @Override
     public boolean onPartActivate(Player player, InteractionHand hand, Vec3 pos) {
-        if (isArsSpellBook(player.getMainHandItem()) || isArsSpellBook(player.getOffhandItem())) return false;
         updateTarget();
         return super.onPartActivate(player, hand, pos);
-    }
-
-    private boolean isArsSpellBook(ItemStack itemStack) {
-        if (itemStack == null) return false;
-        return itemStack.getItem() instanceof SpellBook;
     }
 
     @Override
@@ -127,6 +117,9 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
 
     @Override
     public MEStorage getInventory() {
+        if (getBlockEntity().isRemoved()) {
+            return null;
+        }
         if (!isClientSide()) {
             if (this.tick % 10 == 0) {
                 if (this.handler.getDelegate() instanceof CompositeStorage compositeStorage) {
@@ -169,16 +162,9 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
         }
         var side = getSide();
         if (side == null) return;
-        MEStorage foundMonitor;
-        Map<AEKeyType, MEStorage> foundExternalApi = Collections.emptyMap();
-        if (adjacentStorageAccessor == null) adjacentStorageAccessor = BlockCapabilityCache.create(Capabilities.STORAGE, getHost().getBlockEntity());
-        foundMonitor = adjacentStorageAccessor.find(getHost().getBlockEntity().getBlockPos().relative(side), side, side.getOpposite());
 
-        if (foundMonitor == null) {
-
-            foundExternalApi = new IdentityHashMap<>(2);
-            findExternalStorages(foundExternalApi);
-        }
+        var foundExternalApi = new Reference2ReferenceOpenHashMap<AEKeyType, MEStorage>(2);
+        findExternalStorages(foundExternalApi);
 
         if (this.handler.getDescription() instanceof CompositeStorage compositeStorage && !foundExternalApi.isEmpty()) {
             compositeStorage.setStorages(foundExternalApi);
@@ -187,10 +173,7 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
 
         // Update inventory
         MEStorage newInventory;
-        if (foundMonitor != null) {
-            newInventory = foundMonitor;
-            this.checkStorageBusOnInterface();
-        } else if (!foundExternalApi.isEmpty()) {
+        if (!foundExternalApi.isEmpty()) {
             newInventory = new CompositeStorage(foundExternalApi);
         } else {
             newInventory = NullInventory.of();
@@ -244,13 +227,23 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
     }
 
     @Override
+    public void addAdditionalDrops(List<ItemStack> drops, boolean wrenched) {
+        super.addAdditionalDrops(drops, wrenched);
+        for (var is : this.craftingGrid) {
+            if (!is.isEmpty()) {
+                drops.add(is);
+            }
+        }
+    }
+
+    @Override
     public void mountInventories(IStorageMounts storageMounts) {
         storageMounts.mount(this.handler, 1);
     }
 
     private static class StorageBusInventory extends MEInventoryHandler {
 
-        public StorageBusInventory(MEStorage inventory) {
+        StorageBusInventory(MEStorage inventory) {
             super(inventory);
         }
 
@@ -273,12 +266,12 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
 
     @Override
     public double getAEMaxPower() {
-        return Long.MAX_VALUE / 10000;
+        return Long.MAX_VALUE / 10000.0;
     }
 
     @Override
     public double getAECurrentPower() {
-        return Long.MAX_VALUE / 10000;
+        return Long.MAX_VALUE / 10000.0;
     }
 
     @Override

@@ -3,11 +3,7 @@ package com.gtocore.api.report;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import dev.shadowsoffire.apotheosis.adventure.affix.Affix;
-import dev.shadowsoffire.apotheosis.adventure.affix.AffixHelper;
-import dev.shadowsoffire.apotheosis.adventure.affix.AffixInstance;
-import dev.shadowsoffire.apotheosis.adventure.affix.AffixRegistry;
-import dev.shadowsoffire.apotheosis.adventure.affix.AffixType;
+import dev.shadowsoffire.apotheosis.adventure.affix.*;
 import dev.shadowsoffire.apotheosis.adventure.loot.LootCategory;
 import dev.shadowsoffire.apotheosis.adventure.loot.LootRarity;
 import dev.shadowsoffire.apotheosis.adventure.loot.RarityRegistry;
@@ -22,10 +18,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class AffixReporter {
 
     private static final Path LOG_DIR = Paths.get("logs", "report");
+    private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9.-]");
 
     public static void getAffixReporter() {
         exportAllAffixesToFile();
@@ -64,17 +62,13 @@ public class AffixReporter {
                 List<String> affixPrefixName = new ArrayList<>();
                 List<String> affixSuffixName = new ArrayList<>();
 
-                int i = 0;
-
                 for (Affix affix : allAffixes) {
                     ResourceLocation id = AffixRegistry.INSTANCE.getKey(affix);
 
-                    writer.write("records.add(ApotheosisAffixRecord.create(" +
-                            i + ",\"" +
+                    writer.write("addRecord(\"" +
                             id.toString() + "\",\"" +
                             affix.getName(true).getString() + " · " + affix.getName(false).getString() + "\",\"" +
-                            affix.getName(true).getString() + " · " + affix.getName(false).getString() + "\"));\n");
-                    i++;
+                            affix.getName(true).getString() + " · " + affix.getName(false).getString() + "\");\n");
 
                     affixId.add(id.toString());
                     affixType.add(String.valueOf(affix.getType()));
@@ -141,7 +135,7 @@ public class AffixReporter {
 
             // 创建带时间戳的文件名
             String timestamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
-            String itemName = stack.getDisplayName().getString().replaceAll("[^a-zA-Z0-9.-]", "_");
+            String itemName = PATTERN.matcher(stack.getDisplayName().getString()).replaceAll("_");
             Path outputFile = LOG_DIR.resolve("item_affixes_" + itemName + "_" + timestamp + ".txt");
 
             // 写入文件

@@ -1,5 +1,6 @@
 package com.gtocore.common.machine.multiblock.electric.gcym;
 
+import com.gregtechceu.gtceu.api.blockentity.ITickSubscription;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
@@ -36,14 +37,14 @@ public class LargeMacerationTowerMachine extends GCYMMultiblockMachine {
                     handlers.add(ih);
                 }
             }
-            hurtSub = subscribeServerTick(hurtSub, this::spinWheels);
+            hurtSub = subscribeServerTick(hurtSub, this::spinWheels, 20);
         }
     }
 
     @Override
     public void onStructureInvalid() {
         super.onStructureInvalid();
-        unsubscribe(hurtSub);
+        ITickSubscription.unsubscribe(hurtSub);
         hurtSub = null;
         handlers.clear();
     }
@@ -51,7 +52,7 @@ public class LargeMacerationTowerMachine extends GCYMMultiblockMachine {
     @Override
     public void onUnload() {
         super.onUnload();
-        unsubscribe(hurtSub);
+        ITickSubscription.unsubscribe(hurtSub);
         hurtSub = null;
         handlers.clear();
     }
@@ -63,7 +64,7 @@ public class LargeMacerationTowerMachine extends GCYMMultiblockMachine {
     }
 
     private void spinWheels() {
-        if (isRemote() || getLevel() == null || recipeLogic.isSuspend() || getOffsetTimer() % 20 != 0) return;
+        if (isRemote() || getLevel() == null || recipeLogic.isSuspend()) return;
 
         List<ItemEntity> itemEntities = new ArrayList<>();
         for (var entity : getLevel().getEntities(null, grindBound)) {

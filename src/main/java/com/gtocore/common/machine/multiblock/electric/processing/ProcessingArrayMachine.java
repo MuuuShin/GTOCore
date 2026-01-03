@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.Block;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -41,15 +41,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public final class ProcessingArrayMachine extends TierCasingMultiblockMachine implements IParallelMachine, IArrayMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(ProcessingArrayMachine.class, TierCasingMultiblockMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
     private MachineDefinition machineDefinitionCache;
     private GTRecipeType[] RecipeTypeCache;
+    @Getter
     @DescSynced
     @Persisted
     private final NotifiableItemStackHandler inventory;
@@ -98,7 +92,7 @@ public final class ProcessingArrayMachine extends TierCasingMultiblockMachine im
     }
 
     @Override
-    protected boolean beforeWorking(@Nullable Recipe recipe) {
+    protected boolean beforeWorking(Recipe recipe) {
         if (inventory.getStackInSlot(0).isEmpty()) return false;
         return super.beforeWorking(recipe);
     }
@@ -154,9 +148,5 @@ public final class ProcessingArrayMachine extends TierCasingMultiblockMachine im
     @Override
     public GTRecipeType[] getRecipeTypeCache() {
         return this.RecipeTypeCache;
-    }
-
-    public NotifiableItemStackHandler getInventory() {
-        return this.inventory;
     }
 }

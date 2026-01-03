@@ -1,11 +1,12 @@
-package com.gtocore.common.network
+package com.gtocore.api.misc
 
-import com.gtocore.integration.ae.WirelessMachine
+import com.gtocore.integration.ae.wireless.WirelessMachine
 
 import appeng.api.networking.GridHelper
 import appeng.api.networking.IGridConnection
 
-import kotlin.math.*
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 // 双层结构，主节点为环形连接，子节点为星形连接
 class WirelessNetworkTopologyManager {
@@ -63,6 +64,11 @@ class WirelessNetworkTopologyManager {
         }
 
         return affectedConnections
+    }
+
+    fun getTotalUsedChannels(): Int {
+        if (clusters.isEmpty()) return 0
+        return clusters.first().hubNode.gridNode?.usedChannels ?: 0
     }
 
     private fun cleanupNodeConnections(node: WirelessMachine, cluster: NodeCluster) {

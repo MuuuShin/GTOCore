@@ -19,12 +19,90 @@ object GTOMachineStories : AutoInitialize<GTOMachineStories>() {
     // 尽量使用**灰色**
     // 类GCYM机器(如大热解/裂化/电弧)不要写
 
+    // 大型藻类养殖中心
+    val LargeAlgaeFarmTooltips: ComponentListSupplier = ComponentListSupplier {
+        setTranslationPrefix("large_algae_farm")
+        story("AFBL-3000大型藻类养殖中心是GTO集团最新研发的高效藻类生产设备" translatedTo "AFBL-3000 Large Algae Farming Center is GTO Group's latest high-efficiency algae production equipment")
+        story("采用先进的光照和营养液循环系统，能够大幅提升藻类的生长速度和产量" translatedTo "Using advanced lighting and nutrient solution circulation systems, it can significantly enhance algae growth speed and yield")
+        story("适用于各种藻类品种，为生物燃料、食品添加剂和医药原料等领域提供稳定的原材料供应" translatedTo "Suitable for various algae species, providing a stable supply of raw materials for biofuels, food additives, and pharmaceutical ingredients")
+    }
+
+    // 颜料调配机
+    val PigmentMixerTooltips: ComponentListSupplier = ComponentListSupplier {
+        setTranslationPrefix("pigment_mixer")
+        story("将三种颜色调配成更多的颜色" translatedTo "Mixing three colors into more colors")
+    }
+
+    // 砖窑
+    val brickKilnTooltips: ComponentListSupplier = ComponentListSupplier {
+        setTranslationPrefix("brick_kiln")
+        story("古法窑炉，原始工艺" translatedTo "Ancient kiln, primitive craftsmanship")
+    }
+
+    // 热压成型机
+    val thermoPressTooltips: ComponentListSupplier = ComponentListSupplier {
+        setTranslationPrefix("thermo_press")
+        story("为了将金属，陶瓷，塑料以及胶水粘到一起而开发的机器" translatedTo "A machine developed to bond metals, ceramics, plastics, and adhesives together")
+    }
+
+    // 电镀槽
+    val electroplatingBathTooltips: ComponentListSupplier = ComponentListSupplier {
+        setTranslationPrefix("electroplating_bath")
+        story("掌握了从矿石中提取和分离铂系金属的技术后" translatedTo "After mastering the technology to extract and separate platinum group metals from ores")
+        story("GTO集团的工程师们开始尝试着这个材料混那个，那个材料混这个" translatedTo "GTO Group engineers began experimenting mixing this material with that")
+        story("最开始他们只是在合金冶炼炉里混合" translatedTo "Initially they just alloyed in smelters")
+        story("但他们想要的§6§l镀§r铑钯锭怎么可能在那里诞生呢" translatedTo "But how could they get rhodium §6§lPLATED§r palladium ingots there")
+    }
+
+    // 雾化冷凝器
+    val atomizingCondenserTooltips: ComponentListSupplier = ComponentListSupplier {
+        setTranslationPrefix("atomizing_condenser")
+        story("GTO集团的一名员工在合金冶炼炉前正等待着大锅的熔融合金出锅。" translatedTo "An employee of GTO Group was waiting in front of the alloy smelter for the molten alloy to be ready.")
+        story("他是这台机器的操纵员，负责将金属粉末原料送入冶炼炉，再将熔融的合金倒入模具送入真空冷冻机。" translatedTo "He is the operator of this machine, responsible for feeding metal powder raw materials into the smelter, then pouring the molten alloy into molds and sending them to the vacuum freezer.")
+        story("这是一项需要高度专注的工作，因为任何失误都可能导致合金质量不达标。" translatedTo "This is a task that requires high concentration, as any mistake could lead to substandard alloy quality.")
+        story("一天，当他正忙着操作机器时，突然听到一声巨响。" translatedTo "One day, while he was busy operating the machine, he suddenly heard a loud bang.")
+        story("他迅速转身，看到冶炼炉的盖子被炸飞了，熔融的合金喷涌而出。" translatedTo "He quickly turned around and saw the lid of the smelter blown off, with molten alloy spewing out.")
+        story("这意味着这锅合金算是白炖了，而且可能遭到经理的一顿痛骂。" translatedTo "This meant that the alloy was wasted, and he might face a severe scolding from the manager.")
+        story("他赶紧检查并收拾了现场，结果发现合金并没有完全浪费。" translatedTo "He quickly checked and cleaned up the scene, and found that the alloy was not completely wasted.")
+        story("保护气带着熔融合金喷涌而出的时候，部分合金被冷却成了小颗粒。" translatedTo "When the protective gas sprayed out with the molten alloy, some of the alloy was cooled into small particles.")
+        story("他小心翼翼地收集了这些颗粒，发现它们的质量和正常铸造出来的合金磨成粉以外没有什么区别。" translatedTo "He carefully collected these particles and found that their quality was no different from alloy ground into powder.")
+        story("经理听说后，不但没有责骂，还记录下了这个意外的过程，并据此研发出了这台专门用于从熔融的流体生产金属粉末的机器" translatedTo "The manager, upon hearing this, not only did not scold him but also documented the unexpected process and developed this machine specifically for producing metal powders from molten fluids.")
+        story("只不过生产出来的金属粉末还得重新送回高炉才能变回可加工的金属锭。" translatedTo "However, the produced metal powder still needs to be sent back to the blast furnace to be turned back into workable metal ingots.")
+    }
+
     // 大型蒸汽电路组装机
     val LargeSteamCircuitAssemblerTooltips = ComponentListSupplier {
         setTranslationPrefix("large_steam_circuit_assembler")
         story("后世工程师难以想象先驱者如何用简陋工具打造这台机器" translatedTo "Later engineers can hardly imagine how pioneers built this machine with crude tools")
         story("仅靠蒸汽动力和机械传动却实现了电路产出的倍增效果" translatedTo "Using only steam power and mechanical transmission, yet achieving multiplied circuit output")
         story("或许是魔法？总之没有别的合理解释了" translatedTo "Perhaps magic? There's no other reasonable explanation")
+    }
+
+    // 空间站
+    val SpaceStationTooltips = ComponentListSupplier {
+        setTranslationPrefix("space_station")
+        story("欢迎来到GTO寰宇集团的太空站" translatedTo "Welcome to GTO Universe Group's Space Station")
+        story("你可能注意到，在外太空，大部分的机器因失重，低压，强射线等原因无法正常工作" translatedTo "You may have noticed that in outer space, most machines cannot function properly due to weightlessness, low pressure, strong radiation, and other reasons")
+        story("为了克服这些问题，我们开发了这台专用的空间站" translatedTo "To overcome these issues, we developed this specialized space station")
+        story("它能够在恶劣的太空环境中稳定运行，并为机器们提供一个温暖的小家" translatedTo "It can operate stably in harsh space environments and provide a warm home for the machines")
+        story("空间站的内部还会根据过滤器的类型提供超净环境" translatedTo "The interior of the space station also provides a super clean environment based on the type of filter")
+        story("祝你在太空中工作愉快！" translatedTo "Wish you a pleasant work in space!")
+    }
+
+    // 大型工业空间站
+    val LargeSpaceStationTooltips = ComponentListSupplier {
+        setTranslationPrefix("large_space_station")
+        story("GTO寰宇集团的太空站已经成功运营多年" translatedTo "GTO Universe Group's space station has been successfully operating for many years")
+        story("为了满足更多更大的机器需求，GTO寰宇集团决定建造更大的空间站" translatedTo "To meet the needs of more and larger machines, GTO Universe Group decided to build a larger space station")
+        story("大型空间站不仅拥有更大的内部空间，还支持连接扩展舱室以扩展更多的功能" translatedTo "The large space station not only has a larger internal space but also supports connecting extension modules to expand more functions")
+        story("无论是工业生产还是科研实验，大型空间站都能为你提供一个理想的工作环境" translatedTo "Whether for industrial production or scientific research, the large space station can provide you with an ideal working environment")
+    }
+
+    // 纺丝机（纤维挤出机）
+    val FiberExtruderTooltips = ComponentListSupplier {
+        setTranslationPrefix("fiber_extruder")
+        story("这可不是什么一般的缝纫机或者织布机" translatedTo "This is not just an ordinary sewing machine or loom")
+        story("从这台机器织出的纤维将要成为支起GTO集团未来的工业帝国的强大吊索" translatedTo "The fibers woven from this machine will become the strong cables supporting GTO Group's future industrial empire")
     }
 
     // 大型蒸汽太阳能锅炉

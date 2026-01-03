@@ -15,9 +15,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.material.Fluid;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -25,14 +24,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class ExtremeTemperatureFluctuationPurificationUnitMachine extends WaterPurificationUnitMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            ExtremeTemperatureFluctuationPurificationUnitMachine.class, WaterPurificationUnitMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     private static final Fluid STEAM = GTOMaterials.SupercriticalSteam.getFluid();
     private static final Fluid HELIUM = GTMaterials.Helium.getFluid();
@@ -51,7 +42,7 @@ public final class ExtremeTemperatureFluctuationPurificationUnitMachine extends 
     @Persisted
     private boolean cycle;
 
-    private final List<SensorPartMachine> sensorMachine = new ObjectArrayList<>();
+    private final List<SensorPartMachine> sensorMachine = new ArrayList<>();
 
     public ExtremeTemperatureFluctuationPurificationUnitMachine(MetaMachineBlockEntity holder) {
         super(holder, 16);
@@ -82,7 +73,7 @@ public final class ExtremeTemperatureFluctuationPurificationUnitMachine extends 
         super.customText(textList);
         if (getRecipeLogic().isWorking()) {
             textList.add(Component.translatable("gtceu.multiblock.fusion_reactor.heat", heat));
-            textList.add(Component.translatable("gui.enderio.sag_mill_chance", chance));
+            textList.add(Component.translatable("gtceu.jei.ore_vein_diagram.chance", chance));
         }
     }
 

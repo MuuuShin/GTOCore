@@ -26,13 +26,11 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class ElectricHeaterMachine extends WorkableTieredMachine implements IHeaterMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(ElectricHeaterMachine.class, WorkableTieredMachine.MANAGED_FIELD_HOLDER);
     public static final int MaxTemperature = 1200;
     @Persisted
     @DescSynced
@@ -69,7 +67,7 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
 
     @Nullable
     private Recipe getRecipe() {
-        if (temperature >= getMaxTemperature()) return null;
+        if (temperature >= MaxTemperature) return null;
         Recipe recipe = IEnhancedRecipeLogic.of(getRecipeLogic()).gtolib$getRecipeBuilder().duration(20).EUt(30).buildRawRecipe();
         if (RecipeRunner.matchTickRecipe(this, recipe)) {
             return recipe;
@@ -104,10 +102,9 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
         super.onLoad();
         if (!isRemote()) {
             tickSubs = subscribeServerTick(tickSubs, () -> {
-                if (self().getOffsetTimer() % 20 != 0) return;
                 tickUpdate();
                 getRecipeLogic().updateTickSubscription();
-            });
+            }, 20);
         }
     }
 
@@ -123,7 +120,7 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
     @Override
     public boolean onWorking() {
         if (super.onWorking()) {
-            if (getOffsetTimer() % 10 == 0 && getMaxTemperature() > temperature + 4) {
+            if (getOffsetTimer() % 10 == 0 && MaxTemperature > temperature + 4) {
                 raiseTemperature(4);
             }
             return true;
@@ -139,12 +136,6 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
     @Override
     public int getMaxTemperature() {
         return MaxTemperature;
-    }
-
-    @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Override

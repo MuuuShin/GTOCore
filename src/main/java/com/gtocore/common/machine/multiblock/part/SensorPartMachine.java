@@ -14,10 +14,10 @@ import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -28,7 +28,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public final class SensorPartMachine extends MultiblockPartMachine {
 
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(SensorPartMachine.class, MultiblockPartMachine.MANAGED_FIELD_HOLDER);
     @Persisted
     @DescSynced
     private float min;
@@ -37,6 +36,7 @@ public final class SensorPartMachine extends MultiblockPartMachine {
     private float max;
     @Persisted
     private boolean isInverted;
+    @Getter
     @Persisted
     private int redstoneSignalOutput;
 
@@ -87,11 +87,6 @@ public final class SensorPartMachine extends MultiblockPartMachine {
     }
 
     @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    @Override
     public boolean canShared() {
         return false;
     }
@@ -131,9 +126,5 @@ public final class SensorPartMachine extends MultiblockPartMachine {
 
     private void setInverted(final boolean isInverted) {
         this.isInverted = isInverted;
-    }
-
-    public int getRedstoneSignalOutput() {
-        return this.redstoneSignalOutput;
     }
 }

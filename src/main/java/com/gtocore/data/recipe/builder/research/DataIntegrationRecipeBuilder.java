@@ -17,8 +17,9 @@ public final class DataIntegrationRecipeBuilder {
     }
 
     private int[] inputData = {};
-    private int outputData = 0;
-    private int chanced = 10000;
+    private int outputData;
+    private int chanced;
+    private int errorWeight = 2000;
 
     private ItemStack catalyst1;
     private ItemStack catalyst2;
@@ -49,6 +50,12 @@ public final class DataIntegrationRecipeBuilder {
         return this;
     }
 
+    public DataIntegrationRecipeBuilder errorWeight(int weight) {
+        if (weight < 0) throw new IllegalArgumentException("错误数据权重不能为负数");
+        this.errorWeight = weight;
+        return this;
+    }
+
     public DataIntegrationRecipeBuilder EUt(long eut) {
         this.eut = eut;
         return this;
@@ -56,7 +63,7 @@ public final class DataIntegrationRecipeBuilder {
 
     public DataIntegrationRecipeBuilder CWUt(int cwut) {
         this.cwut = cwut;
-        this.totalCWU = cwut * 4000;
+        this.totalCWU = cwut * 800;
         return this;
     }
 
@@ -70,18 +77,25 @@ public final class DataIntegrationRecipeBuilder {
         if (cwut > totalCWU) throw new IllegalStateException("Total CWU cannot be greater than CWU/t!");
         if (catalyst1 == null || catalyst2 == null) throw new IllegalStateException("Catalyst input required");
         if (inputData == null) throw new IllegalStateException("Missing input items");
-        if (outputData == 0) throw new IllegalStateException("Missing output items");
-        int crystalTire = ExtractDataCrystal(outputData);
+        DataCrystal dataCrystal = analyzeMap.get(outputData);
+        if (dataCrystal == null) throw new IllegalStateException("Unknown output items");
+        int crystalTire = dataCrystal.tier();
 
-        var build = DATA_INTEGRATION_RECIPES.recipeBuilder(AnalyzeMap.get(outputData));
+        int originalTotalWeight = chanced + errorWeight;
+        int normalizedOutput = (int) (((double) chanced / originalTotalWeight) * 10000);
+        int normalizedError = (int) (((double) errorWeight / originalTotalWeight) * 10000);
+        int difference = 10000 - normalizedOutput - normalizedError;
+        if (difference != 0) normalizedError += difference;
+
+        var build = DATA_INTEGRATION_RECIPES.recipeBuilder(dataCrystal.data());
         build
                 .notConsumable(catalyst1)
                 .notConsumable(catalyst2)
-                .inputItems(getEmptyCrystal(crystalTire));
-        for (int inputAnalyzeDatum : inputData) build.notConsumable(getAnalyzeData(inputAnalyzeDatum));
+                .inputItems(EmptyDataCrystalList.get(crystalTire));
+        for (int inputAnalyzeDatum : inputData) build.notConsumable(getDataCrystal(inputAnalyzeDatum));
         build
-                .chancedOutput(getAnalyzeData(outputData), chanced, 0)
-                .chancedOutput(getAnalyzeData(ErrorDataMap.get(crystalTire)), 2000, 0)
+                .chancedOutput(getDataCrystal(outputData), normalizedOutput, 0)
+                .chancedOutput(ErrorDataCrystalList.get(crystalTire), normalizedError, 0)
                 .EUt(eut)
                 .CWUt(cwut)
                 .totalCWU(totalCWU)

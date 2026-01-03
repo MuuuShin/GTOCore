@@ -1,5 +1,7 @@
 package com.gtocore.common.machine.mana.part;
 
+import com.gtocore.utils.ManaUnification;
+
 import com.gtolib.api.machine.mana.feature.IManaMachine;
 import com.gtolib.utils.MathUtil;
 
@@ -25,13 +27,12 @@ public final class ManaExtractHatchPartMachine extends ManaHatchPartMachine {
     public void onLoad() {
         super.onLoad();
         if (!isRemote()) {
-            tickSubs = subscribeServerTick(tickSubs, this::tickUpdate);
+            tickSubs = subscribeServerTick(tickSubs, this::tickUpdate, 20);
         }
     }
 
     @Override
     void tickUpdate() {
-        if (getOffsetTimer() % 20 != 0) return;
         BlockPos frontPos = getPos().relative(getFrontFacing());
         Level level = getLevel();
         if (!isFull()) {
@@ -44,7 +45,7 @@ public final class ManaExtractHatchPartMachine extends ManaHatchPartMachine {
 
             if (level != null && level.getBlockEntity(frontPos) instanceof SourceJarTile jarTile) {
                 int sourceAmount = jarTile.getSource();
-                int change = Math.toIntExact(getManaContainer().addMana(sourceAmount / 4, 20, false) * 4);
+                int change = Math.toIntExact(getManaContainer().addMana(ManaUnification.sourceToMana(sourceAmount), 20, false) * 4);
                 if (change <= 0) return;
                 SourceUtil.takeSource(frontPos, level, 0, change);
             }

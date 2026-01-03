@@ -1,5 +1,6 @@
 package com.gtocore.common.data
 
+import com.gtocore.api.lang.ComponentListSupplier
 import com.gtocore.common.data.GTOOrganItems.TierOrganTypes
 import com.gtocore.common.data.translation.OrganTranslation
 import com.gtocore.common.data.translation.OrganTranslation.organModifierDescriptions
@@ -38,7 +39,12 @@ object GTOOrganItems {
         cn = "翅膀 妖精之翼",
         itemFactory = { properties, organType -> OrganItem(properties.durability(4.hours.inWholeSeconds.toInt()), organType) },
         onRegister = attach(
-            TooltipBehavior(OrganTranslation.flightInfo2::apply),
+            TooltipBehavior(
+                ComponentListSupplier {
+                    add(OrganTranslation.flightInfo2)
+                    add(OrganTranslation.maxFlyAbleSpeed(0.15f))
+                }::apply,
+            ),
         ),
     )
     val MANA_STEEL_WING = OrganItemBase.registerOrganItem(
@@ -49,7 +55,12 @@ object GTOOrganItems {
         cn = "翅膀 魔力钢之翼",
         itemFactory = { properties, organType -> OrganItem(properties.durability(15.minutes.inWholeSeconds.toInt()), organType) },
         onRegister = attach(
-            TooltipBehavior(OrganTranslation.flightInfo2::apply),
+            TooltipBehavior(
+                ComponentListSupplier {
+                    add(OrganTranslation.flightInfo2)
+                    add(OrganTranslation.maxFlyAbleSpeed(0.15f))
+                }::apply,
+            ),
         ),
     )
     val MECHANICAL_WING = OrganItemBase.registerOrganItem(
@@ -60,6 +71,12 @@ object GTOOrganItems {
         cn = "翅膀 电动机械之翼",
         itemFactory = { properties, organType -> OrganItem(properties, organType) },
         onRegister = attach(
+            TooltipBehavior(
+                ComponentListSupplier {
+                    add(OrganTranslation.flightInfo2)
+                    add(OrganTranslation.maxFlyAbleSpeed(0.25f))
+                }::apply,
+            ),
             ElectricStats.createElectricItem(
                 GTValues.V[GTValues.EV] * (32.hours.inWholeSeconds.toInt()),
                 GTValues.EV,
@@ -70,7 +87,11 @@ object GTOOrganItems {
     // ////////////////////////////////
     // ****** 编辑器 ******//
     // //////////////////////////////
-    val ORGAN_MODIFIER = item("organ_modifier", "器官修改器", { properties -> ComponentItem.create(properties.stacksTo(1).setNoRepair()) })
+    val ORGAN_MODIFIER = item("organ_modifier", "器官修改器") { properties ->
+        ComponentItem.create(
+            properties.stacksTo(1).setNoRepair(),
+        )
+    }
         .lang("Organ Modifier")
         .model { ctx, prov -> prov.generated(ctx, GTOCore.id("item/organ/item/visceral_editor")) }
         .onRegister(attach(OrganModifierBehaviour()))
@@ -83,7 +104,7 @@ object GTOOrganItems {
 private fun registerTierOrganItem() {
     (0..4).forEach { tier ->
         TierOrganTypes.forEach { organType ->
-            val itemEntries = GTOOrganItems.TierOrganMap.computeIfAbsent(organType, { mutableListOf() })
+            val itemEntries = GTOOrganItems.TierOrganMap.computeIfAbsent(organType) { mutableListOf() }
             val itemEntry = OrganItemBase.registerOrganItem(
                 id = "tier_${tier}_${organType.key}", // e.g. "tier_1_eye"
                 organType = organType,

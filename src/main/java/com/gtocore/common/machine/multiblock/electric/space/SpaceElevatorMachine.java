@@ -1,10 +1,13 @@
 package com.gtocore.common.machine.multiblock.electric.space;
 
+import com.gtocore.api.gui.GTOGuiTextures;
 import com.gtocore.common.data.GTOItems;
+import com.gtocore.common.machine.multiblock.electric.space.spacestaion.SpaceElevatorConnectorModule;
 import com.gtocore.data.IdleReason;
 
+import com.gtolib.api.annotation.DataGeneratorScanned;
+import com.gtolib.api.capability.IIWirelessInteractor;
 import com.gtolib.api.data.GTODimensions;
-import com.gtolib.api.gui.GTOGuiTextures;
 import com.gtolib.api.machine.feature.multiblock.IHighlightMachine;
 import com.gtolib.api.machine.multiblock.TierCasingMultiblockMachine;
 import com.gtolib.api.machine.trait.CustomRecipeLogic;
@@ -23,28 +26,30 @@ import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.BlockHitResult;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import earth.terrarium.adastra.api.planets.Planet;
+import earth.terrarium.adastra.api.planets.PlanetApi;
 import earth.terrarium.adastra.common.menus.base.PlanetsMenuProvider;
 import earth.terrarium.botarium.common.menu.MenuHooks;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.gtolib.api.GTOValues.POWER_MODULE_TIER;
 
-public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements IHighlightMachine {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(SpaceElevatorMachine.class, TierCasingMultiblockMachine.MANAGED_FIELD_HOLDER);
+@DataGeneratorScanned
+public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements IHighlightMachine, IIWirelessInteractor<SpaceElevatorConnectorModule> {
 
     public SpaceElevatorMachine(MetaMachineBlockEntity holder) {
         super(holder, POWER_MODULE_TIER);
@@ -67,32 +72,31 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
         poss.add(blockPos.offset(-2, 2, -7));
     }
 
-    @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
+    @Getter
     @DescSynced
     protected double high;
+    @Getter
     @Persisted
     @DescSynced
     protected int spoolCount;
     protected int moduleCount;
     @DescSynced
     final List<BlockPos> poss = new ArrayList<>();
-    private ServerPlayer player;
+
+    @Getter
+    @Setter
+    SpaceElevatorConnectorModule netMachineCache;
 
     protected void update(boolean promptly) {
-        if (promptly || getOffsetTimer() % 40 == 0) {
+        if (promptly || getOffsetTimer() % 80 == 0) {
             moduleCount = 0;
             if (spoolCount < getMaxSpoolCount()) {
-                forEachInputItems(stack -> {
+                forEachInputItems((stack, amount) -> {
                     if (stack.getItem() == GTOItems.NANOTUBE_SPOOL.get()) {
                         int count = Math.min(stack.getCount(), getMaxSpoolCount() - spoolCount);
                         if (count < 1) return true;
                         spoolCount += count;
-                        stack.shrink(count);
+                        inputItem(stack.getItem(), count);
                     }
                     return false;
                 });
@@ -103,8 +107,8 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
             for (BlockPos blockPoss : poss) {
                 MetaMachine metaMachine = getMachine(level, blockPoss);
                 if (metaMachine instanceof SpaceElevatorModuleMachine moduleMachine && moduleMachine.isFormed()) {
+                    if (moduleMachine.spaceElevatorMachine != this) moduleMachine.getRecipeLogic().updateTickSubscription();
                     moduleMachine.spaceElevatorMachine = this;
-                    if (promptly) moduleMachine.getRecipeLogic().updateTickSubscription();
                     moduleCount++;
                 }
             }
@@ -130,6 +134,21 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
         super.onStructureFormed();
         initialize();
         high = getBaseHigh();
+        if (!isRemote()) {
+            getNetMachine();
+        }
+    }
+
+    @Override
+    public void onStructureInvalid() {
+        super.onStructureInvalid();
+        removeNetMachineCache();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        removeNetMachineCache();
     }
 
     @Override
@@ -144,16 +163,9 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
         update(false);
         if (getRecipeLogic().getProgress() > 190) {
             getRecipeLogic().setProgress(1);
+            getNetMachine();
         }
         return true;
-    }
-
-    @Override
-    public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
-        if (player instanceof ServerPlayer serverPlayer) {
-            this.player = serverPlayer;
-        }
-        return super.shouldOpenUI(player, hand, hit);
     }
 
     @Override
@@ -162,6 +174,11 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
         update(false);
         if (spoolCount < getMaxSpoolCount()) textList.add(Component.translatable("item.gtocore.nanotube_spool").append(": ").append(Component.translatable("gui.ae2.Missing", getMaxSpoolCount() - spoolCount)));
         textList.add(Component.translatable("gtocore.machine.module", moduleCount));
+        if (netMachineCache != null) {
+            textList.add(Component.translatable(SpaceElevatorConnectorModule.SPACE_ELEVATOR_CONNECTED_CURRENT_PLANET_TEXT, Math.sqrt(netMachineCache.getDurationMultiplier())));
+        } else {
+            textList.add(Component.translatable(SpaceElevatorConnectorModule.SPACE_ELEVATOR_NOT_CONNECTED_CURRENT_PLANET_TEXT));
+        }
     }
 
     @Override
@@ -169,7 +186,7 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
         super.attachConfigurators(configuratorPanel);
         attachHighlightConfigurators(configuratorPanel);
         configuratorPanel.attachConfigurators(new IFancyConfiguratorButton.Toggle(GTOGuiTextures.PLANET_TELEPORT.getSubTexture(0, 0.5, 1, 0.5), GTOGuiTextures.PLANET_TELEPORT.getSubTexture(0, 0, 1, 0.5), getRecipeLogic()::isWorking, (clickData, pressed) -> {
-            if (!clickData.isRemote && getRecipeLogic().isWorking() && player != null) {
+            if (!clickData.isRemote && getRecipeLogic().isWorking() && configuratorPanel.getGui() != null && configuratorPanel.getGui().entityPlayer instanceof ServerPlayer player) {
                 PlanetManagement.unlock(player.getUUID(), GTODimensions.BARNARDA_C);
                 player.addTag("spaceelevatorst");
                 MenuHooks.openMenu(player, new PlanetsMenuProvider());
@@ -180,7 +197,8 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
     @Nullable
     private Recipe getRecipe() {
         if (getTier() > GTValues.ZPM) {
-            Recipe recipe = getRecipeBuilder().duration(400).CWUt(128 * (getTier() - GTValues.ZPM)).EUt(GTValues.VA[getTier()]).buildRawRecipe();
+            var exCWUt = netMachineCache == null ? 1.0 : 1.5;
+            Recipe recipe = getRecipeBuilder().duration(400).CWUt((int) (128 * (getTier() - GTValues.ZPM) * exCWUt)).EUt(GTValues.VA[getTier()]).buildRawRecipe();
             if (RecipeRunner.matchTickRecipe(this, recipe)) return recipe;
         } else {
             setIdleReason(IdleReason.VOLTAGE_TIER_NOT_SATISFIES);
@@ -199,11 +217,43 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
         return poss;
     }
 
-    public double getHigh() {
-        return this.high;
+    @Override
+    public Class<SpaceElevatorConnectorModule> getProviderClass() {
+        return SpaceElevatorConnectorModule.class;
     }
 
-    public int getSpoolCount() {
-        return this.spoolCount;
+    @Override
+    public boolean testMachine(SpaceElevatorConnectorModule machine) {
+        return isFormed() && machine.isFormed() && machine.isWorkspaceReady();
+    }
+
+    @Override
+    public boolean firstTestMachine(SpaceElevatorConnectorModule machine) {
+        Level level = machine.getLevel();
+        if (level != null && testMachine(machine)) {
+            machine.registerElevator(this, getCasingTier(POWER_MODULE_TIER));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void removeNetMachineCache() {
+        if (netMachineCache != null) {
+            netMachineCache.unregisterElevator(this);
+            netMachineCache = null;
+        }
+    }
+
+    @Override
+    public Level getTargetLevel() {
+        if (isRemote() || getLevel() == null) return null;
+        Planet planet = PlanetApi.API.getPlanet(getLevel());
+        if (planet == null) return null;
+        Optional<ResourceKey<Level>> orbitLevel = planet.orbit();
+        if (orbitLevel.isEmpty()) return null;
+        MinecraftServer server = getLevel().getServer();
+        if (server == null) return null;
+        return server.getLevel(orbitLevel.get());
     }
 }

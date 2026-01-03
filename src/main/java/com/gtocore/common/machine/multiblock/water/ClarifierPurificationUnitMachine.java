@@ -12,7 +12,6 @@ import com.gtolib.utils.NumberUtils;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
-import com.gregtechceu.gtceu.utils.collection.OpenCacheHashSet;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -22,10 +21,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 
+import com.fast.fastcollection.OpenCacheHashSet;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -39,12 +38,6 @@ public final class ClarifierPurificationUnitMachine extends WaterPurificationUni
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ClarifierPurificationUnitMachine.class);
     private static final Fluid AIR = GTMaterials.Air.getFluid();
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(ClarifierPurificationUnitMachine.class, WaterPurificationUnitMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     @Persisted
     private int count;
@@ -99,7 +92,7 @@ public final class ClarifierPurificationUnitMachine extends WaterPurificationUni
     long before() {
         eut = 0;
         if (count > 100) {
-            if (inputFluid(AIR, count * 10000L) && inputFluid(Fluids.WATER, (200L + GTValues.RNG.nextInt(100)) * 1000) && outputItem(GTOItems.SCRAP.asStack(count / 20))) {
+            if (inputFluid(AIR, count * 10000L) && inputFluid(Fluids.WATER, (200L + GTValues.RNG.nextInt(100)) * 1000) && outputItem(GTOItems.SCRAP.asItem(), count / 20)) {
                 count = 0;
             } else {
                 return 0;

@@ -1,13 +1,14 @@
 package com.gtocore.data.recipe.magic;
 
 import com.gtocore.common.data.GTOBlocks;
+import com.gtocore.common.data.GTOFluids;
 import com.gtocore.common.data.GTOItems;
 import com.gtocore.common.data.GTOMachines;
 import com.gtocore.common.data.GTOMaterials;
 import com.gtocore.common.data.machines.GCYMMachines;
 import com.gtocore.common.data.machines.ManaMachine;
 import com.gtocore.common.data.machines.ManaMultiBlock;
-import com.gtocore.data.record.Enchantment;
+import com.gtocore.data.record.EnchantmentRecord;
 import com.gtocore.data.tag.Tags;
 
 import com.gtolib.GTOCore;
@@ -25,11 +26,13 @@ import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.fluids.FluidStack;
 
-import com.enderio.base.common.init.EIOFluids;
+import appeng.core.definitions.AEItems;
 import com.hollingsworth.arsnouveau.setup.registry.BlockRegistry;
 import com.hollingsworth.arsnouveau.setup.registry.ItemsRegistry;
 import dev.shadowsoffire.apotheosis.adventure.Adventure;
@@ -55,14 +58,14 @@ public final class MagicRecipesA {
         Material[] ManaSteels = {
                 OriginalBronze, Manasteel, Terrasteel, Elementium, Alfsteel, Gaiasteel, Orichalcos
         };
-        ItemStack[] ManaCasing = {
-                GTOBlocks.ORIGINAL_BRONZE_CASING.asStack(), GTOBlocks.MANASTEEL_CASING.asStack(),
-                GTOBlocks.TERRASTEEL_CASING.asStack(), GTOBlocks.ELEMENTIUM_CASING.asStack(),
-                GTOBlocks.ALFSTEEL_CASING.asStack(), GTOBlocks.GAIASTEEL_CASING.asStack(),
-                GTOBlocks.ORICHALCOS_CASING.asStack(),
+        Item[] ManaCasing = {
+                GTOBlocks.ORIGINAL_BRONZE_CASING.asItem(), GTOBlocks.MANASTEEL_CASING.asItem(),
+                GTOBlocks.TERRASTEEL_CASING.asItem(), GTOBlocks.ELEMENTIUM_CASING.asItem(),
+                GTOBlocks.ALFSTEEL_CASING.asItem(), GTOBlocks.GAIASTEEL_CASING.asItem(),
+                GTOBlocks.ORICHALCOS_CASING.asItem(),
         };
         for (int i = 0; i < ManaSteels.length; i++) {
-            VanillaRecipeHelper.addShapedRecipe(id(GTOValues.MANAN[i].toLowerCase() + "_mana_hull"), ManaMachine.MANA_HULL[i].asStack(),
+            VanillaRecipeHelper.addShapedRecipe(id(GTOValues.MANAN[i].toLowerCase() + "_mana_hull"), ManaMachine.MANA_HULL[i].asItem(),
                     "CBC", "BAB", "CBC",
                     'A', ManaCasing[i], 'B', new MaterialEntry(plate, ManaSteels[i]), 'C', new MaterialEntry(rod, ManaSteels[i]));
         }
@@ -71,7 +74,7 @@ public final class MagicRecipesA {
         {
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("fractal_petal_solvent_slow")
                     .inputItems(COLORFUL_MYSTICAL_FLOWER)
-                    .inputFluids(Water.getFluid(1000))
+                    .inputFluids(Water, 1000)
                     .chancedOutput(FractalPetalSolvent.getFluid(1000), 10, 0)
                     .duration(240)
                     .temperature(500)
@@ -87,8 +90,8 @@ public final class MagicRecipesA {
                     .inputItems(dust, Shimmerwood, 4)
                     .inputItems(dust, Shimmerrock, 4)
                     .inputItems(dust, BifrostPerm, 4)
-                    .inputFluids(FractalPetalSolvent.getFluid(2000))
-                    .inputFluids(Ethanol.getFluid(1000))
+                    .inputFluids(FractalPetalSolvent, 2000)
+                    .inputFluids(Ethanol, 1000)
                     .chancedOutput(CycleofBlossomsSolvent.getFluid(1000), 10, 0)
                     .chancedOutput(FractalPetalSolvent.getFluid(250), 1, 0)
                     .duration(480)
@@ -100,7 +103,7 @@ public final class MagicRecipesA {
 
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("gaia_solvent_slow")
                     .inputItems(dustTiny, Gaia)
-                    .inputFluids(FractalPetalSolvent.getFluid(1000))
+                    .inputFluids(FractalPetalSolvent, 1000)
                     .chancedOutput(GaiaSolvent.getFluid(1000), 10, 0)
                     .duration(600)
                     .MANAt(8)
@@ -116,8 +119,8 @@ public final class MagicRecipesA {
                     .inputItems(ItemsRegistry.WILDEN_HORN)
                     .inputItems(ItemsRegistry.WILDEN_SPIKE)
                     .inputItems(ItemsRegistry.WILDEN_WING)
-                    .inputFluids(FractalPetalSolvent.getFluid(250))
-                    .inputFluids(Ethanol.getFluid(750))
+                    .inputFluids(FractalPetalSolvent, 250)
+                    .inputFluids(Ethanol, 750)
                     .chancedOutput(WildenEssence.getFluid(1000), 10, 0)
                     .duration(600)
                     .temperature(1200)
@@ -130,8 +133,8 @@ public final class MagicRecipesA {
                     .inputItems(dust, GTOMaterials.SourceGem, 8)
                     .inputItems(BlockRegistry.SOURCEBERRY_BUSH, 2)
                     .chancedInput(new ItemStack(ItemsRegistry.WILDEN_TRIBUTE), 10, 0)
-                    .inputFluids(FractalPetalSolvent.getFluid(250))
-                    .inputFluids(Ethanol.getFluid(750))
+                    .inputFluids(FractalPetalSolvent, 250)
+                    .inputFluids(Ethanol, 750)
                     .chancedOutput(WildenEssence.getFluid(1000), 10, 0)
                     .duration(600)
                     .temperature(1500)
@@ -148,7 +151,7 @@ public final class MagicRecipesA {
                 ALCHEMY_CAULDRON_RECIPES.recipeBuilder("alchemy_" + names[i] + "_gas")
                         .circuitMeta(i + 1)
                         .inputItems(dust, Crystals[i], 8)
-                        .inputFluids(FractalPetalSolvent.getFluid(1000))
+                        .inputFluids(FractalPetalSolvent, 1000)
                         .chancedOutput(Elements[i].getFluid(GAS, 4 * L), 10, 0)
                         .chancedOutput(FractalPetalSolvent.getFluid(800), 8000, 0)
                         .duration(80)
@@ -161,7 +164,7 @@ public final class MagicRecipesA {
                 ALCHEMY_CAULDRON_RECIPES.recipeBuilder("alchemy_" + names[i] + 4 + "_gas")
                         .circuitMeta(i + 6)
                         .inputItems(dust, Crystals[i], 8)
-                        .inputFluids(CycleofBlossomsSolvent.getFluid(1000))
+                        .inputFluids(CycleofBlossomsSolvent, 1000)
                         .chancedOutput(Elements[i].getFluid(GAS, 8 * L), 10, 0)
                         .chancedOutput(CycleofBlossomsSolvent.getFluid(900), 9500, 0)
                         .duration(650)
@@ -176,7 +179,7 @@ public final class MagicRecipesA {
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("alchemy_aether_1_gas")
                     .circuitMeta(5)
                     .inputItems(dust, PerditioCrystal, 8)
-                    .inputFluids(FractalPetalSolvent.getFluid(1000))
+                    .inputFluids(FractalPetalSolvent, 1000)
                     .chancedOutput(Aether.getFluid(GAS, 2 * L), 1, 0)
                     .chancedOutput(FractalPetalSolvent.getFluid(600), 6000, 0)
                     .duration(80)
@@ -189,7 +192,7 @@ public final class MagicRecipesA {
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("alchemy_aether_2_gas")
                     .circuitMeta(10)
                     .inputItems(dust, PerditioCrystal, 8)
-                    .inputFluids(CycleofBlossomsSolvent.getFluid(1000))
+                    .inputFluids(CycleofBlossomsSolvent, 1000)
                     .chancedOutput(Aether.getFluid(GAS, 4 * L), 1, 0)
                     .chancedOutput(CycleofBlossomsSolvent.getFluid(800), 8000, 0)
                     .duration(650)
@@ -201,13 +204,24 @@ public final class MagicRecipesA {
                     .save();
 
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("alchemy_ender_eye")
-                    .inputItems(RegistriesUtils.getItem("torchmaster:frozen_pearl"))
-                    .chancedInput(new ItemStack(RegistriesUtils.getItem("mythicbotany:muspelheim_rune")), 2000, 0)
-                    .inputFluids(Salamander.getFluid(GAS, 8000))
-                    .chancedOutput(new ItemStack(Items.ENDER_EYE), 3000, 0)
+                    .inputItems("torchmaster:frozen_pearl")
+                    .inputItems("mythicbotany:muspelheim_rune")
+                    .inputFluids(Salamander, GAS, 8000)
+                    .outputItems(Items.ENDER_EYE)
                     .duration(650)
                     .MANAt(1)
                     .temperature(800)
+                    .save();
+
+            ALCHEMY_CAULDRON_RECIPES.builder("blaze_rod")
+                    .notConsumable("ars_nouveau:fire_essence")
+                    .inputItems(rod, Wood, 2)
+                    .inputItems(dust, Blaze, 4)
+                    .outputItems(rod, Blaze, 2)
+                    .inputFluids(Salamander, GAS, 5)
+                    .blastFurnaceTemp(400)
+                    .duration(200)
+                    .MANAt(1)
                     .save();
 
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("alchemy_herbs_ingot")
@@ -217,7 +231,7 @@ public final class MagicRecipesA {
                     .inputItems(dust, UndineCrystal)
                     .inputItems(dust, SalamanderCrystal)
                     .chancedInput(new ItemStack(ItemsRegistry.MANIPULATION_ESSENCE), 500, 0)
-                    .inputFluids(CycleofBlossomsSolvent.getFluid(500))
+                    .inputFluids(CycleofBlossomsSolvent, 500)
                     .chancedOutput(CycleofBlossomsSolvent.getFluid(300), 5000, 0)
                     .outputItems(ingot, Herbs)
                     .duration(600)
@@ -229,12 +243,15 @@ public final class MagicRecipesA {
                     .inputItems(dust, EDTA)
                     .inputItems(Items.PHANTOM_MEMBRANE, 4)
                     .chancedInput(Animium.getFluid(1000), 500, 0)
-                    .inputFluids(CycleofBlossomsSolvent.getFluid(500))
+                    .inputFluids(CycleofBlossomsSolvent, 500)
                     .chancedOutput(PhantomicElectrolyteBuffer.getFluid(300), 5000, 0)
                     .chancedOutput(Ethylenediamine.getFluid(50), 500, 0)
                     .duration(600)
                     .temperature(1200)
                     .MANAt(32)
+                    .addData("param1", 100)
+                    .addData("param2", 100)
+                    .addData("param3", 114)
                     .save();
 
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("alchemy_unstable_gaia_soul")
@@ -243,7 +260,7 @@ public final class MagicRecipesA {
                     .inputItems(ItemsRegistry.MANIPULATION_ESSENCE)
                     .inputItems(BotaniaItems.manaPowder, 4)
                     .inputItems(BotaniaItems.pixieDust, 4)
-                    .inputFluids(GaiaSolvent.getFluid(8000))
+                    .inputFluids(GaiaSolvent, 8000)
                     .outputItems(UNSTABLE_GAIA_SOUL)
                     .duration(240)
                     .temperature(1600)
@@ -254,7 +271,7 @@ public final class MagicRecipesA {
                     .notConsumable(ItemsRegistry.WILDEN_HORN)
                     .chancedInput(new ItemStack(GTOItems.WILDEN_SLATE), 5, 0)
                     .inputItems(dust, Meat, 16)
-                    .inputFluids(WildenEssence.getFluid(1000))
+                    .inputFluids(WildenEssence, 1000)
                     .outputItems(ItemsRegistry.WILDEN_HORN, 16)
                     .MANAt(4)
                     .duration(650)
@@ -266,7 +283,7 @@ public final class MagicRecipesA {
                     .notConsumable(ItemsRegistry.WILDEN_SPIKE)
                     .chancedInput(new ItemStack(GTOItems.WILDEN_SLATE), 5, 0)
                     .inputItems(dust, Meat, 16)
-                    .inputFluids(WildenEssence.getFluid(1000))
+                    .inputFluids(WildenEssence, 1000)
                     .outputItems(ItemsRegistry.WILDEN_SPIKE, 16)
                     .MANAt(4)
                     .duration(600)
@@ -278,7 +295,7 @@ public final class MagicRecipesA {
                     .notConsumable(ItemsRegistry.WILDEN_WING)
                     .chancedInput(new ItemStack(GTOItems.WILDEN_SLATE), 5, 0)
                     .inputItems(dust, Meat, 16)
-                    .inputFluids(WildenEssence.getFluid(1000))
+                    .inputFluids(WildenEssence, 1000)
                     .outputItems(ItemsRegistry.WILDEN_WING, 16)
                     .MANAt(4)
                     .duration(600)
@@ -290,7 +307,7 @@ public final class MagicRecipesA {
                     .inputItems(GTOItems.WILDEN_SLATE)
                     .inputItems(ItemsRegistry.MANIPULATION_ESSENCE)
                     .inputItems("apotheosis:epic_material")
-                    .inputFluids(WildenEssence.getFluid(4000))
+                    .inputFluids(WildenEssence, 4000)
                     .outputItems(ItemsRegistry.WILDEN_TRIBUTE)
                     .duration(240)
                     .MANAt(8)
@@ -299,8 +316,8 @@ public final class MagicRecipesA {
 
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("spirit_fragment")
                     .inputItems(ExtraBotanyItems.spiritFragment)
-                    .inputFluids(new FluidStack(EIOFluids.XP_JUICE.get().getSource(), 100))
-                    .inputFluids(TheWaterFromTheWellOfWisdom.getFluid(50))
+                    .inputFluids(new FluidStack(GTOFluids.XP_JUICE.get().getSource(), 100))
+                    .inputFluids(TheWaterFromTheWellOfWisdom, 50)
                     .outputFluids(Animium.getFluid(100))
                     .duration(20)
                     .MANAt(16)
@@ -310,8 +327,8 @@ public final class MagicRecipesA {
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("flowing_ciphers_1")
                     .notConsumable("mythicbotany:fimbultyr_tablet")
                     .inputItems(block, Runerock)
-                    .inputFluids(TheWaterFromTheWellOfWisdom.getFluid(1000))
-                    .inputFluids(Animium.getFluid(100))
+                    .inputFluids(TheWaterFromTheWellOfWisdom, 1000)
+                    .inputFluids(Animium, 100)
                     .outputFluids(FlowingCiphers.getFluid(500))
                     .duration(400)
                     .MANAt(16)
@@ -321,8 +338,8 @@ public final class MagicRecipesA {
             ALCHEMY_CAULDRON_RECIPES.recipeBuilder("flowing_ciphers_2")
                     .notConsumable("mythicbotany:fimbultyr_tablet")
                     .inputItems(ingot, Runerock)
-                    .inputFluids(TheWaterFromTheWellOfWisdom.getFluid(100))
-                    .inputFluids(Animium.getFluid(10))
+                    .inputFluids(TheWaterFromTheWellOfWisdom, 100)
+                    .inputFluids(Animium, 10)
                     .outputFluids(FlowingCiphers.getFluid(50))
                     .duration(40)
                     .MANAt(16)
@@ -362,7 +379,7 @@ public final class MagicRecipesA {
                     .inputItems(Tags.ENCHANTMENT_ESSENCE)
                     .inputItems(ItemsRegistry.EARTH_ESSENCE)
                     .inputItems(ItemsRegistry.AIR_ESSENCE)
-                    .inputFluids(TheWaterFromTheWellOfWisdom.getFluid(2000))
+                    .inputFluids(TheWaterFromTheWellOfWisdom, 2000)
                     .inputFluids(Gnome.getFluid(LIQUID, 100))
                     .inputFluids(Sylph.getFluid(LIQUID, 100))
                     .chancedOutput(HerosBrawlers.getFluid(2000), 10, 0)
@@ -380,7 +397,7 @@ public final class MagicRecipesA {
                     .inputItems(Tags.AFFIX_ESSENCE)
                     .inputItems(ItemsRegistry.WATER_ESSENCE)
                     .inputItems(ItemsRegistry.FIRE_ESSENCE)
-                    .inputFluids(TheWaterFromTheWellOfWisdom.getFluid(2000))
+                    .inputFluids(TheWaterFromTheWellOfWisdom, 2000)
                     .inputFluids(Undine.getFluid(LIQUID, 100))
                     .inputFluids(Salamander.getFluid(LIQUID, 100))
                     .chancedOutput(HerosBreach.getFluid(2000), 10, 0)
@@ -398,7 +415,7 @@ public final class MagicRecipesA {
                     .inputItems(ItemsRegistry.MANIPULATION_ESSENCE)
                     .inputItems(ItemsRegistry.ABJURATION_ESSENCE)
                     .inputItems(ItemsRegistry.CONJURATION_ESSENCE)
-                    .inputFluids(TheWaterFromTheWellOfWisdom.getFluid(2000))
+                    .inputFluids(TheWaterFromTheWellOfWisdom, 2000)
                     .inputFluids(FlowingCiphers.getFluid(LIQUID, 500))
                     .inputFluids(Aether.getFluid(LIQUID, 100))
                     .chancedOutput(HerosSplendor.getFluid(2000), 10, 0)
@@ -415,9 +432,9 @@ public final class MagicRecipesA {
                     .inputItems(GTOItems.HEROS_SOUL, 4)
                     .inputItems(GTOItems.GOLD_MEDAL)
                     .inputItems(Adventure.Items.MYTHIC_MATERIAL.get(), 4)
-                    .inputFluids(HerosBrawlers.getFluid(1000))
-                    .inputFluids(HerosBreach.getFluid(1000))
-                    .inputFluids(HerosSplendor.getFluid(1000))
+                    .inputFluids(HerosBrawlers, 1000)
+                    .inputFluids(HerosBreach, 1000)
+                    .inputFluids(HerosSplendor, 1000)
                     .outputItems(ExtraBotanyItems.heroMedal)
                     .duration(200)
                     .MANAt(32)
@@ -426,44 +443,20 @@ public final class MagicRecipesA {
 
         }
 
-        // 苍穹凝聚器
-        {
-            CELESTIAL_CONDENSER_RECIPES.recipeBuilder("astral_silver")
-                    .inputItems(ingot, Silver)
-                    .outputItems(ingot, AstralSilver)
-                    .addData("lunara", 1000)
-                    .duration(10)
-                    .save();
-
-            CELESTIAL_CONDENSER_RECIPES.recipeBuilder("helio_coal")
-                    .inputItems(Items.COAL)
-                    .outputItems(HELIO_COAL)
-                    .addData("solaris", 1000)
-                    .duration(10)
-                    .save();
-
-            CELESTIAL_CONDENSER_RECIPES.recipeBuilder("ender_diamond")
-                    .inputItems(Items.DIAMOND)
-                    .outputItems(ENDER_DIAMOND)
-                    .addData("voidflux", 1000)
-                    .duration(10)
-                    .save();
-        }
-
         // 产线的各种配方
         {
 
-            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("ribbon"), RIBBON.asStack(),
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("ribbon"), RIBBON.asItem(),
                     "ABA", "BAB", "ABA",
                     'A', new ItemStack(BotaniaItems.manaString), 'B', new ItemStack(BotaniaItems.spellCloth));
 
             FORMING_PRESS_RECIPES.builder("gold_medal")
-                    .notConsumable(GTItems.SHAPE_MOLD_BALL.asStack())
-                    .inputItems(GTOItems.RIBBON.asItem())
+                    .notConsumable(GTItems.SHAPE_MOLD_BALL.asItem())
+                    .inputItems(GTOItems.RIBBON)
                     .inputItems("extrabotany:das_rheingold", 4)
                     .inputItems(ingot, Laureril, 4)
                     .inputItems(ingot, Quicksilver, 4)
-                    .outputItems(GTOItems.GOLD_MEDAL.asItem())
+                    .outputItems(GTOItems.GOLD_MEDAL)
                     .EUt(VA[LV])
                     .duration(20)
                     .save();
@@ -477,7 +470,7 @@ public final class MagicRecipesA {
                     .inputItems(TagPrefix.screw, InfusedGold, 8)
                     .inputItems(TagPrefix.plate, InfusedGold, 2)
                     .circuitMeta(6)
-                    .outputItems(GTOBlocks.INFUSED_GOLD_REINFORCED_WOODEN_CASING.asStack())
+                    .outputItems(GTOBlocks.INFUSED_GOLD_REINFORCED_WOODEN_CASING.asItem())
                     .EUt(16)
                     .duration(50)
                     .save();
@@ -485,7 +478,7 @@ public final class MagicRecipesA {
             ASSEMBLER_RECIPES.builder("infused_gold_casing")
                     .inputItems(TagPrefix.plate, GTOMaterials.InfusedGold, 6)
                     .inputItems(TagPrefix.frameGt, GTOMaterials.InfusedGold)
-                    .outputItems(GTOBlocks.INFUSED_GOLD_CASING.asStack())
+                    .outputItems(GTOBlocks.INFUSED_GOLD_CASING.asItem())
                     .circuitMeta(6)
                     .duration(50)
                     .EUt(16)
@@ -497,7 +490,7 @@ public final class MagicRecipesA {
                     .inputItems(TagPrefix.screw, InfusedGold, 8)
                     .inputItems(TagPrefix.plate, InfusedGold, 2)
                     .circuitMeta(6)
-                    .outputItems(GTOBlocks.SOURCE_STONE_CASING.asStack())
+                    .outputItems(GTOBlocks.SOURCE_STONE_CASING.asItem())
                     .EUt(16)
                     .duration(50)
                     .save();
@@ -508,7 +501,7 @@ public final class MagicRecipesA {
                     .inputItems(RegistriesUtils.getItemStack("ars_nouveau:magebloom_block"), 2)
                     .inputItems(ItemsRegistry.MAGE_FIBER, 4)
                     .circuitMeta(6)
-                    .outputItems(GTOBlocks.SOURCE_FIBER_MECHANICAL_CASING.asStack())
+                    .outputItems(GTOBlocks.SOURCE_FIBER_MECHANICAL_CASING.asItem())
                     .EUt(16)
                     .duration(50)
                     .save();
@@ -519,16 +512,16 @@ public final class MagicRecipesA {
                     .inputItems(RegistriesUtils.getItemStack("ars_nouveau:archwood_planks"), 2)
                     .inputItems(TagPrefix.screw, InfusedGold, 8)
                     .circuitMeta(6)
-                    .outputItems(GTOBlocks.SPELL_PRISM_CASING.asStack())
+                    .outputItems(GTOBlocks.SPELL_PRISM_CASING.asItem())
                     .EUt(16)
                     .duration(50)
                     .save();
 
-            VanillaRecipeHelper.addShapedRecipe(id("original_bronze_casing"), GTOBlocks.ORIGINAL_BRONZE_CASING.asStack(),
+            VanillaRecipeHelper.addShapedRecipe(id("original_bronze_casing"), GTOBlocks.ORIGINAL_BRONZE_CASING.asItem(),
                     "CCC", "CBC", "CCC",
                     'B', new MaterialEntry(frameGt, OriginalBronze), 'C', new MaterialEntry(plate, OriginalBronze));
 
-            VanillaRecipeHelper.addShapedRecipe(id("manasteel_casing"), GTOBlocks.MANASTEEL_CASING.asStack(),
+            VanillaRecipeHelper.addShapedRecipe(id("manasteel_casing"), GTOBlocks.MANASTEEL_CASING.asItem(),
                     "CCC", "CBC", "CCC",
                     'B', new MaterialEntry(frameGt, Manasteel), 'C', new MaterialEntry(plate, Manasteel));
 
@@ -536,7 +529,7 @@ public final class MagicRecipesA {
                     .inputItems(TagPrefix.frameGt, GTOMaterials.Terrasteel)
                     .inputItems(gem, GTOMaterials.ManaDiamond, 4)
                     .inputItems(TagPrefix.plate, GTOMaterials.Terrasteel, 2)
-                    .outputItems(GTOBlocks.TERRASTEEL_CASING.asStack())
+                    .outputItems(GTOBlocks.TERRASTEEL_CASING.asItem())
                     .inputFluids(GTOMaterials.Mana, 288)
                     .circuitMeta(6)
                     .duration(200)
@@ -547,7 +540,7 @@ public final class MagicRecipesA {
                     .inputItems(TagPrefix.frameGt, GTOMaterials.Elementium)
                     .inputItems(TagPrefix.plate, GTOMaterials.Dreamwood, 4)
                     .inputItems(TagPrefix.plate, GTOMaterials.Elementium, 2)
-                    .outputItems(GTOBlocks.ELEMENTIUM_CASING.asStack())
+                    .outputItems(GTOBlocks.ELEMENTIUM_CASING.asItem())
                     .inputFluids(GTOMaterials.Manasteel, 288)
                     .circuitMeta(6)
                     .duration(200)
@@ -559,7 +552,7 @@ public final class MagicRecipesA {
                     .inputItems("extrabotany:gaia_quartz_block")
                     .inputItems("extrabotany:elementium_quartz_block")
                     .inputItems(TagPrefix.plate, GTOMaterials.Alfsteel, 2)
-                    .outputItems(GTOBlocks.ALFSTEEL_CASING.asStack())
+                    .outputItems(GTOBlocks.ALFSTEEL_CASING.asItem())
                     .inputFluids(GTOMaterials.Terrasteel, 288)
                     .circuitMeta(6)
                     .duration(200)
@@ -570,7 +563,7 @@ public final class MagicRecipesA {
                     .inputItems(TagPrefix.frameGt, GTOMaterials.Gaiasteel)
                     .inputItems("botania:elf_quartz")
                     .inputItems(TagPrefix.plate, GTOMaterials.Gaiasteel, 2)
-                    .outputItems(GTOBlocks.GAIASTEEL_CASING.asStack())
+                    .outputItems(GTOBlocks.GAIASTEEL_CASING.asItem())
                     .inputFluids(GTOMaterials.Elementium, 288)
                     .circuitMeta(6)
                     .duration(200)
@@ -581,7 +574,7 @@ public final class MagicRecipesA {
                     .inputItems(TagPrefix.frameGt, GTOMaterials.Orichalcos)
                     .inputItems("extrabotany:dimension_catalyst")
                     .inputItems(TagPrefix.plate, GTOMaterials.Orichalcos, 2)
-                    .outputItems(GTOBlocks.ORICHALCOS_CASING.asStack())
+                    .outputItems(GTOBlocks.ORICHALCOS_CASING.asItem())
                     .inputFluids(GTOMaterials.Alfsteel, 288)
                     .circuitMeta(6)
                     .duration(200)
@@ -589,18 +582,33 @@ public final class MagicRecipesA {
                     .save();
 
             ASSEMBLER_RECIPES.builder("heretical_mechanical_casing")
-                    .inputItems(Enchantment.getEnchantedBookBySerialNumber(2, 1))
-                    .inputItems(Enchantment.getEnchantedBookBySerialNumber(9, 1))
-                    .inputItems(Enchantment.getEnchantedBookBySerialNumber(14, 1))
-                    .inputItems(Enchantment.getEnchantedBookBySerialNumber(34, 1))
+                    .inputItems(EnchantmentRecord.getEnchantedBookByEnchantmentId("apotheosis:berserkers_fury", 1))
+                    .inputItems(EnchantmentRecord.getEnchantedBookByEnchantmentId("apotheosis:exploitation", 1))
+                    .inputItems(EnchantmentRecord.getEnchantedBookByEnchantmentId("apotheosis:life_mending", 1))
+                    .inputItems(EnchantmentRecord.getEnchantedBookByEnchantmentId("apotheosis:tempting", 1))
                     .inputItems(GTOBlocks.ORIGINAL_BRONZE_CASING, 4)
-                    .inputItems(Enchantment.getEnchantedBookBySerialNumber(35, 1))
-                    .inputItems(Enchantment.getEnchantedBookBySerialNumber(37, 1))
-                    .inputItems(Enchantment.getEnchantedBookBySerialNumber(40, 1))
-                    .inputItems(Enchantment.getEnchantedBookBySerialNumber(76, 1))
+                    .inputItems(EnchantmentRecord.getEnchantedBookByEnchantmentId("farmersdelight:backstabbing", 1))
+                    .inputItems(EnchantmentRecord.getEnchantedBookByEnchantmentId("minecraft:binding_curse", 1))
+                    .inputItems(EnchantmentRecord.getEnchantedBookByEnchantmentId("minecraft:thorns", 1))
+                    .inputItems(EnchantmentRecord.getEnchantedBookByEnchantmentId("minecraft:vanishing_curse", 1))
                     .outputItems(GTOBlocks.HERETICAL_MECHANICAL_CASING, 4)
-                    .inputFluids(Aether.getFluid(GAS, 1000))
-                    .circuitMeta(6)
+                    .inputFluids(Aether.getFluid(LIQUID, 1000))
+                    .duration(200)
+                    .MANAt(32)
+                    .save();
+
+            ASSEMBLER_RECIPES.builder("heretical_mechanical_casing_2")
+                    .inputItems(ENCHANTMENT_ESSENCE.get("apotheosis:berserkers_fury"))
+                    .inputItems(ENCHANTMENT_ESSENCE.get("apotheosis:exploitation"))
+                    .inputItems(ENCHANTMENT_ESSENCE.get("apotheosis:life_mending"))
+                    .inputItems(ENCHANTMENT_ESSENCE.get("apotheosis:tempting"))
+                    .inputItems(GTOBlocks.ORIGINAL_BRONZE_CASING, 4)
+                    .inputItems(ENCHANTMENT_ESSENCE.get("farmersdelight:backstabbing"))
+                    .inputItems(ENCHANTMENT_ESSENCE.get("minecraft:binding_curse"))
+                    .inputItems(ENCHANTMENT_ESSENCE.get("minecraft:thorns"))
+                    .inputItems(ENCHANTMENT_ESSENCE.get("minecraft:vanishing_curse"))
+                    .outputItems(GTOBlocks.HERETICAL_MECHANICAL_CASING, 4)
+                    .inputFluids(Aether.getFluid(LIQUID, 1000))
                     .duration(200)
                     .MANAt(32)
                     .save();
@@ -611,19 +619,19 @@ public final class MagicRecipesA {
             ASSEMBLER_RECIPES.builder("mana_infuser")
                     .inputItems(TagPrefix.frameGt, GTOMaterials.Manasteel)
                     .inputItems(CustomTags.MV_CIRCUITS)
-                    .inputItems(GTItems.ELECTRIC_PUMP_MV.asStack(2))
+                    .inputItems(GTItems.ELECTRIC_PUMP_MV, 2)
                     .inputItems(TagPrefix.gem, GTOMaterials.ManaDiamond, 8)
                     .inputItems("botania:mana_pearl", 8)
                     .inputItems(TagPrefix.plate, GTOMaterials.Livingwood, 4)
-                    .outputItems(ManaMultiBlock.MANA_INFUSER.asStack())
+                    .outputItems(ManaMultiBlock.MANA_INFUSER.asItem())
                     .inputFluids(GTOMaterials.Mana, 288)
                     .duration(200)
                     .MANAt(32)
                     .save();
 
             ASSEMBLER_RECIPES.builder("mana_condenser")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asStack())
-                    .inputItems(GTItems.FIELD_GENERATOR_HV.asStack(2))
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.IV].asItem())
+                    .inputItems(GTItems.FIELD_GENERATOR_HV, 2)
                     .inputItems(CustomTags.HV_CIRCUITS)
                     .inputItems(TagPrefix.gemExquisite, GTOMaterials.ManaDiamond, 4)
                     .inputItems(TagPrefix.gear, GTOMaterials.Terrasteel, 4)
@@ -631,15 +639,15 @@ public final class MagicRecipesA {
                     .inputItems("mythicbotany:midgard_rune")
                     .inputItems("botania:rune_mana")
                     .inputItems("botania:rune_lust")
-                    .outputItems(ManaMultiBlock.MANA_CONDENSER.asStack())
+                    .outputItems(ManaMultiBlock.MANA_CONDENSER.asItem())
                     .inputFluids(Gaiasteel, 288)
                     .duration(200)
                     .MANAt(128)
                     .save();
 
             ASSEMBLER_RECIPES.builder("elf_exchange")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asStack())
-                    .inputItems(GTItems.FIELD_GENERATOR_MV.asStack(2))
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asItem())
+                    .inputItems(GTItems.FIELD_GENERATOR_MV, 2)
                     .inputItems(CustomTags.MV_CIRCUITS)
                     .inputItems(TagPrefix.gemExquisite, GTOMaterials.Dragonstone, 4)
                     .inputItems(TagPrefix.gear, GTOMaterials.Alfsteel, 4)
@@ -647,15 +655,15 @@ public final class MagicRecipesA {
                     .inputItems(BotaniaBlocks.alfPortal, 4)
                     .inputItems("mythicbotany:alfheim_rune")
                     .inputItems("mythicbotany:asgard_rune")
-                    .outputItems(ManaMultiBlock.ELF_EXCHANGE.asStack())
+                    .outputItems(ManaMultiBlock.ELF_EXCHANGE.asItem())
                     .inputFluids(GTOMaterials.Alfsteel, 288)
                     .duration(200)
                     .MANAt(128)
                     .save();
 
             ASSEMBLER_RECIPES.builder("industrial_altar")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asStack())
-                    .inputItems(GTItems.FIELD_GENERATOR_MV.asStack(2))
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asItem())
+                    .inputItems(GTItems.FIELD_GENERATOR_MV, 2)
                     .inputItems(CustomTags.MV_CIRCUITS)
                     .inputItems(block, GTOMaterials.Runerock, 4)
                     .inputItems(TagPrefix.gear, GTOMaterials.Elementium, 4)
@@ -663,7 +671,7 @@ public final class MagicRecipesA {
                     .inputItems("botania:runic_altar")
                     .inputItems("botania:apothecary_livingrock")
                     .inputItems("botania:brewery")
-                    .outputItems(ManaMultiBlock.INDUSTRIAL_ALTAR.asStack())
+                    .outputItems(ManaMultiBlock.INDUSTRIAL_ALTAR.asItem())
                     .inputFluids(GTOMaterials.Elementium, 288)
                     .duration(200)
                     .MANAt(128)
@@ -679,61 +687,61 @@ public final class MagicRecipesA {
                     .inputItems("botania:pump", 8)
                     .inputItems("botania:conjuration_catalyst", 4)
                     .inputItems(TagPrefix.plateDouble, GTOMaterials.Terrasteel, 8)
-                    .outputItems(ManaMultiBlock.MANA_GARDEN.asStack())
+                    .outputItems(ManaMultiBlock.MANA_GARDEN.asItem())
                     .duration(1600)
                     .MANAt(256)
                     .save();
 
             ASSEMBLER_RECIPES.builder("mana_greenhouse")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asStack())
-                    .inputItems(GTItems.FIELD_GENERATOR_IV.asStack(8))
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asItem())
+                    .inputItems(GTItems.FIELD_GENERATOR_IV, 8)
                     .inputItems(CustomTags.IV_CIRCUITS, 4)
                     .inputItems("botania:agricarnation", 32)
                     .inputItems("botania:hopperhock", 16)
                     .inputItems("botania:rune_spring", 4)
-                    .inputItems(TagPrefix.gear, GTOMaterials.Gaia, 8)
-                    .inputItems(TagPrefix.gemExquisite, GTOMaterials.Dragonstone, 16)
+                    .inputItems(TagPrefix.gear, GTOMaterials.Elementium, 8)
+                    .inputItems(TagPrefix.gemExquisite, GTOMaterials.Aerialite, 16)
                     .inputItems("botania:fertilizer", 64)
-                    .outputItems(ManaMultiBlock.MANA_GREENHOUSE.asStack())
+                    .outputItems(ManaMultiBlock.MANA_GREENHOUSE.asItem())
                     .inputFluids(GTOMaterials.Mana, 4608)
                     .duration(1200)
                     .MANAt(128)
                     .save();
 
             ASSEMBLER_RECIPES.builder("mana_alloy_blast_smelter")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asStack())
-                    .inputItems(GTItems.FIELD_GENERATOR_IV.asStack(16))
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asItem())
+                    .inputItems(GTItems.FIELD_GENERATOR_IV, 16)
                     .inputItems(CustomTags.IV_CIRCUITS, 16)
-                    .inputItems(GCYMMachines.BLAST_ALLOY_SMELTER.asStack(4))
+                    .inputItems(GCYMMachines.BLAST_ALLOY_SMELTER.asItem(), 4)
                     .inputItems("botania:exoflame", 32)
                     .inputItems("mythicbotany:exoblaze", 32)
                     .inputItems("botania:rune_pride", 8)
                     .inputItems("mythicbotany:nidavellir_rune", 8)
                     .inputItems(TagPrefix.gear, GTOMaterials.Orichalcos, 8)
                     .inputFluids(GTOMaterials.Aerialite, L * 16)
-                    .outputItems(ManaMultiBlock.MANA_ALLOY_BLAST_SMELTER.asStack())
+                    .outputItems(ManaMultiBlock.MANA_ALLOY_BLAST_SMELTER.asItem())
                     .duration(1200)
                     .MANAt(512)
                     .save();
 
             ASSEMBLER_RECIPES.builder("rune_engraving_chamber")
                     .inputItems("extrabotany:hero_medal", 4)
-                    .inputItems(GTOBlocks.SPELL_PRISM_CASING.asStack(32))
-                    .inputItems(GTOBlocks.ORICHALCOS_CASING.asStack(16))
+                    .inputItems(GTOBlocks.SPELL_PRISM_CASING.asItem(), 32)
+                    .inputItems(GTOBlocks.ORICHALCOS_CASING.asItem(), 16)
                     .inputItems("botania:mana_bomb", 8)
-                    .inputItems(GTItems.FIELD_GENERATOR_LuV.asStack(8))
-                    .inputItems(GTItems.EMITTER_LuV.asStack(8))
+                    .inputItems(GTItems.FIELD_GENERATOR_LuV, 8)
+                    .inputItems(GTItems.EMITTER_LuV, 8)
                     .inputItems(TagPrefix.lens, GTOMaterials.BifrostPerm, 32)
                     .inputItems("ars_nouveau:manipulation_essence", 32)
                     .inputItems("ars_nouveau:wilden_tribute", 32)
-                    .outputItems(ManaMultiBlock.RUNE_ENGRAVING_CHAMBER.asStack())
+                    .outputItems(ManaMultiBlock.RUNE_ENGRAVING_CHAMBER.asItem())
                     .inputFluids(GTOMaterials.TheWaterFromTheWellOfWisdom, 16000)
                     .duration(200)
                     .MANAt(4096)
                     .save();
 
             ASSEMBLER_RECIPES.builder("large_perfusion_device")
-                    .inputItems(GTOBlocks.SOURCE_FIBER_MECHANICAL_CASING.asStack())
+                    .inputItems(GTOBlocks.SOURCE_FIBER_MECHANICAL_CASING.asItem())
                     .inputItems(TagPrefix.block, GTOMaterials.SourceGem, 16)
                     .inputItems("ars_nouveau:summon_focus")
                     .inputItems("ars_nouveau:imbuement_chamber", 8)
@@ -742,7 +750,7 @@ public final class MagicRecipesA {
                     .inputItems(GTItems.FIELD_GENERATOR_HV, 4)
                     .inputItems(CustomTags.IV_CIRCUITS, 4)
                     .inputItems("ars_nouveau:shapers_focus")
-                    .outputItems(ManaMultiBlock.LARGE_PERFUSION_DEVICE.asStack())
+                    .outputItems(ManaMultiBlock.LARGE_PERFUSION_DEVICE.asItem())
                     .duration(800)
                     .MANAt(64)
                     .save();
@@ -753,35 +761,35 @@ public final class MagicRecipesA {
                     .inputItems("botania:mana_gun", 4)
                     .inputItems(TagPrefix.bolt, GTOMaterials.Manasteel, 8)
                     .inputItems(TagPrefix.plate, GTOMaterials.Livingrock, 16)
-                    .outputItems(ManaMultiBlock.BASE_MANA_DISTRIBUTOR.asStack())
+                    .outputItems(ManaMultiBlock.BASE_MANA_DISTRIBUTOR.asItem())
                     .duration(200)
                     .MANAt(8)
                     .save();
 
             ASSEMBLER_RECIPES.builder("advanced_mana_distributor")
-                    .inputItems(ManaMultiBlock.BASE_MANA_DISTRIBUTOR.asStack())
-                    .inputItems(GTItems.FIELD_GENERATOR_MV.asStack(4))
+                    .inputItems(ManaMultiBlock.BASE_MANA_DISTRIBUTOR.asItem())
+                    .inputItems(GTItems.FIELD_GENERATOR_MV, 4)
                     .inputItems(TagPrefix.plate, GTOMaterials.Terrasteel, 8)
                     .inputItems(TagPrefix.screw, GTOMaterials.Manasteel, 32)
                     .inputItems("botania:rune_mana", 32)
                     .inputItems("botania:mana_tablet", 2)
                     .inputItems(BotaniaBlocks.manaBomb.asItem())
-                    .outputItems(ManaMultiBlock.ADVANCED_MANA_DISTRIBUTOR.asStack())
+                    .outputItems(ManaMultiBlock.ADVANCED_MANA_DISTRIBUTOR.asItem())
                     .duration(800)
                     .MANAt(128)
                     .save();
 
             ASSEMBLER_RECIPES.builder("the_primordial_reconstructor")
-                    .inputItems(new ItemStack(Items.GRINDSTONE.asItem(), 16))
+                    .inputItems(Items.GRINDSTONE.asItem(), 16)
                     .inputItems("apotheosis:gem_cutting_table", 16)
-                    .inputItems(new ItemStack(Items.ANVIL.asItem(), 16))
+                    .inputItems(Items.ANVIL.asItem(), 16)
                     .inputItems("apotheosis:reforging_table", 16)
-                    .inputItems(GTOBlocks.HERETICAL_MECHANICAL_CASING.asStack(16))
+                    .inputItems(GTOBlocks.HERETICAL_MECHANICAL_CASING.asItem(), 16)
                     .inputItems("apotheosis:augmenting_table", 16)
                     .inputItems("apotheosis:salvaging_table", 16)
                     .inputItems("apotheosis:ender_library", 16)
-                    .inputItems(new ItemStack(Items.SMITHING_TABLE.asItem(), 16))
-                    .outputItems(ManaMultiBlock.THE_PRIMORDIAL_RECONSTRUCTOR.asStack())
+                    .inputItems(Items.SMITHING_TABLE.asItem(), 16)
+                    .outputItems(ManaMultiBlock.THE_PRIMORDIAL_RECONSTRUCTOR.asItem())
                     .inputFluids(GTOMaterials.TheWaterFromTheWellOfWisdom, 8000)
                     .duration(200)
                     .MANAt(1024)
@@ -791,412 +799,443 @@ public final class MagicRecipesA {
         // 魔力仓室
         {
             ASSEMBLER_RECIPES.builder("lv_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.LV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.LV].asItem())
                     .inputItems(BotaniaBlocks.pump, 2)
                     .inputItems("botania:mana_pylon")
                     .inputItems(TagPrefix.screw, GTOMaterials.Manasteel, 4)
                     .circuitMeta(1)
-                    .outputItems(ManaMachine.MANA_INPUT_HATCH[LV].asStack())
+                    .outputItems(ManaMachine.MANA_INPUT_HATCH[LV].asItem())
                     .duration(200)
                     .MANAt(4)
                     .save();
 
             ASSEMBLER_RECIPES.builder("mv_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.MV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.MV].asItem())
                     .inputItems(BotaniaBlocks.pump, 2)
                     .inputItems(TagPrefix.lens, GTOMaterials.ManaGlass)
                     .inputItems(TagPrefix.screw, GTOMaterials.Terrasteel, 4)
                     .circuitMeta(1)
-                    .outputItems(ManaMachine.MANA_INPUT_HATCH[MV].asStack())
+                    .outputItems(ManaMachine.MANA_INPUT_HATCH[MV].asItem())
                     .duration(200)
                     .MANAt(16)
                     .save();
 
             ASSEMBLER_RECIPES.builder("hv_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asItem())
                     .inputItems(BotaniaBlocks.pump, 2)
                     .inputItems("botania:natura_pylon")
                     .inputItems(TagPrefix.lens, GTOMaterials.ElfGlass)
                     .inputItems(TagPrefix.screw, GTOMaterials.Elementium, 4)
                     .circuitMeta(1)
-                    .outputItems(ManaMachine.MANA_INPUT_HATCH[HV].asStack())
+                    .outputItems(ManaMachine.MANA_INPUT_HATCH[HV].asItem())
                     .inputFluids(GTOMaterials.BifrostPerm, 1000)
                     .duration(200)
                     .MANAt(64)
                     .save();
 
             ASSEMBLER_RECIPES.builder("ev_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asItem())
                     .inputItems("botania:prism", 2)
                     .inputItems("mythicbotany:alfheim_rune")
                     .inputItems("endrem:magical_eye")
                     .inputItems(TagPrefix.screw, GTOMaterials.Aerialite, 4)
                     .circuitMeta(1)
-                    .outputItems(ManaMachine.MANA_INPUT_HATCH[EV].asStack())
+                    .outputItems(ManaMachine.MANA_INPUT_HATCH[EV].asItem())
                     .inputFluids(GTOMaterials.BifrostPerm, 2000)
                     .duration(200)
                     .MANAt(256)
                     .save();
 
             ASSEMBLER_RECIPES.builder("iv_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.IV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.IV].asItem())
                     .inputItems("botania:prism", 2)
                     .inputItems("botania:gaia_pylon")
                     .inputItems(TagPrefix.screw, GTOMaterials.Gaia, 4)
                     .circuitMeta(1)
-                    .outputItems(ManaMachine.MANA_INPUT_HATCH[IV].asStack())
+                    .outputItems(ManaMachine.MANA_INPUT_HATCH[IV].asItem())
                     .inputFluids(GTOMaterials.Animium, 1000)
                     .duration(200)
                     .MANAt(1024)
                     .save();
 
             ASSEMBLER_RECIPES.builder("luv_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.LuV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.LuV].asItem())
                     .inputItems("botania:prism", 2)
                     .inputItems(ExtraBotanyItems.theUniverse)
                     .inputItems(TagPrefix.lens, GTOMaterials.BifrostPerm)
                     .inputItems(TagPrefix.screw, GTOMaterials.Orichalcos, 4)
                     .circuitMeta(1)
-                    .outputItems(ManaMachine.MANA_INPUT_HATCH[LuV].asStack())
+                    .outputItems(ManaMachine.MANA_INPUT_HATCH[LuV].asItem())
                     .inputFluids(GTOMaterials.Animium, 2000)
                     .duration(200)
                     .MANAt(4096)
                     .save();
 
             ASSEMBLER_RECIPES.builder("lv_wireless_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_INPUT_HATCH[LV].asStack())
+                    .inputItems(ManaMachine.MANA_INPUT_HATCH[LV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:spark", 8)
                     .inputItems("botania:rune_mana", 4)
-                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[LV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(100))
+                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[LV].asItem())
+                    .inputFluids(FlowingCiphers, 100)
                     .duration(200)
                     .MANAt(4)
                     .save();
 
             ASSEMBLER_RECIPES.builder("mv_wireless_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_INPUT_HATCH[MV].asStack())
+                    .inputItems(ManaMachine.MANA_INPUT_HATCH[MV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:spark", 16)
                     .inputItems("botania:rune_mana", 8)
-                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[MV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(200))
+                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[MV].asItem())
+                    .inputFluids(FlowingCiphers, 200)
                     .duration(200)
                     .MANAt(16)
                     .save();
 
             ASSEMBLER_RECIPES.builder("hv_wireless_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_INPUT_HATCH[HV].asStack())
+                    .inputItems(ManaMachine.MANA_INPUT_HATCH[HV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:corporea_spark", 16)
                     .inputItems(ManaMultiBlock.BASE_MANA_DISTRIBUTOR, 4)
-                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[HV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(400))
+                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[HV].asItem())
+                    .inputFluids(FlowingCiphers, 400)
                     .duration(200)
                     .MANAt(64)
                     .save();
 
             ASSEMBLER_RECIPES.builder("ev_wireless_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_INPUT_HATCH[EV].asStack())
+                    .inputItems(ManaMachine.MANA_INPUT_HATCH[EV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:corporea_spark", 32)
                     .inputItems(ManaMultiBlock.BASE_MANA_DISTRIBUTOR, 8)
-                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[EV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(600))
+                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[EV].asItem())
+                    .inputFluids(FlowingCiphers, 600)
                     .duration(200)
                     .MANAt(256)
                     .save();
 
             ASSEMBLER_RECIPES.builder("iv_wireless_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_INPUT_HATCH[IV].asStack())
+                    .inputItems(ManaMachine.MANA_INPUT_HATCH[IV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:corporea_index", 8)
                     .inputItems(ManaMultiBlock.ADVANCED_MANA_DISTRIBUTOR, 2)
-                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[IV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(800))
+                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[IV].asItem())
+                    .inputFluids(FlowingCiphers, 800)
                     .duration(200)
                     .MANAt(1024)
                     .save();
 
             ASSEMBLER_RECIPES.builder("luv_wireless_mana_input_hatch")
-                    .inputItems(ManaMachine.MANA_INPUT_HATCH[LuV].asStack())
+                    .inputItems(ManaMachine.MANA_INPUT_HATCH[LuV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:corporea_index", 16)
                     .inputItems(ManaMultiBlock.ADVANCED_MANA_DISTRIBUTOR, 4)
-                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[LuV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(1000))
+                    .outputItems(ManaMachine.WIRELESS_MANA_INPUT_HATCH[LuV].asItem())
+                    .inputFluids(FlowingCiphers, 1000)
                     .duration(200)
                     .MANAt(4096)
                     .save();
 
             ASSEMBLER_RECIPES.builder("lv_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.LV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.LV].asItem())
                     .inputItems(BotaniaBlocks.pump, 2)
                     .inputItems("botania:mana_pylon")
                     .inputItems(TagPrefix.screw, GTOMaterials.Manasteel, 4)
                     .circuitMeta(2)
-                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[LV].asStack())
+                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[LV].asItem())
                     .duration(200)
                     .MANAt(4)
                     .save();
 
             ASSEMBLER_RECIPES.builder("mv_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.MV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.MV].asItem())
                     .inputItems(BotaniaBlocks.pump, 2)
                     .inputItems(TagPrefix.lens, GTOMaterials.ManaGlass)
                     .inputItems(TagPrefix.screw, GTOMaterials.Terrasteel, 4)
                     .circuitMeta(2)
-                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[MV].asStack())
+                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[MV].asItem())
                     .duration(200)
                     .MANAt(16)
                     .save();
 
             ASSEMBLER_RECIPES.builder("hv_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asItem())
                     .inputItems(BotaniaBlocks.pump, 2)
                     .inputItems("botania:natura_pylon")
                     .inputItems(TagPrefix.lens, GTOMaterials.ElfGlass)
                     .inputItems(TagPrefix.screw, GTOMaterials.Elementium, 4)
                     .circuitMeta(2)
-                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[HV].asStack())
+                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[HV].asItem())
                     .inputFluids(GTOMaterials.BifrostPerm, 1000)
                     .duration(200)
                     .MANAt(16)
                     .save();
 
             ASSEMBLER_RECIPES.builder("ev_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asItem())
                     .inputItems("botania:prism", 2)
                     .inputItems("mythicbotany:alfheim_rune")
                     .inputItems("endrem:magical_eye")
                     .inputItems(TagPrefix.screw, GTOMaterials.Aerialite, 4)
                     .circuitMeta(2)
-                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[EV].asStack())
+                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[EV].asItem())
                     .inputFluids(GTOMaterials.BifrostPerm, 2000)
                     .duration(200)
                     .MANAt(256)
                     .save();
 
             ASSEMBLER_RECIPES.builder("iv_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.IV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.IV].asItem())
                     .inputItems("botania:prism", 2)
                     .inputItems("botania:gaia_pylon")
                     .inputItems(TagPrefix.screw, GTOMaterials.Gaia, 4)
                     .circuitMeta(2)
-                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[IV].asStack())
+                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[IV].asItem())
                     .inputFluids(GTOMaterials.Animium, 1000)
                     .duration(200)
                     .MANAt(1024)
                     .save();
 
             ASSEMBLER_RECIPES.builder("luv_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.LuV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.LuV].asItem())
                     .inputItems("botania:prism", 2)
                     .inputItems(ExtraBotanyItems.theUniverse)
                     .inputItems(TagPrefix.lens, GTOMaterials.BifrostPerm)
                     .inputItems(TagPrefix.screw, GTOMaterials.Orichalcos, 4)
                     .circuitMeta(2)
-                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[LuV].asStack())
+                    .outputItems(ManaMachine.MANA_OUTPUT_HATCH[LuV].asItem())
                     .inputFluids(GTOMaterials.Animium, 2000)
                     .duration(200)
                     .MANAt(4096)
                     .save();
 
             ASSEMBLER_RECIPES.builder("lv_wireless_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[LV].asStack())
+                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[LV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:spark", 8)
                     .inputItems("botania:rune_mana", 4)
-                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[LV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(100))
+                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[LV].asItem())
+                    .inputFluids(FlowingCiphers, 100)
                     .duration(200)
                     .MANAt(4)
                     .save();
 
             ASSEMBLER_RECIPES.builder("mv_wireless_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[MV].asStack())
+                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[MV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:spark", 16)
                     .inputItems("botania:rune_mana", 8)
-                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[MV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(200))
+                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[MV].asItem())
+                    .inputFluids(FlowingCiphers, 200)
                     .duration(200)
                     .MANAt(16)
                     .save();
 
             ASSEMBLER_RECIPES.builder("hv_wireless_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[HV].asStack())
+                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[HV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:corporea_spark", 16)
                     .inputItems(ManaMultiBlock.BASE_MANA_DISTRIBUTOR, 4)
-                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[HV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(400))
+                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[HV].asItem())
+                    .inputFluids(FlowingCiphers, 400)
                     .duration(200)
                     .MANAt(64)
                     .save();
 
             ASSEMBLER_RECIPES.builder("ev_wireless_mana_output_hatch")
-                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[EV].asStack())
+                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[EV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
                     .inputItems("botania:corporea_spark", 32)
                     .inputItems(ManaMultiBlock.BASE_MANA_DISTRIBUTOR, 8)
-                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[EV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(600))
+                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[EV].asItem())
+                    .inputFluids(FlowingCiphers, 600)
                     .duration(200)
                     .MANAt(256)
                     .save();
 
             ASSEMBLER_RECIPES.builder("iv_wireless_mana_output_hatch")
+                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[IV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
-                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[IV].asStack())
                     .inputItems("botania:corporea_index", 8)
                     .inputItems(ManaMultiBlock.ADVANCED_MANA_DISTRIBUTOR, 2)
-                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[IV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(800))
+                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[IV].asItem())
+                    .inputFluids(FlowingCiphers, 800)
                     .duration(200)
                     .MANAt(1024)
                     .save();
 
             ASSEMBLER_RECIPES.builder("luv_wireless_mana_output_hatch")
+                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[LuV].asItem())
                     .inputItems("ars_nouveau:warp_scroll")
-                    .inputItems(ManaMachine.MANA_OUTPUT_HATCH[LuV].asStack())
                     .inputItems("botania:corporea_index", 16)
                     .inputItems(ManaMultiBlock.ADVANCED_MANA_DISTRIBUTOR, 4)
-                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[LuV].asStack())
-                    .inputFluids(FlowingCiphers.getFluid(1000))
+                    .outputItems(ManaMachine.WIRELESS_MANA_OUTPUT_HATCH[LuV].asItem())
+                    .inputFluids(FlowingCiphers, 1000)
                     .duration(200)
                     .MANAt(4096)
                     .save();
 
             ASSEMBLER_RECIPES.builder("lv_mana_extract_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.LV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.LV].asItem())
                     .inputItems(CustomTags.LV_CIRCUITS)
                     .inputItems(TagPrefix.lens, GTOMaterials.ManaGlass)
-                    .inputItems(GTItems.SENSOR_LV.asStack())
+                    .inputItems(GTItems.SENSOR_LV)
                     .inputItems(TagPrefix.gem, GTOMaterials.ManaDiamond)
                     .inputItems("botania:mana_pearl")
                     .inputItems(TagPrefix.screw, GTOMaterials.Manasteel, 4)
-                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[LV].asStack())
+                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[LV].asItem())
                     .inputFluids(GTOMaterials.Mana, 288)
                     .duration(200)
                     .MANAt(4)
                     .save();
 
             ASSEMBLER_RECIPES.builder("mv_mana_extract_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.MV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.MV].asItem())
                     .inputItems(CustomTags.MV_CIRCUITS)
                     .inputItems(TagPrefix.lens, GTOMaterials.ElfGlass)
-                    .inputItems(GTItems.SENSOR_MV.asStack())
+                    .inputItems(GTItems.SENSOR_MV)
                     .inputItems(TagPrefix.gem, GTOMaterials.Dragonstone)
                     .inputItems("botania:pixie_dust")
                     .inputItems(TagPrefix.screw, GTOMaterials.Elementium, 4)
-                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[MV].asStack())
+                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[MV].asItem())
                     .inputFluids(GTOMaterials.Mana, 288)
                     .duration(200)
                     .MANAt(16)
                     .save();
 
             ASSEMBLER_RECIPES.builder("hv_mana_extract_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.HV].asItem())
                     .inputItems(CustomTags.HV_CIRCUITS)
                     .inputItems(TagPrefix.lens, GTOMaterials.BifrostPerm)
-                    .inputItems(GTItems.SENSOR_HV.asStack())
+                    .inputItems(GTItems.SENSOR_HV)
                     .inputItems(TagPrefix.gemExquisite, GTOMaterials.Dragonstone)
                     .inputItems(TagPrefix.rodLong, GTOMaterials.Alfsteel)
                     .inputItems(TagPrefix.screw, GTOMaterials.Terrasteel, 4)
-                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[HV].asStack())
+                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[HV].asItem())
                     .inputFluids(GTOMaterials.Mana, 288)
                     .duration(200)
                     .MANAt(64)
                     .save();
 
             ASSEMBLER_RECIPES.builder("ev_mana_extract_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.EV].asItem())
                     .inputItems(CustomTags.EV_CIRCUITS)
                     .inputItems("botania:natura_pylon")
-                    .inputItems(GTItems.SENSOR_EV.asStack())
+                    .inputItems(GTItems.SENSOR_EV)
                     .inputItems("mythicbotany:alfheim_rune")
                     .inputItems(TagPrefix.rodLong, GTOMaterials.Gaiasteel)
                     .inputItems(TagPrefix.screw, GTOMaterials.Alfsteel, 4)
-                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[EV].asStack())
+                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[EV].asItem())
                     .inputFluids(GTOMaterials.Mana, 1152)
                     .duration(200)
                     .MANAt(256)
                     .save();
 
             ASSEMBLER_RECIPES.builder("iv_mana_extract_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.IV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.IV].asItem())
                     .inputItems(CustomTags.IV_CIRCUITS)
                     .inputItems("mythicbotany:alfsteel_pylon")
-                    .inputItems(GTItems.SENSOR_IV.asStack())
+                    .inputItems(GTItems.SENSOR_IV)
                     .inputItems("endrem:magical_eye")
                     .inputItems(TagPrefix.rodLong, GTOMaterials.Gaia)
                     .inputItems(TagPrefix.screw, GTOMaterials.Aerialite, 4)
-                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[IV].asStack())
+                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[IV].asItem())
                     .inputFluids(GTOMaterials.Mana, 1152)
                     .duration(200)
                     .MANAt(1024)
                     .save();
 
             ASSEMBLER_RECIPES.builder("luv_mana_extract_hatch")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.LuV].asStack())
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.LuV].asItem())
                     .inputItems(CustomTags.LuV_CIRCUITS)
                     .inputItems("botania:gaia_pylon")
-                    .inputItems(GTItems.SENSOR_LuV.asStack())
+                    .inputItems(GTItems.SENSOR_LuV)
                     .inputItems("botania:life_essence")
                     .inputItems(TagPrefix.rodLong, GTOMaterials.Aerialite)
                     .inputItems(TagPrefix.screw, GTOMaterials.Orichalcos, 4)
-                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[LuV].asStack())
+                    .outputItems(ManaMachine.MANA_EXTRACT_HATCH[LuV].asItem())
                     .inputFluids(GTOMaterials.Mana, 1152)
                     .duration(200)
                     .MANAt(4096)
                     .save();
 
             ASSEMBLER_RECIPES.builder("mana_amplifier_hatch")
+                    .inputItems(ManaMachine.MANA_HULL[GTValues.LuV].asItem())
                     .notConsumable("botania:dice")
-                    .inputItems(ManaMachine.MANA_HULL[GTValues.LuV].asStack())
                     .inputItems("botania:laputa_shard")
                     .inputItems("extrabotany:the_universe", 8)
-                    .outputItems(ManaMachine.MANA_AMPLIFIER_HATCH.asStack())
-                    .inputFluids(TheWaterFromTheWellOfWisdom.getFluid(8000))
+                    .outputItems(ManaMachine.MANA_AMPLIFIER_HATCH.asItem())
+                    .inputFluids(TheWaterFromTheWellOfWisdom, 8000)
                     .duration(800)
                     .MANAt(8192)
                     .save();
 
-            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("alchemy_cauldron"), ManaMachine.ALCHEMY_CAULDRON.asStack(),
+            ASSEMBLER_RECIPES.builder("me_mana_amplifier_hatch")
+                    .inputItems("gtocore:mana_amplifier_hatch")
+                    .inputItems(AEItems.SPEED_CARD.asItem())
+                    .inputItems("appbot:fluix_mana_pool")
+                    .inputItems(TagPrefix.gemExquisite, GTOMaterials.Fluix, 4)
+                    .outputItems("gtocore:me_mana_amplifier_hatch")
+                    .duration(200)
+                    .MANAt(1280)
+                    .save();
+
+            ASSEMBLER_RECIPES.builder("me_mana_interface")
+                    .inputItems("gtocore:zpm_mana_machine_hull")
+                    .inputItems("arseng:me_source_jar")
+                    .inputItems("appbot:fluix_mana_pool")
+                    .inputItems("gtocore:advanced_mana_distributor", 32)
+                    .inputItems(GTOItems.SOURCE_ENERGY_CATALYST_CRYSTAL)
+                    .outputItems("gtocore:me_mana_interface")
+                    .inputFluids(GTOMaterials.StarVeinCatalyst, 1000)
+                    .duration(450)
+                    .MANAt(5240)
+                    .save();
+
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("exp_obelisk"), RegistriesUtils.getItem("gtocore:exp_obelisk"),
+                    "AAA",
+                    "ABC",
+                    "ADA",
+                    'A', RegistriesUtils.getItem("botania:mana_glass_pane"), 'B', GTOBlocks.ORIGINAL_BRONZE_CASING.asItem(), 'C', Items.DISPENSER, 'D', RegistriesUtils.getItem("botania:mana_bottle"));
+
+            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("alchemy_cauldron"), ManaMachine.ALCHEMY_CAULDRON.asItem(),
                     "BBB", "ADA", "AAA",
                     'A', new MaterialEntry(TagPrefix.plate, Steel), 'B', new MaterialEntry(rod, Steel), 'D', Items.CAULDRON);
 
-            VanillaRecipeHelper.addShapedRecipe(id("mana_heater"), ManaMachine.MANA_HEATER.asStack(),
+            VanillaRecipeHelper.addShapedRecipe(id("mana_heater"), ManaMachine.MANA_HEATER.asItem(),
                     "EEE", "CDC", "CBC",
-                    'B', ManaMachine.MANA_HULL[2].asStack(), 'C', RegistriesUtils.getItemStack("botania:livingrock_bricks"), 'D', RegistriesUtils.getItemStack("botania:mana_pool"), 'E', new MaterialEntry(plate, Manasteel));
+                    'B', ManaMachine.MANA_HULL[2].asItem(), 'C', RegistriesUtils.getItemStack("botania:livingrock_bricks"), 'D', RegistriesUtils.getItemStack("botania:mana_pool"), 'E', new MaterialEntry(plate, Manasteel));
 
-            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("lv_primitive_magic_energy"), ManaMachine.PRIMITIVE_MAGIC_ENERGY[GTValues.LV].asStack(),
+            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("lv_primitive_magic_energy"), ManaMachine.PRIMITIVE_MAGIC_ENERGY[GTValues.LV].asItem(),
                     "ABA", "BCB", "DBD",
-                    'A', new MaterialEntry(TagPrefix.lens, GTOMaterials.ManaGlass), 'B', RegistriesUtils.getItemStack("botania:rune_mana"), 'C', GTOMachines.THERMAL_GENERATOR[GTValues.LV].asStack(), 'D', RegistriesUtils.getItemStack("botania:lens_bounce"));
-            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("mv_primitive_magic_energy"), ManaMachine.PRIMITIVE_MAGIC_ENERGY[GTValues.MV].asStack(),
+                    'A', new MaterialEntry(TagPrefix.lens, GTOMaterials.ManaGlass), 'B', RegistriesUtils.getItemStack("botania:rune_mana"), 'C', GTOMachines.THERMAL_GENERATOR[GTValues.LV].asItem(), 'D', RegistriesUtils.getItemStack("botania:lens_bounce"));
+            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("mv_primitive_magic_energy"), ManaMachine.PRIMITIVE_MAGIC_ENERGY[GTValues.MV].asItem(),
                     "ABA", "CDC", "EFE",
-                    'A', new MaterialEntry(TagPrefix.plate, GTMaterials.Aluminium), 'B', RegistriesUtils.getItemStack("botania:mana_bomb"), 'C', GTOMachines.THERMAL_GENERATOR[MV].asStack(), 'D', ManaMachine.PRIMITIVE_MAGIC_ENERGY[GTValues.LV].asStack(), 'E', RegistriesUtils.getItemStack("botania:lens_piston"), 'F', new MaterialEntry(TagPrefix.plateDense, GTMaterials.SteelMagnetic));
+                    'A', new MaterialEntry(TagPrefix.plate, GTMaterials.Aluminium), 'B', RegistriesUtils.getItemStack("botania:mana_bomb"), 'C', GTOMachines.THERMAL_GENERATOR[MV].asItem(), 'D', ManaMachine.PRIMITIVE_MAGIC_ENERGY[GTValues.LV].asItem(), 'E', RegistriesUtils.getItemStack("botania:lens_piston"), 'F', new MaterialEntry(TagPrefix.plateDense, GTMaterials.SteelMagnetic));
 
-            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("lv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.LV].asStack(),
+            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("lv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.LV].asItem(),
                     "ABA", "CDC", "AEA",
-                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Manasteel), 'B', GTItems.ROBOT_ARM_LV.asStack(), 'C', CustomTags.LV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.LV].asStack(), 'E', GTItems.FIELD_GENERATOR_LV.asStack());
-            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("mv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.MV].asStack(),
+                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Manasteel), 'B', GTItems.ROBOT_ARM_LV.asItem(), 'C', CustomTags.LV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.LV].asItem(), 'E', GTItems.FIELD_GENERATOR_LV.asItem());
+            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("mv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.MV].asItem(),
                     "ABC", "DED", "FGH",
-                    'A', RegistriesUtils.getItemStack("botania:rune_water"), 'B', GTItems.ROBOT_ARM_MV.asStack(), 'C', RegistriesUtils.getItemStack("botania:rune_fire"), 'D', CustomTags.MV_CIRCUITS, 'E', ManaMachine.MANA_HULL[GTValues.MV].asStack(), 'F', RegistriesUtils.getItemStack("botania:rune_earth"), 'G', GTItems.FIELD_GENERATOR_MV.asStack(), 'H', RegistriesUtils.getItemStack("botania:rune_air"));
-            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("hv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.HV].asStack(),
+                    'A', RegistriesUtils.getItemStack("botania:rune_water"), 'B', GTItems.ROBOT_ARM_MV.asItem(), 'C', RegistriesUtils.getItemStack("botania:rune_fire"), 'D', CustomTags.MV_CIRCUITS, 'E', ManaMachine.MANA_HULL[GTValues.MV].asItem(), 'F', RegistriesUtils.getItemStack("botania:rune_earth"), 'G', GTItems.FIELD_GENERATOR_MV.asItem(), 'H', RegistriesUtils.getItemStack("botania:rune_air"));
+            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("hv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.HV].asItem(),
                     "ABA", "CDC", "AEA",
-                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Terrasteel), 'B', GTItems.ROBOT_ARM_HV.asStack(), 'C', CustomTags.HV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.HV].asStack(), 'E', GTItems.FIELD_GENERATOR_HV.asStack());
-            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("ev_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.EV].asStack(),
+                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Terrasteel), 'B', GTItems.ROBOT_ARM_HV.asItem(), 'C', CustomTags.HV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.HV].asItem(), 'E', GTItems.FIELD_GENERATOR_HV.asItem());
+            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("ev_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.EV].asItem(),
                     "ABA", "CDC", "AEA",
-                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Elementium), 'B', GTItems.ROBOT_ARM_EV.asStack(), 'C', CustomTags.EV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.EV].asStack(), 'E', GTItems.FIELD_GENERATOR_EV.asStack());
-            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("iv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.IV].asStack(),
+                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Elementium), 'B', GTItems.ROBOT_ARM_EV.asItem(), 'C', CustomTags.EV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.EV].asItem(), 'E', GTItems.FIELD_GENERATOR_EV.asItem());
+            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("iv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.IV].asItem(),
                     "ABA", "CDC", "AEA",
-                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Alfsteel), 'B', GTItems.ROBOT_ARM_IV.asStack(), 'C', CustomTags.IV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.IV].asStack(), 'E', GTItems.FIELD_GENERATOR_IV.asStack());
-            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("luv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.LuV].asStack(),
+                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Alfsteel), 'B', GTItems.ROBOT_ARM_IV.asItem(), 'C', CustomTags.IV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.IV].asItem(), 'E', GTItems.FIELD_GENERATOR_IV.asItem());
+            VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("luv_mana_assembler"), ManaMachine.MANA_ASSEMBLER[GTValues.LuV].asItem(),
                     "ABA", "CDC", "AEA",
-                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Gaiasteel), 'B', GTItems.ROBOT_ARM_LuV.asStack(), 'C', CustomTags.LuV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.LuV].asStack(), 'E', GTItems.FIELD_GENERATOR_LuV.asStack());
+                    'A', new MaterialEntry(TagPrefix.plate, GTOMaterials.Gaiasteel), 'B', GTItems.ROBOT_ARM_LuV.asItem(), 'C', CustomTags.LuV_CIRCUITS, 'D', ManaMachine.MANA_HULL[GTValues.LuV].asItem(), 'E', GTItems.FIELD_GENERATOR_LuV.asItem());
 
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("industrial_platform_deployment_tools"), GTOMachines.INDUSTRIAL_PLATFORM_DEPLOYMENT_TOOLS.asItem(),
+                    "AAA", "ABA", "AAA",
+                    'A', AEItems.MATTER_BALL.asItem(), 'B', RegistriesUtils.getItemStack("gtocore:standard_industrial_components_small"));
         }
 
         // 杂项配方
@@ -1221,15 +1260,31 @@ public final class MagicRecipesA {
                     new MaterialEntry(dust, Livingrock), new MaterialEntry(dust, Livingrock), new MaterialEntry(dust, Livingrock),
                     new MaterialEntry(dust, Livingrock), new MaterialEntry(dust, Livingrock));
 
-            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("area_destruction_tools"), ManaMachine.AREA_DESTRUCTION_TOOLS.asStack(),
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("area_destruction_tools"), ManaMachine.AREA_DESTRUCTION_TOOLS.asItem(),
                     "ABA", "CDC", "ABA",
-                    'A', new ItemStack(Items.REPEATER.asItem()), 'B', GTBlocks.INDUSTRIAL_TNT.asStack(), 'C', GTOBlocks.NUKE_BOMB.asStack(), 'D', ManaMachine.MANA_HULL[GTValues.LuV].asStack());
+                    'A', Items.REPEATER.asItem(), 'B', GTBlocks.INDUSTRIAL_TNT.asItem(), 'C', GTOBlocks.NUKE_BOMB.asItem(), 'D', ManaMachine.MANA_HULL[GTValues.EV].asItem());
 
-            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("celestial_condenser"), ManaMachine.CELESTIAL_CONDENSER.asStack(),
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("celestial_condenser"), ManaMachine.CELESTIAL_CONDENSER.asItem(),
                     "ABC", "DEF", "GHI",
-                    'A', new ItemStack(Items.YELLOW_STAINED_GLASS_PANE.asItem()), 'B', new ItemStack(Items.WHITE_STAINED_GLASS_PANE.asItem()), 'C', new ItemStack(Items.PINK_STAINED_GLASS_PANE.asItem()),
-                    'D', new ItemStack(Items.RED_STAINED_GLASS_PANE.asItem()), 'E', new MaterialEntry(TagPrefix.frameGt, GTOMaterials.Aerialite), 'F', new ItemStack(Items.MAGENTA_STAINED_GLASS_PANE.asItem()),
-                    'G', RegistriesUtils.getItemStack("botania:tornado_rod"), 'H', new ItemStack(Items.CHISELED_DEEPSLATE.asItem()), 'I', RegistriesUtils.getItemStack("ars_nouveau:dominion_wand"));
+                    'A', Items.YELLOW_STAINED_GLASS_PANE, 'B', Items.WHITE_STAINED_GLASS_PANE, 'C', Items.PINK_STAINED_GLASS_PANE,
+                    'D', Items.RED_STAINED_GLASS_PANE, 'E', new MaterialEntry(TagPrefix.frameGt, GTOMaterials.Aerialite), 'F', Items.MAGENTA_STAINED_GLASS_PANE,
+                    'G', RegistriesUtils.getItemStack("botania:tornado_rod"), 'H', Items.CHISELED_DEEPSLATE, 'I', RegistriesUtils.getItemStack("ars_nouveau:dominion_wand"));
+
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("slot_boosting_items"), SLOT_ENHANCER,
+                    "   ", " A ", "   ",
+                    'A', PHILOSOPHERS_STONE);
+
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("wreath"), GTOItems.WREATH.asStack(),
+                    "AAA", "ABA", "AAA",
+                    'A', ItemTags.FLOWERS, 'B', GTOItems.COLORFUL_MYSTICAL_FLOWER.asStack());
+
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("stopgap_measures"), STOPGAP_MEASURES,
+                    "BBB", "BAB", "BBB",
+                    'A', Items.DIAMOND, 'B', Items.NETHER_STAR);
+
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("village_trading_station"), GTOMachines.VILLAGE_TRADING_STATION.asStack(),
+                    "ABA", "CDC", "EFE",
+                    'A', RegistriesUtils.getItemStack("easy_villagers:villager"), 'B', new MaterialEntry(foil, GTMaterials.Polytetrafluoroethylene), 'C', new ItemStack(Items.RED_CARPET), 'D', RegistriesUtils.getItemStack("gtceu:chemical_cyan_dye"), 'E', RegistriesUtils.getItemStack("easy_villagers:auto_trader"), 'F', GTOBlocks.INFUSED_GOLD_REINFORCED_WOODEN_CASING.asStack());
         }
 
         // 工具配方
@@ -1252,6 +1307,7 @@ public final class MagicRecipesA {
             VanillaRecipeHelper.addShapedRecipe(GTOCore.id("shimmerrock_mortar"), RegistriesUtils.getItemStack("gtocore:shimmerrock_mortar"),
                     " A ", "BAB", "BBB",
                     'A', new MaterialEntry(TagPrefix.block, GTOMaterials.Shimmerrock), 'B', new MaterialEntry(TagPrefix.rock, GTMaterials.Stone));
+
         }
     }
 }

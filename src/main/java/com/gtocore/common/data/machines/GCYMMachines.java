@@ -3,12 +3,13 @@ package com.gtocore.common.data.machines;
 import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.client.renderer.machine.FluidRenderer;
+import com.gtocore.common.data.GTOMachines;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.machine.multiblock.electric.gcym.*;
-import com.gtocore.common.machine.multiblock.part.ParallelHatchPartMachine;
 import com.gtocore.utils.register.MachineRegisterUtils;
 
 import com.gtolib.api.annotation.NewDataAttributes;
+import com.gtolib.api.machine.impl.part.ParallelHatchPartMachine;
 import com.gtolib.api.machine.multiblock.CoilCustomParallelMultiblockMachine;
 import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 
@@ -44,6 +45,7 @@ import static com.gregtechceu.gtceu.common.data.GTBlocks.*;
 import static com.gregtechceu.gtceu.common.data.GTMachines.*;
 import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.*;
 import static com.gtocore.common.data.GTOBlocks.INTEGRAL_FRAMEWORK_MV;
+import static com.gtocore.common.data.GTORecipeTypes.ATOMIZATION_CONDENSATION_RECIPES;
 import static com.gtocore.utils.register.MachineRegisterUtils.multiblock;
 import static com.gtolib.api.registries.GTORegistration.GTM;
 
@@ -63,6 +65,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_MACERATION_TOWER = GTM
             .multiblock("large_maceration_tower", LargeMacerationTowerMachine::new)
+            .genLang("大型研磨塔")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -76,7 +79,7 @@ public final class GCYMMachines {
                     .aisle("XXaXX", "XGGGX", "XGGGX", "XAAAX")
                     .aisle("XXXXX", "XGGGX", "XGGGX", "XAAAX")
                     .aisle("XXXXX", "XXXXX", "XXSXX", "XXXXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_SECURE_MACERATION.get()).setMinGlobalLimited(55)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -90,6 +93,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_CHEMICAL_BATH = GTM
             .multiblock("large_chemical_bath", LargeChemicalBathMachine::new)
+            .genLang("大型化学浸洗机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -105,7 +109,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "X   X", "X   X")
                     .aisle("XXXXX", "XTTTX", "X   X")
                     .aisle("XXXXX", "XXSXX", "XXXXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_WATERTIGHT.get()).setMinGlobalLimited(55)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -119,6 +123,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_CENTRIFUGE = GTM
             .multiblock("large_centrifuge", GCYMMultiblockMachine::new)
+            .genLang("大型离心机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -132,7 +137,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "XPaPX", "XXXXX")
                     .aisle("XXXXX", "XAPAX", "XXXXX")
                     .aisle("#XXX#", "XXSXX", "#XXX#")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_VIBRATION_SAFE.get()).setMinGlobalLimited(40)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -147,6 +152,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_MIXER = GTM
             .multiblock("large_mixer", LargeMixerMachine::new)
+            .genLang("大型搅拌罐")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -160,7 +166,7 @@ public final class GCYMMachines {
                     .aisle("XXaXX", "XPPPX", "XAPAX", "XPPPX", "XAGAX", "FFGFF")
                     .aisle("XXXXX", "XAPAX", "XAAAX", "XAPAX", "XAAAX", "##F##")
                     .aisle("#XXX#", "#XSX#", "#XXX#", "#XXX#", "#XXX#", "##F##")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_REACTION_SAFE.get()).setMinGlobalLimited(50)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -177,6 +183,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_ELECTROLYZER = GTM
             .multiblock("large_electrolyzer", GCYMMultiblockMachine::new)
+            .genLang("大型电解槽")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -189,7 +196,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "XCCCX", "XCCCX")
                     .aisle("XXaXX", "XCCCX", "XCCCX")
                     .aisle("XXXXX", "XXSXX", "XXXXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_NONCONDUCTING.get()).setMinGlobalLimited(30)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -202,6 +209,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_ELECTROMAGNET = GTM
             .multiblock("large_electromagnet", GCYMMultiblockMachine::new)
+            .genLang("大型电磁工厂")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -214,7 +222,7 @@ public final class GCYMMachines {
                     .aisle("XCXCX", "XCXCX", "XCXCX")
                     .aisle("XCaCX", "XCXCX", "XCXCX")
                     .aisle("XXXXX", "XXSXX", "XXXXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_NONCONDUCTING.get()).setMinGlobalLimited(35)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -227,6 +235,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_PACKER = GTM
             .multiblock("large_packer", GCYMMultiblockMachine::new)
+            .genLang("大型打包机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -242,7 +251,7 @@ public final class GCYMMachines {
                     .aisle("XXX", "XAX", "XXX")
                     .aisle("XXX", "XaX", "XXX")
                     .aisle("XXX", "XSX", "XXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_TUNGSTENSTEEL_ROBUST.get()).setMinGlobalLimited(30)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -255,6 +264,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_ASSEMBLER = GTM
             .multiblock("large_assembler", GCYMMultiblockMachine::new)
+            .genLang("大型组装机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -266,7 +276,7 @@ public final class GCYMMachines {
                     .aisle("XXXXXXXXX", "XXXXXXXXX", "XXXXXXXXX")
                     .aisle("XXXXXXXXX", "XAAAXAaAX", "XGGGXXXXX")
                     .aisle("XXXXXXXXX", "XGGGXXSXX", "XGGGX###X")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_LARGE_SCALE_ASSEMBLING.get()).setMinGlobalLimited(40)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -281,6 +291,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_CIRCUIT_ASSEMBLER = GTM
             .multiblock("large_circuit_assembler", GCYMMultiblockMachine::new)
+            .genLang("大型电路组装机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -294,7 +305,7 @@ public final class GCYMMachines {
                     .aisle("XXXXXXX", "XAAAaPX", "XGGGGGX")
                     .aisle("XXXXXXX", "XTTTTXX", "XXXXXXX")
                     .aisle("#####XX", "#####SX", "#####XX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_LARGE_SCALE_ASSEMBLING.get()).setMinGlobalLimited(55)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -311,6 +322,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_ARC_SMELTER = GTM
             .multiblock("large_arc_smelter", GCYMMultiblockMachine::new)
+            .genLang("大型电弧炉")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -324,7 +336,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "XAAAX", "XAAAX", "XXMXX")
                     .aisle("XXXXX", "XACAX", "XACAX", "XXXXX")
                     .aisle("#XXX#", "#XSX#", "#XXX#", "#XXX#")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_HIGH_TEMPERATURE_SMELTING.get()).setMinGlobalLimited(45)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -339,6 +351,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_ENGRAVING_LASER = GTM
             .multiblock("large_engraving_laser", GCYMMultiblockMachine::new)
+            .genLang("大型激光蚀刻机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -352,7 +365,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "GAaAG", "GACAG", "XKXKX")
                     .aisle("XXXXX", "XAAAX", "XAAAX", "XKKKX")
                     .aisle("XXSXX", "XXGXX", "XXGXX", "XXXXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('C', blocks(CASING_TUNGSTENSTEEL_PIPE.get()))
                     .where('X', blocks(CASING_LASER_SAFE_ENGRAVING.get()).setMinGlobalLimited(45)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
@@ -368,6 +381,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_SIFTING_FUNNEL = GTM
             .multiblock("large_sifting_funnel", GCYMMultiblockMachine::new)
+            .genLang("大型筛选漏斗")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -381,7 +395,7 @@ public final class GCYMMachines {
                     .aisle("#XXX#", "#XaX#", "XKKKX", "XKKKX", "X###X")
                     .aisle("XXXXX", "XAXAX", "XKKKX", "XKKKX", "X###X")
                     .aisle("#X#X#", "#X#X#", "#XSX#", "XXXXX", "#XXX#")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_VIBRATION_SAFE.get()).setMinGlobalLimited(50)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -401,6 +415,7 @@ public final class GCYMMachines {
                 }
                 return 1;
             }, true, true, false))
+            .genLang("合金冶炼炉")
             .tooltipsKey("gtocore.machine.recipe.run", Component.translatable("gtceu.alloy_blast_smelter"))
             .tooltipsKey("gtceu.machine.electric_blast_furnace.tooltip.0")
             .tooltipsKey("gtceu.machine.electric_blast_furnace.tooltip.1")
@@ -408,7 +423,7 @@ public final class GCYMMachines {
             .tooltipsKey("gtocore.machine.recipe.run", Component.translatable("gtceu.alloy_smelter"))
             .tooltipsText("安装附属模块后运行速度翻倍", "The running speed doubles after installing the auxiliary module")
             .coilParallelTooltips()
-            .moduleTooltips()
+            .moduleTooltips(new PartAbility[0])
             .allRotation()
             .recipeTypes(ALLOY_BLAST_RECIPES)
             .recipeTypes(ALLOY_SMELTER_RECIPES)
@@ -432,7 +447,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "CAAAC", "GAAAG", "CAAAC", "XXMXX")
                     .aisle("XXXXX", "CAAAC", "GAAAG", "CAAAC", "XXXXX")
                     .aisle("#XSX#", "#CCC#", "#GGG#", "#CCC#", "#XXX#")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_HIGH_TEMPERATURE_SMELTING.get()).setMinGlobalLimited(30)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, false)))
@@ -461,7 +476,7 @@ public final class GCYMMachines {
                     .where('F', blocks(GCYMBlocks.HEAT_VENT.get()))
                     .where('G', blocks(ChemicalHelper.getBlock(TagPrefix.frameGt, GTMaterials.HSSS)))
                     .where('H', blocks(GTBlocks.CASING_TUNGSTENSTEEL_PIPE.get()))
-                    .where('I', controller(blocks(definition.get())))
+                    .where('I', controller(definition))
                     .where(' ', any())
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/high_temperature_smelting_casing"),
@@ -470,6 +485,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_AUTOCLAVE = GTM
             .multiblock("large_autoclave", GCYMMultiblockMachine::new)
+            .genLang("大型高压釜")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -483,7 +499,7 @@ public final class GCYMMachines {
                     .aisle("XaX", "XTX", "XXX")
                     .aisle("XXX", "XTX", "XXX")
                     .aisle("XXX", "XSX", "XXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_WATERTIGHT.get()).setMinGlobalLimited(30)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -497,6 +513,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_MATERIAL_PRESS = GTM
             .multiblock("large_material_press", GCYMMultiblockMachine::new)
+            .genLang("大型挤压机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -508,7 +525,7 @@ public final class GCYMMachines {
                     .aisle("XXXXXXX", "XXXXXXX", "XXXXXXX")
                     .aisle("XXXXXXX", "XaXGGGX", "XXXXXXX")
                     .aisle("XXXXXXX", "XSXCCCX", "XXXXXXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_STRESS_PROOF.get()).setMinGlobalLimited(40)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -522,6 +539,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_BREWER = GTM
             .multiblock("large_brewer", GCYMMultiblockMachine::new)
+            .genLang("大型酿造厂")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -535,7 +553,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "XCPCX", "XAPAX", "XAPAX", "#XMX#")
                     .aisle("XXXXX", "XCCCX", "XAAAX", "XXaXX", "##X##")
                     .aisle("#XXX#", "#XSX#", "#XXX#", "#XXX#", "#####")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_CORROSION_PROOF.get()).setMinGlobalLimited(50)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -552,6 +570,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_CUTTER = GTM
             .multiblock("large_cutter", GCYMMultiblockMachine::new)
+            .genLang("大型切割机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -564,7 +583,7 @@ public final class GCYMMachines {
                     .aisle("XXXXXXX", "XAXCCCX", "XXXAAAX", "##XXXXX")
                     .aisle("XXXXXXX", "XaXCCCX", "XXXAAAX", "##XXXXX")
                     .aisle("XXXXXXX", "XSXGGGX", "XXXGGGX", "##XXXXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_SHOCK_PROOF.get()).setMinGlobalLimited(65)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -580,6 +599,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_DISTILLERY = GTM
             .multiblock("large_distillery", largeLDistillationTowerMachine::new)
+            .genLang("大型蒸馏塔")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -594,12 +614,12 @@ public final class GCYMMachines {
                         .aisle("#YSY#", "YAAAY", "YAaAY", "YAAAY", "#YYY#")
                         .aisle("##X##", "#XAX#", "XAPAX", "#XAX#", "##X##").setRepeatable(1, 12)
                         .aisle("#####", "#ZZZ#", "#ZCZ#", "#ZZZ#", "#####")
-                        .where('S', controller(blocks(definition.get())))
+                        .where('S', controller(definition))
                         .where('Y', casingPredicate.or(abilities(IMPORT_ITEMS))
                                 .or(abilities(INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(8))
                                 .or(abilities(IMPORT_FLUIDS).setMinGlobalLimited(1))
                                 .or(Predicates.abilities(GTOPartAbility.ACCELERATE_HATCH).setMaxGlobalLimited(1))
-                                .or(Predicates.blocks(ManaMachine.MANA_AMPLIFIER_HATCH.getBlock()).setMaxGlobalLimited(1))
+                                .or(Predicates.blocks(ManaMachine.MANA_AMPLIFIER_HATCH.get()).setMaxGlobalLimited(1))
                                 .or(abilities(GTOPartAbility.ITEMS_OUTPUT).or(blocks(GTAEMachines.ITEM_EXPORT_BUS_ME.get())).setMaxLayerLimited(1))
                                 .or(autoAbilities(true, false, true)))
                         .where('X', casingPredicate.or(abilities(PartAbility.EXPORT_FLUIDS_1X).or(blocks(GTAEMachines.FLUID_EXPORT_HATCH_ME.get())).setMaxLayerLimited(1)))
@@ -664,10 +684,12 @@ public final class GCYMMachines {
             })
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/watertight_casing"),
                     GTCEu.id("block/multiblock/gcym/large_distillery"))
+            .recoveryStacks(GTMachineModify::tinydustFromDustOutput)
             .register();
 
     public static final MultiblockMachineDefinition LARGE_EXTRACTOR = GTM
             .multiblock("large_extractor", GCYMMultiblockMachine::new)
+            .genLang("大型提取机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -679,7 +701,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "XXXXX", "XXXXX")
                     .aisle("XXXXX", "XCaCX", "XXXXX")
                     .aisle("XXXXX", "XXSXX", "XXXXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_WATERTIGHT.get()).setMinGlobalLimited(25)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -692,6 +714,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_EXTRUDER = GTM
             .multiblock("large_extruder", GCYMMultiblockMachine::new)
+            .genLang("大型压模机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -705,7 +728,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "XXXPX", "XXXGX")
                     .aisle("XXXXX", "XaXPX", "XXXGX")
                     .aisle("XXXXX", "XSXXX", "XXXXX")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_STRESS_PROOF.get()).setMinGlobalLimited(40)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -720,6 +743,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_SOLIDIFIER = GTM
             .multiblock("large_solidifier", GCYMMultiblockMachine::new)
+            .genLang("大型固化器")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -733,7 +757,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "XAAAX", "XAAAX", "XXXXX")
                     .aisle("XXXXX", "XCaCX", "XCACX", "XXXXX")
                     .aisle("#XXX#", "#XSX#", "#XXX#", "#XXX#")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_WATERTIGHT.get()).setMinGlobalLimited(45)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -748,6 +772,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition LARGE_WIREMILL = GTM
             .multiblock("large_wiremill", GCYMMultiblockMachine::new)
+            .genLang("大型线材工厂")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -760,7 +785,7 @@ public final class GCYMMachines {
                     .aisle("XXXXX", "XXXXX", "XXX##")
                     .aisle("XXXXX", "XaCCX", "XXXXX")
                     .aisle("XXXXX", "XSXXX", "XXX##")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_STRESS_PROOF.get()).setMinGlobalLimited(25)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -774,6 +799,7 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition MEGA_BLAST_FURNACE = GTM
             .multiblock("mega_blast_furnace", MegaBlastFurnaceMachine::new)
+            .genLang("转底炉")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
@@ -797,7 +823,7 @@ public final class GCYMMachines {
                         .aisle("XXXXXXXXXXXXX", "XXXXVVVVVXXXX", "##F#######F##", "##F#######F##", "##FFFHHHFFF##", "##F#######F##", "##F#######F##", "##F#######F##", "##F#######F##", "##F#######F##", "##FFFHHHFFF##", "#############", "#############", "#############", "#############", "#############", "###TTTTTTT###")
                         .aisle("#XXXXXXXXXXX#", "#XXXXXaXXXXX#", "###F#####F###", "###F#####F###", "###FFFFFFF###", "#############", "#############", "#############", "#############", "#############", "####FFFFF####", "#############", "#############", "#############", "#############", "#############", "#############")
                         .aisle("##XXXXXXXXX##", "##XXXXSXXXX##", "#############", "#############", "#############", "#############", "#############", "#############", "#############", "#############", "#############", "#############", "#############", "#############", "#############", "#############", "#############")
-                        .where('S', controller(blocks(definition.get())))
+                        .where('S', controller(definition))
                         .where('X', casing.or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                                 .or(autoAbilities(true, false, true)))
                         .where('C', heatingCoils())
@@ -820,11 +846,13 @@ public final class GCYMMachines {
 
     public static final MultiblockMachineDefinition MEGA_VACUUM_FREEZER = GTM
             .multiblock("mega_vacuum_freezer", GCYMMultiblockMachine::new)
+            .genLang("巨型真空冷冻机")
             .eutMultiplierTooltips(0.8)
             .durationMultiplierTooltips(0.6)
             .parallelizableTooltips()
             .allRotation()
             .recipeTypes(VACUUM_RECIPES)
+            .recipeTypes(ATOMIZATION_CONDENSATION_RECIPES)
             .recipeModifier(RecipeModifierFunction.GCYM_OVERCLOCKING)
             .block(CASING_ALUMINIUM_FROSTPROOF)
             .pattern(definition -> FactoryBlockPattern.start(definition)
@@ -834,7 +862,7 @@ public final class GCYMMachines {
                     .aisle("XXXaXXX#KVK", "XPAPAPPPPPV", "XAAAAAX#VPV", "XPAAAPPPPPV", "XAAAAAX#KVK", "XPAPAPX####", "XXXXXXX####")
                     .aisle("XXXXXXX#KKK", "XPPPPPX#KVK", "XPA#APX#KVK", "XPAAAPX#KVK", "XPAAAPX#KKK", "XPPPPPX####", "XXXXXXX####")
                     .aisle("#XXXXX#####", "#XXSXX#####", "#XGGGX#####", "#XGGGX#####", "#XGGGX#####", "#XXXXX#####", "###########")
-                    .where('S', controller(blocks(definition.get())))
+                    .where('S', controller(definition))
                     .where('X', blocks(CASING_ALUMINIUM_FROSTPROOF.get()).setMinGlobalLimited(140)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -871,7 +899,7 @@ public final class GCYMMachines {
                     .aisle(" ebbbbbbbe ", " cbeeeeebc ", " cbeeeeebc ", " cbeeeeebc ", " ebeeeeebe ", " bbbbbbbbb ", "  baaaaab  ", "  caaaaac  ", "  caaaaac  ", "  caaaaac  ", "  caaaaac  ", "  caaaaac  ", "  caaaaac  ", "  caaaaac  ", "  caaaaac  ", "  caaaaac  ", "  bbbbbbb  ", "   bbbbb   ")
                     .aisle("  ebbbbbe  ", "  c     c  ", "  c     c  ", "  c     c  ", "  efffffe  ", "  bbbbbbb  ", "   bbbbb   ", "   ccccc   ", "   ccccc   ", "   ccccc   ", "   ccccc   ", "   ccccc   ", "   ccccc   ", "   ccccc   ", "   ccccc   ", "   ccccc   ", "   bbbbb   ", "           ")
                     .aisle("   eeeee   ", "   cbbbc   ", "   cb~bc   ", "   cbbbc   ", "   eeeee   ", "   bbbbb   ", "           ", "           ", "           ", "           ", "           ", "           ", "           ", "           ", "           ", "           ", "           ", "           ")
-                    .where('~', controller(blocks(definition.get())))
+                    .where('~', controller(definition))
                     .where('b', blocks(GCYMBlocks.CASING_HIGH_TEMPERATURE_SMELTING.get()).setMinGlobalLimited(280)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(abilities(MAINTENANCE).setExactLimit(1))
@@ -906,7 +934,7 @@ public final class GCYMMachines {
                     .aisle("AAAAA", "ABaBA", "A   A", "ACCCA")
                     .aisle("AAAAA", "ABBBA", "A   A", "A C A")
                     .aisle("AAAAA", "AA~AA", "AAAAA", "AAAAA")
-                    .where('~', controller(blocks(definition.get())))
+                    .where('~', controller(definition))
                     .where('A', blocks(GCYMBlocks.CASING_SECURE_MACERATION.get())
                             .or(abilities(GTOPartAbility.ACCELERATE_HATCH).setMaxGlobalLimited(1))
                             .or(abilities(IMPORT_ITEMS).setMaxGlobalLimited(1).setPreviewCount(1))
@@ -939,7 +967,7 @@ public final class GCYMMachines {
                     .aisle("AAAAA", "ADDDA", "DDDDD", "AAAAA")
                     .aisle("AAAAA", "A   A", "ACCCA", "AAAAA")
                     .aisle("AA~AA", "A   A", "AAAAA", " AAA ")
-                    .where('~', controller(blocks(definition.get())))
+                    .where('~', controller(definition))
                     .where('A', blocks(GCYMBlocks.CASING_STRESS_PROOF.get())
                             .setMinGlobalLimited(80)
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
@@ -975,7 +1003,7 @@ public final class GCYMMachines {
                     .where('D', blocks(GTBlocks.CASING_TUNGSTENSTEEL_GEARBOX.get()))
                     .where('E', blocks(GTBlocks.CASING_GRATE.get()))
                     .where('F', blocks(GTBlocks.STEEL_HULL.get()))
-                    .where('G', controller(blocks(definition.get())))
+                    .where('G', controller(definition))
                     .where('A', blocks(GCYMBlocks.CASING_STRESS_PROOF.get())
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -1000,7 +1028,7 @@ public final class GCYMMachines {
                     .aisle("EEEEE", "AFFFA", "     ", "     ", "DFFFD", "CGGGC", "D   D", " DDD ")
                     .aisle("EEaEE", "AFFFA", "D   D", "     ", "DFFFD", "CGGGC", "DD DD", " DDD ")
                     .aisle("AABAA", "A   A", "A   A", "ACCCA", "DDDDD", "DCCCD", "DDDDD", "     ")
-                    .where('B', controller(blocks(definition.get())))
+                    .where('B', controller(definition))
                     .where('C', blocks(ChemicalHelper.getBlock(TagPrefix.frameGt, GTMaterials.BlueSteel)))
                     .where('D', blocks(GCYMBlocks.CASING_STRESS_PROOF.get()))
                     .where('E', blocks(GTBlocks.STEEL_HULL.get()))
@@ -1037,7 +1065,7 @@ public final class GCYMMachines {
                     .where('C', blocks(GTBlocks.SUPERCONDUCTING_COIL.get()))
                     .where('D', blocks(GTBlocks.CASING_PALLADIUM_SUBSTATION.get()))
                     .where('E', blocks(GCYMBlocks.ELECTROLYTIC_CELL.get()))
-                    .where('F', controller(blocks(definition.get())))
+                    .where('F', controller(definition))
                     .where('a', blocks(GCYMBlocks.CASING_NONCONDUCTING.get())
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
@@ -1071,7 +1099,7 @@ public final class GCYMMachines {
                     .where('D', blocks(GTBlocks.CASING_TUNGSTENSTEEL_GEARBOX.get()))
                     .where('E', blocks(GTBlocks.CASING_TEMPERED_GLASS.get()))
                     .where('F', blocks(GTBlocks.CASING_POLYTETRAFLUOROETHYLENE_PIPE.get()))
-                    .where('G', controller(blocks(definition.get())))
+                    .where('G', controller(definition))
                     .where('a', GTOPredicates.integralFramework())
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/solid/machine_casing_inert_ptfe"), GTCEu.id("block/multiblock/gcym/large_assembler"))
@@ -1097,7 +1125,7 @@ public final class GCYMMachines {
                     .where('A', blocks(GCYMBlocks.CASING_LASER_SAFE_ENGRAVING.get())
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
                             .or(autoAbilities(true, false, true)))
-                    .where('B', controller(blocks(definition.get())))
+                    .where('B', controller(definition))
                     .where('C', blocks(GCYMBlocks.CASING_LASER_SAFE_ENGRAVING.get()))
                     .where('D', blocks(GTBlocks.CASING_TUNGSTENSTEEL_PIPE.get()))
                     .where('E', blocks(GTBlocks.CASING_GRATE.get()))
@@ -1122,13 +1150,14 @@ public final class GCYMMachines {
                     .aisle("AAAAAAAAA", "      Ca~", "A    CBCA", "ADDAABCBA", "    A   A")
                     .aisle("AAAAAAAAA", "  BCB CCX", "A BCBCBCA", "ADDAABCBA", "    A   A")
                     .aisle("AAAAAAAAA", "XXXXXXXXX", "AAAAAAAAA", "AAAAAAAAA", "     AAA ")
-                    .where('~', controller(blocks(definition.get())))
+                    .where('~', controller(definition))
                     .where('A', blocks(GCYMBlocks.CASING_SECURE_MACERATION.get()))
                     .where('B', blocks(ChemicalHelper.getBlock(TagPrefix.frameGt, GTMaterials.Ultimet)))
                     .where('C', blocks(GTBlocks.CASING_TUNGSTENSTEEL_GEARBOX.get()))
                     .where('D', blocks(GTBlocks.CASING_TEMPERED_GLASS.get()))
                     .where('X', blocks(GCYMBlocks.CASING_SECURE_MACERATION.get())
                             .or(GTOPredicates.autoGCYMAbilities(definition.getRecipeTypes()))
+                            .or(blocks(GTOMachines.MACHINE_ACCESS_LINK.get()).setMaxGlobalLimited(1, 0))
                             .or(autoAbilities(true, false, true)))
                     .where(' ', any())
                     .where('a', GTOPredicates.integralFramework())

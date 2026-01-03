@@ -25,11 +25,15 @@ import com.gregtechceu.gtceu.api.pattern.MultiblockShapeInfo;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
 import com.gregtechceu.gtceu.common.data.*;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.gregtechceu.gtceu.api.machine.multiblock.PartAbility.*;
 import static com.gregtechceu.gtceu.api.pattern.Predicates.*;
+import static com.gtocore.common.data.GTORecipeTypes.ATOMIZATION_CONDENSATION_RECIPES;
+import static com.gtocore.common.data.GTORecipeTypes.VACUUM_RECIPES;
 import static com.gtocore.utils.register.MachineRegisterUtils.multiblock;
 
 public final class MultiBlockF {
@@ -51,7 +55,7 @@ public final class MultiBlockF {
                             .or(GTOPredicates.autoThreadLaserAbilities(definition.getRecipeTypes()))
                             .or(abilities(PARALLEL_HATCH).setMaxGlobalLimited(1))
                             .or(abilities(MAINTENANCE).setExactLimit(1)))
-                    .where('B', controller(blocks(definition.get())))
+                    .where('B', controller(definition))
                     .where('C', blocks(GCYMBlocks.CASING_HIGH_TEMPERATURE_SMELTING.get()))
                     .where('D', blocks(GCYMBlocks.HEAT_VENT.get()))
                     .where('E', blocks(GTBlocks.CASING_ENGINE_INTAKE.get()))
@@ -84,7 +88,7 @@ public final class MultiBlockF {
             .parallelizableOverclock()
             .block(GTOBlocks.LAFIUM_MECHANICAL_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
-                    .where('a', controller(blocks(definition.get())))
+                    .where('a', controller(definition))
                     .where('b', blocks(GTOBlocks.LAFIUM_MECHANICAL_CASING.get())
                             .or(GTOPredicates.autoLaserAbilities(definition.getRecipeTypes()))
                             .or(abilities(PARALLEL_HATCH).setMaxGlobalLimited(1))
@@ -102,10 +106,12 @@ public final class MultiBlockF {
     public static final MultiblockMachineDefinition COMPOUND_EXTREME_COOLING_UNIT = multiblock("compound_extreme_cooling_unit", "复合式极端冷却装置", CompoundExtremeCoolingMachine::new)
             .allRotation()
             .tooltips(GTOMachineStories.INSTANCE.getCompoundExtremeCoolingUnitTooltips().getSupplier())
+            .combinedTooltips(Component.translatable("gtocore.compound_extreme_cooling_unit.tooltips.combined"))
             .parallelizableTooltips()
             .laserTooltips()
             .multipleRecipesTooltips()
-            .recipeTypes(GTRecipeTypes.VACUUM_RECIPES)
+            .moduleTooltips(GTORecipeTypes.PLASMA_CONDENSER_RECIPES)
+            .recipeTypes(VACUUM_RECIPES, ATOMIZATION_CONDENSATION_RECIPES)
             .recipeTypes(GTORecipeTypes.PLASMA_CONDENSER_RECIPES)
             .block(GTBlocks.CASING_ALUMINIUM_FROSTPROOF)
             .pattern(definition -> CompoundExtremeCoolingMachine.getBlockPattern(0, definition))
@@ -133,7 +139,7 @@ public final class MultiBlockF {
                             .or(GTOPredicates.autoThreadLaserAbilities(definition.getRecipeTypes()))
                             .or(abilities(PARALLEL_HATCH).setMaxGlobalLimited(1))
                             .or(abilities(MAINTENANCE).setExactLimit(1)))
-                    .where('B', controller(blocks(definition.get())))
+                    .where('B', controller(definition))
                     .where('C', blocks(ChemicalHelper.getBlock(TagPrefix.frameGt, GTMaterials.TungstenCarbide)))
                     .where('D', blocks(GTOBlocks.NAQUADAH_REINFORCED_PLANT_CASING.get()))
                     .where('E', blocks(GCYMBlocks.CASING_WATERTIGHT.get()))
@@ -170,7 +176,7 @@ public final class MultiBlockF {
                             .or(abilities(MAINTENANCE).setExactLimit(1)))
                     .where('E', blocks(GCYMBlocks.MOLYBDENUM_DISILICIDE_COIL_BLOCK.get()))
                     .where('F', blocks(GCYMBlocks.ELECTROLYTIC_CELL.get()))
-                    .where('G', controller(blocks(definition.get())))
+                    .where('G', controller(definition))
                     .where('H', blocks(GTOBlocks.ACCELERATED_PIPELINE.get()))
                     .where(' ', any())
                     .build())
@@ -206,7 +212,7 @@ public final class MultiBlockF {
                     .where('Q', blocks(GTOBlocks.MOLECULAR_CASING.get())
                             .or(GTOPredicates.autoThreadLaserAbilities(definition.getRecipeTypes()))
                             .or(abilities(MAINTENANCE).setExactLimit(1)))
-                    .where('R', controller(blocks(definition.get())))
+                    .where('R', controller(definition))
                     .where(' ', any())
                     .build())
             .workableCasingRenderer(GTOCore.id("block/casings/molecular_casing"), GTOCore.id("block/multiblock/general1"))
@@ -227,7 +233,7 @@ public final class MultiBlockF {
                             .or(GTOPredicates.autoThreadLaserAbilities(definition.getRecipeTypes()))
                             .or(abilities(PARALLEL_HATCH).setMaxGlobalLimited(1))
                             .or(abilities(MAINTENANCE).setExactLimit(1)))
-                    .where('D', controller(blocks(definition.get())))
+                    .where('D', controller(definition))
                     .where('E', blocks(GTOBlocks.MC_NYLON_TENSILE_MECHANICAL_SHELL.get()))
                     .where('F', blocks(GTOBlocks.DIMENSION_INJECTION_CASING.get()))
                     .where('G', blocks(GTOBlocks.AMPROSIUM_GEARBOX.get()))
@@ -270,7 +276,7 @@ public final class MultiBlockF {
                     .where('J', blocks(GTBlocks.FUSION_GLASS.get()))
                     .where('K', blocks(GTOBlocks.HYPER_MECHANICAL_CASING.get()))
                     .where('L', blocks(ChemicalHelper.getBlock(TagPrefix.frameGt, GTMaterials.Tritanium)))
-                    .where('M', controller(blocks(definition.get())))
+                    .where('M', controller(definition))
                     .where(' ', any())
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/hpca/high_power_casing"), GTOCore.id("block/multiblock/general1"))
@@ -307,7 +313,7 @@ public final class MultiBlockF {
                     .where('S', blocks(GTOBlocks.NAQUADAH_ALLOY_CASING.get())
                             .or(GTOPredicates.autoLaserAbilities(definition.getRecipeTypes()))
                             .or(abilities(MAINTENANCE).setExactLimit(1)))
-                    .where('T', controller(blocks(definition.get())))
+                    .where('T', controller(definition))
                     .where(' ', any())
                     .build())
             .workableCasingRenderer(GTOCore.id("block/casings/hyper_mechanical_casing"), GTCEu.id("block/multiblock/gcym/large_assembler"))

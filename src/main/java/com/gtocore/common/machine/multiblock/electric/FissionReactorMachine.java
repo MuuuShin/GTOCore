@@ -16,7 +16,6 @@ import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.ConditionalSubscriptionHandler;
 import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
-import com.gregtechceu.gtceu.api.machine.multiblock.WorkableMultiblockMachine;
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
@@ -26,7 +25,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.material.Fluid;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import java.util.List;
 
@@ -36,9 +34,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class FissionReactorMachine extends ElectricMultiblockMachine implements IExplosionMachine, IParallelMachine {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            FissionReactorMachine.class, WorkableMultiblockMachine.MANAGED_FIELD_HOLDER);
 
     private static final Fluid DistilledWater = GTMaterials.DistilledWater.getFluid();
     private static final Fluid Steam = GTMaterials.Steam.getFluid();
@@ -62,12 +57,7 @@ public final class FissionReactorMachine extends ElectricMultiblockMachine imple
 
     public FissionReactorMachine(MetaMachineBlockEntity holder) {
         super(holder);
-        HeatSubs = new ConditionalSubscriptionHandler(this, this::HeatUpdate, () -> isFormed() || heat > 298);
-    }
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
+        HeatSubs = new ConditionalSubscriptionHandler(this, this::HeatUpdate, 20, () -> isFormed() || heat > 298);
     }
 
     @Override
@@ -120,51 +110,49 @@ public final class FissionReactorMachine extends ElectricMultiblockMachine imple
     }
 
     private void HeatUpdate() {
-        if (getOffsetTimer() % 20 == 0) {
-            HeatSubs.updateSubscription();
-            if (getRecipeLogic().isWorking()) {
-                boolean isCooler = false;
-                int required = recipeHeat * parallel * heat / 1500;
-                if (required > 0) {
-                    long[] a = getFluidAmount(DistilledWater, SodiumPotassium);
-                    int capacity = (int) Math.min(Math.max(a[0] / 800, a[1] / 20), (cooler - (coolerAdjacent / 3L)) << 3);
-                    if (capacity - required >= 0) {
-                        if (inputFluid(DistilledWater, capacity * 800L)) {
-                            isCooler = outputFluid(Steam, (int) (capacity * 800 * (heat > 373 ? 160 : 160 / Math.pow(1.4, 373 - heat))));
-                        } else if (inputFluid(SodiumPotassium, capacity * 20L)) {
-                            if (heat > 825) {
-                                isCooler = outputFluid(SupercriticalSodiumPotassium, capacity * 20L);
-                            } else isCooler = outputFluid(HotSodiumPotassium, capacity * 20L);
-                        }
-                    }
-                    if (isCooler) {
-                        int progress = getProgress() + 20 * capacity / required;
-                        int surplusProgress = progress - getMaxProgress();
-                        if (surplusProgress > 0) {
-                            if (heat > 298) heat -= surplusProgress / 20;
-                        } else {
-                            getRecipeLogic().setProgress(progress);
-                        }
+        HeatSubs.updateSubscription();
+        if (getRecipeLogic().isWorking()) {
+            boolean isCooler = false;
+            int required = recipeHeat * parallel * heat / 1500;
+            if (required > 0) {
+                long[] a = getFluidAmount(DistilledWater, SodiumPotassium);
+                int capacity = (int) Math.min(Math.max(a[0] / 800, a[1] / 20), (cooler - (coolerAdjacent / 3L)) << 3);
+                if (capacity - required >= 0) {
+                    if (inputFluid(DistilledWater, capacity * 800L)) {
+                        isCooler = outputFluid(Steam, (int) (capacity * 800 * (heat > 373 ? 160 : 160 / Math.pow(1.4, 373 - heat))));
+                    } else if (inputFluid(SodiumPotassium, capacity * 20L)) {
+                        if (heat > 825) {
+                            isCooler = outputFluid(SupercriticalSodiumPotassium, capacity * 20L);
+                        } else isCooler = outputFluid(HotSodiumPotassium, capacity * 20L);
                     }
                 }
-                if (!isCooler) heat += recipeHeat * heatAdjacent;
+                if (isCooler) {
+                    int progress = getProgress() + 20 * capacity / required;
+                    int surplusProgress = progress - getMaxProgress();
+                    if (surplusProgress > 0) {
+                        if (heat > 298) heat -= surplusProgress / 20;
+                    } else {
+                        getRecipeLogic().setProgress(progress);
+                    }
+                }
+            }
+            if (!isCooler) heat += recipeHeat * heatAdjacent;
+        } else {
+            if (heat > 298) {
+                heat--;
+            } else if (damaged > 0) {
+                damaged--;
+            }
+        }
+        if (heat > 1500) {
+            if (damaged > 99) {
+                doExplosion(MachineUtils.getOffsetPos(4, 4, getFrontFacing(), getPos()), fuel);
             } else {
-                if (heat > 298) {
-                    heat--;
-                } else if (damaged > 0) {
-                    damaged--;
-                }
+                damaged += Math.max(1, heatAdjacent / 6);
             }
-            if (heat > 1500) {
-                if (damaged > 99) {
-                    doExplosion(MachineUtils.getOffsetPos(4, 4, getFrontFacing(), getPos()), fuel);
-                } else {
-                    damaged += Math.max(1, heatAdjacent / 6);
-                }
-            }
-            if (sensorMachine != null) {
-                sensorMachine.update(heat);
-            }
+        }
+        if (sensorMachine != null) {
+            sensorMachine.update(heat);
         }
     }
 

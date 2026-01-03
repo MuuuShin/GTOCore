@@ -2,6 +2,7 @@ package com.gtocore.common.data.material;
 
 import com.gtocore.api.data.material.GTOMaterialFlags;
 import com.gtocore.common.data.GTOElements;
+import com.gtocore.common.data.GTORarities;
 
 import com.gtolib.api.item.tool.GTOToolType;
 
@@ -13,14 +14,12 @@ import com.gregtechceu.gtceu.api.fluids.FluidBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Rarity;
 
-import committee.nova.mods.avaritia.init.registry.ModRarities;
-
 import java.awt.*;
 
 import static com.gregtechceu.gtceu.api.data.chemical.material.info.MaterialFlags.*;
 import static com.gregtechceu.gtceu.api.data.chemical.material.properties.BlastProperty.GasTier.*;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.*;
-import static com.gtocore.api.data.material.GTOMaterialFlags.GENERATE_CRYSTAL_SEED;
+import static com.gtocore.api.data.material.GTOMaterialFlags.*;
 import static com.gtocore.api.data.material.GTOMaterialIconSet.*;
 import static com.gtocore.common.data.GTOMaterials.*;
 import static com.gtolib.utils.register.MaterialsRegisterUtils.material;
@@ -34,7 +33,7 @@ public final class MaterialA {
                 .components(NetherQuartz, 1, CertusQuartz, 1, Redstone, 1)
                 .color(0x8f5ccb)
                 .iconSet(QUARTZ)
-                .flags(NO_SMASHING, NO_SMELTING, DISABLE_DECOMPOSITION, GENERATE_PLATE)
+                .flags(NO_SMASHING, NO_SMELTING, DISABLE_DECOMPOSITION, GENERATE_PLATE, CRYSTALLIZABLE)
                 .buildAndRegister();
 
         // ad
@@ -70,7 +69,7 @@ public final class MaterialA {
         CopperAlloy = material("copper_alloy", "铜合金")
                 .ingot()
                 .color(0xc79738)
-                .iconSet(SHINY)
+                .iconSet(METALLIC)
                 .flags(DISABLE_DECOMPOSITION)
                 .components(Copper, 1, Silicon, 1)
                 .buildAndRegister();
@@ -78,7 +77,7 @@ public final class MaterialA {
         EnergeticAlloy = material("energetic_alloy", "充能合金")
                 .ingot()
                 .color(0xffb545)
-                .iconSet(SHINY)
+                .iconSet(METALLIC)
                 .flags(DISABLE_DECOMPOSITION, GENERATE_FRAME)
                 .blastTemp(1650, LOW, GTValues.VA[GTValues.MV], 700)
                 .components(Redstone, 1, Gold, 1, Glowstone, 1)
@@ -90,7 +89,7 @@ public final class MaterialA {
                 .fluid()
                 .color(0xa4ff70)
                 .iconSet(METALLIC)
-                .flags(DISABLE_DECOMPOSITION, GENERATE_FRAME)
+                .flags(DISABLE_DECOMPOSITION, GENERATE_FRAME, GENERATE_GEAR, CAN_BE_COOLED_DOWN_BY_BATHING)
                 .blastTemp(2450, LOW, GTValues.VA[GTValues.MV], 900)
                 .components(EnergeticAlloy, 1, EnderPearl, 1)
                 .cableProperties(512, 1, 0, true)
@@ -100,8 +99,8 @@ public final class MaterialA {
                 .ingot()
                 .fluid()
                 .color(0xf66565)
-                .iconSet(SHINY)
-                .flags(DISABLE_DECOMPOSITION, GENERATE_FRAME)
+                .iconSet(METALLIC)
+                .flags(DISABLE_DECOMPOSITION, GENERATE_PLATE, GENERATE_FRAME)
                 .components(Redstone, 1, Silicon, 1)
                 .buildAndRegister();
 
@@ -119,7 +118,7 @@ public final class MaterialA {
                 .ingot()
                 .fluid()
                 .color(0x6ae26e)
-                .iconSet(SHINY)
+                .iconSet(METALLIC)
                 .flags(DISABLE_DECOMPOSITION, GENERATE_FRAME)
                 .components(Iron, 1, EnderPearl, 1)
                 .cableProperties(8, 1, 0, true)
@@ -128,8 +127,8 @@ public final class MaterialA {
         DarkSteel = material("dark_steel", "玄钢")
                 .ingot()
                 .color(0x414751)
-                .iconSet(DULL)
-                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION)
+                .iconSet(METALLIC)
+                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION, GENERATE_GEAR)
                 .blastTemp(1450, LOW, GTValues.VA[GTValues.MV], 600)
                 .components(Iron, 1, Coal, 1, Obsidian, 1)
                 .toolStats(ToolProperty.Builder.of(30, 16, 8192, 5, GTOToolType.VAJRA_HV).magnetic().build())
@@ -255,6 +254,25 @@ public final class MaterialA {
                 .iconSet(MAGNETIC)
                 .buildAndRegister();
 
+        SoulCrystal = material("soul_crystal", "灵魂水晶")
+                .gem()
+                .dust()
+                .color(new Color(0, 35, 43).getRGB())
+                .flags(DISABLE_DECOMPOSITION)
+                .iconSet(EMERALD)
+                .buildAndRegister().setFormula("?", false);
+
+        Resonarium = material("resonarium", "共振物质")
+                .gem()
+                .fluid()
+                .plasma()
+                .radioactiveHazard(15)
+                .element(GTOElements.RESONARIUM)
+                .color(new Color(76, 209, 247).getRGB())
+                .iconSet(EMERALD)
+                .flags(GENERATE_PLATE, GENERATE_ROD)
+                .buildAndRegister();
+
         Adamantium = material("adamantium", "艾德曼合金")
                 .ingot()
                 .fluid()
@@ -318,7 +336,7 @@ public final class MaterialA {
                 .components(Tungsten, 8, Naquadria, 7, Trinium, 4, Carbon, 4, Vanadium, 3,
                         Plutonium239, 1)
                 .iconSet(METALLIC)
-                .flags(DISABLE_DECOMPOSITION)
+                .flags(DISABLE_DECOMPOSITION, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         Draconium = material("draconium", "龙")
@@ -333,7 +351,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         Chaos = material("chaos", "混沌物质")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .radioactiveHazard(50)
                 .liquid(new FluidBuilder().temperature(1000000).customStill())
@@ -346,7 +364,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         Cosmic = material("cosmic", "宇宙")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .color(0x2d3e5e)
                 .iconSet(COSMIC)
@@ -354,7 +372,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         Hypogen = material("hypogen", "海珀珍")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .fluid()
                 .color(0xda916b)
@@ -367,7 +385,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         Shirabon = material("shirabon", "调律源金")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .fluid()
                 .color(0xc61361)
@@ -418,7 +436,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         CosmicNeutronium = material("cosmic_neutronium", "宇宙中子素")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .radioactiveHazard(50)
                 .liquid(new FluidBuilder().temperature(1000000).customStill())
@@ -460,7 +478,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         AwakenedDraconium = material("awakened_draconium", "觉醒龙")
-                .rarity(ModRarities.LEGEND)
+                .rarity(GTORarities.LEGEND)
                 .ingot()
                 .fluid()
                 .plasma()
@@ -484,7 +502,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         Infinity = material("infinity", "无尽")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .radioactiveHazard(80)
                 .liquid(new FluidBuilder().temperature(1000000).customStill())
@@ -501,10 +519,10 @@ public final class MaterialA {
                 .plasma()
                 .blastTemp(11000, HIGHER)
                 .element(GTOElements.BLAZECUBE)
-                .color(0xff6600)
+                .color(new Color(252, 196, 76).getRGB())
                 .iconSet(METALLIC)
-                .flags(GENERATE_GEAR, GENERATE_BOLT_SCREW)
-                .cableProperties(GTValues.V[GTValues.IV], 128, 32)
+                .flags(GENERATE_GEAR, GENERATE_BOLT_SCREW, GENERATE_FINE_WIRE)
+                .cableProperties(GTValues.V[GTValues.UIV], 128, 32)
                 .buildAndRegister();
 
         Etrium = material("etrium", "埃忒恩")
@@ -513,7 +531,7 @@ public final class MaterialA {
                 .blastTemp(11800, HIGHER)
                 .element(GTOElements.ETRIUM)
                 .color(new Color(123, 252, 215).getRGB())
-                .iconSet(METALLIC)
+                .iconSet(SHINY)
                 .flags(GENERATE_FRAME, GENERATE_PLATE, GENERATE_FOIL, GENERATE_ROD)
                 .buildAndRegister();
 
@@ -587,7 +605,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         Eternity = material("eternity", "永恒")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .radioactiveHazard(100)
                 .liquid(new FluidBuilder().customStill())
@@ -598,7 +616,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         Magmatter = material("magmatter", "磁物质")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .liquid(new FluidBuilder().customStill())
                 .element(GTOElements.MAGMATTER)
@@ -684,7 +702,8 @@ public final class MaterialA {
                 .blastTemp(13100, HIGHER)
                 .color(0xd08c38)
                 .iconSet(QUANTUM_CHROMO_DYNAMICALLY)
-                .flags(GENERATE_FRAME, GENERATE_PLATE)
+                .itemPipeProperties(1000000, 1000000)
+                .flags(GENERATE_FRAME, GENERATE_PLATE, GENERATE_CURVED_PLATE)
                 .buildAndRegister();
 
         TranscendentMetal = material("transcendent_metal", "超时空金属")
@@ -703,7 +722,7 @@ public final class MaterialA {
                 .fluid()
                 .ore()
                 .radioactiveHazard(10)
-                .addOreByproducts(Europium)
+                .addOreByproducts(Europium, Etrium)
                 .blastTemp(14600, HIGHER, GTValues.VA[GTValues.UIV], 1200)
                 .element(GTOElements.URUIUM)
                 .color(0x87ceeb)
@@ -713,7 +732,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         MagnetohydrodynamicallyConstrainedStarMatter = material("magnetohydrodynamically_constrained_star_matter", "磁流体动力学约束恒星物质")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .radioactiveHazard(100)
                 .liquid(new FluidBuilder().temperature(100).customStill())
@@ -801,7 +820,7 @@ public final class MaterialA {
                 .buildAndRegister();
 
         ChaosInfinityAlloy = material("chaos_infinity_alloy", "混沌无尽合金")
-                .rarity(ModRarities.COSMIC)
+                .rarity(GTORarities.COSMIC)
                 .ingot()
                 .radioactiveHazard(100)
                 .liquid(new FluidBuilder().customStill())
@@ -822,7 +841,7 @@ public final class MaterialA {
                         SamariumIronArsenicOxide, 1, IndiumTinBariumTitaniumCuprate, 1)
                 .color(0x006699)
                 .iconSet(METALLIC)
-                .flags(GENERATE_FINE_WIRE, DISABLE_DECOMPOSITION)
+                .flags(GENERATE_FINE_WIRE, DISABLE_DECOMPOSITION, NEED_BLAST_IN_SPACE)
                 .cableProperties(GTValues.V[GTValues.UEV], 32, 0, true)
                 .buildAndRegister();
 
@@ -833,7 +852,7 @@ public final class MaterialA {
                 .components(Naquadria, 1, Taranium, 1)
                 .color(0x000d1a)
                 .iconSet(RADIOACTIVE)
-                .flags(GENERATE_ROD, GENERATE_FINE_WIRE, DISABLE_DECOMPOSITION, GENERATE_FRAME)
+                .flags(GENERATE_ROD, GENERATE_FINE_WIRE, DISABLE_DECOMPOSITION, GENERATE_FRAME, NEED_BLAST_IN_SPACE, GENERATE_DENSE)
                 .cableProperties(GTValues.V[GTValues.UXV], 4, 128)
                 .buildAndRegister();
 
@@ -935,7 +954,7 @@ public final class MaterialA {
                 .color(0x92d959)
                 .iconSet(METALLIC)
                 .flags(GTOMaterialFlags.GENERATE_COMPONENT, GENERATE_ROUND, GENERATE_ROTOR, GENERATE_GEAR, GENERATE_SMALL_GEAR, GENERATE_LONG_ROD,
-                        DISABLE_DECOMPOSITION)
+                        DISABLE_DECOMPOSITION, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         Vibramantium = material("vibramantium", "艾德曼振金")
@@ -945,7 +964,8 @@ public final class MaterialA {
                 .components(Vibranium, 1, Adamantium, 3)
                 .color(0xff009c)
                 .iconSet(METALLIC)
-                .flags(GTOMaterialFlags.GENERATE_COMPONENT, GENERATE_ROUND, GENERATE_ROTOR, GENERATE_GEAR, GENERATE_SMALL_GEAR, GENERATE_LONG_ROD, DISABLE_DECOMPOSITION)
+                .flags(GTOMaterialFlags.GENERATE_COMPONENT, GENERATE_ROUND, GENERATE_ROTOR, GENERATE_GEAR, GENERATE_SMALL_GEAR, GENERATE_LONG_ROD,
+                        DISABLE_DECOMPOSITION, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         EglinSteel = material("eglin_steel", "埃格林钢")
@@ -1028,7 +1048,7 @@ public final class MaterialA {
                 .components(Cobalt, 9, Chromium, 9, Manganese, 5, Titanium, 2)
                 .color(0x888192)
                 .iconSet(METALLIC)
-                .flags(GENERATE_GEAR, DISABLE_DECOMPOSITION)
+                .flags(GENERATE_GEAR, DISABLE_DECOMPOSITION, GENERATE_FOIL, GENERATE_PLATE)
                 .buildAndRegister();
 
         SiliconCarbide = material("silicon_carbide", "碳化硅")
@@ -1038,7 +1058,73 @@ public final class MaterialA {
                 .components(Silicon, 1, Carbon, 1)
                 .color(0x34adb6)
                 .iconSet(METALLIC)
-                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION)
+                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION, GENERATE_FIBER, HAS_NANOSCALE_FORM)
+                .buildAndRegister();
+
+        LeadZirconateTitanateCeramic = material("lead_zirconate_titanate_ceramic", "钛酸铅锆")
+                .dust()
+                .components(Lead, 1, Zirconium, 1, Titanium, 1, Oxygen, 3)
+                .color(0xffa500)
+                .iconSet(BRIGHT)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        LeadNiobateMagnesiumNiobateCeramic = material("lead_niobate_magnesium_niobate_ceramic", "铌酸铅镁")
+                .dust()
+                .components(Lead, 1, Niobium, 1, Magnesium, 1, Oxygen, 3)
+                .color(0xff4500)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        PhosphoricAcidMagnesiumPhosphateCement = material("phosphoric_acid_magnesium_phosphate_cement", "磷酸镁粘合剂")
+                .fluid()
+                .components(Phosphorus, 1, Magnesium, 1, Oxygen, 4)
+                .color(0xffe135)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        PhosphoricAcidChromiumPhosphateCement = material("phosphoric_acid_chromium_phosphate_cement", "磷酸铬粘合剂")
+                .fluid()
+                .components(Phosphorus, 1, Chromium, 1, Oxygen, 4)
+                .color(0x8a9a5b)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        SodiumMolybdate = material("sodium_molybdate", "钼酸钠")
+                .dust()
+                .components(Sodium, 2, Molybdenum, 1, Oxygen, 4)
+                .color(0xbcdef0)
+                .iconSet(BRIGHT)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        AluminumAcetylacetonate = material("aluminum_acetylacetonate", "三(乙酰丙酮)铝")
+                .dust()
+                .components(Aluminium, 1, Carbon, 15, Hydrogen, 21, Oxygen, 6)
+                .color(0xffd700)
+                .iconSet(BRIGHT)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        Acetylacetonate = material("acetylacetonate", "乙酰丙酮")
+                .fluid()
+                .components(Carbon, 5, Hydrogen, 8, Oxygen, 2)
+                .color(0xffffF0)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        Mestitylene = material("mestitylene", "间三甲苯")
+                .fluid()
+                .components(Carbon, 9, Hydrogen, 12)
+                .color(0xfff8dc)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        LeadOxide = material("lead_oxide", "氧化铅")
+                .dust()
+                .components(Lead, 1, Oxygen, 1)
+                .color(0xffd700)
+                .iconSet(BRIGHT)
+                .flags(DISABLE_DECOMPOSITION)
+                .buildAndRegister();
+        NiobiumOxide = material("niobium_oxide", "氧化铌")
+                .dust()
+                .components(Niobium, 2, Oxygen, 5)
+                .color(0xc0c4c0)
+                .iconSet(BRIGHT)
+                .flags(DISABLE_DECOMPOSITION)
                 .buildAndRegister();
 
         QuantumMetal = material("quantum_metal", "量子金属")
@@ -1103,7 +1189,7 @@ public final class MaterialA {
                         SalamanderCrystal, 1)
                 .color(0x595137)
                 .iconSet(METALLIC)
-                .flags(DISABLE_DECOMPOSITION, GENERATE_FOIL)
+                .flags(DISABLE_DECOMPOSITION, GENERATE_FOIL, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         Lumiium = material("lumiium", "流明")
@@ -1123,7 +1209,7 @@ public final class MaterialA {
                 .components(Lumiium, 18, Silver, 8, Sunnarium, 4)
                 .color(0xe2bede)
                 .iconSet(BRIGHT)
-                .flags(DISABLE_DECOMPOSITION, GENERATE_FOIL)
+                .flags(DISABLE_DECOMPOSITION, GENERATE_FOIL, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         SuperheavyLAlloy = material("superheavy_l_alloy", "超重元素-轻合金")
@@ -1134,7 +1220,7 @@ public final class MaterialA {
                         Meitnerium, 1, Darmstadtium, 1, Roentgenium, 1)
                 .color(0x2b45df)
                 .iconSet(METALLIC)
-                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION)
+                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         SuperheavyHAlloy = material("superheavy_h_alloy", "超重元素-重合金")
@@ -1145,7 +1231,7 @@ public final class MaterialA {
                         Tennessine, 1, Oganesson, 1)
                 .color(0xe84b36)
                 .iconSet(METALLIC)
-                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION)
+                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         ZirconiumCarbide = material("zirconium_carbide", "碳化锆")
@@ -1155,7 +1241,7 @@ public final class MaterialA {
                 .components(Zirconium, 1, Carbon, 1)
                 .color(0xd2bfaa)
                 .iconSet(METALLIC)
-                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION, GTOMaterialFlags.GENERATE_TARGET_BASE)
+                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION, GTOMaterialFlags.GENERATE_TARGET_BASE, GTOMaterialFlags.GENERATE_MXene)
                 .buildAndRegister();
 
         MarM200Steel = material("mar_m_200_steel", "MAR-M200特种钢")
@@ -1185,7 +1271,7 @@ public final class MaterialA {
                 .blastTemp(3800, HIGH, GTValues.VA[GTValues.HV], 700)
                 .components(Iron, 15, Niobium, 1, Vanadium, 4, Carbon, 2)
                 .color(0xb4b3b0)
-                .iconSet(SHINY)
+                .iconSet(METALLIC)
                 .flags(GENERATE_DENSE, DISABLE_DECOMPOSITION)
                 .buildAndRegister();
 
@@ -1285,7 +1371,7 @@ public final class MaterialA {
                 .color(0x414151)
                 .components(Silicon, 1)
                 .iconSet(METALLIC)
-                .flags(DISABLE_DECOMPOSITION, GENERATE_CRYSTAL_SEED)
+                .flags(DISABLE_DECOMPOSITION, GENERATE_CRYSTAL_SEED, CAN_BE_COOLED_DOWN_BY_BATHING)
                 .buildAndRegister().setFormula("Si(6N)");
 
         UltraHighPuritySilicon = material("ultra_high_purity_silicon", "超高纯硅")
@@ -1367,7 +1453,7 @@ public final class MaterialA {
                 .fluid()
                 .color(0x9f9f53)
                 .iconSet(DULL)
-                .flags(GENERATE_FOIL)
+                .flags(GENERATE_FOIL, GENERATE_FIBER)
                 .buildAndRegister();
 
         Radox = material("radox", "拉多X聚合物")
@@ -1446,7 +1532,7 @@ public final class MaterialA {
                 .blastTemp(12400, HIGHER, GTValues.VA[GTValues.UHV], 800)
                 .components(Scandium, 1, Yttrium, 1, LanthanoidsMix1, 1, LanthanoidsMix2, 1)
                 .iconSet(METALLIC)
-                .flags(DISABLE_DECOMPOSITION)
+                .flags(DISABLE_DECOMPOSITION, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         ActinoidsMix1 = material("actinoids_mix_1", "轻锕系元素混合物")
@@ -1527,7 +1613,7 @@ public final class MaterialA {
                 .blastTemp(13600, HIGHER, GTValues.VA[GTValues.UHV], 900)
                 .components(TransitionMix1, 1, TransitionMix2, 1, TransitionMix3, 1)
                 .iconSet(METALLIC)
-                .flags(DISABLE_DECOMPOSITION)
+                .flags(DISABLE_DECOMPOSITION, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         PoorMix = material("poor_mix", "贫金属元素混合物")
@@ -1572,7 +1658,7 @@ public final class MaterialA {
                 .color(0x3E2C2B)
                 .iconSet(METALLIC)
                 .components(SuperheavyLAlloy, 1, SuperheavyHAlloy, 1)
-                .flags(NO_UNIFICATION, FORCE_GENERATE_BLOCK)
+                .flags(NO_UNIFICATION, FORCE_GENERATE_BLOCK, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         Periodicium = material("periodicium", "錭錤錶")
@@ -1583,7 +1669,7 @@ public final class MaterialA {
                         AlkalineEarthMix, 1, RareearthMix, 1, AlkalineMix, 1, ActinoidsMix, 1, SuperheavyMix, 1)
                 .color(0x3d4bf6)
                 .iconSet(METALLIC)
-                .flags(DISABLE_DECOMPOSITION)
+                .flags(DISABLE_DECOMPOSITION, NEED_BLAST_IN_SPACE)
                 .buildAndRegister();
 
         EnergeticNetherite = material("energetic_netherite", "充能下界合金")

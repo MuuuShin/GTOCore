@@ -30,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Set;
 
@@ -40,6 +39,9 @@ public abstract class PatternAccessTermMenuMixin implements IPatternAccessTermMe
     @Unique
     @GuiSync(2)
     private ShowMolecularAssembler gtolib$showMolecularAssembler;
+
+    @Unique
+    private ShowMolecularAssembler gtolib$lastShownMolecularAssembler;
 
     @Shadow(remap = false)
     protected abstract boolean isFull(PatternContainer logic);
@@ -54,6 +56,9 @@ public abstract class PatternAccessTermMenuMixin implements IPatternAccessTermMe
     @Shadow(remap = false)
     @Final
     private Set<PatternContainer> pinnedHosts;
+
+    @Shadow(remap = false)
+    protected boolean updatePatterns;
 
     @Override
     public @NotNull ShowMolecularAssembler gtolib$getShownMolecularAssemblers() {
@@ -76,6 +81,14 @@ public abstract class PatternAccessTermMenuMixin implements IPatternAccessTermMe
             gtolib$showMolecularAssembler = this.host.getConfigManager().getSetting(GTOSettings.TERMINAL_SHOW_MOLECULAR_ASSEMBLERS);
         } else {
             gtolib$showMolecularAssembler = ShowMolecularAssembler.ALL;
+        }
+    }
+
+    @Inject(method = "broadcastChanges", at = @At(value = "INVOKE", target = "Lappeng/menu/AEBaseMenu;broadcastChanges()V"))
+    private void broadcastChanges(CallbackInfo ci) {
+        if (gtolib$lastShownMolecularAssembler != gtolib$showMolecularAssembler) {
+            gtolib$lastShownMolecularAssembler = gtolib$showMolecularAssembler;
+            updatePatterns = true;
         }
     }
 
@@ -119,10 +132,13 @@ public abstract class PatternAccessTermMenuMixin implements IPatternAccessTermMe
         };
     }
 
-    @Inject(method = "isVisible", at = @At("HEAD"), cancellable = true, remap = false)
-    private void modifyIsVisible(PatternContainer container, CallbackInfoReturnable<Boolean> cir) {
-        boolean result = gtolib$isMolecularAssembler(container) && gtolib$originalIsVisible(container);
-        cir.setReturnValue(result);
+    /**
+     * @author
+     * @reason
+     */
+    @Overwrite(remap = false)
+    private boolean isVisible(PatternContainer container) {
+        return gtolib$isMolecularAssembler(container) && gtolib$originalIsVisible(container);
     }
 
     @Redirect(

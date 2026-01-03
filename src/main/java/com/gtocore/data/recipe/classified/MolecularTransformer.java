@@ -6,10 +6,7 @@ import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-
-import com.enderio.base.common.init.EIOItems;
 
 import static com.gtocore.common.data.GTORecipeTypes.MOLECULAR_TRANSFORMER_RECIPES;
 
@@ -45,14 +42,14 @@ final class MolecularTransformer {
                 .save();
 
         MOLECULAR_TRANSFORMER_RECIPES.recipeBuilder("nether_star")
-                .inputItems(new ItemStack(Blocks.WITHER_SKELETON_SKULL.asItem(), 2))
+                .inputItems(Blocks.WITHER_SKELETON_SKULL.asItem(), 2)
                 .outputItems(TagPrefix.gem, GTMaterials.NetherStar)
                 .EUt(1920)
                 .duration(18000)
                 .save();
 
         MOLECULAR_TRANSFORMER_RECIPES.recipeBuilder("small_sunnarium_dust")
-                .inputItems(EIOItems.CLAYED_GLOWSTONE.asItem())
+                .inputItems(TagPrefix.dust, GTMaterials.Glowstone)
                 .outputItems(TagPrefix.dustSmall, GTOMaterials.Sunnarium)
                 .EUt(524288)
                 .duration(1600)
@@ -96,7 +93,7 @@ final class MolecularTransformer {
 
         MOLECULAR_TRANSFORMER_RECIPES.recipeBuilder("energy_crystal")
                 .inputItems(TagPrefix.gemExquisite, GTMaterials.Ruby)
-                .outputItems(GTItems.ENERGIUM_CRYSTAL.asStack(2))
+                .outputItems(GTItems.ENERGIUM_CRYSTAL, 2)
                 .EUt(524288)
                 .duration(200)
                 .save();

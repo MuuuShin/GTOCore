@@ -46,15 +46,15 @@ public class MonitorAEThroughput extends AbstractAEInfoMonitor {
     @Persisted
     private final AEFluid aeFluid = new AEFluid();
     @DescSynced
-    private long[] currentAmount = new long[] { 0, 0 };
+    private final long[] currentAmount = new long[] { 0, 0 };
     @DescSynced
-    private long[] lastMinuteStat = new long[] { 0, 0 };
+    private final long[] lastMinuteStat = new long[] { 0, 0 };
     @DescSynced
-    private long[] lastHourStat = new long[] { 0, 0 };
+    private final long[] lastHourStat = new long[] { 0, 0 };
     @DescSynced
-    private long[] lastDayStat = new long[] { 0, 0 };
+    private final long[] lastDayStat = new long[] { 0, 0 };
     @DescSynced
-    private long[] nowStat = new long[] { 0, 0 };
+    private final long[] nowStat = new long[] { 0, 0 };
     private final CurrentGettable[] aeItemFluidGettables = new CurrentGettable[] { aeItem, aeFluid };
 
     public MonitorAEThroughput(MetaMachineBlockEntity holder) {
@@ -98,9 +98,9 @@ public class MonitorAEThroughput extends AbstractAEInfoMonitor {
             lastAmount[i] = currentAmount[i];
             currentAmount[i] = amount;
 
-            lastMinuteStat[i] = stats[i].getMinuteAvg().longValue();
-            lastHourStat[i] = stats[i].getHourAvg().longValue();
-            lastDayStat[i] = stats[i].getDayAvg().longValue();
+            lastMinuteStat[i] = stats[i].minute.getAvgByTick().longValue();
+            lastHourStat[i] = stats[i].hour.getAvgByTick().longValue();
+            lastDayStat[i] = stats[i].day.getAvgByTick().longValue();
 
             nowStat[i] = change;
             // displayingName[i] = current.getDisplayName();
@@ -221,7 +221,7 @@ public class MonitorAEThroughput extends AbstractAEInfoMonitor {
 
     private class AEItem extends ExportOnlyAEItemList implements CurrentGettable {
 
-        public AEItem() {
+        AEItem() {
             super(MonitorAEThroughput.this, 1);
         }
 
@@ -237,7 +237,7 @@ public class MonitorAEThroughput extends AbstractAEInfoMonitor {
 
     private class AEFluid extends ExportOnlyAEFluidList implements CurrentGettable {
 
-        public AEFluid() {
+        AEFluid() {
             super(MonitorAEThroughput.this, 1);
         }
 

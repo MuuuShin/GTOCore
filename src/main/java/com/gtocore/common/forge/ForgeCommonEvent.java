@@ -1,15 +1,14 @@
 package com.gtocore.common.forge;
 
-import com.gtocore.common.data.GTOBlocks;
-import com.gtocore.common.data.GTOCommands;
-import com.gtocore.common.data.GTOEffects;
-import com.gtocore.common.data.GTOItems;
+import com.gtocore.common.data.*;
 import com.gtocore.common.item.ItemMap;
 import com.gtocore.common.machine.multiblock.electric.voidseries.VoidTransporterMachine;
-import com.gtocore.common.network.ServerMessage;
-import com.gtocore.common.saved.*;
+import com.gtocore.common.saved.DysonSphereSavaedData;
+import com.gtocore.common.saved.RecipeRunLimitSavaedData;
+import com.gtocore.common.saved.WirelessSavedData;
 import com.gtocore.config.GTOConfig;
-import com.gtocore.config.GTOStartupConfig;
+import com.gtocore.integration.Mods;
+import com.gtocore.integration.ftbquests.AdditionalTeamData;
 import com.gtocore.utils.OrganUtilsKt;
 
 import com.gtolib.GTOCore;
@@ -19,26 +18,34 @@ import com.gtolib.api.data.GTODimensions;
 import com.gtolib.api.machine.feature.IVacuumMachine;
 import com.gtolib.api.player.IEnhancedPlayer;
 import com.gtolib.utils.RLUtils;
+import com.gtolib.utils.RegistriesUtils;
 import com.gtolib.utils.ServerUtils;
 import com.gtolib.utils.explosion.SphereExplosion;
 import com.gtolib.utils.register.BlockRegisterUtils;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
+import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.tool.GTToolItem;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.WorkableTieredMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.common.data.GTItems;
+import com.gregtechceu.gtceu.common.data.GTMaterials;
+import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,9 +55,11 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -68,12 +77,16 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.registries.MissingMappingsEvent;
 
+import com.google.common.collect.ImmutableMap;
 import earth.terrarium.adastra.common.entities.mob.GlacianRam;
 import org.apache.logging.log4j.core.config.Configurator;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @DataGeneratorScanned
 public final class ForgeCommonEvent {
@@ -260,14 +273,13 @@ public final class ForgeCommonEvent {
             int count = itemStack.getCount();
             if (player.isShiftKeyDown()) {
                 for (int i = 0; i < count; i++) {
-                    level.addFreshEntity(new ItemEntity(level, player.getX(), player.getY(), player.getZ(), ItemMap.getScrapItem()));
+                    level.addFreshEntity(new ItemEntity(level, player.getX(), player.getY(), player.getZ(), ItemMap.getScrapItem().getDefaultInstance()));
                 }
                 player.setItemInHand(event.getHand(), ItemStack.EMPTY);
             } else {
-                level.addFreshEntity(new ItemEntity(level, player.getX(), player.getY(), player.getZ(), ItemMap.getScrapItem()));
+                level.addFreshEntity(new ItemEntity(level, player.getX(), player.getY(), player.getZ(), ItemMap.getScrapItem().getDefaultInstance()));
                 player.setItemInHand(event.getHand(), itemStack.copyWithCount(count - 1));
             }
-            return;
         }
     }
 
@@ -278,27 +290,8 @@ public final class ForgeCommonEvent {
                 player.displayClientMessage(Component.translatable("gtocore.gtm", Component.literal("GitHub").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/GregTech-Odyssey/GregTech-Odyssey/issues")))), false);
                 player.displayClientMessage(Component.translatable("gtocore.dev", Component.literal("GitHub").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/GregTech-Odyssey/GregTech-Odyssey/issues")))), false);
                 Configurator.setRootLevel(org.apache.logging.log4j.Level.INFO);
-            } else {
-                Configurator.setRootLevel(org.apache.logging.log4j.Level.DEBUG);
             }
-            if (player instanceof IEnhancedPlayer enhancedPlayer) {
-                ServerMessage.send(player.getServer(), player, "loggedIn", buf -> buf.writeUUID(ServerUtils.getServerIdentifier()));
-                enhancedPlayer.getPlayerData().setDrift(enhancedPlayer.getPlayerData().disableDrift);
-                OrganUtilsKt.ktFreshOrganState(enhancedPlayer.getPlayerData());
-            }
-            if (!GTCEu.isDev() && player.getLanguage().startsWith("en")) {
-                player.sendSystemMessage(
-                        Component.literal("If you are using the English translation. This translation is community-maintained with help from AI. Have suggestions or corrections? No Chinese required.")
-                                .withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)));
-                player.sendSystemMessage(
-                        Component.literal("Click Here to Join the English translation project on ParaTranz")
-                                .withStyle(Style.EMPTY.withColor(ChatFormatting.AQUA)
-                                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://paratranz.cn/projects/16320"))));
-                player.sendSystemMessage(
-                        Component.literal("Click Here to Join the Discord for more information and updates")
-                                .withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)
-                                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/ZSVb4dgVNB"))));
-            }
+            // Removed server-side language-gated announcement; it will now be handled client-side in ClientHooks
         }
     }
 
@@ -310,6 +303,9 @@ public final class ForgeCommonEvent {
             DysonSphereSavaedData.INSTANCE = serverLevel.getDataStorage().computeIfAbsent(DysonSphereSavaedData::new, DysonSphereSavaedData::new, "dyson_sphere_data");
             RecipeRunLimitSavaedData.INSTANCE = serverLevel.getDataStorage().computeIfAbsent(RecipeRunLimitSavaedData::new, RecipeRunLimitSavaedData::new, "recipe_run_limit_data");
             WirelessSavedData.Companion.setINSTANCE(serverLevel.getDataStorage().computeIfAbsent(WirelessSavedData::initialize, WirelessSavedData::new, "wireless_saved_data_" + GTOConfig.INSTANCE.aeGridKey));
+            if (Mods.FTBQUESTS.isLoaded()) {
+                AdditionalTeamData.instance = serverLevel.getDataStorage().computeIfAbsent(AdditionalTeamData::new, AdditionalTeamData::new, "ftb_quests_additional_team_data");
+            }
         }
     }
 
@@ -345,8 +341,94 @@ public final class ForgeCommonEvent {
     @SubscribeEvent
     public static void serverStarting(ServerStartingEvent event) {
         DistExecutor.unsafeRunWhenOn(Dist.DEDICATED_SERVER, () -> () -> {
-            if (Objects.equals(GTOStartupConfig.serverLang, "en_us")) return;
-            ServerLangHook.gto$loadLanguage(GTOStartupConfig.serverLang, event.getServer());
+            if (Objects.equals(GTOConfig.INSTANCE.serverLang, "en_us")) return;
+            ServerLangHook.gto$loadLanguage(GTOConfig.INSTANCE.serverLang, event.getServer());
         });
     }
+
+    @SubscribeEvent
+    public static void remapIds(MissingMappingsEvent event) {
+        event.getMappings(Registries.BLOCK, GTOCore.MOD_ID).forEach(mapping -> {
+            if (mapping.getKey().equals(GTOCore.id("abs_rad_casing"))) {
+                mapping.remap(GTOBlocks.ABS_RED_CASING.get());
+            } else if (mapping.getKey().equals(GTOCore.id("spacetimecontinuumripper"))) {
+                mapping.remap(GTOBlocks.SPACETIME_CONTINUUM_RIPPER.get());
+            } else if (mapping.getKey().equals(GTOCore.id("spacetimebendingcore"))) {
+                mapping.remap(GTOBlocks.SPACETIME_BENDING_CORE.get());
+            } else if (mapping.getKey().equals(GTOCore.id("titanium_alloy_internal_frame"))) {
+                mapping.remap(GTOBlocks.TITANIUM_ALLOY_INTERNAL_FRAME.get());
+            }
+        });
+        event.getMappings(Registries.ITEM, GTOCore.MOD_ID).forEach(mapping -> {
+            if (mapping.getKey().equals(GTOCore.id("abs_rad_casing"))) {
+                mapping.remap(GTOBlocks.ABS_RED_CASING.asItem());
+            } else if (mapping.getKey().equals(GTOCore.id("spacetimecontinuumripper"))) {
+                mapping.remap(GTOBlocks.SPACETIME_CONTINUUM_RIPPER.asItem());
+            } else if (mapping.getKey().equals(GTOCore.id("spacetimebendingcore"))) {
+                mapping.remap(GTOBlocks.SPACETIME_BENDING_CORE.asItem());
+            } else if (mapping.getKey().equals(GTOCore.id("titanium_alloy_internal_frame"))) {
+                mapping.remap(GTOBlocks.TITANIUM_ALLOY_INTERNAL_FRAME.asItem());
+            }
+        });
+        event.getMappings(Registries.BLOCK, "avaritia").forEach(mapping -> {
+            if (AvaritiaBlocks.get().containsKey(mapping.getKey().getPath())) {
+                mapping.remap(AvaritiaBlocks.get().get(mapping.getKey().getPath()));
+            }
+        });
+        event.getMappings(Registries.BLOCK, "enderio").forEach(mapping -> {
+            if (mapping.getKey().getNamespace().equals("enderio")) {
+                var block = RegistriesUtils.getBlock(GTOCore.id(mapping.getKey().getPath()).toString());
+                if (block != null && block != Blocks.AIR) {
+                    mapping.remap(block);
+                }
+            }
+        });
+        event.getMappings(Registries.ITEM, "avaritia").forEach(mapping -> {
+            if (AvaritiaItems.get().containsKey(mapping.getKey().getPath())) {
+                mapping.remap(AvaritiaItems.get().get(mapping.getKey().getPath()));
+            }
+        });
+        event.getMappings(Registries.ITEM, "enderio").forEach(mapping -> {
+            if (mapping.getKey().getNamespace().equals("enderio")) {
+                var item = RegistriesUtils.getItem(GTOCore.id(mapping.getKey().getPath()));
+                if (mapping.getKey().getPath().startsWith("powdered_")) {
+                    var mat = GTCEuAPI.materialManager.getMaterial(mapping.getKey().getPath().replace("powdered_", ""));
+                    if (mat == null) return;
+                    item = ChemicalHelper.getItem(TagPrefix.dust, mat);
+                }
+                if (item != Items.AIR && item != Items.BARRIER) {
+                    mapping.remap(item);
+                }
+            }
+        });
+        event.getMappings(Registries.FLUID, "enderio").forEach(mapping -> {
+            if (mapping.getKey().getNamespace().equals("enderio")) {
+                var fluid = RegistriesUtils.getFluid(GTOCore.id(mapping.getKey().getPath()));
+                if (fluid != null && fluid != Fluids.EMPTY) {
+                    mapping.remap(fluid);
+                }
+                if (mapping.getKey().equals(ResourceLocation.parse("enderio:rocket_fuel"))) {
+                    mapping.remap(GTMaterials.RocketFuel.getFluid());
+                }
+            }
+        });
+    }
+
+    private static final Supplier<Map<String, Item>> AvaritiaItems = GTMemoizer.memoize(() -> ImmutableMap.<String, Item>builder()
+            .put("neutron_ingot", ChemicalHelper.getItem(TagPrefix.ingot, GTOMaterials.Neutron))
+            .put("crystal_matrix_ingot", ChemicalHelper.getItem(TagPrefix.ingot, GTOMaterials.CrystalMatrix))
+            .put("infinity_ingot", ChemicalHelper.getItem(TagPrefix.ingot, GTOMaterials.Infinity))
+            .put("neutron_nugget", ChemicalHelper.getItem(TagPrefix.nugget, GTOMaterials.Neutron))
+            .put("singularity", GTOItems.INFINITY_SINGULARITY.asItem())
+            .put("eternal_singularity", GTOItems.COSMIC_SINGULARITY.asItem())
+            .put("infinity_catalyst", GTOItems.INFINITY_CATALYST.asItem())
+            .build());
+    @SuppressWarnings("ConstantConditions")
+    private static final Supplier<Map<String, Block>> AvaritiaBlocks = GTMemoizer.memoize(() -> ImmutableMap.<String, Block>builder()
+            .put("infinity", ChemicalHelper.getBlock(TagPrefix.block, GTOMaterials.Infinity))
+            .put("crystal_matrix", ChemicalHelper.getBlock(TagPrefix.block, GTOMaterials.CrystalMatrix))
+            .put("neutron", ChemicalHelper.getBlock(TagPrefix.block, GTOMaterials.Neutron))
+            .build());
+
+    // ===================== CLIENT ONLY HOOKS =====================
 }

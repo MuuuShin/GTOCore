@@ -68,17 +68,27 @@ final class ItemLang {
         addCNEN("tagprefix.excited_stainless_steel_target", "活化%s-不锈钢靶", "Excited %s Stainless Steel Target");
         addCNEN("tagprefix.excited_zirconium_carbide_target", "活化%s-碳化锆靶", "Excited %s Zirconium Carbide Target");
         addCNEN("tagprefix.depleted_breeder_rod", "枯竭%s增殖棒", "%s Depleted Breeder Rod");
-        addCNEN("tagprefix.turbine_rotor", "%s涡轮转子", "%s Turbine Rotor");
-        addCNEN("tagprefix.turbine_rotor_coated", "%s涡轮转子", "%s Turbine Rotor");
         addCNEN("tagprefix.membrane_electrode", "%s膜电极", "%s Membrane Electrode");
+        addCNEN("tagprefix.mxene", "%s二维纳米层", "%s MXene");
+        addCNEN("tagprefix.mborene", "%s二维纳米层", "%s MBorene");
+        addCNEN("tagprefix.aluminium_contained_mxene_precursor", "MAXene%s二维纳米层前驱体", "A-Contained %s MXene Precursor");
+        addCNEN("tagprefix.carbon_fiber", "%s纤维", "%s Fiber");
+        addCNEN("tagprefix.carbon_fibres", "%s纤维原丝", "%s Fiber Tow");
+        addCNEN("tagprefix.carbon_fiber_mesh", "%s纤维网", "%s Fiber Mesh");
+        addCNEN("tagprefix.nano", "纳米质%s", "Nano %s");
+        addCNEN("gtocore.any.liquid", "任何液体物质", "Any Liquid Material");
+        addCNEN("gtocore.any.gas", "任何气体物质", "Any Gas Material");
+        addCNEN("gtocore.any.gem", "任何宝石", "Any Gem");
+        addCNEN("gtocore.any.turbine_rotor_coated", "任何镀膜涡轮转子", "Any Coated Turbine Rotor");
+        addCNEN("gtocore.any.artificial_gem", "任何人造宝石", "Any Artificial Gem");
 
         addCNEN("metaitem.tool.tooltip.rotor.coating_durability", "镀层耐久：%s / %s", "Coating Durability: %s / %s");
         addCNEN("metaitem.tool.tooltip.rotor.coating_efficiency", "镀层效率：%s%%", "Coating Efficiency: %s%%");
         addCNEN("metaitem.tool.tooltip.rotor.coating_power", "镀层产能：%s%%", "Coating Power: %s%%");
         addCNEN("metaitem.tool.tooltip.rotor.coating", "镀层材料：%s", "Coating Material: %s");
         addCNEN("metaitem.tool.tooltip.rotor.coating.tooltip.0", "§6镀层机制：", "§6Coating Mechanism:");
-        addCNEN("metaitem.tool.tooltip.rotor.coating.tooltip.1", "§b镀层会提供一道吸收转子损耗的屏障，当转子A有镀层B，镀层B的耐久为§dmax(B/10, min(B-A, B/2))",
-                "§bThe coating provides a barrier that absorbs rotor wear. When rotor A has coating B, the durability of coating B is §dmax(B/10, min(B-A, B/2))");
+        addCNEN("metaitem.tool.tooltip.rotor.coating.tooltip.1", "§b镀层会提供一道吸收转子损耗的屏障，当转子A有镀层B，镀层B的耐久为§d4 * max(B/10, min(B-A, B/2))",
+                "§bThe coating provides a barrier that absorbs rotor wear. When rotor A has coating B, the durability of coating B is §d4 * max(B/10, min(B-A, B/2))");
         addCNEN("metaitem.tool.tooltip.rotor.coating.tooltip.2", "§b每次转子损坏时95%概率优先消耗镀层耐久，镀层耐久耗尽后再消耗本体耐久",
                 "§bThere is a 95% chance of consuming the coating durability first when the rotor is damaged. After the coating durability is exhausted, the body durability is consumed");
         addCNEN("metaitem.tool.tooltip.rotor.coating.tooltip.0.magic", "§d魔法§6镀层机制：", "§dMagical§6 Coating Mechanism:");
@@ -97,7 +107,7 @@ final class ItemLang {
         addCNEN("item.gtceu.tool.iv_vajra", "%s 终极金刚杵", "%s Ultimate Vajra");
         addCNEN("item.gtceu.tool.vajra.tooltip", "手持工具时按[%s]调整挖掘速度", "Hold [%s] to adjust mining speed when holding the tool");
         addCNEN("item.gtceu.tool.vajra.tooltip.shift", "手持工具时按[Shift + %s]启用/禁用矿工热忱", "Hold [Shift + %s] to enable/disable Miner Fervor when holding the tool");
-        addCNEN("item.gtceu.tool.vajra.tooltip.max_speed", "当前挖掘速度: §a%s§r (最大§a%s%%§r)", "Current mining speed: §a%s§r (Max §a%s%%§r)");
+        addCNEN("item.gtceu.tool.vajra.tooltip.max_speed", "当前挖掘速度: §a%s§r (最大§a%s§r)", "Current mining speed: §a%s§r (Max §a%s§r)");
         addCNEN("gtocore.tooltip.item.kinetic_rotor.max", "最大风力: %s", "Max Wind Speed: %s");
         addCNEN("gtocore.tooltip.item.kinetic_rotor.min", "最小风力: %s", "Min Wind Speed: %s");
         addCNEN("gtocore.tooltip.item.virtual_item_provider", "为机器的虚拟电路槽提供物品", "Provide items for the machine's virtual circuit slot.");
@@ -113,12 +123,13 @@ final class ItemLang {
         addCNEN("gtocore.tooltip.item.universal_circuit", "一个通用的电路", "A universal circuit");
         addCNEN("gtocore.tooltip.item.craft_step", "合成步骤：%s", "Craft Step: %s");
 
-        addCNEN("item.gtocore.structure_detect.error.1", "在 [%s, %s, %s]:", "At [%s, %s, %s]:");
         addCNEN("item.gtocore.structure_detect.tooltip.0", "潜行右键主方块以检测多方块结构", "Sneak right-click the main block to detect multiblock structure.");
         addCNEN("item.gtocore.structure_detect.tooltip.1", "检测大型结构时可能会有延迟", "There may be lag when detecting large structures.");
         addCNEN("item.gtocore.disc.data", "光盘数据：%s", "Disc data: %s");
 
         addCNEN("item.gtocore.order.config", "订单配置", "Order Config");
+
+        addCNEN("item.gtocore.pattern.wildcard", "含通配符处理样板", "With Wildcard Processing Pattern");
 
         addCNEN("item.gtocore.data_item.type.title", "§n%s配方数据：", "§n%s Recipes Data:");
         addCNEN("gtocore.tooltip.item.empty_data", "§n空数据：", "§nEmpty Data:");
@@ -129,6 +140,7 @@ final class ItemLang {
         addCNEN("gtocore.tooltip.item.analyze_data", "§n研究数据：", "§nResearch data:");
         addCNEN("gtocore.tooltip.item.analyze_things", "- %d", "- %d");
         addCNEN("gtocore.tooltip.item.analyze_serial", "- §a研究编号：%s", "- §aResearch number: %s");
+        addCNEN("gtocore.data.empty", "空", "empty");
 
         addCNEN("gtocore.behaviour.grass_harvest.description", GOLD + "极大" + RESET + "地提升小麦种子掉落概率", GOLD + "Greatly" + RESET + " increase the probability of wheat seed dropping");
         addCNEN("gtocore.behaviour.grass_harvest.description2", "右键以收割", "Right click to harvest");
@@ -145,6 +157,20 @@ final class ItemLang {
 
         addCNEN("tooltip.ad_astra.unknown_tag", "§c未知标签§r: %s", "§cUnknown tag§r: %s");
         addCNEN("tooltip.ad_astra.unknown_ingredient", "§c未知物品§r", "§cUnknown item§r");
-        addCNEN("tag.item.forge.ingots.steel", "钢锭", "Steel Ingot");
+        addCNEN("tag.item.gt.ingots", "锭", "Ingots");
+        addCNEN("item.gtocore.globe.earth", "地球仪的球体", "Earth Globe Sphere");
+
+        addCNEN("tooltip.item.pattern.uuid", "编码者：%s", "Encoded by: %s");
+
+        addCNEN("tooltip.item.reward_bag.increases", "附魔时运或效率以提升奖励与品质", "Enchant Fortune or Efficiency to increase rewards and quality");
+
+        addCNEN("item.slot_boost.name", "槽位强化器（当前：%s）", "Slot Booster (Current: %s)");
+        addCNEN("item.slot_boost.switch_hint", "已选择%s槽，当前数量：%d，需要经验%d点", "Selected %s Slot, Current Count: %d, Requires %d XP");
+        addCNEN("item.slot_boost.invalid_slot", "错误：%s槽未注册", "Error: %s Slot Not Registered");
+        addCNEN("item.slot_boost.xp_shortage", "经验不足！需要%d点，当前仅有%d点", "Insufficient XP! Requires %d, Currently Has %d");
+        addCNEN("item.slot_boost.success", "成功添加1个%s槽！当前共%d个", "Successfully Added 1 %s Slot! Now Has %d Total");
+        addCNEN("item.slot_boost.tooltip1", "右键点击：切换目标槽位", "Right Click: Switch Target Slot");
+        addCNEN("item.slot_boost.tooltip2", "Shift+右键：消耗经验扩展槽位（消耗=当前数量×2000）", "Shift+Right Click: Expand Slot with XP (Cost = Current Count × 2000)");
+        addCNEN("item.slot_boost.tooltip3", "当前目标：%s槽", "Current Target: %s Slot");
     }
 }

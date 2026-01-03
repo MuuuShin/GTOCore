@@ -1,12 +1,10 @@
 package com.gtocore.common.machine.noenergy;
 
-import com.gtocore.common.network.ClientMessage;
-
 import com.gtolib.GTOCore;
 import com.gtolib.api.ae2.stacks.IKeyCounter;
 import com.gtolib.api.ae2.storage.CellDataStorage;
 import com.gtolib.api.machine.feature.multiblock.IParallelMachine;
-import com.gtolib.utils.GTOUtils;
+import com.gtolib.utils.SortUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
@@ -19,7 +17,6 @@ import com.gregtechceu.gtceu.api.machine.feature.IUIMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.integration.ae2.machine.feature.IGridConnectedMachine;
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder;
-import com.gregtechceu.gtceu.utils.collection.O2LOpenCacheHashMap;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -33,6 +30,7 @@ import appeng.api.networking.IManagedGridNode;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
+import appeng.api.stacks.AEKeyMap;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.storage.IStorageMounts;
 import appeng.api.storage.IStorageProvider;
@@ -47,15 +45,10 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
 public final class VirtualItemProviderMachine extends MetaMachine implements IUIMachine, IDropSaveMachine, MEStorage, IGridConnectedMachine, IStorageProvider {
-
-    private static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            VirtualItemProviderMachine.class, MetaMachine.MANAGED_FIELD_HOLDER);
 
     private static final Item VIRTUAL_ITEM_PROVIDER = CustomItems.VIRTUAL_ITEM_PROVIDER.asItem();
     static private final AEKey EMPTY_STACK;
@@ -74,14 +67,16 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
     private final GridNodeHolder nodeHolder;
     @DescSynced
     private boolean isOnline;
+    private boolean change = true;
 
     public VirtualItemProviderMachine(MetaMachineBlockEntity holder) {
         super(holder);
         this.inventory = new NotifiableItemStackHandler(this, 288, IO.NONE, IO.BOTH);
         this.nodeHolder = new GridNodeHolder(this);
         getMainNode().addService(IStorageProvider.class, this);
-        storage.setStoredMap(new O2LOpenCacheHashMap<>());
+        storage.setStoredMap(new AEKeyMap<>());
         inventory.addChangedListener(() -> {
+            change = true;
             storage.getStoredMap().clear();
             storage.getStoredMap().addTo(EMPTY_STACK, IParallelMachine.MAX_PARALLEL << 6);
             for (var i = 0; i < inventory.storage.size; i++) {
@@ -104,11 +99,6 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
     }
 
     @Override
-    public @NotNull ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    @Override
     public void onLoad() {
         super.onLoad();
         inventory.notifyListeners();
@@ -121,7 +111,7 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
         var modularUI = new ModularUI(xOffset + 19, 244, this, entityPlayer)
                 .background(GuiTextures.BACKGROUND)
                 .widget(new LabelWidget(5, 5, () -> Component.translatable(getBlockState().getBlock().getDescriptionId()).getString() +
-                        "(" + Stream.of(inventory.getContents()).filter(i -> !((ItemStack) i).isEmpty()).count() + "/" + 288 + ")"))
+                        "(" + Stream.of(inventory.storage.stacks).filter(i -> !i.isEmpty()).count() + "/" + 288 + ")"))
                 .widget(UITemplate.bindPlayerInventory(entityPlayer.getInventory(), GuiTextures.SLOT, 7, 162, true));
 
         var innerContainer = new DraggableScrollableWidgetGroup(4, 4, xOffset + 6, 130)
@@ -129,7 +119,7 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
 
         modularUI.widget(new ButtonWidget(176 - 15, 3, 14, 14,
                 new ResourceTexture(GTOCore.id("textures/gui/sort.png")),
-                (press) -> ClientMessage.send("sortInventory", GTOUtils.noopConsumer())));
+                (press) -> SortUtils.sort()));
         int x = 0;
         int y = 0;
         for (int slot = 0; slot < 288; slot++) {
@@ -167,7 +157,7 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
 
     @Override
     public Component getDescription() {
-        return getDefinition().getItem().getDescription();
+        return getDefinition().asItem().getDescription();
     }
 
     @Override
@@ -215,7 +205,8 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
 
     @Override
     public void getAvailableStacks(KeyCounter out) {
-        IKeyCounter.addAll(out, storage.getStoredMap());
+        var map = storage.getStoredMap();
+        IKeyCounter.addAll(out, map.size(), m -> map.reference2LongEntrySet().fastForEach(e -> m.addTo(e.getKey(), e.getLongValue())));
     }
 
     @Override
@@ -224,11 +215,15 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
         if (keyCounter == null) {
             keyCounter = new KeyCounter();
             storage.setKeyCounter(keyCounter);
-        } else {
+            change = true;
+        } else if (change) {
             keyCounter.clear();
         }
-        getAvailableStacks(keyCounter);
-        keyCounter.removeEmptySubmaps();
+        if (change) {
+            getAvailableStacks(keyCounter);
+            keyCounter.removeEmptySubmaps();
+            change = false;
+        }
         return keyCounter;
     }
 }
