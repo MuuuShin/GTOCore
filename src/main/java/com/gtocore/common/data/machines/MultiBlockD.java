@@ -7,6 +7,7 @@ import com.gtocore.common.block.FusionCasings;
 import com.gtocore.common.data.GTOBlocks;
 import com.gtocore.common.data.GTOMachines;
 import com.gtocore.common.data.GTOMaterials;
+import com.gtocore.common.data.GTORecipeDataKeys;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
@@ -77,7 +78,6 @@ import static com.gtocore.common.block.BlockMap.SEPMMAP;
 import static com.gtocore.common.data.GTORecipeTypes.*;
 import static com.gtocore.utils.register.MachineRegisterUtils.multiblock;
 import static com.gtocore.utils.register.MachineRegisterUtils.registerTieredMultis;
-import static com.gtolib.api.GTOValues.POWER_MODULE_TIER;
 
 public final class MultiBlockD {
 
@@ -319,7 +319,7 @@ public final class MultiBlockD {
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(64))
             .block(GTOBlocks.BLAZE_CASING)
             .upgradable()
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GCYMBlocks.CASING_HIGH_TEMPERATURE_SMELTING.get()))
                     .where('B', blocks(GCYMBlocks.HEAT_VENT.get()))
                     .where('C', blocks(GTBlocks.CASING_TUNGSTENSTEEL_PIPE.get()))
@@ -429,7 +429,7 @@ public final class MultiBlockD {
             .laserTooltips()
             .multipleRecipesTooltips()
             .block(GTOBlocks.MOLECULAR_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.LEFT, RelativeDirection.UP, RelativeDirection.FRONT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTOBlocks.MOLECULAR_CASING.get())
                             .or(GTOPredicates.autoThreadLaserAbilities(definition.getRecipeTypes()))
                             .or(abilities(OPTICAL_DATA_RECEPTION).setExactLimit(1)))
@@ -554,7 +554,7 @@ public final class MultiBlockD {
             .perfectOverclock()
             .fromSourceTooltips("GTNH")
             .block(GTOBlocks.INCONEL_625_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.BACK, RelativeDirection.UP, RelativeDirection.RIGHT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('B', blocks(GTOBlocks.INCONEL_625_CASING.get())
                             .or(Predicates.blocks(GTMachines.CONTROL_HATCH.get()).setMaxGlobalLimited(1).setPreviewCount(0))
@@ -602,7 +602,7 @@ public final class MultiBlockD {
                             .or(abilities(IMPORT_ITEMS).setMaxGlobalLimited(2).setPreviewCount(1)))
                     .where('D', blocks(GTOBlocks.PROCESS_MACHINE_CASING.get()))
                     .where('E', blocks(GTBlocks.CASING_LAMINATED_GLASS.get()))
-                    .where('F', GTOPredicates.countBlock("SpeedPipe",
+                    .where('F', GTOPredicates.countBlock(GTOPredicates.DataKeys.SPEED_PIPE,
                             GTOBlocks.SPEEDING_PIPE.get()))
                     .where(' ', any())
                     .build())
@@ -716,7 +716,7 @@ public final class MultiBlockD {
             .tooltips(GTOMachineTooltips.INSTANCE.getSpaceElevatorTooltips().getSupplier())
             .fromSourceTooltips("GTNH")
             .block(GTOBlocks.SPACE_ELEVATOR_MECHANICAL_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTOBlocks.HIGH_STRENGTH_CONCRETE.get()))
                     .where('B', blocks(GTOBlocks.SPACE_ELEVATOR_INTERNAL_SUPPORT.get()))
@@ -725,7 +725,7 @@ public final class MultiBlockD {
                     .where('E', frames(GTMaterials.Neutronium))
                     .where('F', blocks(GTOBlocks.SPACE_ELEVATOR_MODULE_BASE.get()))
                     .where('G', blocks(GTOBlocks.HIGH_STRENGTH_CONCRETE.get()).or(blocks(GTOBlocks.MODULE_CONNECTOR.get()).setPreviewCount(1)))
-                    .where('H', GTOPredicates.tierBlock(SEPMMAP, POWER_MODULE_TIER))
+                    .where('H', GTOPredicates.tierBlock(SEPMMAP, GTORecipeDataKeys.POWER_MODULE_TIER))
                     .where('I', air())
                     .where('J', blocks(GTOBlocks.SPACE_ELEVATOR_POWER_CORE.get()))
                     .where('X', blocks(GTOBlocks.SPACE_ELEVATOR_MECHANICAL_CASING.get())
@@ -863,10 +863,7 @@ public final class MultiBlockD {
             .block(() -> FusionCasings.getCasingState(LuV))
             .pattern(definition -> {
                 TraceabilityPredicate casing = blocks(FusionCasings.getCasingState(LuV));
-                return MultiBlockFileReader.builder()
-                        .LUF(RelativeDirection.FRONT, RelativeDirection.UP, RelativeDirection.RIGHT)
-                        .name("kuangbiao1")
-                        .startBuild(definition)
+                return MultiBlockFileReader.start(definition, "kuangbiao1")
                         .where('A', blocks(GCYMBlocks.CASING_NONCONDUCTING.get()))
                         .where('B', blocks(GTOBlocks.HIGH_STRENGTH_CONCRETE.get()))
                         .where('C', frames(GTMaterials.Tungsten))
@@ -1006,7 +1003,7 @@ public final class MultiBlockD {
 
     static {
         List<Function<MultiblockMachineDefinition, BlockPattern>> KUANGBIAO_subs = List.of(
-                def -> MultiBlockFileReader.builder().name("kuangbiao2").startBuild(def)
+                def -> MultiBlockFileReader.start(def, "kuangbiao2")
                         .where('A', controller(def))
                         .where('B', GTOPredicates.frame(GTMaterials.Ultimet))
                         .where('C', blocks(GTOBlocks.COBALT_OXIDE_CERAMIC_STRONG_THERMALLY_CONDUCTIVE_MECHANICAL_BLOCK.get()))
@@ -1030,7 +1027,7 @@ public final class MultiBlockD {
                         .where('U', blocks(GCYMBlocks.ELECTROLYTIC_CELL.get()))
                         .where(' ', any())
                         .build(),
-                def -> MultiBlockFileReader.builder().name("kuangbiao3").startBuild(def)
+                def -> MultiBlockFileReader.start(def, "kuangbiao3")
                         .where('A', blocks(GTBlocks.FUSION_CASING_MK3.get()))
                         .where('B', blocks(GTOBlocks.HYPER_MECHANICAL_CASING.get()))
                         .where('C', GTOPredicates.frame(GTMaterials.Tritanium))
@@ -1055,7 +1052,7 @@ public final class MultiBlockD {
                         .where('V', blocks(GTOBlocks.PRESSURE_CONTAINMENT_CASING.get()))
                         .where(' ', any())
                         .build(),
-                def -> MultiBlockFileReader.builder().name("kuangbiao4").startBuild(def)
+                def -> MultiBlockFileReader.start(def, "kuangbiao4")
                         .where('A', GTOPredicates.frame(GTMaterials.Trinium))
                         .where('B', blocks(GTOBlocks.NAQUADAH_ALLOY_CASING.get()))
                         .where('C', GTOPredicates.frame(GTMaterials.Naquadah))
@@ -1089,7 +1086,7 @@ public final class MultiBlockD {
                         .where('_', controller(def))
                         .where(' ', any())
                         .build(),
-                def -> MultiBlockFileReader.builder().name("kuangbiao5").startBuild(def)
+                def -> MultiBlockFileReader.start(def, "kuangbiao5")
                         .where('A', GTOPredicates.frame(GTOMaterials.OdysseyNanoSuperalloy))
                         .where('B', blocks(GTOBlocks.COMPRESSED_FUSION_COIL_MK2.get()))
                         .where('C', GTOPredicates.frame(GTOMaterials.PlatinumManganeseAntimonyHeuslerAlloy))
@@ -1121,7 +1118,7 @@ public final class MultiBlockD {
                         .where(']', controller(def))
                         .where(' ', any())
                         .build(),
-                def -> MultiBlockFileReader.builder().name("kuangbiao_crossrecipe").startBuild(def)
+                def -> MultiBlockFileReader.start(def, "kuangbiao_crossrecipe")
                         .where('A', blocks(GTBlocks.FUSION_CASING.get()))
                         .where('B', blocks(GTBlocks.FUSION_CASING.get())
                                 .or(Predicates.abilities(THREAD_HATCH).setMaxGlobalLimited(1))

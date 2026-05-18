@@ -2,6 +2,7 @@ package com.gtocore.common.machine.multiblock.electric.space;
 
 import com.gtocore.api.gui.GTOGuiTextures;
 import com.gtocore.common.data.GTOItems;
+import com.gtocore.common.data.GTORecipeDataKeys;
 import com.gtocore.common.machine.multiblock.electric.space.spacestaion.SpaceElevatorConnectorModule;
 import com.gtocore.data.IdleReason;
 
@@ -35,7 +36,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
+import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import earth.terrarium.adastra.api.planets.Planet;
 import earth.terrarium.adastra.api.planets.PlanetApi;
@@ -50,15 +51,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.gtolib.api.GTOValues.POWER_MODULE_TIER;
-
 @DataGeneratorScanned
 public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements IHighlightMachine, IIWirelessInteractor<SpaceElevatorConnectorModule> {
 
     private TickableSubscription highSubscription;
 
     public SpaceElevatorMachine(MetaMachineBlockEntity holder) {
-        super(holder, POWER_MODULE_TIER);
+        super(holder, GTORecipeDataKeys.POWER_MODULE_TIER);
     }
 
     void initialize() {
@@ -79,14 +78,14 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
     }
 
     @Getter
-    @DescSynced
+    @SyncToClient
     protected double high;
     @Getter
     @Persisted
-    @DescSynced
+    @SyncToClient
     protected int spoolCount;
     protected int moduleCount;
-    @DescSynced
+    @SyncToClient
     final List<BlockPos> poss = new ArrayList<>();
 
     @Getter
@@ -241,14 +240,22 @@ public class SpaceElevatorMachine extends TierCasingMultiblockMachine implements
 
     @Override
     public boolean testMachine(SpaceElevatorConnectorModule machine) {
-        return isFormed() && machine.isFormed() && machine.isWorkspaceReady();
+        return isFormed() && machine.isFormed() && machine.isWorkspaceReady() && ownerTest(machine);
+    }
+
+    private boolean ownerTest(SpaceElevatorConnectorModule module) {
+        var moduleOwner = module.getOwner();
+        if (moduleOwner == null) return true;
+        var machineOwner = getOwner();
+        if (machineOwner == null) return true;
+        return moduleOwner.isPlayerInTeam(machineOwner.getPlayerUUID());
     }
 
     @Override
     public boolean firstTestMachine(SpaceElevatorConnectorModule machine) {
         Level level = machine.getLevel();
         if (level != null && testMachine(machine)) {
-            machine.registerElevator(this, getCasingTier(POWER_MODULE_TIER));
+            machine.registerElevator(this, getCasingTier(GTORecipeDataKeys.POWER_MODULE_TIER));
             return true;
         }
         return false;

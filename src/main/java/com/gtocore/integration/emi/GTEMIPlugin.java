@@ -2,6 +2,7 @@ package com.gtocore.integration.emi;
 
 import com.gtocore.common.CommonProxy;
 import com.gtocore.common.data.GTOItems;
+import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachine;
 import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt;
 import com.gtocore.config.GTOConfig;
@@ -11,6 +12,7 @@ import com.gtocore.integration.chisel.ChiselRecipe;
 import com.gtocore.integration.emi.multipage.MultiblockInfoEmiRecipe;
 import com.gtocore.integration.emi.oreprocessing.OreProcessingEmiCategory;
 import com.gtocore.integration.emi.space.SatelliteEmiCategory;
+import com.gtocore.integration.misc.CalculatorOverlay;
 
 import com.gtolib.api.GTOApi;
 import com.gtolib.api.ae2.me2in1.Me2in1Menu;
@@ -90,6 +92,7 @@ import snownee.jade.compat.JEICompat;
 import umpaz.farmersrespite.integration.jei.JEIFRPlugin;
 import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.client.integration.emi.BotaniaEmiPlugin;
+import vectorwing.farmersdelight.FarmersDelight;
 import vectorwing.farmersdelight.common.registry.ModItems;
 
 import java.util.Arrays;
@@ -161,10 +164,12 @@ public final class GTEMIPlugin implements EmiPlugin {
         list.accept(new MythicJei());
         list.accept(new JEIFRPlugin());
         list.accept(new JEIArsNouveauPlugin());
-        list.accept(new vectorwing.farmersdelight.integration.jei.JEIPlugin());
         list.accept(new JEICompat());
         if (GTCEu.isModLoaded("ftbxmodcompat")) {
             NotDevCompat.addPlugin(list);
+        }
+        if (GTCEu.isModLoaded("calculatoroverlay")) {
+            CalculatorOverlay.initJEI(list);
         }
     }
 
@@ -182,6 +187,7 @@ public final class GTEMIPlugin implements EmiPlugin {
         list.accept(new EmiPluginContainer(new GTEMIPlugin(), GTCEu.MOD_ID));
         list.accept(new EmiPluginContainer(new MeteoritesEmiPlugin(), ArsMeteorites.MOD_ID));
         list.accept(new EmiPluginContainer(new AppEngEmiPlugin(), AppEng.MOD_ID));
+        list.accept(new EmiPluginContainer(new vectorwing.farmersdelight.integration.emi.EMIPlugin(), FarmersDelight.MODID));
         try {
             list.accept(new EmiPluginContainer(new fzzyhmstrs.emi_loot.emi.EmiClientPlugin(), fzzyhmstrs.emi_loot.EMILoot.MOD_ID));
         } catch (Throwable ignored) {
@@ -207,7 +213,13 @@ public final class GTEMIPlugin implements EmiPlugin {
         registry.addCategory(OreProcessingEmiCategory.CATEGORY);
         registry.addCategory(GTOreVeinEmiCategory.CATEGORY);
         registry.addCategory(GTBedrockFluidEmiCategory.CATEGORY);
+        registry.addCategory(NanitesIntegratedProcessingEmiCategory.ORE_EXTRACTION_MODULE);
+        registry.addCategory(NanitesIntegratedProcessingEmiCategory.BIOENGINEERING_MODULE);
+        registry.addCategory(NanitesIntegratedProcessingEmiCategory.POLYMER_TWISTING_MODULE);
         for (GTRecipeCategory category : GTRegistries.RECIPE_CATEGORIES) {
+            if (category.getRecipeType() == GTORecipeTypes.NANITES_INTEGRATED_PROCESSING_CENTER_RECIPES) {
+                continue;
+            }
             if (GTCEu.isDev() || category.isXEIVisible()) {
                 registry.addCategory(GTRecipeEMICategory.CATEGORIES.apply(category));
             }
@@ -234,6 +246,7 @@ public final class GTEMIPlugin implements EmiPlugin {
         GTRecipeEMICategory.registerWorkStations(registry);
         GTOreVeinEmiCategory.registerWorkStations(registry);
         GTBedrockFluidEmiCategory.registerWorkStations(registry);
+        NanitesIntegratedProcessingEmiCategory.registerWorkstations(registry);
         registry.setDefaultComparison(GTItems.PROGRAMMED_CIRCUIT.asItem(), Comparison.compareNbt());
         registry.setDefaultComparison(GTOItems.DIMENSION_DATA.asItem(), Comparison.compareNbt());
         registerDimensionDataVariants(registry);

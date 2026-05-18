@@ -3,6 +3,7 @@ package com.gtocore.common.machine.multiblock.electric;
 import com.gtocore.api.data.Algae;
 import com.gtocore.api.gui.helper.LineChartHelper;
 import com.gtocore.common.data.GTOItems;
+import com.gtocore.common.data.GTORecipeDataKeys;
 import com.gtocore.common.machine.multiblock.part.ae.StorageAccessPartMachine;
 
 import com.gtolib.api.machine.feature.multiblock.ITierCasingMachine;
@@ -10,6 +11,7 @@ import com.gtolib.api.machine.multiblock.ElectricMultiblockMachine;
 import com.gtolib.api.machine.trait.CustomRecipeLogic;
 import com.gtolib.api.machine.trait.TierCasingTrait;
 import com.gtolib.api.recipe.Recipe;
+import com.gtolib.api.recipe.TierDataKey;
 import com.gtolib.utils.GTOUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
@@ -30,15 +32,15 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import appeng.api.config.Actionable;
 import appeng.api.networking.security.IActionSource;
 
+import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.DraggableScrollableWidgetGroup;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +51,6 @@ import java.util.Map;
 
 import static com.gregtechceu.gtceu.api.GTValues.V;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.Biomass;
-import static com.gtolib.api.GTOValues.GLASS_TIER;
 
 public class LargeAlgaeFarm extends ElectricMultiblockMachine implements ITierCasingMachine {
 
@@ -63,12 +64,12 @@ public class LargeAlgaeFarm extends ElectricMultiblockMachine implements ITierCa
     private float greenWeight = 1.0f;
     private float blueWeight = 1.0f;
 
-    @DescSynced
-    private Algae selectedAlgae = Algae.BlueAlge;
+    @SyncToClient
+    private Algae selectedAlgae = Algae.BlueAlgae;
 
     public LargeAlgaeFarm(MetaMachineBlockEntity metaMachineBlockEntity) {
         super(metaMachineBlockEntity);
-        this.tierCasingTrait = new TierCasingTrait(this, GLASS_TIER);
+        this.tierCasingTrait = new TierCasingTrait(this, GTORecipeDataKeys.GLASS_TIER);
     }
 
     @Override
@@ -182,7 +183,7 @@ public class LargeAlgaeFarm extends ElectricMultiblockMachine implements ITierCa
                     algaeGreenAbsorptions.get(algae) / totalAbsorptionGreen,
                     algaeBlueAbsorptions.get(algae) / totalAbsorptionBlue);
             long currentCount = algaeAccessHatch.extract(algae.aeKey(), Long.MAX_VALUE, Actionable.SIMULATE, IActionSource.ofMachine(algaeAccessHatch));
-            long increasement = getIncreasement(currentCount, tier, getCasingTier(GLASS_TIER),
+            long increasement = getIncreasement(currentCount, tier, getCasingTier(GTORecipeDataKeys.GLASS_TIER),
                     (algaeRedAbsorptions.get(algae) +
                             algaeGreenAbsorptions.get(algae) +
                             algaeBlueAbsorptions.get(algae)) * lightIntensity / 16,
@@ -243,7 +244,7 @@ public class LargeAlgaeFarm extends ElectricMultiblockMachine implements ITierCa
     }
 
     @Override
-    public Object2IntMap<String> getCasingTiers() {
+    public Reference2IntMap<TierDataKey> getCasingTiers() {
         return tierCasingTrait.getCasingTiers();
     }
 

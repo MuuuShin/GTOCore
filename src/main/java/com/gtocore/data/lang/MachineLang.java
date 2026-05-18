@@ -16,6 +16,7 @@ final class MachineLang {
         addCNEN("gui.tooltips.redstone_mode.disabled", "禁用红石模式，机器无视红石信号", "Disable redstone mode, the machine will ignore redstone signals");
         addCNEN("gtocore.machine.programmablec_hatch.extra_tooltip.0", "通过虚拟物品提供器来设置电路槽物品", "Set the circuit slot items through a virtual item provider");
         addCNEN("gtocore.machine.programmablec_hatch.extra_tooltip.1", "可独立指定仓室的配方类型，覆盖机器的默认设定", "Can independently select recipe types, overriding the machine’s default setting");
+        addCNEN("gtocore.machine.programmablec_hatch.extra_tooltip.2", "虚拟物品槽：§b1§r", "Virtual item slots: §b1§r");
         addCNEN("gtocore.machine.energy_loss", "能量损失: %s", "Energy loss: %s");
         addCNEN("gtocore.machine.highlight_module", "高亮显示模块位置", "Highlight module position");
         addCNEN("gtocore.machine.highlight_obstruction", "高亮显示会被阻挡的区域", "Highlight areas that will be obstructed");
@@ -29,6 +30,7 @@ final class MachineLang {
         addCNEN("gtocore.machine.rest_burn_time", "剩余燃烧时间: %s Tick", "Rest Burn Time %s Tick");
         addCNEN("gtocore.machine.total_time.duration", "额外耗时减免: %s", "Additional Duration Reduction: %s");
         addCNEN("gtocore.machine.block_conversion_room.am", "每次转化数量: %s", "Amount converted each time: %s");
+        addCNEN("gtocore.machine.vacuum_pump.tooltip.0", "仅向水平相邻方块提供真空", "Only provides vacuum to horizontally adjacent blocks");
         addCNEN("gtocore.machine.dimensionally_transcendent_plasma_forge.coil", "当前配方模式无法使用该线圈", "Current recipe mode cannot use this coil");
         addCNEN("gtocore.machine.duration_multiplier.tooltip", "耗时倍数: %s", "Duration Multiplication: %s");
         addCNEN("gtocore.machine.dyson_sphere.number", "该星系发射次数: %s / 10000", "Launch Times: %s / 10000");
@@ -117,7 +119,7 @@ final class MachineLang {
         addCNEN("gtocore.recipe.fuelcell.converted_energy", "可转换的基础能量: %s EU", "Convertible Base Energy: %s EU");
         addCNEN("gtocore.recipe.fuelcell.converted_efficiency", "效率: %s%%%%", "Efficiency: %s%%%%");
         addCNEN("gtocore.machine.advanced_infinite_driller.drilled_fluid", "流体: %s 产量: %s", "Fluid: %s Output: %s");
-        addCNEN("gtocore.machine.steam.tooltip.1", "默认支持%s等级及以下的配方处理", "default can process &s-Tier recipes and below, processing time is 1.5 times");
+        addCNEN("gtocore.machine.steam.tooltip.1", "默认支持%s等级及以下的配方处理", "default can process %s Tier recipes and below, processing time is 1.5 times");
         addCNEN("gtocore.machine.steam.tooltip.2", "安装大型蒸汽输入仓后提升一个配方等级，并解锁超频功能", "After installing a large steam input hatch, upgrade one recipe tier and unlock the overclocking function");
         addCNEN("gtocore.machine.mana_stored", "魔力总量: %s", "Total Mana: %s");
         addCNEN("gtocore.machine.mana_consumption", "最大魔力消耗: %s", "Max Mana Consumption Rate: %s");

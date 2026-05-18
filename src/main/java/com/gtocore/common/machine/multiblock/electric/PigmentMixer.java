@@ -1,6 +1,7 @@
 package com.gtocore.common.machine.multiblock.electric;
 
 import com.gtocore.api.machine.IMultiFluidRendererMachine;
+import com.gtocore.api.pattern.GTOPredicates;
 
 import com.gtolib.api.machine.multiblock.ElectricMultiblockMachine;
 import com.gtolib.api.recipe.Recipe;
@@ -14,7 +15,7 @@ import net.minecraft.world.level.material.Fluid;
 import com.fast.fastcollection.OpenCacheHashSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
+import com.gto.datasynclib.annotations.SyncToClient;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,15 +23,15 @@ import java.util.Set;
 
 public class PigmentMixer extends ElectricMultiblockMachine implements IMultiFluidRendererMachine {
 
-    @DescSynced
+    @SyncToClient
     final Set<BlockPos> cachedYellowOffsets = new OpenCacheHashSet<>();
-    @DescSynced
+    @SyncToClient
     final Set<BlockPos> cachedCyanOffsets = new OpenCacheHashSet<>();
-    @DescSynced
+    @SyncToClient
     final Set<BlockPos> cachedMagentaOffsets = new OpenCacheHashSet<>();
-    @DescSynced
+    @SyncToClient
     final Set<BlockPos> cachedBlackOffsets = new OpenCacheHashSet<>();
-    @DescSynced
+    @SyncToClient
     final Set<BlockPos> cachedWhiteOffsets = new OpenCacheHashSet<>();
 
     public PigmentMixer(MetaMachineBlockEntity metaMachineBlockEntity) {
@@ -39,11 +40,11 @@ public class PigmentMixer extends ElectricMultiblockMachine implements IMultiFlu
 
     @Override
     protected boolean beforeWorking(@NotNull Recipe recipe) {
-        cachedYellowOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault("yellow", new OpenCacheHashSet<>()));
-        cachedCyanOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault("cyan", new OpenCacheHashSet<>()));
-        cachedMagentaOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault("magenta", new OpenCacheHashSet<>()));
-        cachedBlackOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault("black", new OpenCacheHashSet<>()));
-        cachedWhiteOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault("white", new OpenCacheHashSet<>()));
+        cachedYellowOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault(GTOPredicates.DataKeys.YELLOW, new OpenCacheHashSet<>()));
+        cachedCyanOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault(GTOPredicates.DataKeys.CYAN, new OpenCacheHashSet<>()));
+        cachedMagentaOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault(GTOPredicates.DataKeys.MAGENTA, new OpenCacheHashSet<>()));
+        cachedBlackOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault(GTOPredicates.DataKeys.BLACK, new OpenCacheHashSet<>()));
+        cachedWhiteOffsets.addAll(getMultiblockState().getMatchContext().getOrDefault(GTOPredicates.DataKeys.WHITE, new OpenCacheHashSet<>()));
         return super.beforeWorking(recipe);
     }
 

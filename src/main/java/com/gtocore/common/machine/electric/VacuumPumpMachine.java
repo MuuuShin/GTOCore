@@ -1,5 +1,7 @@
 package com.gtocore.common.machine.electric;
 
+import com.gtocore.common.data.GTORecipeDataKeys;
+
 import com.gtolib.api.machine.feature.IVacuumMachine;
 
 import com.gregtechceu.gtceu.api.GTValues;
@@ -14,7 +16,7 @@ import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
 
 import net.minecraft.network.chat.Component;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
+import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +27,7 @@ import java.util.List;
 public final class VacuumPumpMachine extends SimpleTieredMachine implements IVacuumMachine {
 
     @Persisted
-    @DescSynced
+    @SyncToClient
     private int vacuumTier;
     @Getter
     @Persisted
@@ -72,7 +74,7 @@ public final class VacuumPumpMachine extends SimpleTieredMachine implements IVac
     @Nullable
     @Override
     public GTRecipe doModifyRecipe(@NotNull GTRecipe recipe) {
-        if (getTier() == recipe.data.getInt("tier")) {
+        if (getTier() == recipe.data.getInt(GTORecipeDataKeys.TIER)) {
             return recipe;
         }
         return null;

@@ -7,6 +7,7 @@ import com.gtocore.client.renderer.machine.CustomPartRenderer;
 import com.gtocore.common.data.GTOBlocks;
 import com.gtocore.common.data.GTOMachines;
 import com.gtocore.common.data.GTOMaterials;
+import com.gtocore.common.data.GTORecipeDataKeys;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
@@ -70,7 +71,6 @@ import static com.gtocore.common.data.machines.GTAEMachines.FLUID_IMPORT_HATCH_M
 import static com.gtocore.common.data.machines.GTAEMachines.STOCKING_IMPORT_HATCH_ME;
 import static com.gtocore.utils.register.MachineRegisterUtils.multiblock;
 import static com.gtocore.utils.register.MachineRegisterUtils.registerTieredMultis;
-import static com.gtolib.api.GTOValues.GLASS_TIER;
 
 public final class MultiBlockG {
 
@@ -222,7 +222,7 @@ public final class MultiBlockG {
             .tooltips(GTOMachineTooltips.INSTANCE.getSatelliteControlCenterTooltips().getSupplier())
             .recipeTypes(DUMMY_RECIPES)
             .block(GTBlocks.CASING_STAINLESS_CLEAN)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.BACK, RelativeDirection.UP, RelativeDirection.LEFT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get()))
                     .where('B', blocks(GTOBlocks.MULTI_FUNCTIONAL_CASING.get()))
                     .where('C', blocks(GTBlocks.CASING_STEEL_PIPE.get()))
@@ -251,7 +251,7 @@ public final class MultiBlockG {
             .perfectOverclock()
             .perfectOCTooltips()
             .block(GTBlocks.CASING_STAINLESS_CLEAN)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', GTOPredicates.frame(GTMaterials.StainlessSteel))
                     .where('B', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get())
                             .or(autoAbilities(definition.getRecipeTypes()))
@@ -270,12 +270,7 @@ public final class MultiBlockG {
             .tooltips(GTOMachineTooltips.INSTANCE.getTreeGrowthSimulatorTooltips().getSupplier())
             .recipeTypes(GTORecipeTypes.TREE_GROWTH_SIMULATOR_RECIPES)
             .block(GTOBlocks.BRASS_REINFORCED_WOODEN_CASING)
-            .pattern(definition -> FactoryBlockPattern.start(definition)
-                    .aisle(" B   B ", " BBBBB ", "  GGG  ", "  GGG  ", "  GGG  ", " BBBBB ", "       ")
-                    .aisle("AAEEEAA", "AAFFFAA", " A   A ", " A   A ", " A   A ", "BAEEEAB", " A   A ")
-                    .aisle("BAAAAAB", "BCFFFCB", "BC   CB", "BC   CB", "BC   CB", "BDDDDDB", " AAAAA ")
-                    .aisle("AAEEEAA", "AAFFFAA", " A   A ", " A   A ", " A   A ", "BAEEEAB", " A   A ")
-                    .aisle(" B   B ", " BBHBB ", "  GGG  ", "  GGG  ", "  GGG  ", " BBBBB ", "       ")
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GCYMBlocks.CASING_INDUSTRIAL_STEAM.get()))
                     .where('B', blocks(GTOBlocks.BRASS_REINFORCED_WOODEN_CASING.get())
                             .or(abilities(IMPORT_ITEMS).setMaxGlobalLimited(1))
@@ -385,7 +380,7 @@ public final class MultiBlockG {
             .tooltips(GTOMachineTooltips.INSTANCE.getDrillingControlCenterTooltips().getSupplier())
             .recipeTypes(DUMMY_RECIPES)
             .block(GTBlocks.CASING_STEEL_SOLID)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STEEL_SOLID.get())
                             .or(abilities(INPUT_ENERGY).setMaxGlobalLimited(2))
                             .or(abilities(MAINTENANCE).setExactLimit(1)))
@@ -406,7 +401,7 @@ public final class MultiBlockG {
             .nonYAxisRotation()
             .recipeTypes(DUMMY_RECIPES)
             .block(GTBlocks.CASING_STAINLESS_CLEAN)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get()))
                     .where('B', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get())
                             .or(abilities(EXPORT_ITEMS).setMaxGlobalLimited(1))
@@ -442,7 +437,7 @@ public final class MultiBlockG {
             .recipeTypes(DUMMY_RECIPES)
             .block(GTBlocks.CASING_PALLADIUM_SUBSTATION)
             .tooltips(GTOMachineTooltips.INSTANCE.getWirelessDimensionRepeaterTooltips().getSupplier())
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.BACK, RelativeDirection.UP, RelativeDirection.LEFT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_PALLADIUM_SUBSTATION.get()))
                     .where('B', GTOPredicates.integralFramework())
                     .where('C', blocks(GTBlocks.HIGH_POWER_CASING.get()))
@@ -565,7 +560,7 @@ public final class MultiBlockG {
                             .or(abilities(MAINTENANCE).setExactLimit(1)))
                     .where('B', GTOPredicates.frame(GTMaterials.StainlessSteel))
                     .where('C', blocks(GTBlocks.CASING_LAMINATED_GLASS.get()))
-                    .where('c', GTOPredicates.countBlock("laminated_glass", GTBlocks.CASING_LAMINATED_GLASS.get()))
+                    .where('c', GTOPredicates.countBlock(GTOPredicates.DataKeys.LAMINATED_GLASS, GTBlocks.CASING_LAMINATED_GLASS.get()))
                     .where('D', blocks(GTOBlocks.TUNGSTEN_BOROSILICATE_GLASS.get()))
                     .where('E', GTOPredicates.frame(GTMaterials.TungstenSteel))
                     .where('F', blocks(GTBlocks.CASING_TUNGSTENSTEEL_GEARBOX.get()))
@@ -582,7 +577,7 @@ public final class MultiBlockG {
             .recipeTypes(GTORecipeTypes.ROCKET_ASSEMBLER_RECIPES)
             .overclock()
             .block(GTBlocks.CASING_STAINLESS_CLEAN)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STEEL_SOLID.get()))
                     .where('B', blocks(GTBlocks.CASING_STEEL_GEARBOX.get()))
                     .where('C', GTOPredicates.frame(GTMaterials.Steel))
@@ -630,7 +625,7 @@ public final class MultiBlockG {
             .tooltips(GTOMachineTooltips.INSTANCE.getSuperMolecularAssemblerTooltips().getSupplier())
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(h -> h.addLines("合成物品的数量", "Amount of items to be crafted")))
             .block(GTOBlocks.OXIDATION_RESISTANT_HASTELLOY_N_MECHANICAL_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', GTOPredicates.frame(GTOMaterials.HastelloyN))
                     .where('B', blocks(GTOBlocks.OXIDATION_RESISTANT_HASTELLOY_N_MECHANICAL_CASING.get()))
                     .where('C', blocks(GTOBlocks.ZIRCONIA_CERAMIC_HIGH_STRENGTH_BENDING_RESISTANCE_MECHANICAL_BLOCK.get()).setMinGlobalLimited(20)
@@ -702,7 +697,7 @@ public final class MultiBlockG {
             .workableCasingRenderer(GTCEu.id("block/casings/hpca/computer_casing/back"), GTCEu.id("block/multiblock/fusion_reactor"))
             .register();
 
-    public static final MultiblockMachineDefinition ME_ENERGY_SUBSTATION = multiblock("me_energy_substation", "ME能源塔", TierCasingMultiblockMachine.createMachine(GLASS_TIER))
+    public static final MultiblockMachineDefinition ME_ENERGY_SUBSTATION = multiblock("me_energy_substation", "ME能源塔", TierCasingMultiblockMachine.createMachine(GTORecipeDataKeys.GLASS_TIER))
             .langValue("ME Energy Substation")
             .allRotation()
             .tooltips(GTOMachineTooltipsA.INSTANCE.getMeEnergySubstationTooltips().getSupplier())

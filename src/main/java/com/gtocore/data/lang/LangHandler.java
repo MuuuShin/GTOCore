@@ -233,8 +233,8 @@ public final class LangHandler {
         addCNEN("config.jade.plugin_gtocore.upgrade_module_provider", "[GTOCore] 升级模块信息", "[GTOCore] Upgrade Module Info");
         addCNEN("config.jade.plugin_gtocore.destroy_time_provider", "[GTOCore] 硬度信息", "[GTOCore] Destroy Time Info");
         addCNEN("config.jade.plugin_gtocore.wireless_grid_provider", "[GTOCore] 无线ME网络信息", "[GTOCore] Wireless ME Network Info");
-        addCNEN("config.jade.plugin_gtocore.maintenance_hatch_provider", "[GTOCore] 维护仓信息", "[GTOCore] Maintenance Hatch Info");
-        addCNEN("config.jade.plugin_gtocore.maintenance_param_provider", "[GTOCore] 维护仓参数", "[GTOCore] Maintenance Hatch Params");
+        addCNEN("config.jade.plugin_gtocore.maintenance_hatch_provider", "[GTOCore] 维护仓耗时信息", "[GTOCore] Maintenance Hatch Duration Info");
+        addCNEN("config.jade.plugin_gtocore.maintenance_param_provider", "[GTOCore] 维护仓损坏信息", "[GTOCore] Maintenance Hatch Damage Info");
 
         addCNEN("gtocore.applicable_modules", "安装附属模块后可解锁的仓室类型 : %s",
                 "Hatch types unlocked by installing auxiliary modules : %s");
@@ -355,14 +355,15 @@ public final class LangHandler {
         addCNEN("gtocore.ae.appeng.me2in1.encode_to.accessor.title", "编码到样板管理终端", "Encode to Pattern Terminal");
         addCNEN("gtocore.ae.appeng.me2in1.encode_to.accessor", "直接编码到当前页面中的空白部分", "Encode directly to the blank slots on the current page of terminal");
         addCNEN("gtocore.ae.appeng.me2in1.draggable_mark.tooltip", "按住并拖动以调整该面板位置", "Hold and drag to adjust the position of this panel");
+        addCNEN("gtocore.ae.appeng.me2in1.draggable_mark.tooltip.1", "拖动到屏幕顶部以自动隐藏", "Drag to the top of the screen to auto-hide");
         addCNEN("gtocore.ae.appeng.me2in1.material_slot", "材料槽", "Material Slot");
         addCNEN("gtocore.ae.appeng.me2in1.material_slot.1", "将带有材料类型的物品（如xx板，xx杆等）放入此槽位", "Place items with materials (such as xx plate, xx rod, etc.) in this slot");
         addCNEN("gtocore.ae.appeng.me2in1.material_slot.2", "编码时将自动应用材料类型到可替换的物品上", "The material type will be automatically applied to replaceable items when encoding");
         addCNEN("gtocore.ae.appeng.me2in1.auto_encode_rename_pattern", "自动编码重命名样板", "Auto Encode Renaming Pattern");
         addCNEN("gtocore.ae.appeng.me2in1.auto_encode_rename_pattern.1", "启用后，所有重命名后的物品将额外编码一份样板，数量与原样板中设置的一致。", "When enabled, all renamed items will encode an additional pattern, with the same quantity as set in the original pattern.");
-        addCNEN("gtocore.ae.appeng.me2in1.emi.catalyst", "编码默认不填充催化剂", "Shift + Left Click: Fill catalysts into the pattern");
-        addCNEN("gtocore.ae.appeng.me2in1.emi.catalyst.fill", "Shift + 左击：将催化剂填充至样板", "Shift + Left Click: Fill catalysts into the pattern");
-        addCNEN("gtocore.ae.appeng.me2in1.emi.catalyst.virtual", "Ctrl + 左击：将催化剂（虚拟物品）填充至样板", "Hold Ctrl to encode catalysts as virtual item catalysts");
+        addCNEN("gtocore.ae.appeng.me2in1.emi.catalyst", "编码默认不填充催化剂", "Catalysts are skipped by default");
+        addCNEN("gtocore.ae.appeng.me2in1.emi.catalyst.fill", "Shift + 左击：将催化剂填充至样板", "Shift + Click: Fill catalysts into the pattern");
+        addCNEN("gtocore.ae.appeng.me2in1.emi.catalyst.virtual", "Ctrl + 左击：将催化剂（虚拟物品）填充至样板", "Ctrl + Click: Encode catalysts as virtual items");
         addCNEN("gtocore.ae.appeng.me2in1.emi.multiblock.sub", "Shift + 左击：编码基础结构和当前模块", "Shift + Click: Encode base structure and this module");
         addCNEN("gtocore.ae.appeng.me2in1.emi.multiblock.sub.all", "Ctrl + 左击：编码到当前模块为止的全部结构", "Ctrl + Click: Encode all modules up to this one");
         addCNEN("gtocore.ae.appeng.me2in1.emi.gt_batch_encode", "Alt + 左击：批量编码，试图替换的材料用黄色标记", "Batch encoding is available while holding Alt, materials to be replaced are marked in yellow");
@@ -390,6 +391,9 @@ public final class LangHandler {
         addCNEN("gtocore.ae.appeng.me2in1.add_mapping", "添加配方搜索映射", "Add Recipe Search Mapping");
         addCNEN("gtocore.ae.appeng.me2in1.add_mapping.desc", "单击打开EMI中的配方，然后点击想要自定义映射的目录中配方的\"+\"按钮以添加映射。自定义的配方映射保存于config/me2in1category.json中。", "Click to open the recipe in EMI, then click the \"+\" button of the recipe in the directory you want to customize the mapping for to add the mapping. The custom recipe mappings are saved in config/me2in1category.json.");
         addCNEN("gtocore.ae.appeng.me2in1.config_mapping", "配置配方搜索映射", "Configure Recipe Search Mapping");
+        addCNEN("gtocore.ae.appeng.me2in1.panel.bufferPanel", "样板缓存区", "Patterns Output");
+        addCNEN("gtocore.ae.appeng.me2in1.panel.mePanel", "ME存储区", "ME Storage");
+        addCNEN("gtocore.ae.appeng.me2in1.panel.encodingModePanel", "编码区", "Encoding Configs");
         addCNEN("gtocore.ae.appeng.craft.add_missing_to_emi", "收藏缺失", "Bookmark Missing");
         addCNEN("gtocore.ae.appeng.craft.add_missing_to_emi.desc", "将缺失的物品添加到EMI书签页", "Add missing items to EMI bookmark page");
         addCNEN("gtocore.ae.appeng.craft.missing_start", "缺失合成", "Missing Crafting");
@@ -406,9 +410,11 @@ public final class LangHandler {
         addCNEN("gtocore.ae.appeng.craft.resume_job", "继续", "Resume");
         addCNEN("gtocore.ae.appeng.craft.pause_job.desc", "暂停正在进行中的发配；已推送的样板不会被撤回", "Pause the ongoing crafting; pushed patterns will not be withdrawn");
         addCNEN("gtocore.ae.appeng.craft.resume_job.desc", "继续已暂停的发配", "Resume the paused crafting");
-        addCNEN("gtocore.ae.appeng.craft.temp_order", "中键点击以创建临时合成订单，下单一份该配方的原材料", "Middle-click to create a temporary crafting order, ordering one set of raw materials for this recipe");
+        addCNEN("gtocore.ae.appeng.craft.temp_order", "中键点击以创建临时合成订单，下单一份该配方的原材料", "Middle-click: order one set of materials for this recipe");
         addCNEN("gtocore.ae.appeng.craft.encode_send", "§o[右键点击] 编码并发送样板§r", "§o[Right Click] Encode and send pattern§r");
-        addCNEN("gtocore.ae.appeng.craft.encode_send.desc", "点击选择目的地样板供应器，并将样板发送至该供应器", "Click to select the destination Pattern Provider and encode the current recipe to it");
+        addCNEN("gtocore.ae.appeng.craft.encode_send.desc", "点击将样板发送至该目的地", "Click to send the pattern to this destination");
+        addCNEN("gtocore.ae.appeng.craft.encode_send.full", "满", "Full");
+        addCNEN("gtocore.ae.appeng.craft.encode_send.full.desc", "该目的地样板槽已满", "This destination has no empty pattern slot");
         addCNEN("gtocore.ae.appeng.wft.wireless", "无线设施管理终端", "Wireless Facility Management Terminal");
         addCNEN("gtocore.ae.appeng.wrt.wireless", "无线请求器终端", "Wireless Requester Terminal");
 

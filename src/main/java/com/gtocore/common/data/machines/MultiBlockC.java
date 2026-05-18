@@ -6,6 +6,7 @@ import com.gtocore.client.renderer.machine.PrimitiveDistillationRenderer;
 import com.gtocore.common.data.GTOBlocks;
 import com.gtocore.common.data.GTOMachines;
 import com.gtocore.common.data.GTOMaterials;
+import com.gtocore.common.data.GTORecipeDataKeys;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
@@ -60,8 +61,6 @@ import static com.gregtechceu.gtceu.api.pattern.Predicates.*;
 import static com.gtocore.api.machine.part.GTOPartAbility.*;
 import static com.gtocore.common.block.BlockMap.CALMAP;
 import static com.gtocore.utils.register.MachineRegisterUtils.multiblock;
-import static com.gtolib.api.GTOValues.COMPONENT_ASSEMBLY_CASING_TIER;
-import static com.gtolib.api.GTOValues.GLASS_TIER;
 
 public final class MultiBlockC {
 
@@ -112,7 +111,7 @@ public final class MultiBlockC {
             .recipeTypes(GTORecipeTypes.STEAM_CRACKING_RECIPES)
             .tooltips(GTOMachineTooltipsA.INSTANCE.getLargeSteamCrackerTooltips().getSupplier())
             .block(GTBlocks.CASING_BRONZE_BRICKS)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTBlocks.CASING_BRONZE_BRICKS.get())
                             .or(abilities(STEAM).setExactLimit(1))
@@ -132,7 +131,7 @@ public final class MultiBlockC {
             .recipeTypes(GTORecipeTypes.CRUSHER_RECIPES)
             .steamOverclock()
             .block(GTBlocks.CASING_BRONZE_BRICKS)
-            .pattern(definition -> MultiBlockFileReader.start(definition) // , RelativeDirection.FRONT,
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.BRONZE_BRICKS_HULL.get()))
                     .where('B', blocks(GTBlocks.CASING_BRONZE_BRICKS.get())
                             .or(abilities(STEAM).setExactLimit(1))
@@ -290,7 +289,7 @@ public final class MultiBlockC {
             .laserTooltips()
             .multipleRecipesTooltips()
             .block(GCYMBlocks.CASING_HIGH_TEMPERATURE_SMELTING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.FRONT, RelativeDirection.UP, RelativeDirection.RIGHT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTBlocks.STEEL_HULL.get()))
                     .where('B', blocks(GCYMBlocks.CASING_HIGH_TEMPERATURE_SMELTING.get()))
@@ -343,7 +342,7 @@ public final class MultiBlockC {
                     .where('C', blocks(GTBlocks.CASING_GRATE.get()))
                     .where('D', blocks(GTBlocks.CASING_TEMPERED_GLASS.get()))
                     .where('E', blocks(GTBlocks.STEEL_HULL.get()))
-                    .where('F', GTOPredicates.tierBlock(CALMAP, COMPONENT_ASSEMBLY_CASING_TIER))
+                    .where('F', GTOPredicates.tierBlock(CALMAP, GTORecipeDataKeys.COMPONENT_ASSEMBLY_CASING_TIER))
                     .where('G', blocks(GTOBlocks.MULTI_FUNCTIONAL_CASING.get()))
                     .where('H', GTOPredicates.frame(GTMaterials.Steel))
                     .where('I', blocks(Blocks.IRON_BARS))
@@ -367,7 +366,7 @@ public final class MultiBlockC {
                     .where('A', blocks(GTBlocks.CASING_STEEL_SOLID.get())
                             .or(GTOPredicates.autoIOAbilities(definition.getRecipeTypes()))
                             .or(abilities(ACCELERATE_HATCH).setMaxGlobalLimited(1)))
-                    .where('B', GTOPredicates.tierBlock(CALMAP, COMPONENT_ASSEMBLY_CASING_TIER))
+                    .where('B', GTOPredicates.tierBlock(CALMAP, GTORecipeDataKeys.COMPONENT_ASSEMBLY_CASING_TIER))
                     .where('C', blocks(GCYMBlocks.CASING_NONCONDUCTING.get()))
                     .where('D', blocks(GTBlocks.CASING_STEEL_SOLID.get()))
                     .where('E', blocks(GTBlocks.CASING_ASSEMBLY_CONTROL.get()))
@@ -455,7 +454,7 @@ public final class MultiBlockC {
             .multipleRecipesTooltips()
             .recipeTypes(GTRecipeTypes.BENDER_RECIPES)
             .block(GTOBlocks.DIMENSION_INJECTION_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTOBlocks.MOLECULAR_CASING.get()))
                     .where('B', GTOPredicates.absBlocks())
                     .where('C', blocks(GTOBlocks.DIMENSION_INJECTION_CASING.get()))
@@ -484,7 +483,7 @@ public final class MultiBlockC {
             .laserTooltips()
             .multipleRecipesTooltips()
             .block(GTOBlocks.PRESSURE_CONTAINMENT_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', GTOPredicates.frame(GTMaterials.Tungsten))
                     .where('B', blocks(GTOBlocks.PRESSURE_CONTAINMENT_CASING.get()))
                     .where('C', blocks(GTOBlocks.PRESSURE_CONTAINMENT_CASING.get())
@@ -513,7 +512,7 @@ public final class MultiBlockC {
             .laserTooltips()
             .multipleRecipesTooltips()
             .block(GTOBlocks.NAQUADAH_ALLOY_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTOBlocks.STRENGTHEN_THE_BASE_BLOCK.get()))
                     .where('B', GTOPredicates.frame(GTMaterials.Ultimet))
                     .where('C', GTOPredicates.frame(GTMaterials.HastelloyC276))
@@ -547,7 +546,7 @@ public final class MultiBlockC {
             .recipeTypes(GTORecipeTypes.CHEMICAL_VAPOR_DEPOSITION_RECIPES)
             .recipeModifiers((machine, recipe) -> RecipeModifierFunction.recipeReduction(recipe, 1, Math.log(900) / Math.log(((ICoilMachine) machine).getTemperature())), RecipeModifierFunction.OVERCLOCKING)
             .block(GTBlocks.CASING_PTFE_INERT)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get()))
                     .where('B', blocks(GTBlocks.CASING_PTFE_INERT.get())
                             .or(autoAbilities(definition.getRecipeTypes()))
@@ -565,11 +564,11 @@ public final class MultiBlockC {
             .register();
 
     public static final MultiblockMachineDefinition PHYSICAL_VAPOR_DEPOSITION = multiblock("physical_vapor_deposition", "物理气相沉积系统",
-            TierCasingParallelMultiblockMachine.createParallel(m -> 1L << (2 * (m.getTier() - 1)), true, GLASS_TIER))
+            TierCasingParallelMultiblockMachine.createParallel(m -> 1L << (2 * (m.getTier() - 1)), true, GTORecipeDataKeys.GLASS_TIER))
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.INSTANCE.getPhysicalVaporDepositionTooltips().getSupplier())
             .recipeTypes(GTORecipeTypes.PHYSICAL_VAPOR_DEPOSITION_RECIPES)
-            .recipeModifiers((machine, recipe) -> RecipeModifierFunction.recipeReduction(recipe, 1, Math.sqrt(1.0D / ((ITierCasingMachine) machine).getCasingTier(GLASS_TIER))), RecipeModifierFunction.OVERCLOCKING)
+            .recipeModifiers((machine, recipe) -> RecipeModifierFunction.recipeReduction(recipe, 1, Math.sqrt(1.0D / ((ITierCasingMachine) machine).getCasingTier(GTORecipeDataKeys.GLASS_TIER))), RecipeModifierFunction.OVERCLOCKING)
             .block(GTBlocks.PLASTCRETE)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_TUNGSTENSTEEL_ROBUST.get()))
@@ -585,7 +584,7 @@ public final class MultiBlockC {
                     .where('I', blocks(GTBlocks.FILTER_CASING.get()))
                     .where(' ', any())
                     .build())
-            .additionalDisplay((controller, components) -> components.add(Component.translatable("gtocore.machine.duration_multiplier.tooltip", Component.literal(FormattingUtil.formatNumbers(Math.sqrt(1.0D / ((ITierCasingMachine) controller).getCasingTier(GLASS_TIER)))))))
+            .additionalDisplay((controller, components) -> components.add(Component.translatable("gtocore.machine.duration_multiplier.tooltip", Component.literal(FormattingUtil.formatNumbers(Math.sqrt(1.0D / ((ITierCasingMachine) controller).getCasingTier(GTORecipeDataKeys.GLASS_TIER)))))))
             .workableCasingRenderer(GTCEu.id("block/casings/cleanroom/plascrete"), GTCEu.id("block/multiblock/gcym/large_chemical_bath"))
             .register();
 
@@ -594,7 +593,7 @@ public final class MultiBlockC {
             .recipeTypes(GTORecipeTypes.PLASMA_CENTRIFUGE_RECIPES)
             .laserTooltips()
             .block(GTOBlocks.MOLECULAR_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.FRONT, RelativeDirection.UP, RelativeDirection.RIGHT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTOBlocks.MOLECULAR_CASING.get()))
                     .where('a', blocks(GTOBlocks.MOLECULAR_CASING.get())
@@ -624,7 +623,7 @@ public final class MultiBlockC {
             .recipeTypes(GTORecipeTypes.PLASMA_EXTRACTION_RECIPES)
             .laserTooltips()
             .block(GTOBlocks.DIMENSION_INJECTION_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.FRONT, RelativeDirection.UP, RelativeDirection.RIGHT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTOBlocks.HYPER_MECHANICAL_CASING.get()))
                     .where('B', blocks(GTOBlocks.DIMENSION_INJECTION_CASING.get()))
@@ -682,7 +681,7 @@ public final class MultiBlockC {
             .parallelizableTooltips()
             .multipleRecipesTooltips()
             .block(GTBlocks.CASING_STAINLESS_CLEAN)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.FRONT, RelativeDirection.UP, RelativeDirection.RIGHT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get()))
                     .where('B', blocks(GTOBlocks.BIOLOGICAL_MECHANICAL_CASING.get()))
@@ -711,7 +710,7 @@ public final class MultiBlockC {
             .tooltips(GTOMachineStories.INSTANCE.getOreExtractionModuleTooltips().getSupplier())
             .laserTooltips()
             .block(GTBlocks.CASING_HSSE_STURDY)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTBlocks.CASING_ASSEMBLY_LINE.get()))
                     .where('B', blocks(GTOBlocks.HYPER_MECHANICAL_CASING.get()))
@@ -741,7 +740,7 @@ public final class MultiBlockC {
             .tooltips(GTOMachineStories.INSTANCE.getPolymerTwistingModuleTooltips().getSupplier())
             .laserTooltips()
             .block(GTBlocks.CASING_PTFE_INERT)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTBlocks.CASING_ASSEMBLY_LINE.get()))
                     .where('B', blocks(GTBlocks.CASING_PTFE_INERT.get()))
@@ -767,7 +766,7 @@ public final class MultiBlockC {
             .tooltips(GTOMachineStories.INSTANCE.getBioengineeringModuleTooltips().getSupplier())
             .laserTooltips()
             .block(GTOBlocks.IRIDIUM_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTBlocks.CASING_ASSEMBLY_LINE.get()))
                     .where('B', frames(GTMaterials.Iridium))
@@ -834,7 +833,7 @@ public final class MultiBlockC {
             .recipeTypes(GTRecipeTypes.DUMMY_RECIPES)
             .laserTooltips()
             .block(GTOBlocks.MOLECULAR_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.FRONT, RelativeDirection.UP, RelativeDirection.RIGHT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
                     .where('A', blocks(GTOBlocks.ECHO_CASING.get()))
                     .where('B', blocks(GTOBlocks.HIGH_PRESSURE_RESISTANT_CASING.get()))
@@ -901,7 +900,7 @@ public final class MultiBlockC {
             .recipeTypes(GTRecipeTypes.DUMMY_RECIPES)
             .laserTooltips()
             .block(GCYMBlocks.CASING_NONCONDUCTING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GCYMBlocks.CASING_NONCONDUCTING.get())
                             .or(abilities(IMPORT_ITEMS).setExactLimit(1))
                             .or(abilities(EXPORT_ITEMS).setExactLimit(1))
@@ -948,7 +947,7 @@ public final class MultiBlockC {
             .perfectOCTooltips()
             .laserTooltips()
             .block(GTOBlocks.DIMENSIONALLY_TRANSCENDENT_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.BACK, RelativeDirection.UP, RelativeDirection.LEFT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTOBlocks.DIMENSIONALLY_TRANSCENDENT_CASING.get()))
                     .where('B', blocks(GTOBlocks.DIMENSIONAL_STABILITY_CASING.get()))
                     .where('C', blocks(GTOBlocks.DIMENSION_INJECTION_CASING.get()))
@@ -983,7 +982,7 @@ public final class MultiBlockC {
             .multipleRecipesTooltips()
             .recipeTypes(GTRecipeTypes.CIRCUIT_ASSEMBLER_RECIPES)
             .block(GTOBlocks.NAQUADAH_ALLOY_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.FRONT, RelativeDirection.UP, RelativeDirection.RIGHT)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', frames(GTOMaterials.HastelloyN))
                     .where('B', blocks(GTOBlocks.PIKYONIUM_MACHINE_CASING.get()))
                     .where('C', blocks(GTOBlocks.DIMENSION_INJECTION_CASING.get()))
@@ -1012,7 +1011,7 @@ public final class MultiBlockC {
             .multipleRecipesTooltips()
             .recipeTypes(GTORecipeTypes.PRECISION_ASSEMBLER_RECIPES)
             .block(GTOBlocks.IRIDIUM_CASING)
-            .pattern(definition -> MultiBlockFileReader.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
+            .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTOBlocks.IRIDIUM_CASING.get())
                             .or(GTOPredicates.autoThreadLaserAbilities(definition.getRecipeTypes()))
                             .or(abilities(PARALLEL_HATCH).setMaxGlobalLimited(1))

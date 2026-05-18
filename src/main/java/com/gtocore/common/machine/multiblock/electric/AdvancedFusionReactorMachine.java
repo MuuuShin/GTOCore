@@ -15,12 +15,13 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.IRecipeHandler;
 import com.gregtechceu.gtceu.api.machine.ConditionalSubscriptionHandler;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.common.data.GTRecipeDataKeys;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
+import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +39,7 @@ import static com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionRea
 public final class AdvancedFusionReactorMachine extends CrossRecipeMultiblockMachine {
 
     @Getter
-    @DescSynced
+    @SyncToClient
     private int color = -1;
     private static final int tier = LuV;
     @Persisted
@@ -103,7 +104,7 @@ public final class AdvancedFusionReactorMachine extends CrossRecipeMultiblockMac
     @Override
     @Nullable
     public Recipe getRealRecipe(Recipe recipe) {
-        long eu_to_start = recipe.data.getLong("eu_to_start");
+        long eu_to_start = recipe.data.getLong(GTRecipeDataKeys.EU_TO_START);
         if (eu_to_start > energyContainer.getEnergyCapacity()) {
             setIdleReason(IdleReason.INSUFFICIENT_ENERGY_BUFFER);
             return null;

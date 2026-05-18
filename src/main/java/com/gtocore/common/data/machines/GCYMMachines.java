@@ -430,6 +430,7 @@ public final class GCYMMachines {
             .allRotation()
             .recipeTypes(ALLOY_BLAST_RECIPES)
             .recipeTypes(ALLOY_SMELTER_RECIPES)
+            .disabledCombined()
             .recipeModifier((m, r) -> {
                 if (m instanceof CoilCustomParallelMultiblockMachine machine) {
                     if (machine.getSubFormedAmount() > 0) {
@@ -619,6 +620,7 @@ public final class GCYMMachines {
                         .aisle("#####", "#ZZZ#", "#ZCZ#", "#ZZZ#", "#####")
                         .where('S', controller(definition))
                         .where('Y', casingPredicate.or(abilities(IMPORT_ITEMS))
+                                .or(Predicates.blocks(CONTROL_HATCH.get()).setMaxGlobalLimited(1).setPreviewCount(0))
                                 .or(abilities(INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(8))
                                 .or(abilities(IMPORT_FLUIDS).setMinGlobalLimited(1))
                                 .or(Predicates.abilities(GTOPartAbility.ACCELERATE_HATCH).setMaxGlobalLimited(1))

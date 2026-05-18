@@ -1,10 +1,13 @@
 package com.gtocore.data.recipe.gtm.misc;
 
+import com.gtocore.common.data.GTOItems;
 import com.gtocore.common.data.GTOMaterials;
 
+import com.gtolib.GTOCore;
 import com.gtolib.utils.RegistriesUtils;
 
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
+import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.recipe.FacadeCoverRecipe;
@@ -30,6 +33,7 @@ import vazkii.botania.common.item.BotaniaItems;
 import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.common.data.GTItems.*;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.*;
+import static com.gtocore.api.data.tag.GTOTagPrefix.COIN;
 import static com.gtocore.common.data.GTOItems.*;
 
 public final class CraftingRecipeLoader {
@@ -127,6 +131,14 @@ public final class CraftingRecipeLoader {
         VanillaRecipeHelper.addShapedRecipe("nano_saber", NANO_SABER.asItem(), "PIC", "PIC",
                 "XEX", 'P', new MaterialEntry(plate, Platinum), 'I', new MaterialEntry(plate, Ruridit), 'C',
                 CARBON_FIBER_PLATE.asItem(), 'X', CustomTags.EV_CIRCUITS, 'E', ENERGIUM_CRYSTAL.asItem());
+
+        VanillaRecipeHelper.addShapedRecipe(GTOCore.id("solar_panel"), GTItems.COVER_SOLAR_PANEL.asItem(),
+                " A ",
+                "BCB",
+                "EDE",
+                'A', Items.GLASS_PANE, 'B', new MaterialEntry(TagPrefix.plate, GTMaterials.WroughtIron),
+                'C', new MaterialEntry(TagPrefix.dust, GTMaterials.Silicon), 'D', GTOItems.SUPER_CAPACITOR.asItem(),
+                'E', CustomTags.LV_CIRCUITS);
 
         VanillaRecipeHelper.addShapedRecipe("universal_fluid_cell", FLUID_CELL_UNIVERSAL.asItem(), "C ",
                 "  ", 'C', FLUID_CELL);
@@ -325,5 +337,43 @@ public final class CraftingRecipeLoader {
         // Special //
         ///////////////////////////////////////////////////
         SpecialRecipeBuilder.special(FacadeCoverRecipe.SERIALIZER).save(GTDynamicDataPack.CONSUMER, "gtceu:crafting/facade_cover");
+
+        ///////////////////////////////////////////////////
+        // Coin //
+        ///////////////////////////////////////////////////
+        addCoinConversionRecipes();
+    }
+
+    private static final Material[] COIN_TIERS = {
+            GTMaterials.Copper,
+            GTMaterials.Cupronickel,
+            GTMaterials.Silver,
+            GTMaterials.Gold,
+            GTMaterials.Osmium,
+            GTMaterials.Naquadah,
+            GTMaterials.Neutronium,
+            GTOMaterials.Adamantine,
+            GTOMaterials.Infinity,
+            GTOMaterials.Neutron
+    };
+
+    private static void addCoinConversionRecipes() {
+        for (int i = 0; i < COIN_TIERS.length - 1; i++) {
+            Material lower = COIN_TIERS[i];
+            Material upper = COIN_TIERS[i + 1];
+            VanillaRecipeHelper.addShapelessRecipe("coin_upgrade_" + lower.getName() + "_to_" + upper.getName(),
+                    ChemicalHelper.get(COIN, upper),
+                    new MaterialEntry(COIN, lower),
+                    new MaterialEntry(COIN, lower),
+                    new MaterialEntry(COIN, lower),
+                    new MaterialEntry(COIN, lower),
+                    new MaterialEntry(COIN, lower),
+                    new MaterialEntry(COIN, lower),
+                    new MaterialEntry(COIN, lower),
+                    new MaterialEntry(COIN, lower));
+            VanillaRecipeHelper.addShapelessRecipe("coin_downgrade_" + upper.getName() + "_to_" + lower.getName(),
+                    ChemicalHelper.get(COIN, lower, 8),
+                    new MaterialEntry(COIN, upper));
+        }
     }
 }
