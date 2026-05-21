@@ -4,26 +4,40 @@ import com.gtocore.common.machine.multiblock.part.ae.slots.ExportOnlyAEFluidList
 import com.gtocore.common.machine.multiblock.part.ae.slots.ExportOnlyAEFluidSlot;
 import com.gtocore.common.machine.multiblock.part.ae.slots.ExportOnlyAEItemList;
 import com.gtocore.common.machine.multiblock.part.ae.widget.MEInputBufferPartMachineUIKt;
+import com.gtocore.common.machine.multiblock.part.ae.widget.slot.AEPatternViewSlotWidgetKt;
 import com.gtocore.common.machine.trait.InternalSlotRecipeHandler;
 
+import com.gtolib.api.annotation.DataGeneratorScanned;
+import com.gtolib.api.annotation.language.RegisterLanguage;
 import com.gtolib.api.gui.ktflexible.VBoxBuilder;
 import com.gtolib.api.machine.trait.ExtendedRecipeHandlerList;
 import com.gtolib.api.machine.trait.NotifiableNotConsumableFluidHandler;
 import com.gtolib.api.machine.trait.NotifiableNotConsumableItemHandler;
+import com.gtolib.api.recipe.RecipeBuilder;
+import com.gtolib.api.recipe.RecipeDefinition;
+import com.gtolib.api.recipe.RecipeType;
+import com.gtolib.utils.RLUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
+import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableMultiblockMachine;
 import com.gregtechceu.gtceu.api.machine.trait.CircuitHandler;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
+import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
 import com.gregtechceu.gtceu.api.transfer.item.LockableItemStackHandler;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.TickTask;
 import net.minecraft.world.item.ItemStack;
 
@@ -36,6 +50,7 @@ import appeng.api.networking.IStackWatcher;
 import appeng.api.networking.crafting.*;
 import appeng.api.stacks.*;
 import appeng.api.storage.MEStorage;
+import appeng.client.gui.me.common.StackSizeRenderer;
 import appeng.crafting.pattern.AEProcessingPattern;
 import appeng.crafting.pattern.EncodedPatternItem;
 import appeng.crafting.pattern.ProcessingPatternItem;
@@ -44,6 +59,7 @@ import appeng.helpers.MultiCraftingTracker;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.gto.datasynclib.annotations.SyncToClient;
 import com.gto.datasynclib.annotations.SyncToServer;
 import com.gto.datasynclib.listener.IntNotifiableHolder;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -55,13 +71,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.IntSupplier;
 
+@DataGeneratorScanned
 public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBufferPartMachine.InternalSlot> {
 
-    private IStackWatcher storageWatcher;
     private IStackWatcher craftingWatcher;
 
     private final List<RecipeHandlerList> recipeHandlers;
+
+    @SyncToClient
+    final boolean[] disconnectStates = new boolean[getMaxPatternCount()];
 
     @Getter
     @SyncToServer
@@ -75,13 +95,11 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
         if (!isRemote()) return;
         if (configuratorField.get() == index) {
             configuratorField.set(-1);
-            configuratorField.markAsDirty();
-            syncToServer();
         } else {
             configuratorField.set(index);
-            configuratorField.markAsDirty();
-            syncToServer();
         }
+        configuratorField.markAsDirty();
+        syncToServer();
     }
 
     private final Multimap<AEKey, InternalSlot> watcher2SlotMap = Multimaps.newSetMultimap(new Reference2ObjectOpenHashMap<>(), ReferenceOpenHashSet::new);
@@ -207,10 +225,6 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
     }
 
     private void configureWatchers() {
-        if (this.storageWatcher != null) {
-            this.storageWatcher.reset();
-        }
-
         if (this.craftingWatcher != null) {
             this.craftingWatcher.reset();
         }
@@ -238,9 +252,6 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
             if (slot.isEmitterMode && craftingWatcher != null) {
                 craftingWatcher.add(slot.reportingKey);
             }
-            if (slot.minThreshold >= 0 && storageWatcher != null) {
-                storageWatcher.add(slot.reportingKey);
-            }
             slot2WatcherMap.put(slot, slot.reportingKey);
             watcher2SlotMap.put(slot.reportingKey, slot);
         }
@@ -250,6 +261,51 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
     public boolean patternFilter(@NotNull ItemStack stack) {
         return stack.getItem() instanceof ProcessingPatternItem &&
                 MEPatternPartMachineKtKt.checkDuplicatedPattern(this, stack);
+    }
+
+    @Override
+    public @NotNull IntSupplier getApplyIndex() {
+        return configuratorField::get;
+    }
+
+    @Override
+    public void runOnUpdate() {
+        if (isRemote()) {
+            configuratorField.set(-1);
+            configuratorField.markAsDirty();
+            syncToServer();
+        }
+    }
+
+    @Override
+    public @NotNull AEPatternViewSlotWidgetKt createPatternSlotWidget(int index) {
+        return new AEPatternViewSlotWidgetKt(
+                0,
+                0,
+                index,
+                getApplyIndex(),
+                getPatternInventory(),
+                () -> onMouseClicked(-1),
+                () -> onMouseClicked(index)) {
+
+            @Override
+            public void drawInBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+                super.drawInBackground(graphics, mouseX, mouseY, partialTicks);
+
+                if (getInner().getItem().isEmpty()) {
+                    return;
+                }
+                var state = disconnectStates[index];
+                var text = state ? Component.translatable(STOPPED) : Component.translatable(RESTOCKING);
+                StackSizeRenderer.renderSizeLabel(
+                        graphics, Minecraft.getInstance().font,
+                        getPositionX() + 1,
+                        getPositionY() + 17 - Minecraft.getInstance().font.lineHeight * 0.5f,
+                        text, 0.5f, true, true
+
+                );
+            }
+        };
     }
 
     public static final class InternalSlot extends AbstractRecipeInternalSlot implements ICraftingRequester {
@@ -275,10 +331,18 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
         @Setter
         @Persisted
         public long minThreshold = -1;
+        @Setter
+        public long multiplier = 1;
         @Persisted
         private boolean isEmitterMode = false;
         @Persisted
         public boolean useRequest = false;
+        @Setter
+        public GTRecipeDefinition recipe;
+
+        /// used to prevent frequent disconnect and reconnect when the pattern is being crafted and the output
+        /// fluctuates around the threshold
+        private boolean disconnected = false;
 
         MultiCraftingTracker craftingTracker = new MultiCraftingTracker(this, 32);
 
@@ -352,6 +416,7 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
         @Override
         public void onPatternChange() {
             refund();
+            setRecipe(null);
             reloadConfig();
         }
 
@@ -365,7 +430,7 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
             ICraftingProvider.requestUpdate(machine.getMainNode());
         }
 
-        private void reloadConfig() {
+        public void reloadConfig() {
             final var oldWatcher = reportingKey;
             if (oldWatcher != null) {
                 machine.watcher2SlotMap.remove(oldWatcher, this);
@@ -387,15 +452,23 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
                 reportingKey = aeProcessingPattern.getPrimaryOutput().what();
                 machine.watcher2SlotMap.put(reportingKey, this);
                 machine.slot2WatcherMap.put(this, reportingKey);
+
+                if (newPattern.getOrCreateTag().tags.get("recipe") instanceof StringTag stringTag) {
+                    var recipe = RecipeBuilder.get(RLUtils.parse(stringTag.getAsString()));
+                    setRecipe(recipe);
+                }
+
                 int itemIdx = 0, fluidIdx = 0;
                 for (var ingredient : aeProcessingPattern.getSparseInputs()) {
                     var key = ingredient.what();
+                    var amount = ingredient.amount();
+                    var configStack = new GenericStack(key, amount * multiplier);
                     if (key instanceof AEItemKey) {
                         if (itemIdx >= exportOnlyItemList.getInventory().length) continue;
-                        exportOnlyItemList.getInventory()[itemIdx++].setConfig(ingredient);
+                        exportOnlyItemList.getInventory()[itemIdx++].setConfig(configStack);
                     } else if (key instanceof AEFluidKey) {
                         if (fluidIdx >= exportOnlyFluidList.getInventory().length) continue;
-                        exportOnlyFluidList.getInventory()[fluidIdx++].setConfig(ingredient);
+                        exportOnlyFluidList.getInventory()[fluidIdx++].setConfig(configStack);
                     }
                 }
             }
@@ -424,20 +497,20 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
             return last < minThreshold;
         }
 
-        private boolean disconnected = false;
-
         private void syncME(@NotNull IGrid grid) {
             if (!shouldSync(grid)) {
                 if (disconnected) {
                     return;
                 }
                 disconnected = true;
+                machine.disconnectStates[index] = true;
                 clearConfig();
             } else {
                 if (disconnected) {
                     reloadConfig();
                 }
                 disconnected = false;
+                machine.disconnectStates[index] = false;
             }
             var cg = grid.getCraftingService();
             MEStorage networkInv = grid.getStorageService().getInventory();
@@ -524,6 +597,9 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
         @Override
         public @NotNull CompoundTag serializeNBT() {
             CompoundTag tag = super.serializeNBT();
+            if (recipe != null) {
+                tag.putString("recipe", recipe.id.toString());
+            }
             if (!notConsumableItem.isEmpty()) tag.put("inv", notConsumableItem.storage.serializeNBT());
             if (!notConsumableFluid.isEmpty()) {
                 ListTag tanks = new ListTag();
@@ -547,6 +623,7 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
             tag.putBoolean("emitterMode", isEmitterMode);
             tag.putBoolean("useRequest", useRequest);
             tag.putLong("minThreshold", minThreshold);
+            tag.putLong("multiplier", multiplier);
             var c = IntCircuitBehaviour.getCircuitConfiguration(circuitInventory.storage.getStackInSlot(0));
             if (c > 0) tag.putInt("c", c);
             return tag;
@@ -554,6 +631,7 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
 
         @Override
         public void deserializeNBT(CompoundTag tag) {
+            setRecipe(RecipeDefinition.of(tag.getString("recipe")));
             if (tag.tags.get("inv") instanceof CompoundTag inv) {
                 notConsumableItem.storage.deserializeNBT(inv);
             }
@@ -587,6 +665,9 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
             }
             if (tag.tags.get("minThreshold") instanceof LongTag minThres) {
                 this.minThreshold = minThres.getAsLong();
+            }
+            if (tag.tags.get("multiplier") instanceof LongTag mul) {
+                this.multiplier = mul.getAsLong();
             }
             var c = tag.getInt("c");
             if (c > 0) circuitInventory.storage.setStackInSlot(0, IntCircuitBehaviour.stack(c));
@@ -630,5 +711,30 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
         public ExtendedRecipeHandlerList wrapper() {
             return new SlotRHL(slot, (MEInputBufferPartMachine) part);
         }
+
+        @Override
+        protected @Nullable GTRecipeDefinition getCachedRecipe() {
+            return slot.recipe;
+        }
+
+        @Override
+        protected boolean isCachedRecipeAvailable(GTRecipeDefinition recipe, IRecipeLogicMachine machine) {
+            return RecipeType.available(recipe.recipeType, machine.disabledCombined() ? new GTRecipeType[] { machine.getRecipeType() } : machine.getRecipeTypes());
+        }
+
+        @Override
+        protected void clearCachedRecipe() {
+            slot.setRecipe(null);
+        }
+
+        @Override
+        protected void onRecipeHandled(GTRecipe recipe) {
+            slot.setRecipe(recipe.definition);
+        }
     }
+
+    @RegisterLanguage(cn = "补货中", en = "Restocking")
+    public static final String RESTOCKING = "gtocore.machine.me_input_buffer.restocking";
+    @RegisterLanguage(cn = "已停止", en = "Stopped")
+    public static final String STOPPED = "gtocore.machine.me_input_buffer.stopped";
 }

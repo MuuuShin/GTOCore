@@ -1,7 +1,5 @@
 package com.gtocore.common.machine.multiblock.part.ae
 
-import com.gtocore.api.gui.ktflexible.multiPageAdvanced
-import com.gtocore.api.gui.ktflexible.textBlock
 import com.gtocore.common.data.machines.GTAEMachines
 import com.gtocore.common.machine.multiblock.part.ae.widget.slot.AEPatternViewSlotWidgetKt
 import com.gtocore.eio_travel.logic.TravelSavedData
@@ -353,52 +351,17 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     lateinit var freshWidgetGroup: FreshWidgetGroupAbstract
     override fun createUIWidget(): Widget {
         freshWidgetGroup = rootFresh(176, 148) {
-            val chunked: List<List<List<Int>>> = (0 until maxPatternCount).chunked(9).chunked(6)
             vBox(width = availableWidth, style = { spacing = 3 }) {
-                hBox(height = 12, alwaysVerticalCenter = true) {
-                    blank(width = 7)
-                    textBlock(maxWidth = this@vBox.availableWidth, textSupplier = {
-                        when (onlineField) {
-                            true -> Component.translatable("gtceu.gui.me_network.online")
-                            false -> Component.translatable("gtceu.gui.me_network.offline")
-                        }
-                    })
-                    blank(width = 9)
-                    textBlock(maxWidth = this@vBox.availableWidth, textSupplier = {
-                        Component.translatable(AE_NAME)
-                    })
-                    field(height = 12, getter = { customName }, setter = {
-                        customName = it
-                        TravelUtils.requireResync(level!!)
-                    })
-                }
+                buildHeader(this, this@MEPatternPartMachineKt)
                 val height1 = this@rootFresh.availableHeight - 24 - 16
                 val pageWidget =
-                    multiPageAdvanced(width = this@vBox.availableWidth, runOnUpdate = ::runOnUpdate, height = height1, pageSelector = newPageField) {
-                        chunked.forEach { pageIndices ->
-                            page {
-                                vScroll(width = this@vBox.availableWidth, height = height1) {
-                                    vBox(width = this@vBox.availableWidth, alwaysHorizonCenter = true) {
-                                        buildToolBoxContent()
-                                        pageIndices.forEach { lineIndices ->
-                                            hBox(height = 18) {
-                                                lineIndices.forEach { index ->
-                                                    widget(createPatternSlot(index))
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (chunked.isEmpty()) {
-                            page {
-                                textBlock(maxWidth = this.availableWidth, textSupplier = {
-                                    Component.translatable(NOT_simple)
-                                })
-                            }
-                        }
-                    }
+                    createPatternPageWidget(
+                        container = this,
+                        machine = this@MEPatternPartMachineKt,
+                        pageHeight = height1,
+                        buildToolBoxContent = { buildToolBoxContent() },
+                        emptyPageTextSupplier = { Component.translatable(NOT_simple) },
+                    )
                 val wid = this@vBox.availableWidth - 2 * 2
                 if (pageWidget.getMaxPageSize() > 1) {
                     hBox(height = 13, style = { spacing = 2 }) {
@@ -493,33 +456,22 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
         }
     }
 
+    open fun createPatternSlotWidget(index: Int): AEPatternViewSlotWidgetKt = AEPatternViewSlotWidgetKt(
+        0,
+        0,
+        index,
+        getApplyIndex(),
+        patternInventory,
+        { onMouseClicked(-1) },
+    ) { onMouseClicked(index) }
+
     fun createPatternSlot(index: Int): AEPatternViewSlotWidgetKt {
-        val slot = AEPatternViewSlotWidgetKt(
-            0,
-            0,
-            index,
-            getApplyIndex(),
-            patternInventory,
-            { onMouseClicked(-1) },
-        ) { onMouseClicked(index) }
+        val slot = createPatternSlotWidget(index)
 
-        slot.inner.setOccupiedTexture(GuiTextures.SLOT)
-        slot.inner.setItemHook { stack ->
-            when (val item = stack.item) {
-                is EncodedPatternItem -> {
-                    val output = item.getOutput(stack)
-                    if (!output.isEmpty) output else stack
-                }
-
-                else -> stack
-            }
-        }
         slot.inner.setChangeListener { onPatternChange(index) }
         slot.inner.setOnAddedTooltips { _, tooltips ->
             appendHoverTooltips(index)?.let { tooltips.add(it) }
         }
-        slot.inner.setBackground(GuiTextures.SLOT, GuiTextures.PATTERN_OVERLAY)
-
         return slot
     }
     open fun VBoxBuilder.buildToolBoxContent() {}

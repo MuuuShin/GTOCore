@@ -110,6 +110,7 @@ fun LayoutBuilder<*>.textBlock(textSupplier: Supplier<Component>, tab: Int = 0, 
     }
     return widget(widget)
 }
+
 class MultiPageDSLBuilder {
     private val pageSuppliers: MutableList<Supplier<VBoxBuilder.() -> Unit>> = mutableListOf()
     fun page(box: VBoxBuilder.() -> Unit) {
@@ -117,10 +118,12 @@ class MultiPageDSLBuilder {
     }
     fun build(): List<Supplier<VBoxBuilder.() -> Unit>> = pageSuppliers
 }
+
 interface MultiPageVScroll {
     fun refresh()
     fun getMaxPageSize(): Int
 }
+
 fun LayoutBuilder<*>.multiPageAdvanced(width: Int, height: Int, style: (Style.() -> Unit)? = null, pageSelector: IntNotifiableHolder, runOnUpdate: Runnable = Runnable {}, builder: MultiPageDSLBuilder.() -> Unit): MultiPageVScroll {
     val widget = object : WidgetGroup(0, 0, width, height), MultiPageVScroll {
         var currentPage: IntNotifiableHolder = pageSelector
@@ -141,6 +144,7 @@ fun LayoutBuilder<*>.multiPageAdvanced(width: Int, height: Int, style: (Style.()
                 pageSuppliers.addAll(build())
             }
         }
+
         override fun refresh() {
             clearAllWidgets()
             val receiver = pageSuppliers[currentPage.get()].get()

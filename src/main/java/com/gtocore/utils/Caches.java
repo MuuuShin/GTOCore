@@ -18,15 +18,7 @@ public final class Caches {
         return TAG_FILTER_CACHE.getCache(new BiString(white, black));
     }
 
-    private static final class BiString {
-
-        private final String a;
-        private final String b;
-
-        private BiString(String a, String b) {
-            this.a = a;
-            this.b = b;
-        }
+    private record BiString(String a, String b) {
 
         private boolean isBlank() {
             return a.isBlank() && b.isBlank();
@@ -34,12 +26,7 @@ public final class Caches {
 
         @Override
         public boolean equals(Object o) {
-            return o instanceof BiString s && s.a.equals(a) && s.b.equals(b);
-        }
-
-        @Override
-        public int hashCode() {
-            return a.hashCode() * 31 + b.hashCode();
+            return o instanceof BiString(String a1, String b1) && a1.equals(a) && b1.equals(b);
         }
     }
 }

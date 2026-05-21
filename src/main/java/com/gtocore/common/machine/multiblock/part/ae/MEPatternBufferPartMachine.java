@@ -103,7 +103,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<MEPatternBufferPartMachine.InternalSlot> implements IDataStickInteractable, IWailaDisplayProvider {
 
-    @RegisterLanguage(cn = "配方已缓存", en = "Recipe cached")
+    @RegisterLanguage(cn = "此槽已缓存配方", en = "Recipe cached in this slot")
     private static final String CACHE = "gtocore.pattern_buffer.cache";
     @RegisterLanguage(cn = "样板独立配置", en = "Pattern independent configuration")
     private static final String INDEPENDENT = "gtocore.pattern_buffer.independent";

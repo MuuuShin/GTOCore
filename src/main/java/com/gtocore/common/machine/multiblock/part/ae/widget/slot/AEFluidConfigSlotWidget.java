@@ -66,7 +66,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
             if (!stack.isEmpty()) {
                 DrawerHelper.drawFluidForGui(graphics, FluidHelperImpl.toFluidStack(stack), config.amount(), stackX,
                         stackY, 16, 16);
-                if (!parentWidget.isStocking()) {
+                if (parentWidget.showAmount()) {
                     String amountStr = FormattingUtil.formatNumberReadable(config.amount(), true,
                             FormattingUtil.DECIMAL_FORMAT_0F, "B");
                     drawStringFixedCorner(graphics, amountStr, stackX + 17, stackY + 17, 16777215, true, 0.5f);
@@ -117,7 +117,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
                 // Right click to clear
                 writeClientAction(REMOVE_ID, buf -> {});
 
-                if (!parentWidget.isStocking()) {
+                if (parentWidget.showAmount()) {
                     this.parentWidget.disableAmountClient();
                 }
             } else if (button == 0) {
