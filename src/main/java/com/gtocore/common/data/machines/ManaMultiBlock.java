@@ -26,6 +26,7 @@ import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.MultiblockShapeInfo;
+import com.gregtechceu.gtceu.client.renderer.machine.WorkableSidedCasingMachineRenderer;
 import com.gregtechceu.gtceu.common.data.GCYMBlocks;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
@@ -33,11 +34,13 @@ import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 
+import dev.shadowsoffire.apotheosis.Apotheosis;
 import vazkii.botania.common.block.BotaniaBlocks;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static com.gregtechceu.gtceu.api.machine.multiblock.PartAbility.*;
 import static com.gregtechceu.gtceu.api.pattern.Predicates.*;
@@ -588,5 +591,36 @@ public final class ManaMultiBlock {
                     .where(' ', any())
                     .build())
             .workableCasingRenderer(GTOCore.id("block/casings/manasteel_casing"), GTCEu.id("block/multiblock/cleanroom"))
+            .register();
+
+    // 脉冲机器维护基座
+    public static final MultiblockMachineDefinition PULSE_MACHINE_MAINTENANCE_PEDESTAL = multiblock("pulse_machine_maintenance_pedestal", "脉冲机器维护基座", PulseMachineMaintenancePedestal::new)
+            .nonYAxisRotation()
+            .block(RegistriesUtils.getSupplierBlock("apotheosis:stoneshelf"))
+            .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
+            .tooltips(GTOMachineTooltipsA.INSTANCE.getPulseMachineMaintenancePedestalTooltips().getSupplier())
+            .pattern(definition -> FactoryBlockPattern.start(definition)
+                    .aisle("   BB", "     ", "     ", "     ", "     ", "     ", "     ", "     ")
+                    .aisle(" AABA", "     ", "     ", "     ", "     ", "     ", "     ", "     ")
+                    .aisle(" ACB ", "  D  ", "  E  ", "     ", "     ", "  F  ", "  G  ", "  F  ")
+                    .aisle("BABB ", "     ", "     ", "     ", "     ", "     ", "     ", "     ")
+                    .aisle("AA   ", "     ", "     ", "     ", "     ", "     ", "     ", "     ")
+                    .where('A', blocks(Blocks.CHISELED_QUARTZ_BLOCK))
+                    .where('B', blocks(RegistriesUtils.getBlock("ars_nouveau:smooth_sourcestone")))
+                    .where('C', blocks(RegistriesUtils.getBlock("gtceu:opal_block")))
+                    .where('D', controller(definition))
+                    .where('E', blocks(RegistriesUtils.getBlock("apotheosis:stoneshelf")))
+                    .where('F', blocks(RegistriesUtils.getBlock("botania:natura_pylon")))
+                    .where('G', blocks(ManaMachine.PULSE_CORE.get()))
+                    .where(' ', any())
+                    .build())
+            .renderer(() -> {
+                var r = new WorkableSidedCasingMachineRenderer("", GTCEu.id("block/multiblock/implosion_compressor"));
+                r.setTextureOverride(Map.of(
+                        "bottom", RLUtils.mc("block/polished_andesite"),
+                        "top", RLUtils.mc("block/polished_andesite"),
+                        "side", RLUtils.fromNamespaceAndPath(Apotheosis.MODID, "blocks/stoneshelf")));
+                return r;
+            })
             .register();
 }

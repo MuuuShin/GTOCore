@@ -17,6 +17,17 @@ import com.gregtechceu.gtceu.config.ConfigHolder
 
 object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
 
+    val pulseMachineMaintenancePedestalTooltips: ComponentListSupplier = ComponentListSupplier {
+        setTranslationPrefix("pulse_machine_maintenance_pedestal")
+
+        section(MainFunction)
+        command("当机器上方的脉冲核心收到一个强度不低于240的魔力脉冲时，尝试工作一次" translatedTo "When the pulse core above the machine receives a mana pulse with strength not less than 240, it will attempt to work once")
+        command("工作时会尝试对附近的机器进行维护，或是从消声仓中消除4份灰尘" translatedTo "When working, it will attempt to maintain nearby machines or eliminate 4 units of dust from the muffler hatch")
+        info("工作半径为12格，且每次工作仅随机维护一个机器或随机消除4份灰尘" translatedTo "The working radius is 12 blocks, and each time it works, it only randomly maintains one machine or randomly eliminates 4 units of dust")
+        guide("这样的魔力脉冲可以通过魔力发射器安装魔力透镜：强度来发射" translatedTo "Such mana pulses can be emitted by installing a mana lens: Power on a mana blaster")
+        guide("或是使用精灵等级及以上的魔力发射器" translatedTo "Or using a mana blaster of Alfhelm tier or above")
+    }
+
     val virtualCoinMinerTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("virtual_coin_miner")
 

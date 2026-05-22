@@ -1,6 +1,7 @@
 package com.gtocore.mixin.gtm.machine;
 
 import com.gtocore.common.item.ItemMap;
+import com.gtocore.common.machine.mana.multiblock.PulseMachineMaintenancePedestal;
 
 import com.gtolib.api.GTOValues;
 import com.gtolib.api.machine.feature.IAirScrubberInteractor;
@@ -32,6 +33,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -75,6 +77,8 @@ public abstract class MufflerPartMachineMixin extends WorkableTieredPartMachine 
     @Unique
     private AirScrubberMachine gtolib$airScrubberCache;
     @Unique
+    private PulseMachineMaintenancePedestal gto$manaCenter;
+    @Unique
     private int gto$chanceOfNotProduceAsh = 100;
     @Unique
     private boolean gtolib$lastFrontFaceFree;
@@ -103,6 +107,28 @@ public abstract class MufflerPartMachineMixin extends WorkableTieredPartMachine 
     @Unique
     public void setNetMachineCache(IDroneControlCenterMachine cache) {
         gtolib$cache = cache;
+        var oldManaCenter = gto$manaCenter;
+        if (oldManaCenter != null) {
+            oldManaCenter.removeProblem(this);
+        }
+        gto$manaCenter = cache instanceof PulseMachineMaintenancePedestal m ? m : null;
+        if (gto$manaCenter != null) {
+            gto$manaCenter.addProblem(this, this::gto$clear4dusts);
+        }
+    }
+
+    @Unique
+    private void gto$clear4dusts() {
+        int remainingClears = 4;
+        for (int i = 0; i < inventory.size; i++) {
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (stack.getCount() > 0) {
+                int toClear = Math.min(stack.getCount(), remainingClears);
+                stack.shrink(toClear);
+                remainingClears -= toClear;
+                if (remainingClears <= 0) break;
+            }
+        }
     }
 
     @Unique
@@ -266,5 +292,16 @@ public abstract class MufflerPartMachineMixin extends WorkableTieredPartMachine 
             e.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 80, 2));
             e.addEffect(new MobEffectInstance(MobEffects.POISON, 40, 1));
         });
+    }
+
+    @Override
+    public boolean firstTestMachine(IDroneControlCenterMachine machine) {
+        Level level = machine.getLevel();
+        if (level == null) return false;
+        if (testMachine(machine) && machine.hasDrone(self().getPos(), d -> d.getCharge() > 0)) {
+            return true;
+        }
+        return machine instanceof PulseMachineMaintenancePedestal p &&
+                p.inRange(getPos());
     }
 }

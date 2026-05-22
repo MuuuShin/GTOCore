@@ -97,7 +97,6 @@ public class SpaceElevatorConnectorModule extends Extension implements ISpaceSer
 
     @Override
     public void onStructureInvalid() {
-        IIWirelessInteractor.removeFromNet(this);
         elevatorTiers.clear();
         maxTier = 0;
         super.onStructureInvalid();

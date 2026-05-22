@@ -4,6 +4,7 @@ import com.gtocore.common.data.*;
 import com.gtocore.common.data.machines.GCYMMachines;
 import com.gtocore.common.data.machines.ManaMachine;
 import com.gtocore.common.data.machines.ManaMultiBlock;
+import com.gtocore.data.recipe.builder.ars.EnchantingApparatusRecipeBuilder;
 import com.gtocore.data.record.EnchantmentRecord;
 import com.gtocore.data.tag.Tags;
 
@@ -1284,6 +1285,25 @@ public final class MagicRecipesA {
             VanillaRecipeHelper.addShapedRecipe(GTOCore.id("village_trading_station"), GTOMachines.VILLAGE_TRADING_STATION.asStack(),
                     "ABA", "CDC", "EFE",
                     'A', RegistriesUtils.getItemStack("easy_villagers:villager"), 'B', new MaterialEntry(foil, GTMaterials.Polytetrafluoroethylene), 'C', new ItemStack(Items.RED_CARPET), 'D', RegistriesUtils.getItemStack("gtceu:chemical_cyan_dye"), 'E', RegistriesUtils.getItemStack("easy_villagers:auto_trader"), 'F', GTOBlocks.INFUSED_GOLD_REINFORCED_WOODEN_CASING.asStack());
+
+            EnchantingApparatusRecipeBuilder.builder("pulsecore")
+                    .input(ChemicalHelper.getItem(TagPrefix.frameGt, GTOMaterials.Terrasteel))
+                    .output(RegistriesUtils.getItemStack("gtocore:pulse_core"))
+                    .sourceCost(1000)
+                    .addPedestalItem(ChemicalHelper.getItem(TagPrefix.plate, GTOMaterials.Livingrock))
+                    .addPedestalItem(ChemicalHelper.getItem(TagPrefix.plate, GTOMaterials.Livingrock))
+                    .addPedestalItem(ChemicalHelper.getItem(TagPrefix.plate, GTOMaterials.Livingrock))
+                    .addPedestalItem(ChemicalHelper.getItem(TagPrefix.plate, GTOMaterials.Livingrock))
+                    .addPedestalItem(ChemicalHelper.getItem(TagPrefix.plate, GTOMaterials.Thaumium))
+                    .addPedestalItem(RegistriesUtils.getItem("ars_nouveau:shapers_focus"))
+                    .addPedestalItem(RegistriesUtils.getItem("extrabotany:lens_mana"))
+                    .addPedestalItem(RegistriesUtils.getItem("extrabotany:lens_trace"))
+                    .save();
+            VanillaRecipeHelper.addShapedRecipe(GTOCore.id("pulse_machine_maintenance_pedestal"), RegistriesUtils.getItem("gtocore:pulse_machine_maintenance_pedestal"),
+                    "ABA",
+                    "CDC",
+                    "AEA",
+                    'A', new MaterialEntry(TagPrefix.rock, GTMaterials.Andesite), 'B', RegistriesUtils.getItem("endrem:magical_eye"), 'C', new MaterialEntry(TagPrefix.gear, GTOMaterials.Terrasteel), 'D', RegistriesUtils.getItem("ars_nouveau:glyph_animate_block"), 'E', RegistriesUtils.getItem("botania:spark"));
         }
 
         // 工具配方
