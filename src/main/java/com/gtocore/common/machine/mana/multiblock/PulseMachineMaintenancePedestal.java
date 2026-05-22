@@ -78,8 +78,8 @@ public class PulseMachineMaintenancePedestal extends NoEnergyMultiblockMachine i
     }
 
     public void resolveRandomProblem() {
-        if (problems.isEmpty()) return;
-        var randomEntry = problems.reference2ObjectEntrySet().stream().skip((int) (problems.size() * Math.random())).findFirst();
+        if (problems.isEmpty() || getLevel() == null) return;
+        var randomEntry = problems.reference2ObjectEntrySet().stream().skip((int) (problems.size() * getLevel().random.nextFloat())).findFirst();
         randomEntry.ifPresent(entry -> {
             entry.getValue().run();
             totalResolvedProblems++;
@@ -105,9 +105,9 @@ public class PulseMachineMaintenancePedestal extends NoEnergyMultiblockMachine i
     @Override
     public void onPartScan(@NotNull IMultiPart part) {
         super.onPartScan(part);
-        if (part instanceof PulseMachineMaintenanceCore core) {
+        if (part instanceof PulseMachineMaintenanceCore c) {
             core.setPedestal(this);
-            this.core = core;
+            this.core = c;
         }
     }
 
