@@ -5189,6 +5189,8 @@
   "gtocore.lang.wireless_dimension_repeater.2.-1548032904": "能量最大電壓取決於使用的外殼等級",
   "gtocore.lang.wireless_dimension_repeater.3.438009707": "與電流大小無關",
   "gtocore.lang.wireless_dimension_repeater.4.231278609": "沒有電流上限簡直是原始人的超級科技",
+  "gtocore.lang.wireless_energy_binding.0.-2096988699": "右鍵可綁定電池箱或蓄能變電站",
+  "gtocore.lang.wireless_energy_binding.1.-634493022": "綁定目標決定了單個無線設備的傳輸上限",
   "gtocore.lang.wireless_energy_substation.0.1288417405": "為無線電網提供容量支持",
   "gtocore.lang.wireless_energy_substation.1.-1430140471": "電網容量",
   "gtocore.lang.wireless_energy_substation.2.42593670": "可在內部安裝任意無線能量單元來提高容量上限",

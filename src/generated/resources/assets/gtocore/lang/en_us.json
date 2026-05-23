@@ -5064,6 +5064,8 @@
   "gtocore.lang.wireless_dimension_repeater.2.-1548032904": "Maximum voltage depends on shell tier",
   "gtocore.lang.wireless_dimension_repeater.3.438009707": "Not related to current size",
   "gtocore.lang.wireless_dimension_repeater.4.231278609": "No current limit - truly primitive super-technology",
+  "gtocore.lang.wireless_energy_binding.0.-2096988699": "Right-click to bind a Battery Buffer or Power Substation",
+  "gtocore.lang.wireless_energy_binding.1.-634493022": "Binding target determines the transmission limit of a single wireless device",
   "gtocore.lang.wireless_energy_substation.0.1288417405": "Provides capacity support to the wireless grid",
   "gtocore.lang.wireless_energy_substation.1.-1430140471": "Electricity Capacity",
   "gtocore.lang.wireless_energy_substation.2.42593670": "Install wireless energy units inside to increase capacity limit",
