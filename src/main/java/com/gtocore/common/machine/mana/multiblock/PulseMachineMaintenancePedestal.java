@@ -106,8 +106,8 @@ public class PulseMachineMaintenancePedestal extends NoEnergyMultiblockMachine i
     public void onPartScan(@NotNull IMultiPart part) {
         super.onPartScan(part);
         if (part instanceof PulseMachineMaintenanceCore c) {
-            core.setPedestal(this);
             this.core = c;
+            core.setPedestal(this);
         }
     }
 
