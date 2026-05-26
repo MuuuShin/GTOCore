@@ -2373,6 +2373,7 @@
   "gtocore.ae.appeng.me2in1.material_slot.2": "編碼時將自動應用材料類型到可替換的物品上",
   "gtocore.ae.appeng.me2in1.panel.bufferPanel": "樣板緩存區",
   "gtocore.ae.appeng.me2in1.panel.encodingModePanel": "編碼區",
+  "gtocore.ae.appeng.me2in1.panel.exPatternTerminalPanel": "樣板終端區",
   "gtocore.ae.appeng.me2in1.panel.mePanel": "ME存儲區",
   "gtocore.ae.appeng.me2in1.quantum_bridge": "安裝糾纏奇點",
   "gtocore.ae.appeng.me2in1.quantum_bridge.info": "該終端已內置量子環，無需額外插件即可實現遠程訪問ME網絡",

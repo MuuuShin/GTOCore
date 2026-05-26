@@ -2245,6 +2245,7 @@
   "gtocore.ae.appeng.me2in1.material_slot.2": "The material type will be automatically applied to replaceable items when encoding",
   "gtocore.ae.appeng.me2in1.panel.bufferPanel": "Patterns Output",
   "gtocore.ae.appeng.me2in1.panel.encodingModePanel": "Encoding Configs",
+  "gtocore.ae.appeng.me2in1.panel.exPatternTerminalPanel": "Pattern Terminal",
   "gtocore.ae.appeng.me2in1.panel.mePanel": "ME Storage",
   "gtocore.ae.appeng.me2in1.quantum_bridge": "Install Quantum Entangled Singularity",
   "gtocore.ae.appeng.me2in1.quantum_bridge.info": "This terminal has a built-in quantum ring, allowing remote access to the ME network without additional plugins",
