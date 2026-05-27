@@ -86,14 +86,10 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
     @Persisted
     private final NotifiableItemStackHandler inventory;
 
-    private final List<PlatformBlockType.PlatformPreset> presets = PlatformTemplateStorage.initializePresets();
-    private final int maxGroup;
-
     public PlatformDeploymentMachine(MetaMachineBlockEntity holder) {
         super(holder);
         inventory = new NotifiableItemStackHandler(this, 27, IO.NONE, IO.BOTH);
         inventory.addChangedListener(this::examineMaterial);
-        maxGroup = presets.size();
     }
 
     @Override
@@ -345,8 +341,8 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
 
                 Component leftBtn1 = ComponentPanelWidget.withButton(Component.literal(" [ ← ] "), "previous_group_plas");
                 Component leftBtn2 = ComponentPanelWidget.withButton(Component.literal(" [ ← ] "), "previous_group");
-                Component empty1 = Component.literal(" ".repeat(15 - ((checkGroup + 1) / 10 + maxGroup / 10 + 5) / 2));
-                textList.add(Component.empty().append(leftBtn1).append(leftBtn2).append(empty1).append(Component.literal("<" + (checkGroup + 1) + "/" + maxGroup + ">")));
+                Component empty1 = Component.literal(" ".repeat(15 - ((checkGroup + 1) / 10 + PlatformTemplateStorage.preset.size() / 10 + 5) / 2));
+                textList.add(Component.empty().append(leftBtn1).append(leftBtn2).append(empty1).append(Component.literal("<" + (checkGroup + 1) + "/" + PlatformTemplateStorage.preset.size() + ">")));
 
                 int totalIds = getPlatformPreset(checkGroup).structures().size();
                 Component leftBtn3 = ComponentPanelWidget.withButton(Component.literal(" [ ← ] "), "previous_id_plas");
@@ -604,19 +600,19 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
                 int maxId = getPlatformPreset(checkGroup).structures().size() - 1;
                 switch (componentData) {
                     case "next_group" -> {
-                        checkGroup = Mth.clamp(checkGroup + 1, 0, maxGroup - 1);
+                        checkGroup = Mth.clamp(checkGroup + 1, 0, PlatformTemplateStorage.preset.size() - 1);
                         checkId = 0;
                     }
                     case "previous_group" -> {
-                        checkGroup = Mth.clamp(checkGroup - 1, 0, maxGroup - 1);
+                        checkGroup = Mth.clamp(checkGroup - 1, 0, PlatformTemplateStorage.preset.size() - 1);
                         checkId = 0;
                     }
                     case "next_group_plas" -> {
-                        checkGroup = Mth.clamp(checkGroup + 10, 0, maxGroup - 1);
+                        checkGroup = Mth.clamp(checkGroup + 10, 0, PlatformTemplateStorage.preset.size() - 1);
                         checkId = 0;
                     }
                     case "previous_group_plas" -> {
-                        checkGroup = Mth.clamp(checkGroup - 10, 0, maxGroup - 1);
+                        checkGroup = Mth.clamp(checkGroup - 10, 0, PlatformTemplateStorage.preset.size() - 1);
                         checkId = 0;
                     }
 
@@ -814,11 +810,11 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
 
     private PlatformBlockType.PlatformPreset getPlatformPreset(int group) {
         try {
-            return presets.get(group);
+            return PlatformTemplateStorage.preset.get(group);
         } catch (IndexOutOfBoundsException | NullPointerException e) {
             checkGroup = 0;
             saveGroup = 0;
-            return presets.getFirst();
+            return PlatformTemplateStorage.preset.getFirst();
         }
     }
 

@@ -20,7 +20,7 @@ public final class PlatformTemplateStorage {
 
     public static final Map<String, CNEN> LANG = GTCEu.isDataGen() ? new O2OOpenCacheHashMap<>() : null;
 
-    private static final List<PlatformPreset> preset = new ArrayList<>();
+    static final List<PlatformPreset> preset = new ArrayList<>();
 
     private static final String platform = add("平台", "platform");
     private static final String platform_3_3 = add("平台(3*3)", "platform(3*3)");
@@ -53,11 +53,7 @@ public final class PlatformTemplateStorage {
     }
 
     private static String in(String path) {
-        return "platforms/" + path;
-    }
-
-    static List<PlatformPreset> initializePresets() {
-        return preset;
+        return path;
     }
 
     private static final String high_saturation_chessboard = add("高饱和棋盘", "High saturation chessboard");
