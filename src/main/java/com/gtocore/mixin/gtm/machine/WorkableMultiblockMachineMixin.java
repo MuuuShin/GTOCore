@@ -10,8 +10,8 @@ import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableMultiblockMachine;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
+import com.gregtechceu.gtceu.utils.TaskHandler;
 
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
@@ -76,7 +76,7 @@ public abstract class WorkableMultiblockMachineMixin extends MultiblockControlle
         if (this instanceof IEnhancedMultiblockMachine enhancedRecipeLogicMachine && (unit.itemHandlers.length > 0 || unit.fluidHandlers.length > 0)) {
             traitSubscriptions.add(unit.subscribe(() -> enhancedRecipeLogicMachine.onContentChanges(unit)));
             if (getLevel() instanceof ServerLevel serverLevel) {
-                serverLevel.getServer().tell(new TickTask(1, () -> enhancedRecipeLogicMachine.onContentChanges(unit)));
+                TaskHandler.enqueueTask(serverLevel, () -> enhancedRecipeLogicMachine.onContentChanges(unit));
             }
         }
     }

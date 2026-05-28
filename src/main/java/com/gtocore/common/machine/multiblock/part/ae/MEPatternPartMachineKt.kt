@@ -80,7 +80,6 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     ICraftingProvider,
     WirelessMachine,
     IInteractedMachine,
-    ISync,
     IExtendedPatternContainer,
     IDropSaveMachine {
     override fun onUse(state: BlockState?, world: Level?, pos: BlockPos?, player: Player?, hand: InteractionHand?, hit: BlockHitResult?): InteractionResult? {

@@ -18,11 +18,11 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
+import com.gregtechceu.gtceu.utils.TaskHandler;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.TickTask;
 
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import earth.terrarium.adastra.api.planets.PlanetApi;
@@ -37,7 +37,6 @@ import static com.gregtechceu.gtceu.api.GTValues.IV;
 import static com.gregtechceu.gtceu.api.GTValues.VA;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.DistilledWater;
 import static com.gtocore.common.data.GTOMaterials.FlocculationWasteSolution;
-import static com.gtolib.utils.ServerUtils.getServer;
 
 public class Core extends AbstractSpaceStation implements ILargeSpaceStationMachine, IWirelessDimensionProvider {
 
@@ -96,9 +95,9 @@ public class Core extends AbstractSpaceStation implements ILargeSpaceStationMach
 
     private void delayedUnload() {
         if (!isRemote()) {
-            getServer().tell(new TickTask(200, () -> {
+            TaskHandler.enqueueTask(Objects.requireNonNull(getLevel()), () -> {
                 if (getHolder().hasLevel() && !isFormed()) unloadContainer();
-            }));
+            }, 200);
         }
     }
 

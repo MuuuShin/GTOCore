@@ -15,7 +15,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
 import appeng.api.stacks.AEKey;
@@ -268,11 +267,6 @@ public class MonitorAEThroughput extends AbstractAEInfoMonitor {
 
         public @Nullable AEKey getCurrent() {
             return getInventory()[0].getConfig() == null ? null : getInventory()[0].getConfig().what();
-        }
-
-        @Override
-        public @NotNull ItemStack getStackInSlot(int slot) {
-            return ItemStack.EMPTY;
         }
     }
 

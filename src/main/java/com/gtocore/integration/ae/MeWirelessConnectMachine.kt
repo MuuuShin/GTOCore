@@ -26,19 +26,14 @@ import com.gregtechceu.gtceu.api.gui.fancy.TabsWidget
 import com.gregtechceu.gtceu.api.machine.MetaMachine
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife
-import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder
 import com.gto.datasynclib.annotations.SyncToClient
 import com.gto.datasynclib.listener.IntNotifiableHolder
 import com.gto.datasynclib.listener.ObjNotifiableHolder
-import com.gtolib.api.capability.ISync
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture
 import com.lowdragmc.lowdraglib.gui.widget.Widget
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
-
-import kotlin.math.max
 
 /**
  * ME 无线连接机 — 可切换 INPUT/OUTPUT 节点类型。
@@ -49,7 +44,6 @@ class MeWirelessConnectMachine(holder: MetaMachineBlockEntity) :
     MetaMachine(holder),
     WirelessMachine,
     IMachineLife,
-    ISync,
     IFancyUIMachine {
 
     // ==================== AE2 Grid ====================
@@ -94,13 +88,13 @@ class MeWirelessConnectMachine(holder: MetaMachineBlockEntity) :
 
     // ==================== WirelessMachine - Sync Fields ====================
     @SyncToClient
-    private val _networkListCache: ObjNotifiableHolder<List<NetworkSummary>> = createNetworkSummarySyncField(this)
+    private val _networkListCache: ObjNotifiableHolder<List<NetworkSummary>> = createNetworkSummarySyncField()
 
     @SyncToClient
     private val _unassignedOutputCount: IntNotifiableHolder = IntNotifiableHolder.create()
 
     @SyncToClient
-    private val _topologyCache: ObjNotifiableHolder<List<TopologySummary>> = createTopologySyncField(this)
+    private val _topologyCache: ObjNotifiableHolder<List<TopologySummary>> = createTopologySyncField()
 
     @SyncToClient
     private val _nodeTypeSync: IntNotifiableHolder = IntNotifiableHolder.create()

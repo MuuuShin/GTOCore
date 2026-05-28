@@ -214,11 +214,6 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
             if (inputNodes.isEmpty()) return
             assignNodesGreedy()
         } else {
-            if (inputNodes.isEmpty()) {
-                val orphan = outputNodes.firstOrNull { isNodeValid(it) } ?: return
-                orphan.switchNodeType(WirelessMachine.NodeType.SOURCE)
-                return
-            }
             if (inputNodes.size > 1) {
                 inputNodes.drop(1).forEach {
                     if (isNodeValid(it)) {

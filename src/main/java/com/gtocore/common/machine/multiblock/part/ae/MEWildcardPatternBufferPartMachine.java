@@ -34,7 +34,6 @@ import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
-import com.gregtechceu.gtceu.utils.collection.FastObjectArrayList;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -275,7 +274,7 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
             AtomicLong validatingPatterns = new AtomicLong();
 
             // var patterns = super.getAvailablePatterns();
-            var newPatterns = new FastObjectArrayList<IPatternDetails>();
+            var newPatterns = new ArrayList<IPatternDetails>();
             var templates = new WildcardPatternTemplate[patterns.size()];
             var searchContext = new SearchContext();
 

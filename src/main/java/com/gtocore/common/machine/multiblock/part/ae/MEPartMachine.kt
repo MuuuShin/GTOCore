@@ -37,10 +37,8 @@ import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder
 import com.gto.datasynclib.annotations.SyncToClient
 import com.gto.datasynclib.listener.IntNotifiableHolder
 import com.gto.datasynclib.listener.ObjNotifiableHolder
-import com.gtolib.api.capability.ISync
 import com.gtolib.api.machine.feature.IMEPartMachine
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.mojang.datafixers.util.Pair
 
@@ -58,7 +56,6 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
     WorkableTieredIOPartMachine(holder, GTValues.LuV, io),
     WirelessMachine,
     IMEPartMachine,
-    ISync,
     IDistinctPart,
     IMachineLife {
 
@@ -112,11 +109,7 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
     }
 
     // ==================== WirelessMachine - Node Type ====================
-    var nodeTyp: WirelessMachine.NodeType? = WirelessMachine.NodeType.CHILD
-    override fun getNodeType(): WirelessMachine.NodeType? = nodeTyp
-    override fun setNodeType(type: WirelessMachine.NodeType) {
-        nodeTyp = type
-    }
+    override fun getNodeType(): WirelessMachine.NodeType? = WirelessMachine.NodeType.CHILD
 
     // ==================== WirelessMachine - Persisted State ====================
     @Persisted
@@ -139,13 +132,13 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
 
     // ==================== WirelessMachine - Sync Fields ====================
     @SyncToClient
-    private val _networkListCache: ObjNotifiableHolder<List<NetworkSummary>> = createNetworkSummarySyncField(this)
+    private val _networkListCache: ObjNotifiableHolder<List<NetworkSummary>> = createNetworkSummarySyncField()
 
     @SyncToClient
     private val _unassignedOutputCount: IntNotifiableHolder = IntNotifiableHolder.create()
 
     @SyncToClient
-    private val _topologyCache: ObjNotifiableHolder<List<TopologySummary>> = createTopologySyncField(this)
+    private val _topologyCache: ObjNotifiableHolder<List<TopologySummary>> = createTopologySyncField()
 
     @SyncToClient
     private val _nodeTypeSync: IntNotifiableHolder = IntNotifiableHolder.create()

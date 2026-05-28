@@ -1,20 +1,22 @@
 package com.gtocore.common.machine.multiblock.part.ae.slots;
 
+import com.gregtechceu.gtceu.api.misc.IContentChange;
 import com.gregtechceu.gtceu.integration.ae2.slot.IConfigurableSlot;
 
 import net.minecraft.nbt.CompoundTag;
 
 import appeng.api.stacks.GenericStack;
 
-import com.lowdragmc.lowdraglib.syncdata.IContentChangeAware;
 import com.lowdragmc.lowdraglib.syncdata.ITagSerializable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class ExportOnlyAESlot implements IConfigurableSlot, ITagSerializable<CompoundTag>, IContentChangeAware {
+public abstract class ExportOnlyAESlot implements IConfigurableSlot, ITagSerializable<CompoundTag>, IContentChange {
 
     private static final String CONFIG_TAG = "config";
     private static final String STOCK_TAG = "stock";
     private Runnable onContentsChanged = () -> {};
+    private boolean freezeChanged = false;
     @Nullable
     GenericStack config;
     /** 槽位的当前库存，可为空。 */
@@ -124,8 +126,19 @@ public abstract class ExportOnlyAESlot implements IConfigurableSlot, ITagSeriali
     }
 
     @Override
-    public void setOnContentsChanged(final Runnable onContentsChanged) {
+    public void setOnContentsChanged(@NotNull final Runnable onContentsChanged) {
+        if (freezeChanged) return;
         this.onContentsChanged = onContentsChanged;
+    }
+
+    public void setOnContentsChangedAndfreeze(@NotNull final Runnable onContentsChanged) {
+        this.onContentsChanged = onContentsChanged;
+        freezeChanged = true;
+    }
+
+    @Override
+    public boolean isFreezeChanged() {
+        return freezeChanged;
     }
 
     @Override

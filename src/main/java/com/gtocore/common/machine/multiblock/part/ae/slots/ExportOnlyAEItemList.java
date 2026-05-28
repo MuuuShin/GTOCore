@@ -45,14 +45,8 @@ public class ExportOnlyAEItemList extends NotifiableItemStackHandler implements 
         this.inventory = new ExportOnlyAEItemSlot[slots];
         for (int i = 0; i < slots; i++) {
             this.inventory[i] = slotFactory.get();
-            this.inventory[i].setOnContentsChanged(this::onContentsChanged);
+            this.inventory[i].setOnContentsChangedAndfreeze(this::onContentsChanged);
         }
-    }
-
-    @Override
-    public void onContentsChanged() {
-        super.onContentsChanged();
-        changed = true;
     }
 
     @Override

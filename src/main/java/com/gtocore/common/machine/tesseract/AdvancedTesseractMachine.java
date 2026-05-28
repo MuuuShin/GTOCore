@@ -92,6 +92,7 @@ public class AdvancedTesseractMachine extends MetaMachine implements IFancyUIMac
         super(holder);
         inventory = new NotifiableItemStackHandler(this, 20, IO.NONE, IO.NONE);
         inventory.storage.setOnContentsChangedAndfreeze(() -> {
+            onChanged();
             called = false;
             poss.clear();
             for (int i = 0; i < 20; i++) {

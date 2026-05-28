@@ -28,12 +28,12 @@ import com.gregtechceu.gtceu.api.recipe.handler.IRecipeHandler;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.api.transfer.item.LockableItemStackHandler;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
+import com.gregtechceu.gtceu.utils.TaskHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.TickTask;
 import net.minecraft.world.item.ItemStack;
 
 import appeng.api.config.Actionable;
@@ -83,7 +83,7 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
     @SyncToServer
     public IntNotifiableHolder configuratorField = IntNotifiableHolder.create(-1)
             .setReceiverListener((side, o, n) -> {
-                if (side.isServer()) Objects.requireNonNull(Objects.requireNonNull(getLevel()).getServer()).tell(new TickTask(10, () -> freshWidgetGroup.serverFresh()));
+                if (side.isServer()) TaskHandler.enqueueTask(Objects.requireNonNull(getLevel()), () -> freshWidgetGroup.serverFresh(), 10);
             });
 
     @Override
@@ -518,7 +518,7 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
             }
             var cg = grid.getCraftingService();
             MEStorage networkInv = grid.getStorageService().getInventory();
-            for (int i = 0; i < exportOnlyItemList.getSlots(); i++) {
+            for (int i = 0; i < exportOnlyItemList.getConfigurableSlots(); i++) {
                 var aeSlot = exportOnlyItemList.getInventory()[i];
                 GenericStack exceedItem = aeSlot.exceedStack();
                 if (exceedItem != null) {
@@ -560,7 +560,7 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
                 if (reqFluid != null) {
                     long extracted = networkInv.extract(reqFluid.what(), reqFluid.amount(), Actionable.MODULATE, machine.getActionSourceField());
                     if (useRequest && extracted < reqFluid.amount()) {
-                        craftingTracker.handleCrafting(i + exportOnlyItemList.getSlots(), reqFluid.what(), reqFluid.amount() - extracted,
+                        craftingTracker.handleCrafting(i + exportOnlyItemList.getConfigurableSlots(), reqFluid.what(), reqFluid.amount() - extracted,
                                 machine.getLevel(), cg, machine.getActionSourceField());
                     }
                     if (extracted > 0) {

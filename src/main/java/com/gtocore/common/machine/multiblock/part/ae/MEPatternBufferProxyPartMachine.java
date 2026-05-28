@@ -15,6 +15,7 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.client.util.TooltipHelper;
+import com.gregtechceu.gtceu.utils.TaskHandler;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -22,7 +23,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -79,7 +79,7 @@ public final class MEPatternBufferProxyPartMachine extends WorkableTieredIOPartM
     public void onLoad() {
         super.onLoad();
         if (getLevel() instanceof ServerLevel level) {
-            level.getServer().tell(new TickTask(0, () -> this.setBuffer(bufferPos)));
+            TaskHandler.enqueueTask(level, () -> this.setBuffer(bufferPos));
         }
     }
 

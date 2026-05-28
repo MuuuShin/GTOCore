@@ -25,7 +25,6 @@ import com.gto.datasynclib.datasream.codec.ByteStreamCodec
 import com.gto.datasynclib.datasream.codec.ByteStreamDecoder
 import com.gto.datasynclib.datasream.codec.ByteStreamEncoder
 import com.gto.datasynclib.listener.ObjNotifiableHolder
-import com.gtolib.api.capability.ISync
 import com.gtolib.api.network.NetworkPack
 import com.hepdd.gtmthings.utils.TeamUtil
 import com.lowdragmc.lowdraglib.LDLib
@@ -490,7 +489,7 @@ enum class STATUS {
 /**
  * 创建用于同步网络摘要列表的 ISync.ObjectSyncedField。
  */
-fun createNetworkSummarySyncField(sync: ISync): ObjNotifiableHolder<List<NetworkSummary>> = ObjNotifiableHolder.create(
+fun createNetworkSummarySyncField(): ObjNotifiableHolder<List<NetworkSummary>> = ObjNotifiableHolder.create(
     CombinationCodec.of(
         ByteStreamCodec.of(
             ByteStreamEncoder.collection
@@ -523,7 +522,7 @@ fun createNetworkSummarySyncField(sync: ISync): ObjNotifiableHolder<List<Network
 /**
  * 创建用于同步拓扑信息列表的 ISync.ObjectSyncedField。
  */
-fun createTopologySyncField(sync: ISync): ObjNotifiableHolder<List<TopologySummary>> = ObjNotifiableHolder.create(
+fun createTopologySyncField(): ObjNotifiableHolder<List<TopologySummary>> = ObjNotifiableHolder.create(
     CombinationCodec.of(
         ByteStreamCodec.of(
             ByteStreamEncoder.collection { buf, topo ->

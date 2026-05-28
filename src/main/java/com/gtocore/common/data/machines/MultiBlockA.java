@@ -1658,7 +1658,7 @@ public final class MultiBlockA {
             .tooltips(GTOMachineTooltips.INSTANCE.getIndustrialFlotationCellTooltips().getSupplier())
             .parallelizableTooltips()
             .perfectOCTooltips()
-            .fromSourceTooltips("GTNH")
+            .fromSourceTooltips("GregTech: New Horizon")
             .parallelizablePerfectOverclock()
             .block(GTOBlocks.HASTELLOY_N_75_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
