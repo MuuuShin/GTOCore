@@ -117,76 +117,7 @@ public final class GTEMIRecipe extends ModularEmiRecipe<Widget> {
 
     @Override
     public List<EmiIngredient> getInputs() {
-        if (inputs == null) {
-            inputs = new ArrayList<>();
-            recipe.itemInputs.forEach(c -> {
-                if (c.inner instanceof ItemIngredient ingredient) {
-                    float chance = (float) c.chance / ContentBuilder.maxChance;
-                    EmiIngredient emiIngredient = getEmiIngredient(ingredient, true).setChance(chance);
-                    if (chance > 0) {
-                        inputs.add(emiIngredient);
-                    } else {
-                        catalysts.add(emiIngredient);
-                    }
-                }
-            });
-            recipe.fluidInputs.forEach(c -> {
-                if (c.inner instanceof FluidIngredient ingredient) {
-                    var fluid = ingredient.getFluid();
-                    if (fluid != null) {
-                        float chance = (float) c.chance / ContentBuilder.maxChance;
-                        EmiIngredient emiIngredient = EmiStack.of(fluid, ingredient.nbt, ingredient.amount).setChance(chance);
-                        if (chance > 0) {
-                            inputs.add(emiIngredient);
-                        } else {
-                            catalysts.add(emiIngredient);
-                        }
-                    }
-                }
-            });
-        }
-        recipe.itemOutputs.forEach(c -> {
-            if (c.inner instanceof ItemIngredient ingredient) {
-                float chance = (float) c.chance / ContentBuilder.maxChance;
-                outputs.add((EmiStack) getEmiIngredient(ingredient, false).setChance(chance));
-            }
-        });
-        recipe.fluidOutputs.forEach(c -> {
-            if (c.inner instanceof FluidIngredient ingredient) {
-                float chance = (float) c.chance / ContentBuilder.maxChance;
-                var fluid = ingredient.getFluid();
-                if (fluid != null) {
-                    outputs.add(EmiStack.of(fluid, ingredient.nbt, ingredient.amount).setChance(chance));
-                }
-            }
-        });
-        if (recipe.recipeType.isScanner()) {
-            ResearchManager.ResearchItem researchData = null;
-            for (var content : recipe.itemOutputs) {
-                var stack = content.inner.getInnerItemStack();
-                if (stack.isEmpty()) continue;
-                researchData = ResearchManager.readResearchId(stack);
-                if (researchData != null) break;
-            }
-            if (researchData != null) {
-                var possibleRecipes = researchData.recipeType().getDataStickEntry(researchData.researchId());
-                Set<ItemStack> cache = new ObjectOpenCustomHashSet<>(ItemStackHashStrategy.ITEM);
-                if (possibleRecipes != null) {
-                    for (var r : possibleRecipes) {
-                        var outputs = r.itemOutputs;
-                        if (outputs.isEmpty()) continue;
-                        var outputContent = outputs.getFirst();
-                        var ingredient = outputContent.inner;
-                        var stack = ingredient.getInnerItemStack();
-                        if (stack.isEmpty()) continue;
-                        if (!cache.contains(stack)) {
-                            cache.add(stack);
-                            super.outputs.add((EmiStack) getEmiIngredient(ingredient, false));
-                        }
-                    }
-                }
-            }
-        }
+        if (inputs == null) initRecipe();
         return inputs;
     }
 
@@ -272,5 +203,76 @@ public final class GTEMIRecipe extends ModularEmiRecipe<Widget> {
         widgets.add(new ModularWrapperWidget(modular, slots));
         slots.forEach(widgets::add);
         widgets.add(new ModularForegroundRenderWidget(modular));
+    }
+
+    private void initRecipe() {
+        inputs = new ArrayList<>();
+        recipe.itemInputs.forEach(c -> {
+            if (c.inner instanceof ItemIngredient ingredient) {
+                float chance = (float) c.chance / ContentBuilder.maxChance;
+                EmiIngredient emiIngredient = getEmiIngredient(ingredient, true).setChance(chance);
+                if (chance > 0) {
+                    inputs.add(emiIngredient);
+                } else {
+                    catalysts.add(emiIngredient);
+                }
+            }
+        });
+        recipe.fluidInputs.forEach(c -> {
+            if (c.inner instanceof FluidIngredient ingredient) {
+                var fluid = ingredient.getFluid();
+                if (fluid != null) {
+                    float chance = (float) c.chance / ContentBuilder.maxChance;
+                    EmiIngredient emiIngredient = EmiStack.of(fluid, ingredient.nbt, ingredient.amount).setChance(chance);
+                    if (chance > 0) {
+                        inputs.add(emiIngredient);
+                    } else {
+                        catalysts.add(emiIngredient);
+                    }
+                }
+            }
+        });
+        recipe.itemOutputs.forEach(c -> {
+            if (c.inner instanceof ItemIngredient ingredient) {
+                float chance = (float) c.chance / ContentBuilder.maxChance;
+                outputs.add((EmiStack) getEmiIngredient(ingredient, false).setChance(chance));
+            }
+        });
+        recipe.fluidOutputs.forEach(c -> {
+            if (c.inner instanceof FluidIngredient ingredient) {
+                float chance = (float) c.chance / ContentBuilder.maxChance;
+                var fluid = ingredient.getFluid();
+                if (fluid != null) {
+                    outputs.add(EmiStack.of(fluid, ingredient.nbt, ingredient.amount).setChance(chance));
+                }
+            }
+        });
+        if (recipe.recipeType.isScanner()) {
+            ResearchManager.ResearchItem researchData = null;
+            for (var content : recipe.itemOutputs) {
+                var stack = content.inner.getInnerItemStack();
+                if (stack.isEmpty()) continue;
+                researchData = ResearchManager.readResearchId(stack);
+                if (researchData != null) break;
+            }
+            if (researchData != null) {
+                var possibleRecipes = researchData.recipeType().getDataStickEntry(researchData.researchId());
+                Set<ItemStack> cache = new ObjectOpenCustomHashSet<>(ItemStackHashStrategy.ITEM);
+                if (possibleRecipes != null) {
+                    for (var r : possibleRecipes) {
+                        var outputs = r.itemOutputs;
+                        if (outputs.isEmpty()) continue;
+                        var outputContent = outputs.getFirst();
+                        var ingredient = outputContent.inner;
+                        var stack = ingredient.getInnerItemStack();
+                        if (stack.isEmpty()) continue;
+                        if (!cache.contains(stack)) {
+                            cache.add(stack);
+                            super.outputs.add((EmiStack) getEmiIngredient(ingredient, false));
+                        }
+                    }
+                }
+            }
+        }
     }
 }
