@@ -15,7 +15,7 @@ import earth.terrarium.adastra.api.planets.PlanetApi;
 
 public final class GravityCondition extends RecipeCondition {
 
-    private final boolean zero;
+    public final boolean zero;
 
     public GravityCondition(boolean zero) {
         this.zero = zero;

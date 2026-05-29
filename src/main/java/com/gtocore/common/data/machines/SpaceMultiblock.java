@@ -455,6 +455,7 @@ public class SpaceMultiblock {
             .tooltips(GTOMachineTooltips.INSTANCE.getFunctionSpaceStationModuleTooltips().getSupplier())
             .recipeTypes(GTORecipeTypes.SPACE_SMELTING_RECIPES)
             .recipeTypes(GTORecipeTypes.ALLOY_BLAST_RECIPES)
+            .recipeTypes(GTORecipeTypes.BLAST_RECIPES)
             .block(GTOBlocks.SMELTING_CONTROL_CASING)
             .pattern(definition -> FactoryBlockPattern.start(definition)
                     .aisle("                                             ", "                                             ", "                                             ", "                                             ", "                                             ", "                                             ", "                 M M       M M               ", "                 M M       M M               ", "                 M M       M M               ", "                 M M       M M               ", "                 M M       M M               ", "                                             ", "                                             ", "                                             ", "                                             ", "                                             ", "                                             ")
