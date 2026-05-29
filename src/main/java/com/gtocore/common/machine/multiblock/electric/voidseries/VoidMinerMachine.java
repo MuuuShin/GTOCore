@@ -75,9 +75,10 @@ public final class VoidMinerMachine extends StorageMultiblockMachine implements 
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
         if (dim == null) return null;
         if (!isEmpty()) {
-            if (unit.inputFluid(DrillingFluid.getFluid(), 1000)) {
+            if (unit.matchFluid(DrillingFluid.getFluid(), 1000)) {
                 var builder = getRecipeBuilder();
                 builder.EUt(GTValues.VA[getTier()]);
+                builder.inputFluids(DrillingFluid.getFluid(), 1000);
                 builder.outputItems(getItems());
                 return builder.build();
             }

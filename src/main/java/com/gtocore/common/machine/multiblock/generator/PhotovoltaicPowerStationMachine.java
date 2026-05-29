@@ -331,8 +331,10 @@ public final class PhotovoltaicPowerStationMachine extends StorageMultiblockMach
             }
             int eut;
             int basic = (int) (basic_rate * PlanetApi.API.getSolarPower(level));
+            boolean distilledWater = false;
             if (PlanetApi.API.isSpace(level)) {
-                eut = unit.inputFluid(GTMaterials.DistilledWater.getFluid(), basic / 4) ? basic << 4 : 0;
+                distilledWater = true;
+                eut = unit.matchFluid(GTMaterials.DistilledWater.getFluid(), basic / 4) ? basic << 4 : 0;
                 if (eut == 0) setIdleReason(Component.translatable("gtceu.recipe_logic.insufficient_in").append(": ").append(GTMaterials.DistilledWater.getLocalizedName()));
             } else {
                 eut = (int) (basic * (GTODimensions.isVoid(level.dimension()) ? 14 : GTOUtils.getSunIntensity(level.getDayTime()) * 15 / 100 * (level.isRaining() ? (level.isThundering() ? 0.3f : 0.7f) : 1)));
@@ -340,6 +342,7 @@ public final class PhotovoltaicPowerStationMachine extends StorageMultiblockMach
             }
             if (eut == 0) return null;
             var builder = getRecipeBuilder().duration(20);
+            if (distilledWater) builder.inputFluids(GTMaterials.DistilledWater.getFluid(), basic / 4);
             if (getStorageStack().getCount() == 64) {
                 builder.MANAt(-eut);
             } else {

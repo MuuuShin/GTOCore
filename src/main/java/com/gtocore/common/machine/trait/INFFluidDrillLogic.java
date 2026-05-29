@@ -54,7 +54,7 @@ public final class INFFluidDrillLogic extends RecipeLogic implements IFluidDrill
             }
             var match = getFluidDrillRecipe();
             if (match != null) {
-                if (machine.handleRecipeOutput(match) && machine.matchTickRecipe(match)) {
+                if (machine.matchRecipeOutput(match) && machine.matchTickRecipe(match)) {
                     setupRecipe(RecipeHandlerUnit.NO_DATA, match);
                 }
             }
@@ -104,7 +104,7 @@ public final class INFFluidDrillLogic extends RecipeLogic implements IFluidDrill
         }
         var match = getFluidDrillRecipe();
         if (match != null) {
-            if (machine.handleRecipeOutput(match) && machine.matchTickRecipe(match)) {
+            if (machine.matchRecipeOutput(match) && machine.matchTickRecipe(match)) {
                 setupRecipe(RecipeHandlerUnit.NO_DATA, match);
                 return;
             }

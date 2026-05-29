@@ -1,7 +1,6 @@
 package com.gtocore.common.machine.multiblock.noenergy;
 
 import com.gtocore.common.data.GTOMaterials;
-import com.gtocore.common.data.GTORecipeDataKeys;
 
 import com.gtolib.api.machine.multiblock.NoEnergyMultiblockMachine;
 
@@ -40,19 +39,19 @@ public final class HeatExchangerMachine extends NoEnergyMultiblockMachine implem
     @Override
     public GTRecipe getRealRecipe(@NotNull RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {
         water = recipe.fluidInputs.getFirst().inner.getFluid() == Fluids.WATER;
-        var result = ParallelLogic.accurateParallel(this, unit, getRecipeBuilder()
+        return ParallelLogic.accurateParallel(this, unit, getRecipeBuilder()
                 .inputFluids(recipe.fluidInputs.getFirst())
                 .outputFluids(recipe.fluidOutputs.getFirst())
                 .duration(200)
                 .buildRawRecipe(), Integer.MAX_VALUE);
-        if (result == null) return null;
-        hs = result.parallels * recipe.data.getLong(GTORecipeDataKeys.EU) / 2;
-        if (unit.inputFluid(water ? Fluids.WATER : DistilledWater, hs / 40)) {
-            return result;
-        } else {
+    }
+
+    @Override
+    public void beforeWorking(RecipeHandlerUnit unit, GTRecipe recipe) {
+        super.beforeWorking(unit, recipe);
+        if (!unit.inputFluid(water ? Fluids.WATER : DistilledWater, hs / 40)) {
             doExplosion(Math.min(10, hs / 10000));
         }
-        return null;
     }
 
     @Override

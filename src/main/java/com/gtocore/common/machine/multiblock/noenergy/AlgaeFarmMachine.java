@@ -37,28 +37,29 @@ public final class AlgaeFarmMachine extends NoEnergyMultiblockMachine implements
         super(holder);
     }
 
-    private GTRecipeDefinition getRecipe(ItemStack stack) {
+    private GTRecipeDefinition getRecipe(boolean raise, ItemStack stack) {
         RecipeBuilder builder = getRecipeBuilder().inputFluids(new FluidStack(Fluids.WATER, 100 * GTValues.RNG.nextInt(50) + 5000)).duration(200);
         builder.outputItems(stack);
+        if (raise) builder.inputFluids(FERMENTEDBIOMASS, 10000);
         return builder.build();
     }
 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
-        boolean raise = unit.inputFluid(FERMENTEDBIOMASS, 10000);
+        boolean raise = unit.matchFluid(FERMENTEDBIOMASS, 10000);
         int amount = raise ? 10 : 1;
         amount = amount + GTValues.RNG.nextInt(9 * amount);
         ObjHolder<GTRecipeDefinition> recipe = new ObjHolder<>();
         int finalAmount = amount;
         unit.forEachItems(true, (stack, a) -> {
             if (ALGAES.contains(stack.getItem())) {
-                recipe.set(getRecipe(stack.copyWithCount((int) (finalAmount * Math.max(1, a / 4)))));
+                recipe.set(getRecipe(raise, stack.copyWithCount((int) (finalAmount * Math.max(1, a / 4)))));
                 return true;
             }
             return false;
         });
         if (recipe.get() == null) {
-            recipe.set(getRecipe(new ItemStack(ALGAES.get(GTValues.RNG.nextInt(5)), amount)));
+            recipe.set(getRecipe(raise, new ItemStack(ALGAES.get(GTValues.RNG.nextInt(5)), amount)));
         }
         return recipe.get();
     }

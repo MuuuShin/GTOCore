@@ -59,7 +59,7 @@ public final class AdvancedInfiniteDrillLogic extends RecipeLogic implements IFl
             }
             var match = getFluidDrillRecipe();
             if (match != null) {
-                if (machine.handleRecipeOutput(match) && machine.matchTickRecipe(match)) {
+                if (machine.matchRecipeOutput(match) && machine.matchTickRecipe(match)) {
                     setupRecipe(RecipeHandlerUnit.NO_DATA, match);
                 }
             }
@@ -150,7 +150,7 @@ public final class AdvancedInfiniteDrillLogic extends RecipeLogic implements IFl
         // try it again
         var match = getFluidDrillRecipe();
         if (match != null) {
-            if (machine.handleRecipeOutput(match) && machine.matchTickRecipe(match)) {
+            if (machine.matchRecipeOutput(match) && machine.matchTickRecipe(match)) {
                 setupRecipe(RecipeHandlerUnit.NO_DATA, match);
                 return;
             }

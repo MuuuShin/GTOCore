@@ -15,6 +15,7 @@ import com.gtolib.utils.MachineUtils;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.handler.ICustomRecipeLogicHolder;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
@@ -78,6 +79,7 @@ public final class SlaughterhouseMachine extends StorageMultiblockMachine implem
     @Persisted
     private boolean filterNbt = false;
     private String entityId;
+    private long xp = 0;
     private static final String[] mobList1 = {
             "minecraft:chicken",
             "minecraft:rabbit",
@@ -261,6 +263,13 @@ public final class SlaughterhouseMachine extends StorageMultiblockMachine implem
     }
 
     @Override
+    public void beforeWorking(RecipeHandlerUnit unit, GTRecipe recipe) {
+        super.beforeWorking(unit, recipe);
+        if (xp > 0) outputFluid(GTOFluids.XP_JUICE.getSource(), xp);
+        xp = 0;
+    }
+
+    @Override
     @Nullable
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
         if (getLevel() instanceof ServerLevel serverLevel) {
@@ -292,7 +301,7 @@ public final class SlaughterhouseMachine extends StorageMultiblockMachine implem
             int parallel = (int) Math.pow(3, tier - 1);
             int tierMultiplier = Math.min(16, parallel);
             int multiplier = Math.max(1, parallel / tierMultiplier);
-            long xp = 0;
+            xp = 0;
 
             var lootParams = new LootParams.Builder(serverLevel)
                     .withParameter(LootContextParams.LAST_DAMAGE_PLAYER, player)
@@ -318,7 +327,6 @@ public final class SlaughterhouseMachine extends StorageMultiblockMachine implem
                 xp += (long) mob.getExperienceReward() * multiplier;
                 getAllDeathLoot(player, serverLevel, mob, source, lootParams, itemStacks, multiplier);
             }
-            if (xp > 0) outputFluid(GTOFluids.XP_JUICE.getSource(), xp);
             int duration = Math.max(60, 600 - attackDamage);
             RecipeBuilder builder = getRecipeBuilder().duration(duration).EUt(getOverclockVoltage());
             itemStacks.forEach(builder::outputItems);
