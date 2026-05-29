@@ -38,7 +38,7 @@ public final class OptionalMachine {
                     .tier(MV)
                     .allRotation()
                     .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS)
-                    .tooltipsKey("gtceu.part_sharing.enabled")
+                    .notAllowSharedTooltips()
                     .renderer(() -> new OverlayTieredMachineRenderer(MV, GTCEu.id("block/machine/part/me_pattern_buffer")))
                     .register() :
             null;
