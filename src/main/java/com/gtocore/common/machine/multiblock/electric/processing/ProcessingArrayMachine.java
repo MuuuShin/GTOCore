@@ -43,7 +43,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public final class ProcessingArrayMachine extends TierCasingMultiblockMachine implements IParallelMachine, IArrayMachine {
 
     private MachineDefinition machineDefinitionCache;
-    private GTRecipeType[] RecipeTypeCache;
     @Getter
     @DescSynced
     @Persisted
@@ -74,11 +73,6 @@ public final class ProcessingArrayMachine extends TierCasingMultiblockMachine im
             }
         }
         return false;
-    }
-
-    @Override
-    public GTRecipeType[] getRecipeTypes() {
-        return recipeTypes();
     }
 
     @Override
@@ -135,15 +129,5 @@ public final class ProcessingArrayMachine extends TierCasingMultiblockMachine im
     @Override
     public MachineDefinition getMachineDefinitionCache() {
         return this.machineDefinitionCache;
-    }
-
-    @Override
-    public void setRecipeTypeCache(final GTRecipeType[] RecipeTypeCache) {
-        this.RecipeTypeCache = RecipeTypeCache;
-    }
-
-    @Override
-    public GTRecipeType[] getRecipeTypeCache() {
-        return this.RecipeTypeCache;
     }
 }

@@ -30,6 +30,7 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -111,6 +112,13 @@ public final class ProgrammableHatchPartMachine extends DualHatchPartMachine imp
         super.addedToController(controller);
         this.recipeTypes.clear();
         this.recipeTypes.addAll(MultiMachineModeFancyConfigurator.extractRecipeTypes(this.getController()));
+        MultiMachineModeFancyConfigurator.verify(recipeTypes, recipeType, () -> recipeType = null);
+    }
+
+    @Override
+    public void setAvailableRecipeTypes(@NotNull GTRecipeType[] types) {
+        this.recipeTypes.clear();
+        this.recipeTypes.addAll(Arrays.asList(types));
         MultiMachineModeFancyConfigurator.verify(recipeTypes, recipeType, () -> recipeType = null);
     }
 

@@ -1,6 +1,5 @@
 package com.gtocore.common.machine.multiblock.electric.processing;
 
-import com.gtocore.api.machine.IUnlockRecipeTypeMachine;
 import com.gtocore.common.data.GTORecipeTypes;
 
 import com.gtolib.api.machine.multiblock.CustomParallelMultiblockMachine;
@@ -16,7 +15,7 @@ import net.minecraftforge.fluids.FluidStack;
 
 import org.jetbrains.annotations.NotNull;
 
-public final class ColdIceFreezerMachine extends CustomParallelMultiblockMachine implements IUnlockRecipeTypeMachine {
+public final class ColdIceFreezerMachine extends CustomParallelMultiblockMachine {
 
     private static final FluidStack ICE = GTMaterials.Ice.getFluid(1);
 
@@ -34,7 +33,7 @@ public final class ColdIceFreezerMachine extends CustomParallelMultiblockMachine
 
     @Override
     public boolean handleTickRecipe(GTRecipe recipe) {
-        if (getOffsetTimer() % 20 == 0 && !inputFluid()) getRecipeLogic().setProgress(0);
+        if (getOffsetTimer() % 20 == 0 && !inputFluid()) return false;
         return super.handleTickRecipe(recipe);
     }
 
@@ -44,7 +43,7 @@ public final class ColdIceFreezerMachine extends CustomParallelMultiblockMachine
     }
 
     @Override
-    public boolean canProcess(GTRecipeType type) {
+    public boolean recipeTypeAvailable(GTRecipeType type) {
         if (type == GTORecipeTypes.ATOMIZATION_CONDENSATION_RECIPES) {
             return formedAmount > 0;
         }

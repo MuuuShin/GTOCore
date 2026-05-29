@@ -40,7 +40,7 @@ public final class BlazeBlastFurnaceMachine extends CoilCustomParallelMultiblock
 
     @Override
     public boolean handleTickRecipe(GTRecipe recipe) {
-        if (getOffsetTimer() % 20 == 0 && !inputFluid()) getRecipeLogic().setProgress(0);
+        if (getOffsetTimer() % 20 == 0 && !inputFluid()) return false;
         return super.handleTickRecipe(recipe);
     }
 

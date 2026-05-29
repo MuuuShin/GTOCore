@@ -83,6 +83,7 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.ITooltip;
@@ -243,6 +244,13 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
         for (InternalSlot internalSlot : getInternalInventory()) {
             internalSlot.verify(recipeTypes);
         }
+    }
+
+    @Override
+    public void setAvailableRecipeTypes(@NotNull GTRecipeType[] types) {
+        this.recipeTypes.clear();
+        this.recipeTypes.addAll(Arrays.asList(types));
+        MultiMachineModeFancyConfigurator.verify(recipeTypes, recipeType, () -> recipeType = null);
     }
 
     @Override

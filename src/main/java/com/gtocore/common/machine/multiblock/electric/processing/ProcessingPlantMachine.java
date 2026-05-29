@@ -20,6 +20,7 @@ import com.gregtechceu.gtceu.api.item.MetaMachineItem;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.feature.ICleanroomProvider;
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiPart;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
@@ -98,9 +99,6 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
         return c;
     }
 
-    @Nullable
-    private GTRecipeType[] recipeTypeCache = { GTRecipeTypes.DUMMY_RECIPES };
-
     private boolean mismatched;
 
     @Persisted
@@ -155,14 +153,26 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
     }
 
     @Override
-    public GTRecipeType[] getRecipeTypes() {
-        return recipeTypeCache;
-    }
-
-    @Override
-    public void onStructureFormed() {
-        super.onStructureFormed();
-        update();
+    public GTRecipeType[] getAvailableRecipeTypes() {
+        var cache = availableRecipeTypesCache;
+        if (cache == null) {
+            mismatched = false;
+            cache = new GTRecipeType[] { GTRecipeTypes.DUMMY_RECIPES };
+            if (machineStorage.storage.getStackInSlot(0).getItem() instanceof MetaMachineItem metaMachineItem) {
+                MachineDefinition definition = metaMachineItem.getDefinition();
+                if (tier != definition.getTier()) {
+                    mismatched = true;
+                }
+                cache = definition.getRecipeTypes();
+                availableRecipeTypesCache = cache;
+                for (var p : getParts()) {
+                    if (p instanceof IWorkableMultiPart part) {
+                        part.setAvailableRecipeTypes(cache);
+                    }
+                }
+            }
+        }
+        return cache;
     }
 
     @Override
@@ -184,22 +194,6 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
         if (mismatched) textList.add(Component.translatable("gtocore.machine.processing_plant.mismatched").withStyle(ChatFormatting.RED));
     }
 
-    private void update() {
-        recipeTypeCache = new GTRecipeType[] { GTRecipeTypes.DUMMY_RECIPES };
-        mismatched = false;
-        if (machineStorage.storage.getStackInSlot(0).getItem() instanceof MetaMachineItem metaMachineItem) {
-            MachineDefinition definition = metaMachineItem.getDefinition();
-            if (tier != definition.getTier()) {
-                mismatched = true;
-            }
-            recipeTypeCache = definition.getRecipeTypes();
-            for (var p : getParts()) {
-                p.removedFromController(this);
-                p.addedToController(this);
-            }
-        }
-    }
-
     @Override
     public void onMachineChanged() {
         customParallelTrait.onStructureInvalid();
@@ -208,8 +202,8 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
                 getRecipeLogic().markLastRecipeDirty();
             }
             getRecipeLogic().updateTickSubscription();
-            update();
             customParallelTrait.onStructureFormed();
+            availableRecipeTypesCache = null;
         }
     }
 

@@ -16,7 +16,6 @@ import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
 
 import it.unimi.dsi.fastutil.ints.IntIntImmutablePair;
 import org.jetbrains.annotations.NotNull;
@@ -86,7 +85,7 @@ public final class DysonSphereReceivingStationMcahine extends ElectricMultiblock
         return getRecipeBuilder().duration(20)
                 .CWUt(Math.max(1, pair.leftInt() * integer / 2))
                 .EUt(-GTValues.V[GTValues.MAX] * pair.leftInt() * (50 - Math.max(0, pair.rightInt() - 60)) / 50)
-                .inputFluids(new FluidStack(GTOFluids.GELID_CRYOTHEUM.get(), Math.max(1, (int) Math.sqrt(pair.leftInt()))))
+                .inputFluids(GTOFluids.GELID_CRYOTHEUM.get(), Math.max(1, (int) Math.sqrt(pair.leftInt())))
                 .build();
     }
 

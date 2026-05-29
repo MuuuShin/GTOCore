@@ -72,7 +72,6 @@ public final class GeneratorArrayMachine extends StorageMultiblockMachine implem
     private static int generatorLimit = 16;
     private WirelessEnergyContainer WirelessEnergyContainerCache;
     private MachineDefinition machineDefinitionCache;
-    private GTRecipeType[] RecipeTypeCache;
     @Persisted
     private boolean isw;
     @Persisted
@@ -103,11 +102,6 @@ public final class GeneratorArrayMachine extends StorageMultiblockMachine implem
             }
         }
         return false;
-    }
-
-    @Override
-    public GTRecipeType[] getRecipeTypes() {
-        return recipeTypes();
     }
 
     @Override
@@ -244,15 +238,5 @@ public final class GeneratorArrayMachine extends StorageMultiblockMachine implem
     @Override
     public MachineDefinition getMachineDefinitionCache() {
         return this.machineDefinitionCache;
-    }
-
-    @Override
-    public void setRecipeTypeCache(final GTRecipeType[] RecipeTypeCache) {
-        this.RecipeTypeCache = RecipeTypeCache;
-    }
-
-    @Override
-    public GTRecipeType[] getRecipeTypeCache() {
-        return this.RecipeTypeCache;
     }
 }
