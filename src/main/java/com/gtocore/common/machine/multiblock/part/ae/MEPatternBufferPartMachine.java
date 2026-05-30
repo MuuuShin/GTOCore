@@ -146,7 +146,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
     @SyncToServer
     protected IntNotifiableHolder configuratorField = IntNotifiableHolder.create(-1)
             .setSenderListener((side, o, n) -> {}).setReceiverListener((side, o, n) -> {
-                if (side.isServer()) TaskHandler.enqueueTask(Objects.requireNonNull(getLevel()), () -> freshWidgetGroup.serverFresh(), 10);
+                if (side.isServer()) TaskHandler.enqueueTask(Objects.requireNonNull(getLevel()), () -> freshWidgetGroup.serverFresh());
             });
 
     protected ConfiguratorPanel configuratorPanel;

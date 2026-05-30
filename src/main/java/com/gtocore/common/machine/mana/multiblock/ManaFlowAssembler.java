@@ -208,6 +208,11 @@ public class ManaFlowAssembler extends ManaMultiblockMachine {
     private class ItemEntityRecipeHandler implements IRecipeHandler {
 
         @Override
+        public boolean canHandleItem() {
+            return true;
+        }
+
+        @Override
         public boolean handleRecipeItem(IO io, GTRecipe recipe, List<Content<ItemIngredient>> items, boolean simulate) {
             if (io == IO.OUT) {
                 if (!simulate && getLevel() instanceof ServerLevel level) {
@@ -289,11 +294,6 @@ public class ManaFlowAssembler extends ManaMultiblockMachine {
                 }
             }
             return intIngredientMap;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return getItemEntitiesAbove().stream().noneMatch(ItemEntity::isAlive);
         }
     }
 

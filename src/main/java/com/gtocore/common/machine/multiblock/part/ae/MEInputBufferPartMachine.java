@@ -86,7 +86,7 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
     @SyncToServer
     public IntNotifiableHolder configuratorField = IntNotifiableHolder.create(-1)
             .setReceiverListener((side, o, n) -> {
-                if (side.isServer()) TaskHandler.enqueueTask(Objects.requireNonNull(getLevel()), () -> freshWidgetGroup.serverFresh(), 10);
+                if (side.isServer()) TaskHandler.enqueueTask(Objects.requireNonNull(getLevel()), () -> freshWidgetGroup.serverFresh());
             });
 
     @Override
@@ -528,10 +528,10 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
                     long total = exceedItem.amount();
                     long inserted = networkInv.insert(exceedItem.what(), exceedItem.amount(), Actionable.MODULATE, machine.getActionSourceField());
                     if (inserted > 0) {
-                        aeSlot.extractItem(inserted, false, true);
+                        aeSlot.extract(inserted, false, true);
                         continue;
                     } else {
-                        aeSlot.extractItem(total, false, true);
+                        aeSlot.extract(total, false, true);
                     }
                 }
                 GenericStack reqItem = aeSlot.requestStack();
@@ -553,10 +553,10 @@ public class MEInputBufferPartMachine extends MEPatternPartMachineKt<MEInputBuff
                     long total = exceedFluid.amount();
                     long inserted = networkInv.insert(exceedFluid.what(), exceedFluid.amount(), Actionable.MODULATE, machine.getActionSourceField());
                     if (inserted > 0) {
-                        aeTank.drain(inserted, false, true);
+                        aeTank.extract(inserted, false, true);
                         continue;
                     } else {
-                        aeTank.drain(total, false, true);
+                        aeTank.extract(total, false, true);
                     }
                 }
                 GenericStack reqFluid = aeTank.requestStack();

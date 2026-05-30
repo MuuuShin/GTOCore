@@ -220,25 +220,16 @@ public final class HugeBusPartMachine extends WorkableTieredIOPartMachine implem
         }
 
         @Override
-        public boolean isEmpty() {
-            if (this.isEmpty == null) {
-                this.isEmpty = ((HugeCustomItemStackHandler) storage).stack.isEmpty();
-            }
-
-            return this.isEmpty;
+        public boolean updateEmpty() {
+            return ((HugeCustomItemStackHandler) storage).stack.isEmpty();
         }
 
         @Override
-        public IntLongMap getSearchMap(GTRecipeType type) {
-            if (changed) {
-                changed = false;
-                intIngredientMap.clear();
-                var amount = ((HugeCustomItemStackHandler) storage).count;
-                if (amount > 0) {
-                    type.convertItem(getStackInSlot(0), amount, intIngredientMap);
-                }
+        public void fillSearchMap(GTRecipeType type, IntLongMap map) {
+            var amount = ((HugeCustomItemStackHandler) storage).count;
+            if (amount > 0) {
+                type.convertItem(getStackInSlot(0), amount, map);
             }
-            return intIngredientMap;
         }
 
         @Override

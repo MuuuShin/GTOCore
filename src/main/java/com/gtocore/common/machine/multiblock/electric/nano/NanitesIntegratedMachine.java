@@ -17,6 +17,7 @@ import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
@@ -29,7 +30,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -84,18 +84,14 @@ public final class NanitesIntegratedMachine extends CoilCrossRecipeMultiblockMac
             return;
         }
         Material material = ChemicalHelper.getMaterialEntry(getStorageStack().getItem()).material();
-        if (MATERIAL_TIER_MAP.get(material) > getTier()) return;
+        if (!MATERIAL_TIER_MAP.containsKey(material) || MATERIAL_TIER_MAP.get(material) > getTier()) return;
         chance = Math.min(100, (int) (getStorageStack().getCount() * MATERIAL_MAP.get(material)));
     }
 
     static void trimRecipe(GTRecipe recipe, int chance) {
         if (GTValues.RNG.nextInt(100) < chance) {
-            var input = new ArrayList<>(recipe.itemInputs);
-            input.removeFirst();
-            var output = new ArrayList<>(recipe.itemOutputs);
-            output.removeFirst();
-            recipe.itemInputs = input;
-            recipe.itemOutputs = output;
+            recipe.itemInputs = RecipeHelper.trimLast(recipe.itemInputs, recipe.itemInputs.size() - 1);
+            recipe.itemOutputs = RecipeHelper.trimLast(recipe.itemOutputs, recipe.itemOutputs.size() - 1);
         }
     }
 

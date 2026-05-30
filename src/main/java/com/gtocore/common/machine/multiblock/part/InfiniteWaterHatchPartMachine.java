@@ -89,5 +89,10 @@ public final class InfiniteWaterHatchPartMachine extends WorkableTieredIOPartMac
         public IntLongMap getSearchMap(@NotNull GTRecipeType type) {
             return MAP;
         }
+
+        @Override
+        public boolean canHandleFluid() {
+            return true;
+        }
     }
 }
