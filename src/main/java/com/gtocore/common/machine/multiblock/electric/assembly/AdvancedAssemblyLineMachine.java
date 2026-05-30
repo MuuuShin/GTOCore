@@ -27,8 +27,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputBusPartMachine;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputHatchPartMachine;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -252,8 +250,6 @@ public final class AdvancedAssemblyLineMachine extends ElectricMultiblockMachine
             }
             case HugeBusPartMachine hugeBusPartMachine -> itemStackTransfers.add(hugeBusPartMachine.getInventory().storage);
             case FluidHatchPartMachine fluidHatchPartMachine -> fluidTankTransfers.add(fluidHatchPartMachine.tank.getStorages());
-            case CreativeInputBusPartMachine creativeInputBusPartMachine -> itemStackTransfers.add(creativeInputBusPartMachine.getInventory().storage);
-            case CreativeInputHatchPartMachine creativeInputHatchPartMachine -> fluidTankTransfers.add(creativeInputHatchPartMachine.tank.getStorages());
             default -> {}
         }
     }

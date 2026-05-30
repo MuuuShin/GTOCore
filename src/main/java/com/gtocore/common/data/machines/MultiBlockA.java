@@ -370,7 +370,7 @@ public final class MultiBlockA {
                     .where('I', blocks(GTBlocks.CASING_TUNGSTENSTEEL_ROBUST.get()))
                     .where('A', blocks(GTBlocks.CASING_HSSE_STURDY.get())
                             .or(abilities(INPUT_ENERGY).setMaxGlobalLimited(2).setMinGlobalLimited(1))
-                            .or(abilities(GTOPartAbility.ITEMS_INPUT).setExactLimit(1))
+                            .or(abilities(GTOPartAbility.ITEMS_INPUT_BUS).setExactLimit(1))
                             .or(abilities(EXPORT_FLUIDS).setExactLimit(1))
                             .or(abilities(MAINTENANCE).setExactLimit(1)))
                     .where(' ', any())
