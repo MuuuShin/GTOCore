@@ -129,7 +129,7 @@ public final class GTORecipeTypes {
     public static final RecipeType RADIATION_HATCH_RECIPES = register("radiation_hatch", "放射仓材料", MULTIBLOCK)
             .setMaxIOSize(1, 0, 0, 0)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.radioactivity", data.getInt(GTORecipeDataKeys.RADIOACTIVITY)));
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.radioactivity", data.data.getInt(GTORecipeDataKeys.RADIOACTIVITY)));
 
     public static final RecipeType ARC_GENERATOR_RECIPES = register("arc_generator", "电弧发生器", ELECTRIC)
             .setMaxIOSize(6, 1, 6, 1)
@@ -253,9 +253,9 @@ public final class GTORecipeTypes {
     public static final RecipeType NEUTRON_ACTIVATOR_RECIPES = register("neutron_activator", "中子活化", MULTIBLOCK)
             .setMaxIOSize(6, 3, 1, 1)
             .setSound(GTSoundEntries.COOLING)
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.ev_min", data.getInt(GTORecipeDataKeys.EV_MIN)))
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.ev_max", data.getInt(GTORecipeDataKeys.EV_MAX)))
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.evt", data.getInt(GTORecipeDataKeys.EVT)));
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.ev_min", data.data.getInt(GTORecipeDataKeys.EV_MIN)))
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.ev_max", data.data.getInt(GTORecipeDataKeys.EV_MAX)))
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.evt", data.data.getInt(GTORecipeDataKeys.EVT)));
 
     public static final RecipeType HEAT_EXCHANGER_RECIPES = register("heat_exchanger", "流体热交换", MULTIBLOCK)
             .setMaxIOSize(0, 0, 2, 3)
@@ -282,7 +282,7 @@ public final class GTORecipeTypes {
             .setEUIO(IO.IN)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.ARC)
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.frheat", FormattingUtil.formatNumbers(data.getInt(GTORecipeDataKeys.FR_HEAT))));
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.frheat", FormattingUtil.formatNumbers(data.data.getInt(GTORecipeDataKeys.FR_HEAT))));
 
     public static final RecipeType STELLAR_FORGE_RECIPES = register("stellar_forge", "恒星热能熔炼", MULTIBLOCK)
             .setEUIO(IO.IN)
@@ -290,7 +290,7 @@ public final class GTORecipeTypes {
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARC_FURNACE, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.ARC)
             .addDataInfo(data -> {
-                String tierString = switch (data.getInt(GTORecipeDataKeys.STELLAR_CONTAINMENT_TIER)) {
+                String tierString = switch (data.data.getInt(GTORecipeDataKeys.STELLAR_CONTAINMENT_TIER)) {
                     case 3 -> I18n.get("gtocore.tier.ultimate");
                     case 2 -> I18n.get("gtocore.tier.advanced");
                     default -> I18n.get("gtocore.tier.base");
@@ -304,7 +304,7 @@ public final class GTORecipeTypes {
             .setEUIO(IO.IN)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
             .prepareBuilder(recipeBuilder -> recipeBuilder.addMaterialInfo(true, true))
-            .addDataInfo(data -> LocalizationUtils.format(TierCasingTrait.getTierTranslationKey(COMPONENT_ASSEMBLY_CASING_TIER), GTValues.VN[data.getInt(GTORecipeDataKeys.COMPONENT_ASSEMBLY_CASING_TIER)]))
+            .addDataInfo(data -> LocalizationUtils.format(TierCasingTrait.getTierTranslationKey(COMPONENT_ASSEMBLY_CASING_TIER), GTValues.VN[data.data.getInt(GTORecipeDataKeys.COMPONENT_ASSEMBLY_CASING_TIER)]))
             .setSound(GTSoundEntries.ASSEMBLER);
 
     public static final RecipeType GREENHOUSE_RECIPES = register("greenhouse", "温室培育", MULTIBLOCK)
@@ -318,9 +318,9 @@ public final class GTORecipeTypes {
             .setEUIO(IO.IN)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARC_FURNACE, LEFT_TO_RIGHT)
             .setSound(GTOSoundEntries.DTPF)
-            .addDataInfo(data -> LocalizationUtils.format("gtceu.recipe.temperature", FormattingUtil.formatNumbers(data.getInt(GTRecipeDataKeys.EBF_TEMP))))
+            .addDataInfo(data -> LocalizationUtils.format("gtceu.recipe.temperature", FormattingUtil.formatNumbers(data.data.getInt(GTRecipeDataKeys.EBF_TEMP))))
             .addDataInfo(data -> {
-                int temp = data.getInt(GTRecipeDataKeys.EBF_TEMP);
+                int temp = data.data.getInt(GTRecipeDataKeys.EBF_TEMP);
                 ICoilType requiredCoil = ICoilType.getMinRequiredType(temp);
                 if (requiredCoil != null && requiredCoil.getMaterial() != null) {
                     return LocalizationUtils.format("gtceu.recipe.coil.tier", (temp > 21600 && temp <= 32000) ? I18n.get("gtocore.recipe.coil.uruium") : I18n.get(requiredCoil.getMaterial().getUnlocalizedName()));
@@ -408,7 +408,7 @@ public final class GTORecipeTypes {
             .setSound(GTSoundEntries.ARC)
             .ingredientConverter(DimensionDataItem.INGREDIENT_CONVERTER)
             .itemConverter(DimensionDataItem.ITEM_CONVERTER)
-            .addDataInfo(data -> I18n.get("ars_nouveau.tier", data.getInt(GTORecipeDataKeys.TIER)));
+            .addDataInfo(data -> I18n.get("ars_nouveau.tier", data.data.getInt(GTORecipeDataKeys.TIER)));
 
     public static final RecipeType SPACE_PROBE_SURFACE_RECEPTION_RECIPES = register("space_probe_surface_reception", "宇宙射线搜集", MULTIBLOCK)
             .setEUIO(IO.IN)
@@ -462,7 +462,7 @@ public final class GTORecipeTypes {
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.ASSEMBLER)
             .onRecipeBuild(GenerateDisassembly::generateDisassembly)
-            .addDataInfo(data -> LocalizationUtils.format(TierCasingTrait.getTierTranslationKey(POWER_MODULE_TIER), FormattingUtil.formatNumbers(data.getInt(GTORecipeDataKeys.POWER_MODULE_TIER))));
+            .addDataInfo(data -> LocalizationUtils.format(TierCasingTrait.getTierTranslationKey(POWER_MODULE_TIER), FormattingUtil.formatNumbers(data.data.getInt(GTORecipeDataKeys.POWER_MODULE_TIER))));
 
     public static final RecipeType MINER_MODULE_RECIPES = register("miner_module", "Space Miner", "太空采矿", MULTIBLOCK)
             .setEUIO(IO.IN)
@@ -494,14 +494,14 @@ public final class GTORecipeTypes {
             .setProgressBar(GuiTextures.PROGRESS_BAR_BATH, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.COOLING)
             .addDataInfo(data -> {
-                String filterCasing = switch (data.getInt(GTORecipeDataKeys.FILTER_CASING)) {
+                String filterCasing = switch (data.data.getInt(GTORecipeDataKeys.FILTER_CASING)) {
                     case 3 -> "T3：" + I18n.get("block.gtocore.law_filter_casing");
                     case 2 -> "T2：" + I18n.get("block.gtceu.sterilizing_filter_casing");
                     default -> "T1：" + I18n.get("block.gtceu.filter_casing");
                 };
                 return LocalizationUtils.format("gtceu.recipe.cleanroom", filterCasing);
             })
-            .addDataInfo(data -> data.contains(GTORecipeDataKeys.RADIOACTIVITY) ? LocalizationUtils.format("gtocore.recipe.radioactivity", data.getInt(GTORecipeDataKeys.RADIOACTIVITY)) : "");
+            .addDataInfo(data -> data.data.contains(GTORecipeDataKeys.RADIOACTIVITY) ? LocalizationUtils.format("gtocore.recipe.radioactivity", data.data.getInt(GTORecipeDataKeys.RADIOACTIVITY)) : "");
 
     public static final RecipeType PCB_FACTORY_RECIPES = register("pcb_factory", "PCB工厂", MULTIBLOCK)
             .setEUIO(IO.IN)
@@ -517,7 +517,7 @@ public final class GTORecipeTypes {
                 }
                 b.addData(GTORecipeDataKeys.TIER, tier);
             })
-            .addDataInfo(data -> LocalizationUtils.format(PCBFactoryMachine.TIER) + data.getInt(GTORecipeDataKeys.TIER));
+            .addDataInfo(data -> LocalizationUtils.format(PCBFactoryMachine.TIER) + data.data.getInt(GTORecipeDataKeys.TIER));
 
     public static final RecipeType LAVA_FURNACE_RECIPES = register("lava_furnace", "熔岩炉", MULTIBLOCK)
             .setEUIO(IO.IN)
@@ -626,7 +626,7 @@ public final class GTORecipeTypes {
             .setMaxIOSize(6, 1, 3, 0)
             .setEUIO(IO.IN)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.nano_forge_tier", FormattingUtil.formatNumbers(data.getInt(GTORecipeDataKeys.NANO_FORGE_TIER))))
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.nano_forge_tier", FormattingUtil.formatNumbers(data.data.getInt(GTORecipeDataKeys.NANO_FORGE_TIER))))
             .setSound(GTSoundEntries.ARC);
 
     public static final RecipeType FUEL_REFINING_RECIPES = register("fuel_refining", "燃料精炼", MULTIBLOCK)
@@ -652,7 +652,7 @@ public final class GTORecipeTypes {
             .setEUIO(IO.IN)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.MACERATOR)
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.grindball", I18n.get(data.getInt(GTORecipeDataKeys.GRINDBALL) == 2 ? "material.gtceu.aluminium" : "material.gtceu.soapstone")));
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.grindball", I18n.get(data.data.getInt(GTORecipeDataKeys.GRINDBALL) == 2 ? "material.gtceu.aluminium" : "material.gtceu.soapstone")));
 
     public static final RecipeType FLOTATING_BENEFICIATION_RECIPES = register("flotating_beneficiation", "浮游选矿", MULTIBLOCK)
             .setMaxIOSize(2, 0, 1, 1)
@@ -868,7 +868,7 @@ public final class GTORecipeTypes {
             .setMaxIOSize(0, 0, 1, 1)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.ARC)
-            .addDataInfo(data -> LocalizationUtils.format("ars_nouveau.tier", data.getInt(GTORecipeDataKeys.TIER)));
+            .addDataInfo(data -> LocalizationUtils.format("ars_nouveau.tier", data.data.getInt(GTORecipeDataKeys.TIER)));
 
     public static final RecipeType PHYSICAL_VAPOR_DEPOSITION_RECIPES = register("physical_vapor_deposition", "物理气相沉积", MULTIBLOCK)
             .setEUIO(IO.IN)
@@ -891,31 +891,31 @@ public final class GTORecipeTypes {
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.TURBINE)
             .addDataInfo(data -> {
-                var nFlux = data.getFloat(GTORecipeDataKeys.NEUTRON_FLUX);
+                var nFlux = data.data.getFloat(GTORecipeDataKeys.NEUTRON_FLUX);
                 return LocalizationUtils.format(nFlux > 1000 ? "gtocore.recipe.neutron_flux.m" : "gtocore.recipe.neutron_flux.k", FormattingUtil.formatNumber2Places(nFlux > 1000 ? nFlux / 1_000f : nFlux));
             })
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.neutron_flux.change", FormattingUtil.formatNumber2Places(data.getFloat(GTORecipeDataKeys.NEUTRON_FLUX_CHANGE))))
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.heat.change", FormattingUtil.formatNumber2Places(data.getFloat(GTORecipeDataKeys.HEAT))));
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.neutron_flux.change", FormattingUtil.formatNumber2Places(data.data.getFloat(GTORecipeDataKeys.NEUTRON_FLUX_CHANGE))))
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.heat.change", FormattingUtil.formatNumber2Places(data.data.getFloat(GTORecipeDataKeys.HEAT))));
 
     public static final RecipeType BIOCHEMICAL_REACTION_RECIPES = register("biochemical_reaction", "生化反应", MULTIBLOCK)
             .setEUIO(IO.IN)
             .setMaxIOSize(3, 2, 5, 1)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
-            .addDataInfo(data -> data.contains(GTORecipeDataKeys.RADIOACTIVITY) ? LocalizationUtils.format("gtocore.recipe.radioactivity", data.getInt(GTORecipeDataKeys.RADIOACTIVITY)) : "")
+            .addDataInfo(data -> data.data.contains(GTORecipeDataKeys.RADIOACTIVITY) ? LocalizationUtils.format("gtocore.recipe.radioactivity", data.data.getInt(GTORecipeDataKeys.RADIOACTIVITY)) : "")
             .setSound(GTSoundEntries.COOLING);
 
     public static final RecipeType FUEL_CELL_ENERGY_ABSORPTION_RECIPES = register("fuel_cell_energy_absorption", "燃料电池液能量吸收", MULTIBLOCK)
             .setEUIO(IO.IN)
             .setMaxIOSize(1, 0, 2, 0)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.fuelcell.converted_energy", FormattingUtil.formatNumbers(data.getLong(GTORecipeDataKeys.CONVERTED_ENERGY))))
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.fuelcell.converted_energy", FormattingUtil.formatNumbers(data.data.getLong(GTORecipeDataKeys.CONVERTED_ENERGY))))
             .setSound(GTSoundEntries.CHEMICAL);
 
     public static final RecipeType FUEL_CELL_ENERGY_TRANSFER_RECIPES = register("fuel_cell_energy_transfer", "燃料电池液能量交换", MULTIBLOCK)
             .setEUIO(IO.IN)
             .setMaxIOSize(1, 1, 4, 4)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
-            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.fuelcell.converted_efficiency", FormattingUtil.formatNumber2Places(data.getFloat(GTORecipeDataKeys.EFFICIENCY) * 100)))
+            .addDataInfo(data -> LocalizationUtils.format("gtocore.recipe.fuelcell.converted_efficiency", FormattingUtil.formatNumber2Places(data.data.getFloat(GTORecipeDataKeys.EFFICIENCY) * 100)))
             .setSound(GTSoundEntries.CHEMICAL);
 
     public static final RecipeType FUEL_CELL_ENERGY_RELEASE_RECIPES = register("fuel_cell_energy_release", "燃料电池液能量释放", MULTIBLOCK)
@@ -1016,14 +1016,14 @@ public final class GTORecipeTypes {
             .setProgressBar(GuiTextures.PROGRESS_BAR_BATH, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.COOLING)
             .addDataInfo(data -> {
-                int temperature = data.getInt(GTORecipeDataKeys.TEMPERATURE);
+                int temperature = data.data.getInt(GTORecipeDataKeys.TEMPERATURE);
                 if (temperature > 0) {
                     return I18n.get("gtceu.multiblock.hpca.temperature", temperature);
                 }
                 return "";
             })
             .addDataInfo(data -> {
-                boolean flag = data.contains(GTORecipeDataKeys.PARAM3) || data.contains(GTORecipeDataKeys.PARAM1) || data.contains(GTORecipeDataKeys.PARAM2);
+                boolean flag = data.data.contains(GTORecipeDataKeys.PARAM3) || data.data.contains(GTORecipeDataKeys.PARAM1) || data.data.contains(GTORecipeDataKeys.PARAM2);
                 if (flag) {
                     return I18n.get("gtocore.machine.alchemical.chance_can_be_boosted");
                 }
@@ -1035,11 +1035,11 @@ public final class GTORecipeTypes {
             .setProgressBar(GuiTextures.PROGRESS_BAR_BATH, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.COOLING)
             .addDataInfo(data -> {
-                int solaris = data.getInt(SOLARIS);
-                int lunara = data.getInt(LUNARA);
-                int voidflux = data.getInt(VOIDFLUX);
-                int stellarm = data.getInt(STELLARM);
-                int any = data.getInt(ANY);
+                int solaris = data.data.getInt(SOLARIS);
+                int lunara = data.data.getInt(LUNARA);
+                int voidflux = data.data.getInt(VOIDFLUX);
+                int stellarm = data.data.getInt(STELLARM);
+                int any = data.data.getInt(ANY);
                 if (solaris > 0) return I18n.get("gtocore.celestial_condenser.solaris", solaris);
                 else if (lunara > 0) return I18n.get("gtocore.celestial_condenser.lunara", lunara);
                 else if (voidflux > 0) return I18n.get("gtocore.celestial_condenser.voidflux", voidflux);
@@ -1106,7 +1106,7 @@ public final class GTORecipeTypes {
             .setProgressBar(GuiTextures.PROGRESS_BAR_BATH, LEFT_TO_RIGHT)
             .setSound(GTSoundEntries.BATH)
             .addDataInfo(data -> {
-                Object[] resonance = ResonanceFlowerMachine.fromResonanceTag(data.getData(GTORecipeDataKeys.RESONANCE));
+                Object[] resonance = ResonanceFlowerMachine.fromResonanceTag(data.data.getData(GTORecipeDataKeys.RESONANCE));
                 if (resonance[0] instanceof ItemStack itemStack) {
                     return Component.translatable("gtocore.elemental_resonance.0", itemStack.getCount(), resonance[1]).getString();
                 } else if (resonance[0] instanceof FluidStack fluidStack) {

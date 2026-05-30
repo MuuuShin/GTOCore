@@ -2,7 +2,7 @@ package com.gtocore.common.machine.multiblock.part.ae.slots;
 
 import com.gtolib.utils.MathUtil;
 
-import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
+import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler;
 import com.gregtechceu.gtceu.utils.GTMath;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -18,7 +18,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class ExportOnlyAEFluidSlot extends ExportOnlyAESlot implements IFluidHandlerModifiable, IFluidTank {
+public class ExportOnlyAEFluidSlot extends ExportOnlyAESlot implements ICustomFluidStackHandler, IFluidTank {
 
     FluidStack forgeStock = null;
 

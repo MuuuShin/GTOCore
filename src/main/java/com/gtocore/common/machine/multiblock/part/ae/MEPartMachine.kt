@@ -32,7 +32,8 @@ import com.gregtechceu.gtceu.api.machine.feature.IMachineLife
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart
 import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine
 import com.gregtechceu.gtceu.api.recipe.handler.IO
-import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable
+import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler
+import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder
 import com.gto.datasynclib.annotations.SyncToClient
 import com.gto.datasynclib.listener.IntNotifiableHolder
@@ -74,8 +75,8 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
     @Persisted
     var isAllFacing: Boolean = false
 
-    override fun getItemHandlerCap(side: Direction?, useCoverCapability: Boolean): IItemHandlerModifiable? = null
-    override fun getFluidHandlerCap(side: Direction?, useCoverCapability: Boolean): IFluidHandlerModifiable? = null
+    override fun getItemHandlerCap(side: Direction?, useCoverCapability: Boolean): ICustomItemStackHandler? = null
+    override fun getFluidHandlerCap(side: Direction?, useCoverCapability: Boolean): ICustomFluidStackHandler? = null
 
     override fun tintColor(index: Int): Int = if (index == 9) realColor else -1
 

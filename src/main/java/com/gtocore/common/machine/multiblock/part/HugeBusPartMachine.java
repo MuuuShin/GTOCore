@@ -357,6 +357,29 @@ public final class HugeBusPartMachine extends WorkableTieredIOPartMachine implem
         }
 
         @Override
+        public int extract(int slot, int amount, boolean simulate) {
+            var count = MathUtil.saturatedCast(this.count);
+            if (amount == 0 || count < 1 || this.stack.isEmpty()) return 0;
+            if (amount >= count) {
+                if (simulate) {
+                    return count;
+                } else {
+                    this.count = 0;
+                    this.stack = ItemStack.EMPTY;
+                    onContentsChanged(0);
+                    return count;
+                }
+            } else {
+                if (!simulate) {
+                    this.count -= amount;
+                    stack.setCount(MathUtil.saturatedCast(count));
+                    onContentsChanged(0);
+                }
+                return amount;
+            }
+        }
+
+        @Override
         public int getSlotLimit(int slot) {
             return Integer.MAX_VALUE;
         }

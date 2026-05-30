@@ -26,7 +26,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -106,9 +105,7 @@ public final class VoidTransporterMachine extends ElectricMultiblockMachine impl
     }
 
     private EnergyContainerTrait createEnergyContainer() {
-        var container = eu == 0 ? new EnergyContainerTrait(this, 0) : new EnergyContainerTrait(this, 409600);
-        container.setCapabilityValidator(Objects::isNull);
-        return container;
+        return eu == 0 ? new EnergyContainerTrait(this, 0) : new EnergyContainerTrait(this, 409600);
     }
 
     private boolean check() {

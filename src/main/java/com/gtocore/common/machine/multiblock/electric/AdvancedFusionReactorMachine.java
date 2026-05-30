@@ -24,7 +24,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -52,9 +51,7 @@ public final class AdvancedFusionReactorMachine extends CrossRecipeMultiblockMac
     }
 
     private EnergyContainerTrait createEnergyContainer() {
-        var container = new EnergyContainerTrait(this, 0);
-        container.setCapabilityValidator(Objects::isNull);
-        return container;
+        return new EnergyContainerTrait(this, 0);
     }
 
     @Override

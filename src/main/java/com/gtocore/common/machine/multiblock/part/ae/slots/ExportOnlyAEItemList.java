@@ -2,6 +2,7 @@ package com.gtocore.common.machine.multiblock.part.ae.slots;
 
 import com.gtolib.api.ae2.stacks.IAEItemKey;
 import com.gtolib.api.recipe.RecipeType;
+import com.gtolib.utils.MathUtil;
 
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
@@ -224,6 +225,12 @@ public class ExportOnlyAEItemList extends NotifiableItemStackHandler implements 
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
             if (amount == 0) return ItemStack.EMPTY;
             return list.inventory[slot].extractItem(0, amount, simulate);
+        }
+
+        @Override
+        public int extract(int slot, int amount, boolean simulate) {
+            if (amount == 0) return 0;
+            return MathUtil.saturatedCast(list.inventory[slot].extractItem(amount, simulate, true));
         }
 
         @Override

@@ -20,6 +20,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
+import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
 import com.gregtechceu.gtceu.common.data.GTMachines;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -30,8 +31,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
@@ -89,7 +88,7 @@ public class VillageTradingStationMachine extends MetaMachine implements IAutoOu
     private final boolean[] startUp = new boolean[10];
 
     private final VillagerRecipe[][] villagersDataset = new VillagerRecipe[10][];
-    private final ItemStackHandler RecipesHandler = new ItemStackHandler(3 * 10);
+    private final CustomItemStackHandler RecipesHandler = new CustomItemStackHandler(3 * 10);
 
     // 升级物品
     @Persisted
@@ -233,7 +232,7 @@ public class VillageTradingStationMachine extends MetaMachine implements IAutoOu
     }
 
     // 计算两个输入物品堆能支持的最大交易次数
-    private int getMaxPossibleTrades(IItemHandlerModifiable input, ItemStack buy, ItemStack buyB) {
+    private int getMaxPossibleTrades(ICustomItemStackHandler input, ItemStack buy, ItemStack buyB) {
         int totalBuy = 0;
         for (int i = 0; i < input.getSlots(); i++) {
             ItemStack stack = input.getStackInSlot(i);
@@ -259,7 +258,7 @@ public class VillageTradingStationMachine extends MetaMachine implements IAutoOu
     }
 
     // 从物品处理器中扣除指定数量的物品
-    private void deductItems(IItemHandlerModifiable handler, ItemStack target, int count) {
+    private void deductItems(ICustomItemStackHandler handler, ItemStack target, int count) {
         if (target.isEmpty() || count <= 0) return;
 
         int remaining = target.getCount() * count;
@@ -277,7 +276,7 @@ public class VillageTradingStationMachine extends MetaMachine implements IAutoOu
     }
 
     // 向物品处理器中添加物品
-    private void addItems(IItemHandlerModifiable handler, ItemStack stack) {
+    private void addItems(ICustomItemStackHandler handler, ItemStack stack) {
         if (stack.isEmpty()) return;
 
         ItemStack remaining = stack.copy();

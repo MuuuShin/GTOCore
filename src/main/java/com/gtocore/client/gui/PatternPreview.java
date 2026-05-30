@@ -4,7 +4,7 @@ import com.gtocore.integration.emi.multipage.MultiblockInfoEmiRecipe;
 
 import com.gtolib.api.gui.PatternSlotWidget;
 import com.gtolib.api.gui.SelectedSlotWidget;
-import com.gtolib.api.item.ItemHandlerModifiable;
+import com.gtolib.api.item.ItemStackHandler;
 import com.gtolib.api.machine.MultiblockDefinition;
 import com.gtolib.api.machine.feature.multiblock.IMultiStructureMachine;
 
@@ -271,7 +271,7 @@ public final class PatternPreview extends WidgetGroup {
         }
         slotWidgets = new PatternSlotWidget[itemList.size()];
         for (int i = 0; i < slotWidgets.length; i++) {
-            slotWidgets[i] = new PatternSlotWidget(new ItemHandlerModifiable(itemList.get(i)), i, 4 + i * 18, 0);
+            slotWidgets[i] = new PatternSlotWidget(new ItemStackHandler(itemList.get(i)), i, 4 + i * 18, 0);
             scrollableWidgetGroup.addWidget(slotWidgets[i]);
         }
     }

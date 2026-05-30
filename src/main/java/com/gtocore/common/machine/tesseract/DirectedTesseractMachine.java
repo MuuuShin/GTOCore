@@ -14,6 +14,8 @@ import com.gregtechceu.gtceu.api.machine.ConditionalSubscriptionHandler;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
+import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler;
+import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
 
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -23,8 +25,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import appeng.api.config.Actionable;
 import appeng.api.crafting.IPatternDetails;
@@ -69,9 +69,9 @@ public class DirectedTesseractMachine extends MetaMachine implements
     public static final Multiset<ImmutableList<TesseractDirectedTarget>> HIGHLIGHTS = HashMultiset.create();
 
     @Getter
-    private final List<IItemHandler> itemHandlers = new ArrayList<>(20);
+    private final List<ICustomItemStackHandler> itemHandlers = new ArrayList<>(20);
     @Getter
-    private final List<IFluidHandler> fluidHandlers = new ArrayList<>(20);
+    private final List<ICustomFluidStackHandler> fluidHandlers = new ArrayList<>(20);
 
     @Getter
     @Setter

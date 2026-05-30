@@ -40,6 +40,7 @@ public class BaseSteamMultiblockMachine extends SteamParallelMultiblockMachine {
 
     protected int maxOCamount;
     private int euMultiplier;
+    private double conversionRate;
 
     @Persisted
     private int amountOC;
@@ -70,9 +71,9 @@ public class BaseSteamMultiblockMachine extends SteamParallelMultiblockMachine {
     protected void addSteamEnergy() {
         maxOCamount = 0;
         euMultiplier = 0;
+        conversionRate = 2D;
         for (var part : getParts()) {
             if (part instanceof SteamHatchPartMachine machine) {
-                var conversionRate = 2D;
                 var fluid = GTMaterials.Steam.getFluid(1);
                 if (machine instanceof LargeSteamHatchPartMachine partMachine) {
                     conversionRate = partMachine.c;
@@ -84,6 +85,11 @@ public class BaseSteamMultiblockMachine extends SteamParallelMultiblockMachine {
                 return;
             }
         }
+    }
+
+    @Override
+    public double getConversionRate() {
+        return conversionRate;
     }
 
     @Nullable

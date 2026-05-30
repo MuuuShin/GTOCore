@@ -193,7 +193,7 @@ public class MEMufflerHatchPartMachine extends StatusTrackedMEPartMachine implem
     @Override
     public void recoverItemsTable(ItemStack recoveryItems) {
         if (!workingEnabled) return;
-        handler.insertInternal(recoveryItems, recoveryItems.getCount());
+        handler.insertItem(0, recoveryItems, false);
     }
 
     @Override

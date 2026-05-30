@@ -73,7 +73,7 @@ public final class VoidMinerMachine extends StorageMultiblockMachine implements 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
         if (dim == null) return null;
-        if (!isEmpty()) {
+        if (!isEmpty() && getTier() > 3) {
             if (unit.matchFluid(DrillingFluid.getFluid(), 1000)) {
                 var builder = getRecipeBuilder();
                 builder.EUt(GTValues.VA[getTier()]);

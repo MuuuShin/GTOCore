@@ -2,7 +2,7 @@ package com.gtocore.mixin.gtm.capability;
 
 import com.gtocore.api.data.tag.GTOTagPrefix;
 
-import com.gtolib.api.item.ItemHandlerModifiable;
+import com.gtolib.api.item.ItemStackHandler;
 import com.gtolib.api.recipe.ContentBuilder;
 
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
@@ -16,12 +16,12 @@ import com.gregtechceu.gtceu.api.recipe.info.ContentRecipeInfo;
 import com.gregtechceu.gtceu.api.recipe.info.ItemRecipeInfo;
 import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
 import com.gregtechceu.gtceu.api.recipe.ui.GTRecipeTypeUI;
+import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
 import com.gregtechceu.gtceu.common.recipe.condition.ResearchCondition;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTRecipeWidget;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.jei.IngredientIO;
@@ -45,7 +45,7 @@ public abstract class ItemRecipeInfoMixin extends ContentRecipeInfo<ItemIngredie
     @Overwrite(remap = false)
     public void applyWidgetInfo(@NotNull Widget widget, int index, boolean isXEI, IO io, GTRecipeTypeUI.@UnknownNullability("null when storage == null") RecipeHolder recipeHolder, @NotNull GTRecipeType recipeType, @UnknownNullability("null when content == null") GTRecipeDefinition recipe, @Nullable Content<ItemIngredient> content, @Nullable Object storage, int recipeTier, int chanceTier) {
         if (widget instanceof SlotWidget slot) {
-            if (storage instanceof IItemHandlerModifiable items) {
+            if (storage instanceof ICustomItemStackHandler items) {
                 if (index >= 0 && index < items.getSlots()) {
                     slot.setHandlerSlot(items, index);
                     slot.setIngredientIO(io == IO.IN ? IngredientIO.INPUT : IngredientIO.OUTPUT);
@@ -55,7 +55,7 @@ public abstract class ItemRecipeInfoMixin extends ContentRecipeInfo<ItemIngredie
                 if (isXEI && recipeType.isHasResearchSlot() && index == items.getSlots()) {
                     ResearchCondition condition = recipeHolder.conditions().stream().filter(ResearchCondition.class::isInstance).findAny().map(ResearchCondition.class::cast).orElse(null);
                     if (condition != null) {
-                        slot.setHandlerSlot(new ItemHandlerModifiable(condition.dataStack), 0);
+                        slot.setHandlerSlot(new ItemStackHandler(condition.dataStack), 0);
                         slot.setIngredientIO(IngredientIO.CATALYST);
                         slot.setCanTakeItems(false);
                         slot.setCanPutItems(false);
