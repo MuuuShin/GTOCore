@@ -60,8 +60,8 @@ import static com.gtolib.api.recipe.lookup.MapIngredient.ITEM_CONVERTER;
 @DataGeneratorScanned
 public class ManaFlowAssembler extends ManaMultiblockMachine {
 
-    private static final DataComponentKey<AtomicInteger> MAX_RATE = DataComponentKey.create("maxRate", null);
-    private static final DataComponentKey<List<BlockPos>> POOL = DataComponentKey.create("manaPool", null);
+    private static final DataComponentKey<AtomicInteger> MAX_RATE = DataComponentKey.createNoCodec("maxRate");
+    private static final DataComponentKey<List<BlockPos>> POOL = DataComponentKey.createNoCodec("manaPool");
 
     private final static int SIZE = 9;
     private final ItemEntityRecipeHandler itemIn = new ItemEntityRecipeHandler();

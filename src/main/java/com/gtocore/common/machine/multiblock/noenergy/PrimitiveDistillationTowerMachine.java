@@ -63,7 +63,7 @@ import static com.gregtechceu.gtceu.api.pattern.Predicates.abilities;
 @MethodsReturnNonnullByDefault
 public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockMachine implements IExplosionMachine, IDummyEnergyMachine, IDistillationTower {
 
-    private static final DataComponentKey<Set<BlockPos>> WATER = DataComponentKey.create("water", null);
+    private static final DataComponentKey<Set<BlockPos>> WATER = DataComponentKey.createNoCodec("water");
 
     @Nullable
     private Set<BlockPos> waterSources = null;

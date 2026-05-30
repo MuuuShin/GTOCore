@@ -41,10 +41,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.fast.fastcollection.OpenCacheHashSet;
 import com.gto.datasynclib.datasream.DataComponentKey;
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import vazkii.botania.common.block.block_entity.mana.ManaPoolBlockEntity;
 
 import java.util.*;
@@ -345,30 +347,22 @@ public final class GTOPredicates {
 
     public static final class DataKeys {
 
-        public static final DataComponentKey<Collection<IWorkInSpaceMachine>> SPACE_MACHINE = createCollection("spaceMachine");
-        public static final DataComponentKey<Set<BlockPos>> SPACE = createCollection("space");
-        public static final DataComponentKey<Set<BlockPos>> SPACE_MACHINE_PHOTOVOLTAIC_SUPP = createCollection("spaceMachinePhotovoltaicSupp");
-        public static final DataComponentKey<Double> ME_STORAGE_CORE = create("MEStorageCore");
-        public static final DataComponentKey<double[]> CRAFTING_STORAGE_CORE = create("CraftingStorageCore");
-        public static final DataComponentKey<ArrayList<WirelessEnergyUnitBlock.BlockData>> WIRELESS_ENERGY_UNIT = createCollection("wirelessEnergyUnit");
-        public static final DataComponentKey<int[]> FISSION_COMPONENT = create("fissionComponent");
+        public static final DataComponentKey<Set<IWorkInSpaceMachine>> SPACE_MACHINE = DataComponentKey.create("spaceMachine", DataComponentKey.collectionBuilder(ReferenceOpenHashSet::new));
+        public static final DataComponentKey<Set<BlockPos>> SPACE = DataComponentKey.create("space", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
+        public static final DataComponentKey<Set<BlockPos>> SPACE_MACHINE_PHOTOVOLTAIC_SUPP = DataComponentKey.create("spaceMachinePhotovoltaicSupp", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
+        public static final DataComponentKey<Double> ME_STORAGE_CORE = DataComponentKey.createNoCodec("MEStorageCore");
+        public static final DataComponentKey<double[]> CRAFTING_STORAGE_CORE = DataComponentKey.createNoCodec("CraftingStorageCore");
+        public static final DataComponentKey<ArrayList<WirelessEnergyUnitBlock.BlockData>> WIRELESS_ENERGY_UNIT = DataComponentKey.create("wirelessEnergyUnit", DataComponentKey.collectionBuilder(ArrayList::new));
+        public static final DataComponentKey<int[]> FISSION_COMPONENT = DataComponentKey.createNoCodec("fissionComponent");
 
-        public static final DataComponentKey<Integer> STEEL_FRAME = create("SteelFrame");
-        public static final DataComponentKey<Integer> SPEED_PIPE = create("SpeedPipe");
-        public static final DataComponentKey<Integer> LAMINATED_GLASS = create("laminated_glass");
+        public static final DataComponentKey<Integer> STEEL_FRAME = DataComponentKey.createNoCodec("SteelFrame");
+        public static final DataComponentKey<Integer> SPEED_PIPE = DataComponentKey.createNoCodec("SpeedPipe");
+        public static final DataComponentKey<Integer> LAMINATED_GLASS = DataComponentKey.createNoCodec("laminated_glass");
 
-        public static final DataComponentKey<Set<BlockPos>> CYAN = createCollection("cyan");
-        public static final DataComponentKey<Set<BlockPos>> MAGENTA = createCollection("magenta");
-        public static final DataComponentKey<Set<BlockPos>> YELLOW = createCollection("yellow");
-        public static final DataComponentKey<Set<BlockPos>> BLACK = createCollection("black");
-        public static final DataComponentKey<Set<BlockPos>> WHITE = createCollection("white");
-
-        private static <T> DataComponentKey<T> create(String name) {
-            return DataComponentKey.create(name, null);
-        }
-
-        private static <T, C extends Collection<T>> DataComponentKey<C> createCollection(String name) {
-            return DataComponentKey.createCollection(name, null);
-        }
+        public static final DataComponentKey<Set<BlockPos>> CYAN = DataComponentKey.create("cyan", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
+        public static final DataComponentKey<Set<BlockPos>> MAGENTA = DataComponentKey.create("magenta", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
+        public static final DataComponentKey<Set<BlockPos>> YELLOW = DataComponentKey.create("yellow", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
+        public static final DataComponentKey<Set<BlockPos>> BLACK = DataComponentKey.create("black", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
+        public static final DataComponentKey<Set<BlockPos>> WHITE = DataComponentKey.create("white", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
     }
 }

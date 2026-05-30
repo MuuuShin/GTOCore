@@ -55,4 +55,9 @@ public final class ParticleExpander extends DataComponentKey<List<ParticleBeam>>
 
     @Override
     public void addXEIInfo(GTRecipeDefinition recipe, WidgetGroup group, int xOffset, MutableInt yOffset) {}
+
+    @Override
+    public int getYOffset(GTRecipeDefinition recipe) {
+        return 0;
+    }
 }

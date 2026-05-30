@@ -54,16 +54,12 @@ public final class GTEMIRecipe extends ModularEmiRecipe<Widget> {
     public final IntSupplier displayPriority;
 
     public GTEMIRecipe(GTRecipeDefinition recipe, EmiRecipeCategory category) {
-        super(() -> EMI_RECIPE_WIDGETS.computeIfAbsent(recipe.recipeType, type -> new Widget(getXOffset(recipe), 0, type.getRecipeUI().getJEISize().width, getHeight(recipe))));
+        super(() -> EMI_RECIPE_WIDGETS.computeIfAbsent(recipe.recipeType, type -> new Widget(GTRecipeWidget.getXOffset(recipe), 0, type.getRecipeUI().getJEISize().width, GTRecipeWidget.getYOffset(recipe))));
         this.recipe = recipe;
         this.category = category;
         displayPriority = () -> recipe.priority;
         inputs = null;
-        widget = () -> {
-            var w = new GTRecipeWidget(recipe);
-            w.setSizeHeight(getHeight(recipe));
-            return w;
-        };
+        widget = () -> new GTRecipeWidget(recipe);
     }
 
     public int getTier() {
@@ -72,23 +68,6 @@ public final class GTEMIRecipe extends ModularEmiRecipe<Widget> {
 
     public GTRecipeType getRecipeType() {
         return recipe.recipeType;
-    }
-
-    private static int getXOffset(GTRecipeDefinition recipe) {
-        if (recipe.recipeType.getRecipeUI().getOriginalWidth() != recipe.recipeType.getRecipeUI().getJEISize().width) {
-            return (recipe.recipeType.getRecipeUI().getJEISize().width -
-                    recipe.recipeType.getRecipeUI().getOriginalWidth()) / 2;
-        }
-        return 0;
-    }
-
-    private static int getHeight(GTRecipeDefinition recipe) {
-        return recipe.recipeType.getRecipeUI().getJEISize().height + (recipe.contentExpanders.length + recipe.tickContentExpanders.length + recipe.conditions.length) * 10;
-    }
-
-    @Override
-    public int getDisplayHeight() {
-        return getHeight(recipe);
     }
 
     @SuppressWarnings("all")

@@ -52,6 +52,11 @@ public class GalaxyCondition extends DimensionCondition {
     }
 
     @Override
+    public int getYOffset(GTRecipeDefinition recipe) {
+        return 10;
+    }
+
+    @Override
     public SlotWidget setupDimensionMarkers(int xOffset, int yOffset) {
         Supplier<DimensionMarker> dimSupplier = () -> getDimensions()[Math.toIntExact((System.currentTimeMillis() / 1000) % getDimensions().length)];
         CustomItemStackHandler handler = new CustomItemStackHandler(1);
