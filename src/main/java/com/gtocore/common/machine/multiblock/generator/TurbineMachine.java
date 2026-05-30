@@ -18,7 +18,6 @@ import com.gtolib.api.recipe.TierDataKey;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.ICoilType;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfigurator;
@@ -30,6 +29,7 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiPart;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
+import com.gregtechceu.gtceu.api.recipe.info.RecipeInfo;
 import com.gregtechceu.gtceu.api.recipe.modifier.ParallelLogic;
 import com.gregtechceu.gtceu.common.item.TurbineRotorBehaviour;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.RotorHolderPartMachine;
@@ -60,8 +60,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-
-import static com.gtolib.api.GTOValues.GLASS_TIER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -261,7 +259,7 @@ public class TurbineMachine extends ElectricMultiblockMachine {
     }
 
     @Override
-    public boolean canVoidRecipeOutputs(RecipeCapability<?> capability) {
+    public boolean canVoidRecipeOutputs(RecipeInfo capability) {
         return true;
     }
 

@@ -5,8 +5,6 @@ import com.gtocore.api.data.tag.GTOTagPrefix;
 import com.gtolib.api.item.ItemHandlerModifiable;
 import com.gtolib.api.recipe.ContentBuilder;
 
-import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
-import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.item.TagPrefixItem;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
@@ -14,6 +12,8 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.content.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
+import com.gregtechceu.gtceu.api.recipe.info.ContentRecipeInfo;
+import com.gregtechceu.gtceu.api.recipe.info.ItemRecipeInfo;
 import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
 import com.gregtechceu.gtceu.api.recipe.ui.GTRecipeTypeUI;
 import com.gregtechceu.gtceu.common.recipe.condition.ResearchCondition;
@@ -21,7 +21,6 @@ import com.gregtechceu.gtceu.integration.xei.widgets.GTRecipeWidget;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -32,10 +31,10 @@ import org.jetbrains.annotations.UnknownNullability;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-@Mixin(ItemRecipeCapability.class)
-public abstract class ItemRecipeCapabilityMixin extends RecipeCapability<Ingredient> {
+@Mixin(ItemRecipeInfo.class)
+public abstract class ItemRecipeInfoMixin extends ContentRecipeInfo<ItemIngredient> {
 
-    protected ItemRecipeCapabilityMixin(String name, int color, boolean doRenderSlot, int sortIndex) {
+    protected ItemRecipeInfoMixin(String name, int color, boolean doRenderSlot, int sortIndex) {
         super(name, color, doRenderSlot, sortIndex);
     }
 

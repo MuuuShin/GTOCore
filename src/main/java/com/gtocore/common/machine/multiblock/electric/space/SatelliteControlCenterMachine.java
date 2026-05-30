@@ -38,7 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.gregtechceu.gtceu.api.GTValues.*;
+import static com.gregtechceu.gtceu.api.GTValues.HV;
+import static com.gregtechceu.gtceu.api.GTValues.V;
 
 @DataGeneratorScanned
 public final class SatelliteControlCenterMachine extends ElectricMultiblockMachine implements ICustomRecipeLogicHolder {

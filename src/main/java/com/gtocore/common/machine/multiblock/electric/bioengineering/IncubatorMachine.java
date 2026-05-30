@@ -21,8 +21,6 @@ import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static com.gtolib.api.GTOValues.GLASS_TIER;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class IncubatorMachine extends TierCasingMultiblockMachine {

@@ -31,8 +31,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 
-import static com.gtolib.api.GTOValues.STELLAR_CONTAINMENT_TIER;
-
 @DataGeneratorScanned
 public final class StellarForgeMachine extends TierCasingMultiblockMachine implements IExplosionMachine, IManaMultiblock {
 

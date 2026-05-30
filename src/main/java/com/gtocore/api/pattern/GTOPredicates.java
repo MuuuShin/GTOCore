@@ -13,7 +13,6 @@ import com.gtolib.utils.GTOUtils;
 
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.EURecipeCapability;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
@@ -30,6 +29,7 @@ import com.gregtechceu.gtceu.api.pattern.predicates.PredicateBlocks;
 import com.gregtechceu.gtceu.api.pattern.predicates.SimplePredicate;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.info.EURecipeInfo;
 import com.gregtechceu.gtceu.common.data.GTMachines;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.RotorHolderPartMachine;
 
@@ -95,10 +95,10 @@ public final class GTOPredicates {
     public static TraceabilityPredicate autoLaserAbilities(GTRecipeType... recipeType) {
         TraceabilityPredicate predicate = Predicates.autoAbilities(recipeType, false, false, true, true, true, true);
         for (GTRecipeType type : recipeType) {
-            if (type.getMaxInputs(EURecipeCapability.CAP) > 0) {
+            if (type.getMaxInputs(EURecipeInfo.INSTANCE) > 0) {
                 predicate = predicate.or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMaxGlobalLimited(2).setPreviewCount(0)).or(Predicates.abilities(PartAbility.INPUT_LASER).setMaxGlobalLimited(2).setPreviewCount(1));
                 break;
-            } else if (type.getMaxOutputs(EURecipeCapability.CAP) > 0) {
+            } else if (type.getMaxOutputs(EURecipeInfo.INSTANCE) > 0) {
                 predicate = predicate.or(Predicates.abilities(PartAbility.OUTPUT_ENERGY).setMaxGlobalLimited(2).setPreviewCount(0)).or(Predicates.abilities(PartAbility.OUTPUT_LASER).setMaxGlobalLimited(2).setPreviewCount(1));
                 break;
             }

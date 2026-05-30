@@ -10,7 +10,6 @@ import net.minecraftforge.items.IItemHandlerModifiable
 
 import appeng.crafting.pattern.EncodedPatternItem
 import com.gregtechceu.gtceu.api.gui.GuiTextures
-import com.lowdragmc.lowdraglib.gui.util.DrawerHelper
 
 import java.util.function.IntSupplier
 

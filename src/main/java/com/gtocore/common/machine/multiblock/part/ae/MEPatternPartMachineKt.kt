@@ -55,7 +55,6 @@ import com.gtolib.api.ae2.MyPatternDetailsHelper
 import com.gtolib.api.ae2.pattern.IParallelPatternDetails
 import com.gtolib.api.annotation.DataGeneratorScanned
 import com.gtolib.api.annotation.language.RegisterLanguage
-import com.gtolib.api.capability.ISync
 import com.gtolib.api.gui.ktflexible.*
 import com.gtolib.api.machine.feature.IEnhancedRecipeLogicMachine
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup

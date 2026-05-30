@@ -54,10 +54,10 @@ public final class ParticleExpander extends DataComponentKey<List<ParticleBeam>>
     public void setParallel(GTRecipe recipe, long parallel) {}
 
     @Override
-    public void addXEIInfo(GTRecipeDefinition recipe, WidgetGroup group, int xOffset, MutableInt yOffset) {}
+    public void addInfo(GTRecipeDefinition recipe, WidgetGroup group, int xOffset, MutableInt yOffset) {}
 
     @Override
-    public int getYOffset(GTRecipeDefinition recipe) {
+    public int getInfoHeight(GTRecipeDefinition recipe) {
         return 0;
     }
 }

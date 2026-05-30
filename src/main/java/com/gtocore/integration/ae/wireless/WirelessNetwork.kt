@@ -12,12 +12,10 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.Level
 
 import appeng.api.networking.GridHelper
-import appeng.api.networking.IGrid
 import appeng.api.networking.IGridConnection
 import appeng.api.networking.pathing.ChannelMode
 import appeng.api.networking.pathing.ControllerState
 import appeng.api.networking.pathing.IPathingService
-import appeng.core.AEConfig
 import com.gregtechceu.gtceu.GTCEu
 import com.hepdd.gtmthings.api.capability.IBindable
 import com.lowdragmc.lowdraglib.LDLib
@@ -29,8 +27,6 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 
 import java.util.*
-import kotlin.compareTo
-import kotlin.dec
 
 /**
  * 无线网络。每个网络有源节点（提供AE网络）和子节点（使用AE网络）。
@@ -214,14 +210,6 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
             if (inputNodes.isEmpty()) return
             assignNodesGreedy()
         } else {
-            if (inputNodes.size > 1) {
-                inputNodes.drop(1).forEach {
-                    if (isNodeValid(it)) {
-                        it.switchNodeType(WirelessMachine.NodeType.CHILD)
-                    }
-                }
-                return
-            }
             assignNodesInfinity()
         }
 
@@ -284,14 +272,6 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
                 bestInput.conns++
             }
         }
-    }
-
-    /**
-     * 当某个源节点掉线时调用。尝试将其子节点重新分配到其他源节点。
-     */
-    fun handleInputOffline(offlineInput: WirelessMachine) {
-        if (!inputNodes.contains(offlineInput)) return
-        refreshConnections()
     }
 
     fun getUnassignedOutputCount(): Int {

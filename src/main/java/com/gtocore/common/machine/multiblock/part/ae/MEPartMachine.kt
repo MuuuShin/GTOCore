@@ -121,15 +121,6 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
         _connectedNetworkId = id
     }
 
-    var lastNeighbor: Block? = null
-    override fun onNeighborChanged(block: Block, fromPos: BlockPos, isMoving: Boolean) {
-        super<WorkableTieredIOPartMachine>.onNeighborChanged(block, fromPos, isMoving)
-
-        if (lastNeighbor === block) return
-        super<WirelessMachine>.onNeighborChanged(fromPos)
-        lastNeighbor = block
-    }
-
     // ==================== WirelessMachine - Sync Fields ====================
     @SyncToClient
     private val _networkListCache: ObjNotifiableHolder<List<NetworkSummary>> = createNetworkSummarySyncField()

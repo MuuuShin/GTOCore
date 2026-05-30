@@ -5,7 +5,9 @@ import com.gtocore.api.accelerator.Particles;
 import net.minecraft.world.phys.Vec3;
 
 import com.gto.datasynclib.datasream.codec.DataCodec;
-import com.gto.datasynclib.datasream.data.*;
+import com.gto.datasynclib.datasream.data.Data;
+import com.gto.datasynclib.datasream.data.MapData;
+import com.gto.datasynclib.datasream.data.NullData;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 

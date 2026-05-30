@@ -13,7 +13,6 @@ import com.gtolib.api.recipe.RecipeHelper;
 import com.gtolib.api.recipe.RecipeType;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;

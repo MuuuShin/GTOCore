@@ -39,7 +39,6 @@ import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gtocore.common.block.BlockMap.GRAVITONFLOWMAP;
-import static com.gtolib.api.GTOValues.GRAVITON_FLOW_TIER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

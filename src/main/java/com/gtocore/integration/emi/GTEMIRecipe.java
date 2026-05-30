@@ -54,12 +54,13 @@ public final class GTEMIRecipe extends ModularEmiRecipe<Widget> {
     public final IntSupplier displayPriority;
 
     public GTEMIRecipe(GTRecipeDefinition recipe, EmiRecipeCategory category) {
-        super(() -> EMI_RECIPE_WIDGETS.computeIfAbsent(recipe.recipeType, type -> new Widget(GTRecipeWidget.getXOffset(recipe), 0, type.getRecipeUI().getJEISize().width, GTRecipeWidget.getYOffset(recipe))));
+        super(() -> EMI_RECIPE_WIDGETS.computeIfAbsent(recipe.recipeType, type -> new Widget(GTRecipeWidget.getXOffset(recipe), 0, type.getRecipeUI().getJEISize(recipe).width, type.getRecipeUI().getJEISize(recipe).height)));
         this.recipe = recipe;
         this.category = category;
-        displayPriority = () -> recipe.priority;
-        inputs = null;
-        widget = () -> new GTRecipeWidget(recipe);
+        this.height = recipe.recipeType.getRecipeUI().getJEISize(recipe).height;
+        this.displayPriority = () -> recipe.priority;
+        this.inputs = null;
+        this.widget = () -> new GTRecipeWidget(recipe);
     }
 
     public int getTier() {

@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static com.gregtechceu.gtceu.api.GTValues.VA;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.DrillingFluid;
 import static net.minecraft.network.chat.Component.translatable;
 

@@ -155,15 +155,6 @@ class MeWirelessConnectMachine(holder: MetaMachineBlockEntity) :
         sideTabs.attachSubTab(topologyProvider)
     }
 
-    var lastNeighbor: Block? = null
-    override fun onNeighborChanged(block: Block, fromPos: BlockPos, isMoving: Boolean) {
-        super<MetaMachine>.onNeighborChanged(block, fromPos, isMoving)
-
-        if (lastNeighbor === block) return
-        super<WirelessMachine>.onNeighborChanged(fromPos)
-        lastNeighbor = block
-    }
-
     override fun getTabIcon(): IGuiTexture = fancyUIProvider.tabIcon
     override fun getTabTooltips(): MutableList<Component?> = fancyUIProvider.tabTooltips
     override fun createMainPage(p0: FancyMachineUIWidget?): Widget = fancyUIProvider.createMainPage(p0)

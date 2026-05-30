@@ -10,7 +10,8 @@ import com.gtolib.api.item.ItemStackSet;
 import com.gtolib.api.machine.feature.multiblock.ITierCasingMachine;
 import com.gtolib.api.machine.multiblock.StorageMultiblockMachine;
 import com.gtolib.api.machine.trait.TierCasingTrait;
-import com.gtolib.api.recipe.*;
+import com.gtolib.api.recipe.RecipeBuilder;
+import com.gtolib.api.recipe.TierDataKey;
 import com.gtolib.utils.MachineUtils;
 
 import com.gregtechceu.gtceu.api.GTValues;
@@ -65,8 +66,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-
-import static com.gtolib.api.GTOValues.GLASS_TIER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
