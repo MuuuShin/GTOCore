@@ -293,10 +293,10 @@ public final class SupercomputingCenterMachine extends StorageMultiblockMachine 
     }
 
     private void tick() {
-        cacheCWUt = allocatedCWUt;
         var timer = getOffsetTimer();
         if (lastTimeStamp != timer) {
             lastTimeStamp = timer;
+            cacheCWUt = allocatedCWUt;
             allocatedCWUt = 0;
         }
     }
@@ -333,6 +333,7 @@ public final class SupercomputingCenterMachine extends StorageMultiblockMachine 
         var timer = getOffsetTimer();
         if (lastTimeStamp != timer) {
             lastTimeStamp = timer;
+            cacheCWUt = allocatedCWUt;
             allocatedCWUt = 0;
         }
         long toAllocate = Math.min(cwu, getAdjustedMaxCWU() - allocatedCWUt);
