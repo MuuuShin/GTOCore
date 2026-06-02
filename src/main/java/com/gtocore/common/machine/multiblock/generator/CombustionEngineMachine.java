@@ -27,7 +27,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public final class CombustionEngineMachine extends ElectricMultiblockMachine {
     private final int tier;
     // runtime
     private boolean isOxygenBoosted;
-    @Persisted
+    @SaveToDisk
     private final NotifiableFluidTank tank;
     private final ConditionalSubscriptionHandler tankSubs;
 

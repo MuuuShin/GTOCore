@@ -69,6 +69,7 @@ import appeng.crafting.pattern.ProcessingPatternItem;
 
 import com.fast.fastcollection.OpenCacheHashSet;
 import com.fast.recipesearch.IntLongMap;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.gto.datasynclib.annotations.SyncToServer;
 import com.gto.datasynclib.datasream.data.Data;
@@ -79,7 +80,6 @@ import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -118,25 +118,25 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
         return recipeTypes;
     }
 
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     @Getter
     private final ArrayList<GTRecipeType> recipeTypes = new ArrayList<>();
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     @Getter
     public GTRecipeType recipeType = null;
 
     @SyncToClient
     private final boolean[] caches;
-    @Persisted
+    @SaveToDisk
     public final NotifiableNotConsumableItemHandler shareInventory;
-    @Persisted
+    @SaveToDisk
     public final NotifiableNotConsumableFluidHandler shareTank;
-    @Persisted
+    @SaveToDisk
     public final NotifiableItemStackHandler circuitInventorySimulated;
 
-    @Persisted
+    @SaveToDisk
     private final Set<BlockPos> proxies = new OpenCacheHashSet<>();
     private final Set<MEPatternBufferProxyPartMachine> proxyMachines = new ReferenceOpenHashSet<>();
     public final InternalSlotRecipeHandler internalRecipeHandler;
@@ -359,11 +359,11 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
         if (!isRemote()) return;
         if (configuratorField.get() == index) {
             configuratorField.set(-1);
-            configuratorField.markAsDirty();
+            configuratorField.markAsChanged();
             syncToServer();
         } else {
             configuratorField.set(index);
-            configuratorField.markAsDirty();
+            configuratorField.markAsChanged();
             syncToServer();
         }
     }

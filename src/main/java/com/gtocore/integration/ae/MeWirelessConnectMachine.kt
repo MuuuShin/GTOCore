@@ -27,6 +27,7 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder
+import com.gto.datasynclib.annotations.SaveToDisk
 import com.gto.datasynclib.annotations.SyncToClient
 import com.gto.datasynclib.listener.IntNotifiableHolder
 import com.gto.datasynclib.listener.ObjNotifiableHolder
@@ -64,7 +65,7 @@ class MeWirelessConnectMachine(holder: MetaMachineBlockEntity) :
     }
 
     // ==================== WirelessMachine - Node Type (switchable) ====================
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private var _nodeType: Int = WirelessMachine.NodeType.CHILD.ordinal
 
@@ -77,7 +78,7 @@ class MeWirelessConnectMachine(holder: MetaMachineBlockEntity) :
     }
 
     // ==================== WirelessMachine - Persisted State ====================
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private var _connectedNetworkId: String = ""
 

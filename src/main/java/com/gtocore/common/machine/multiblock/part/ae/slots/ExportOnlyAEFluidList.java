@@ -20,7 +20,7 @@ import net.minecraftforge.fluids.FluidStack;
 import appeng.api.stacks.AEFluidKey;
 
 import com.fast.recipesearch.IntLongMap;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ import java.util.function.Supplier;
 @Getter
 public class ExportOnlyAEFluidList extends NotifiableContentHandler implements ICustomFluidStackHandler, IConfigurableSlotList {
 
-    @Persisted
+    @SaveToDisk
     final ExportOnlyAEFluidSlot[] inventory;
 
     public ExportOnlyAEFluidList(MetaMachine machine, int slots) {

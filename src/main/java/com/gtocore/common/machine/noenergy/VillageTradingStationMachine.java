@@ -32,6 +32,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
@@ -41,8 +42,6 @@ import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.gui.widget.layout.Layout;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,22 +67,22 @@ public class VillageTradingStationMachine extends MetaMachine implements IAutoOu
     private ISubscription exportItemSubs;
 
     // 输入输出物品存储
-    @Persisted
+    @SaveToDisk
     private final NotifiableItemStackHandler input;
-    @Persisted
+    @SaveToDisk
     private final NotifiableItemStackHandler output;
 
     // 村民存储与配置
-    @Persisted
-    @DescSynced
+    @SaveToDisk
+    @SyncToClient
     private final VillageHolder villagers;
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private final boolean[] isLocked = new boolean[10];
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private final int[] selected = new int[10];
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private final boolean[] startUp = new boolean[10];
 
@@ -91,9 +90,9 @@ public class VillageTradingStationMachine extends MetaMachine implements IAutoOu
     private final CustomItemStackHandler RecipesHandler = new CustomItemStackHandler(3 * 10);
 
     // 升级物品
-    @Persisted
+    @SaveToDisk
     private final CustomItemStackHandler upgrade;
-    @Persisted
+    @SaveToDisk
     private final CustomItemStackHandler enhance;
 
     // 最大交易次数 32*
@@ -102,12 +101,12 @@ public class VillageTradingStationMachine extends MetaMachine implements IAutoOu
             FIELD_GENERATOR_IV.asItem(), FIELD_GENERATOR_LuV.asItem(), FIELD_GENERATOR_ZPM.asItem(), FIELD_GENERATOR_UV.asItem() };
 
     // 补货与交易参数
-    @Persisted
+    @SaveToDisk
     private int replenishmentInterval = 2400;
-    @Persisted
+    @SaveToDisk
     private int tradingMultiple = 1;
 
-    @Persisted
+    @SaveToDisk
     private int tire = 0;
     // 补货时间间隔 -225* 多倍交易 4*
     private static final Map<Item, Integer> ENHANCE_INDEX_MAP = Map.ofEntries(
@@ -755,13 +754,13 @@ public class VillageTradingStationMachine extends MetaMachine implements IAutoOu
     // ********* 自动输出实现 ********* //
     /////////////////////////////////////
 
-    @Persisted
+    @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private Direction outputFacingItems;
-    @Persisted
+    @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private boolean autoOutputItems;
-    @Persisted
+    @SaveToDisk
     private boolean allowInputFromOutputSideItems;
 
     @Override

@@ -22,15 +22,15 @@ import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
 
 import net.minecraft.core.Direction;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class ElectricHeaterMachine extends WorkableTieredMachine implements IHeaterMachine, ICustomRecipeLogicHolder {
 
     public static final int MaxTemperature = 1200;
-    @Persisted
+    @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private int temperature = 273;
     private TickableSubscription tickSubs;

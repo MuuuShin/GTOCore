@@ -35,6 +35,7 @@ import com.gregtechceu.gtceu.api.recipe.handler.IO
 import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler
 import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder
+import com.gto.datasynclib.annotations.SaveToDisk
 import com.gto.datasynclib.annotations.SyncToClient
 import com.gto.datasynclib.listener.IntNotifiableHolder
 import com.gto.datasynclib.listener.ObjNotifiableHolder
@@ -61,7 +62,7 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
     IMachineLife {
 
     // ==================== AE2 Grid ====================
-    @Persisted
+    @SaveToDisk
     private val nodeHolder: GridNodeHolder = GridNodeHolder(this)
 
     @SyncToClient
@@ -69,10 +70,10 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
 
     val actionSourceField: IActionSource = IActionSource.ofMachine { nodeHolder.getMainNode().node }
 
-    @Persisted
+    @SaveToDisk
     protected var distinctField: Boolean = false
 
-    @Persisted
+    @SaveToDisk
     var isAllFacing: Boolean = false
 
     override fun getItemHandlerCap(side: Direction?, useCoverCapability: Boolean): ICustomItemStackHandler? = null
@@ -113,7 +114,7 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
     override fun getNodeType(): WirelessMachine.NodeType? = WirelessMachine.NodeType.CHILD
 
     // ==================== WirelessMachine - Persisted State ====================
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private var _connectedNetworkId: String = ""
 

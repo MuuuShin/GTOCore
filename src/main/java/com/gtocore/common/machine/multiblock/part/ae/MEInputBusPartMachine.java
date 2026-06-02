@@ -30,10 +30,10 @@ import appeng.api.storage.MEStorage;
 
 import gto_ae.helpers.facility_management.WorkingStatus;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.utils.Position;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -44,10 +44,10 @@ public class MEInputBusPartMachine extends StatusTrackedMEPartMachine implements
 
     private TickableSubscription autoIOSubs;
 
-    @Persisted
+    @SaveToDisk
     final ExportOnlyAEItemList aeItemHandler;
 
-    @Persisted
+    @SaveToDisk
     protected final NotifiableItemStackHandler circuitInventory;
 
     public MEInputBusPartMachine(MetaMachineBlockEntity holder) {

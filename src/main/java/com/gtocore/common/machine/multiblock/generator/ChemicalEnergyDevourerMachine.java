@@ -31,8 +31,8 @@ import net.minecraft.network.chat.Style;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -49,7 +49,7 @@ public final class ChemicalEnergyDevourerMachine extends ElectricMultiblockMachi
     private static final int tier = 5;
     private boolean isOxygenBoosted;
     private boolean isDinitrogenTetroxideBoosted;
-    @Persisted
+    @SaveToDisk
     private final NotifiableFluidTank tank;
     private final ConditionalSubscriptionHandler tankSubs;
     @SyncToClient

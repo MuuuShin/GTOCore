@@ -149,7 +149,7 @@ open class MEPatternBufferPartMachineKt(holder: MetaMachineBlockEntity, maxPatte
     override fun runOnUpdate() = run {
         if (isRemote) {
             configuratorField.set(-1)
-            configuratorField.markAsDirty()
+            configuratorField.markAsChanged()
             syncToServer()
         }
     }

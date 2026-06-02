@@ -25,9 +25,9 @@ import net.minecraft.util.Mth;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class BaseSteamMultiblockMachine extends SteamParallelMultiblockMachine {
     private int euMultiplier;
     private double conversionRate;
 
-    @Persisted
+    @SaveToDisk
     private int amountOC;
 
     private final long eut;

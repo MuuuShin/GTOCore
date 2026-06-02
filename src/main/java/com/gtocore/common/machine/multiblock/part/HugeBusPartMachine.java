@@ -25,12 +25,17 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
 import com.fast.recipesearch.IntLongMap;
+import com.gto.datasynclib.LogicalSide;
+import com.gto.datasynclib.annotations.SaveToDisk;
+import com.gto.datasynclib.datasream.data.Data;
+import com.gto.datasynclib.util.DataCodecs;
 import com.hepdd.gtmthings.api.machine.fancyconfigurator.ButtonConfigurator;
 import com.hepdd.gtmthings.api.transfer.UnlimitItemTransferHelper;
 import com.lowdragmc.lowdraglib.gui.editor.Icons;
@@ -40,7 +45,6 @@ import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +57,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public final class HugeBusPartMachine extends WorkableTieredIOPartMachine implements IMachineLife {
 
-    @Persisted
+    @SaveToDisk
     private final HugeNotifiableItemStackHandler inventory;
     @Nullable
     private TickableSubscription autoIOSubs;
@@ -376,15 +380,22 @@ public final class HugeBusPartMachine extends WorkableTieredIOPartMachine implem
         }
 
         @Override
-        public CompoundTag serializeNBT() {
+        public void writeBuf(LogicalSide side, @NotNull FriendlyByteBuf data) {}
+
+        @Override
+        public void readBuf(LogicalSide side, @NotNull FriendlyByteBuf data) {}
+
+        @Override
+        public Data writeData() {
             CompoundTag nbt = new CompoundTag();
             nbt.put("stack", stack.serializeNBT());
             nbt.putLong("count", count);
-            return nbt;
+            return DataCodecs.COMPOUND_TAG_CODEC.encode(nbt);
         }
 
         @Override
-        public void deserializeNBT(CompoundTag nbt) {
+        public void readData(Data data, int dataVersion) {
+            var nbt = DataCodecs.COMPOUND_TAG_CODEC.decode(data);
             var stack = nbt.get("stack");
             if (stack instanceof CompoundTag tag) {
                 this.stack = ItemStack.of(tag);

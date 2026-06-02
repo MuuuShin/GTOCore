@@ -29,10 +29,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -72,9 +72,9 @@ public final class GeneratorArrayMachine extends StorageMultiblockMachine implem
     private static int generatorLimit = 16;
     private WirelessEnergyContainer WirelessEnergyContainerCache;
     private MachineDefinition machineDefinitionCache;
-    @Persisted
+    @SaveToDisk
     private boolean isw;
-    @Persisted
+    @SaveToDisk
     private long eut;
 
     private static boolean isEligibleRecipeType(GTRecipeType type) {

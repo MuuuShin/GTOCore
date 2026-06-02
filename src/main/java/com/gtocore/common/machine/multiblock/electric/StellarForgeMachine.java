@@ -24,7 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +37,7 @@ public final class StellarForgeMachine extends TierCasingMultiblockMachine imple
     @RegisterLanguage(cn = "内部压力：", en = "Internal Pressure: ")
     private static final String PRESSURE = "gtocore.machine.stellar_forge.pressure";
 
-    @Persisted
+    @SaveToDisk
     private int pressure;
 
     private final ManaTrait manaTrait;

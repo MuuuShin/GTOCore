@@ -45,12 +45,12 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
 
 import com.fast.fastcollection.OpenCacheHashSet;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.hepdd.gtmthings.utils.FormatUtil;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,9 +77,9 @@ public class TurbineMachine extends ElectricMultiblockMachine {
     private final int tier;
     private final boolean mega;
     private long energyPerTick;
-    @Persisted
+    @SaveToDisk
     private boolean highSpeedMode;
-    @Persisted
+    @SaveToDisk
     private float highSpeedFactor = 1.0f;
     final List<RotorHolderPartMachine> rotorHolderMachines = new ArrayList<>();
     private ItemPartMachine rotorHatchPartMachine;

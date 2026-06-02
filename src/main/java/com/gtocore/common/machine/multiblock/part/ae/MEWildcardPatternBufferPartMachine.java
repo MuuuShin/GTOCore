@@ -52,6 +52,7 @@ import appeng.crafting.pattern.AEProcessingPattern;
 import appeng.crafting.pattern.ProcessingPatternItem;
 
 import com.fast.recipesearch.IntLongMap;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.util.holder.ObjHolder;
 import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior;
 import com.hepdd.gtmthings.data.CustomItems;
@@ -59,7 +60,6 @@ import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.gui.widget.layout.Align;
 import com.lowdragmc.lowdraglib.misc.ItemStackTransfer;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.utils.Position;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -91,23 +91,23 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
     private int scannedPatterns = 0;
     @Getter
     @Setter
-    @Persisted
+    @SaveToDisk
     private int patternPriority = 0;
     @Getter
-    @Persisted
+    @SaveToDisk
     private int maxFluidsOutput = 1;
     @Getter
-    @Persisted
+    @SaveToDisk
     private int maxItemsOutput = 1;
-    @Persisted
+    @SaveToDisk
     private final CustomItemStackHandler blacklistedItems;
-    @Persisted
+    @SaveToDisk
     private final ItemStackTransfer blacklistedItemsStorageTransfer;
-    @Persisted
+    @SaveToDisk
     private final CustomFluidTank[] blacklistedFluids;
-    @Persisted
+    @SaveToDisk
     private final CustomItemStackHandler blacklistedAltProcessableMachines;
-    @Persisted
+    @SaveToDisk
     private final ItemStackTransfer blacklistedAltProcessableMachinesStorageTransfer;
     private final Int2ReferenceOpenHashMap<Material> blacklistedMaterials = new Int2ReferenceOpenHashMap<>();
     private final ReferenceOpenHashSet<Material> blacklistedMaterialSet = new ReferenceOpenHashSet<>();

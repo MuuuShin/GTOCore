@@ -45,10 +45,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import appeng.util.Platform;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.hollingsworth.arsnouveau.common.items.MobJarItem;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import dev.shadowsoffire.apotheosis.adventure.AdventureConfig;
 import dev.shadowsoffire.apotheosis.adventure.boss.ApothBoss;
 import dev.shadowsoffire.apotheosis.adventure.boss.BossRegistry;
@@ -75,7 +75,7 @@ public final class SlaughterhouseMachine extends StorageMultiblockMachine implem
     private DamageSource damageSource;
     private ItemStack activeWeapon = ItemStack.EMPTY;
     private boolean bossMode = false;
-    @Persisted
+    @SaveToDisk
     private boolean filterNbt = false;
     private String entityId;
     private long xp = 0;

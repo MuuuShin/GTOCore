@@ -49,8 +49,10 @@ import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler
 import com.gregtechceu.gtceu.utils.TaskHandler
 import com.gregtechceu.gtceu.utils.asm.EmptyMethodChecker
+import com.gto.datasynclib.annotations.SaveToDisk
 import com.gto.datasynclib.annotations.SyncToClient
 import com.gto.datasynclib.listener.IntNotifiableHolder
+import com.gto.datasynclib.util.DataCodecs
 import com.gtolib.api.ae2.MyPatternDetailsHelper
 import com.gtolib.api.ae2.pattern.IParallelPatternDetails
 import com.gtolib.api.annotation.DataGeneratorScanned
@@ -84,7 +86,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     override fun onUse(state: BlockState?, world: Level?, pos: BlockPos?, player: Player?, hand: InteractionHand?, hit: BlockHitResult?): InteractionResult? {
         if (!isRemote) {
             newPageField.set(newPageField.get())
-            newPageField.markAsDirty()
+            newPageField.markAsChanged()
             syncToClient()
         }
         return super.onUse(state, world, pos, player, hand, hit)
@@ -120,18 +122,18 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     }
 
     // ==================== 持久化属性 ====================
-    @Persisted
-    @DescSynced
-    var patternInventory: CustomItemStackHandler = CustomItemStackHandler(maxPatternCount)
+    @SaveToDisk
+    @SyncToClient
+    val patternInventory: CustomItemStackHandler = CustomItemStackHandler(maxPatternCount)
 
-    @Persisted
-    private var internalInventory: Array<AbstractInternalSlot> = createInternalSlotArray()
+    @SaveToDisk
+    private val internalInventory: Array<AbstractInternalSlot> = createInternalSlotArray()
 
     @SyncToClient
-    @Persisted
+    @SaveToDisk
     var customName: String = ""
 
-    @Persisted
+    @SaveToDisk
     var showInTravelNetwork: Boolean = defaultShowInTravel()
 
     // ==================== 运行时属性 ====================
@@ -167,6 +169,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
 
     open fun onPatternChange(index: Int) {
         if (isRemote) return
+        onChanged()
 
         val internalInv = getInternalInventory()[index]
         val newPattern = patternInventory.getStackInSlot(index)
@@ -371,7 +374,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
                                 onPagePrev()
                                 if (!isRemote) {
                                     newPageField.set((newPageField.get() - 1).coerceAtLeast(0))
-                                    newPageField.markAsDirty()
+                                    newPageField.markAsChanged()
                                     syncToClient()
                                 }
                             },
@@ -385,7 +388,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
                                 onPageNext()
                                 if (!isRemote) {
                                     newPageField.set((newPageField.get() + 1).coerceAtMost(pageWidget.getMaxPageSize() - 1))
-                                    newPageField.markAsDirty()
+                                    newPageField.markAsChanged()
                                     syncToClient()
                                 }
                             },
@@ -439,7 +442,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     open fun convertPattern(pattern: IPatternDetails, index: Int): IPatternDetails = pattern
 
     open fun decodePattern(stack: ItemStack, index: Int): IPatternDetails? {
-        val pattern = MyPatternDetailsHelper.decodePattern(stack, holder.self, getGrid()) ?: return null
+        val pattern = MyPatternDetailsHelper.decodePattern(stack, holder, getGrid()) ?: return null
         return IParallelPatternDetails.of(convertPattern(pattern, index), level, 1)
     }
 

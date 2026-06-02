@@ -34,12 +34,12 @@ import net.minecraft.world.item.ItemStack;
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGridNodeListener;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -49,11 +49,11 @@ import java.util.Objects;
 @Scanned
 public class MEMufflerHatchPartMachine extends StatusTrackedMEPartMachine implements IGTOMufflerMachine {
 
-    @Persisted
+    @SaveToDisk
     private final KeyStorage internalBuffer;
-    @Persisted
+    @SaveToDisk
     private final NotifiableItemStackHandler mufflerHatchInv;
-    @Persisted
+    @SaveToDisk
     private final NotifiableItemStackHandler amplifierInv;
     private final InaccessibleInfiniteHandler handler;
 

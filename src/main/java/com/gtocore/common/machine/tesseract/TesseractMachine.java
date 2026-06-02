@@ -32,8 +32,8 @@ import appeng.api.config.Actionable;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.stacks.AEItemKey;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,10 +52,10 @@ public class TesseractMachine extends MetaMachine implements IFancyUIMachine, IM
 
     private WeakReference<BlockEntity> blockEntityReference;
 
-    @Persisted
+    @SaveToDisk
     public BlockPos pos;
 
-    @Persisted
+    @SaveToDisk
     protected NotifiableItemStackHandler inventory;
 
     private boolean call;
@@ -63,7 +63,7 @@ public class TesseractMachine extends MetaMachine implements IFancyUIMachine, IM
     public TesseractMachine(MetaMachineBlockEntity holder) {
         super(holder);
         inventory = new NotifiableItemStackHandler(this, 1, IO.NONE, IO.NONE);
-        inventory.storage.setOnContentsChangedAndfreeze(() -> {
+        inventory.storage.setOnContentsChanged(() -> {
             onChanged();
             call = false;
             pos = null;

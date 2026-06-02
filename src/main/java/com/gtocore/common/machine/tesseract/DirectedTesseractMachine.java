@@ -44,11 +44,11 @@ import com.fast.fastcollection.O2OOpenCacheHashMap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
+import com.gto.datasynclib.annotations.SaveToDisk;
+import com.gto.datasynclib.annotations.SyncToClient;
 import com.gto.datasynclib.util.holder.BooleanHolder;
 import com.gto.datasynclib.util.holder.ObjHolder;
 import com.lowdragmc.lowdraglib.syncdata.IManaged;
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.FieldManagedStorage;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import lombok.Getter;
@@ -77,11 +77,11 @@ public class DirectedTesseractMachine extends MetaMachine implements
     @Setter
     private boolean called;
 
-    @Persisted
-    @DescSynced
+    @SaveToDisk
+    @SyncToClient
     @Getter
     public final List<TesseractDirectedTarget> targets;
-    @Persisted
+    @SaveToDisk
     private final UnfinishedPushList unfinishedPushLists;
     private WeakReference<BlockEntity>[] blockEntityReference;
     private final ConditionalSubscriptionHandler task;
@@ -248,9 +248,9 @@ public class DirectedTesseractMachine extends MetaMachine implements
 
         final DirectedTesseractMachine machine;
 
-        @Persisted
+        @SaveToDisk
         final List<TesseractDirectedTarget> unfinishedPushes = new ArrayList<>();
-        @Persisted
+        @SaveToDisk
         final List<GenericStack> unfinishedStacks = new ArrayList<>();
 
         public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(UnfinishedPushList.class);

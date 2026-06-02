@@ -15,7 +15,7 @@ import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.gto.datasynclib.annotations.SaveToDisk;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public final class IncubatorMachine extends TierCasingMultiblockMachine {
 
-    @Persisted
+    @SaveToDisk
     private final RadioactivityTrait radioactivityTrait;
 
     private int cleanroomTier = 1;

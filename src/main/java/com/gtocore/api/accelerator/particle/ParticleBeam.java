@@ -37,7 +37,7 @@ public final class ParticleBeam {
         }
 
         @Override
-        public Vec3 decode(@NotNull Data data) {
+        public Vec3 decode(@NotNull Data data, int dataVersion) {
             var array = data.getDoubleArray();
             return new Vec3(array[0], array[1], array[2]);
         }
@@ -46,10 +46,10 @@ public final class ParticleBeam {
     public static final DataCodec<ParticleBeam> DATA_CODEC = new DataCodec<>() {
 
         @Override
-        public ParticleBeam decode(@NotNull Data data) {
+        public ParticleBeam decode(@NotNull Data data, int dataVersion) {
             if (data.isNull()) return empty();
             var map = data.getMap();
-            var definition = Particles.REGISTRY_KEY.dataCodec().decode(map.get(PARTICLE_KEY));
+            var definition = Particles.REGISTRY_KEY.dataCodec().decode(map.get(PARTICLE_KEY), dataVersion);
             if (definition == null) {
                 definition = Particles.EMPTY;
             }
@@ -58,8 +58,8 @@ public final class ParticleBeam {
                     map.get("energy").getDouble(),
                     map.get("focus").getDouble(),
                     map.get("quantity").getLong(),
-                    VEC3_DATA_CODEC.decode(map.get("position")),
-                    VEC3_DATA_CODEC.decode(map.get("velocity")));
+                    VEC3_DATA_CODEC.decode(map.get("position"), dataVersion),
+                    VEC3_DATA_CODEC.decode(map.get("velocity"), dataVersion));
         }
 
         @Override

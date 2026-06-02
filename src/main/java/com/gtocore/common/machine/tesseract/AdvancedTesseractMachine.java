@@ -46,12 +46,12 @@ import appeng.helpers.patternprovider.PatternProviderTarget;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.gto.datasynclib.util.holder.BooleanHolder;
 import com.gto.datasynclib.util.holder.ObjHolder;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
@@ -67,14 +67,14 @@ public class AdvancedTesseractMachine extends MetaMachine implements IFancyUIMac
 
     private final WeakReference<BlockEntity>[] blockEntityReference = new WeakReference[20];
 
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     public final List<BlockPos> poss = new ArrayList<>(20);
 
-    @Persisted
+    @SaveToDisk
     protected NotifiableItemStackHandler inventory;
 
-    @Persisted
+    @SaveToDisk
     private boolean roundRobin;
 
     @Getter
@@ -89,7 +89,7 @@ public class AdvancedTesseractMachine extends MetaMachine implements IFancyUIMac
     public AdvancedTesseractMachine(MetaMachineBlockEntity holder) {
         super(holder);
         inventory = new NotifiableItemStackHandler(this, 20, IO.NONE, IO.NONE);
-        inventory.storage.setOnContentsChangedAndfreeze(() -> {
+        inventory.storage.setOnContentsChanged(() -> {
             onChanged();
             called = false;
             poss.clear();

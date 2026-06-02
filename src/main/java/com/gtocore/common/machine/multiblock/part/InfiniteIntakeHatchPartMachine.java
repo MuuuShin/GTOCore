@@ -29,8 +29,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +43,7 @@ public final class InfiniteIntakeHatchPartMachine extends WorkableTieredIOPartMa
 
     private TickableSubscription intakeSubs;
 
-    @Persisted
+    @SaveToDisk
     private final NotifiableFluidTank tank;
 
     @SyncToClient(notifyUpdate = true)

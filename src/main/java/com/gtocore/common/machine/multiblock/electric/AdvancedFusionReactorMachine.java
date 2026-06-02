@@ -18,8 +18,8 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,9 +38,9 @@ public final class AdvancedFusionReactorMachine extends CrossRecipeMultiblockMac
     @SyncToClient
     private int color = -1;
     private static final int tier = LuV;
-    @Persisted
+    @SaveToDisk
     private long heat = 0;
-    @Persisted
+    @SaveToDisk
     private final EnergyContainerTrait energyContainer;
     private final ConditionalSubscriptionHandler preHeatSubs;
 

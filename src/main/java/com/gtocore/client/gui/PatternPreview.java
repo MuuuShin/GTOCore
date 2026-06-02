@@ -369,8 +369,8 @@ public final class PatternPreview extends WidgetGroup {
             LEVEL.addBlock(BlockPos.of(entry.getLongKey()), entry.getValue());
         }
         if (controllerBase != null) {
-            controllerBase.self().holder.getSelf().setLevel(LEVEL);
-            LEVEL.setInnerBlockEntity(controllerBase.self().holder.getSelf());
+            controllerBase.self().holder.setLevel(LEVEL);
+            LEVEL.setInnerBlockEntity(controllerBase.self().holder);
         }
         Long2ObjectOpenHashMap<TraceabilityPredicate> predicateMap = controllerBase == null ? null : new Long2ObjectOpenHashMap<>();
         if (controllerBase != null) {

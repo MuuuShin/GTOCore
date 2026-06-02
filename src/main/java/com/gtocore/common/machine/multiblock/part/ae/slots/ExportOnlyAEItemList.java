@@ -21,7 +21,7 @@ import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.GenericStack;
 
 import com.fast.recipesearch.IntLongMap;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 @Getter
 public class ExportOnlyAEItemList extends NotifiableContentHandler implements ICustomItemStackHandler, IConfigurableSlotList {
 
-    @Persisted
+    @SaveToDisk
     final ExportOnlyAEItemSlot[] inventory;
 
     public ExportOnlyAEItemList(MetaMachine holder, int slots) {

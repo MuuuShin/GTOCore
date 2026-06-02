@@ -42,10 +42,10 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import com.fast.fastcollection.OpenCacheHashSet;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.gto.datasynclib.datasream.DataComponentKey;
 import com.lowdragmc.lowdraglib.gui.widget.*;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +76,7 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
 
     private static final Item COAL_DUST = ChemicalHelper.getItem(TagPrefix.dust, GTMaterials.Coal);
     @Getter
-    @Persisted
+    @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private int heat = 298;
     @Getter
@@ -85,9 +85,9 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
     @Getter
     @SyncToClient(notifyUpdate = true)
     private int waterLevel = 0; // Used for rendering water level in the machine
-    @Persisted
+    @SaveToDisk
     private int tier;
-    @Persisted
+    @SaveToDisk
     private long time;
     private final ConditionalSubscriptionHandler tickSubs;
     private SensorPartMachine sensorMachine;
