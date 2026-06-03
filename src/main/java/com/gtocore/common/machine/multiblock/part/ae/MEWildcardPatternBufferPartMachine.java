@@ -606,7 +606,7 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
     }
 
     private @Nullable GTRecipeType getCurrentSearchType() {
-        if (recipeType != GTORecipeTypes.HATCH_COMBINED) {
+        if (recipeType != null) {
             return recipeType;
         }
         var recipeTypes = getRecipeTypes();
