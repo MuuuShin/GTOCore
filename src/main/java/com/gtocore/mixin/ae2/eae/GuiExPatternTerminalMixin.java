@@ -126,7 +126,9 @@ public abstract class GuiExPatternTerminalMixin<T extends ContainerExPatternTerm
     @Inject(method = "updateBeforeRender", at = @At("TAIL"), remap = false)
     private void updateBeforeRender(CallbackInfo ci) {
         this.gtolib$showMolecularAssembler.set(getMenu().gtolib$showMolecularAssembler);
-        scrollbar.setVisible(false);
+        if (this.getMenu() instanceof Me2in1Menu) {
+            scrollbar.setVisible(false);
+        }
     }
 
     /**
