@@ -102,8 +102,8 @@ public class ManaFlowAssembler extends ManaMultiblockMachine {
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         var level = getLevel();
         if (level != null) {
             level.playSound(null, getPos().getX(), getPos().above().getY(), getPos().getZ(), BotaniaSounds.terrasteelCraft, SoundSource.BLOCKS, 1F, 1F);

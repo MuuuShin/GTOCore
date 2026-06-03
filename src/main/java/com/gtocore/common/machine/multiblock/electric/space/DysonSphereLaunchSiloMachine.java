@@ -41,8 +41,8 @@ public final class DysonSphereLaunchSiloMachine extends ElectricMultiblockMachin
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         IntIntImmutablePair pair = DysonSphereSavaedData.getDimensionData(getDimension());
         if (pair.leftInt() < 10000) {
             if (pair.rightInt() > 60) {

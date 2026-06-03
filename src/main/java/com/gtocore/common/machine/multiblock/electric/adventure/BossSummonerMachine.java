@@ -34,8 +34,8 @@ public final class BossSummonerMachine extends ElectricMultiblockMachine impleme
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         Level world = getLevel();
         if (world == null || world.isClientSide) return;
         ApothBoss item = BossRegistry.INSTANCE.getRandomItem(world.getRandom(), getTier() << 2, WeightedDynamicRegistry.IDimensional.matches(world));
@@ -51,6 +51,7 @@ public final class BossSummonerMachine extends ElectricMultiblockMachine impleme
 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
+        if (getOverclockVoltage() < 1) return null;
         return getRecipeBuilder().duration(Math.max(5, 400 / (getTier() + 1))).EUt(getOverclockVoltage()).build();
     }
 }

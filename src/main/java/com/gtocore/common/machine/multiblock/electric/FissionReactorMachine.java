@@ -95,7 +95,7 @@ public final class FissionReactorMachine extends ElectricMultiblockMachine imple
     }
 
     @Override
-    public void onRecipeFinish() {
+    public void afterWorking() {
         parallel = 0;
         recipeHeat = 0;
     }

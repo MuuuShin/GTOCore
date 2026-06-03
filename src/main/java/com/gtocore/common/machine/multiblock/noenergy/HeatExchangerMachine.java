@@ -63,8 +63,8 @@ public final class HeatExchangerMachine extends NoEnergyMultiblockMachine implem
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         if (hs != 0) {
             if (getRecipeLogic().getTotalContinuousRunningTime() > 800) {
                 if (water) {

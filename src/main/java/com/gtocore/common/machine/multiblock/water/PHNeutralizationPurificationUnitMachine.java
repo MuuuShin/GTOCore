@@ -87,8 +87,8 @@ public final class PHNeutralizationPurificationUnitMachine extends WaterPurifica
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         if (ph >= 6.95 && ph <= 7.05) outputFluid(WaterPurificationPlantMachine.GradePurifiedWater4, inputCount * 9 / 10);
     }
 

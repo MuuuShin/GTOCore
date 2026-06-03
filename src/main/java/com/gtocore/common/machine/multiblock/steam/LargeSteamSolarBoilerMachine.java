@@ -216,7 +216,7 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
         if (level != null && isFormed()) {
             if (timing == 0) {
                 sunlit = calculateSunlit(level);
-                timing = 5;
+                timing = 10;
             } else {
                 timing--;
             }

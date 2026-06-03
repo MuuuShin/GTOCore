@@ -80,6 +80,7 @@ public final class ExtremeTemperatureFluctuationPurificationUnitMachine extends 
     public void afterWorking() {
         sensorMachine.forEach(s -> s.update(heat));
         super.afterWorking();
+        if (Math.random() * 100 <= chance) outputFluid(WaterPurificationPlantMachine.GradePurifiedWater5, inputCount * 9 / 10);
     }
 
     @Override
@@ -110,12 +111,6 @@ public final class ExtremeTemperatureFluctuationPurificationUnitMachine extends 
             }
             sensorMachine.forEach(s -> s.update(heat));
         }
-    }
-
-    @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
-        if (Math.random() * 100 <= chance) outputFluid(WaterPurificationPlantMachine.GradePurifiedWater5, inputCount * 9 / 10);
     }
 
     @Override

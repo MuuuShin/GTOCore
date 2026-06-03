@@ -101,11 +101,6 @@ public final class ResidualDecontaminantDegasserPurificationUnitMachine extends 
     public void afterWorking() {
         super.afterWorking();
         indicatorHatchPartMachine.setRedstoneSignalOutput(0);
-    }
-
-    @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
         if (successful && !failed) outputFluid(WaterPurificationPlantMachine.GradePurifiedWater7, inputCount * 9 / 10);
     }
 

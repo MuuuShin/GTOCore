@@ -82,12 +82,12 @@ public final class WaterPurificationPlantMachine extends ElectricMultiblockMachi
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         for (var entry : waterPurificationUnitMachineMap.object2BooleanEntrySet()) {
             if (entry.getBooleanValue() && entry.getKey().getRecipeLogic().getLastRecipe() != null) {
                 entry.getKey().getRecipeLogic().onRecipeFinish();
-                entry.getKey().onRecipeFinish();
+                entry.getKey().afterWorking();
                 entry.setValue(false);
             }
         }

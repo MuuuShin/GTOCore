@@ -127,8 +127,8 @@ public final class AbsoluteBaryonicPerfectionPurificationUnitMachine extends Wat
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         outputs.forEach(this::outputItem);
         outputs.clear();
         if (successful) outputFluid(WaterPurificationPlantMachine.GradePurifiedWater8, inputCount * 9 / 10);

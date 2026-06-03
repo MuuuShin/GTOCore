@@ -82,8 +82,8 @@ public class VirtualCoinMiner extends ElectricMultiblockMachine implements ICust
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         if (cwuBuffer > 0) {
             coinBuffer += VirtualCoinSavedData.accumulateCoinWork(getOwnerUUID(), cwuBuffer);
             if (outputItem(ChemicalHelper.getItem(GTOTagPrefix.COIN, GTMaterials.Gold), coinBuffer)) {
