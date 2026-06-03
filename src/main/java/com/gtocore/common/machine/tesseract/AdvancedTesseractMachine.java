@@ -19,6 +19,7 @@ import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler;
 import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
+import com.gregtechceu.gtceu.core.ILevel;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -172,7 +173,7 @@ public class AdvancedTesseractMachine extends MetaMachine implements IFancyUIMac
         if (pos == null) return null;
         var reference = blockEntityReference[i];
         if (reference == null) {
-            var be = getLevel().getBlockEntity(pos);
+            var be = ILevel.getCachedBlockEntity(getLevel(), pos);
             if (be != null) {
                 blockEntityReference[i] = new WeakReference<>(be);
                 return be;
@@ -180,7 +181,7 @@ public class AdvancedTesseractMachine extends MetaMachine implements IFancyUIMac
         } else {
             var blockEntity = reference.get();
             if (blockEntity == null || blockEntity.isRemoved()) {
-                blockEntity = getLevel().getBlockEntity(pos);
+                blockEntity = ILevel.getCachedBlockEntity(getLevel(), pos);
                 if (blockEntity != null) {
                     blockEntityReference[i] = new WeakReference<>(blockEntity);
                     return blockEntity;

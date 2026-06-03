@@ -130,7 +130,7 @@ class WirelessNetworkSavedData : SavedData() {
         @JvmStatic
         @SubscribeEvent
         fun onTickEnd(event: ServerTickEvent) {
-            if (event.phase == TickEvent.Phase.END && event.server != null && !event.server.isCurrentlySaving) {
+            if (event.phase == TickEvent.Phase.END && event.server != null && !event.server.isCurrentlySaving && event.server.tickCount % 10 == 5) {
                 if (requiredWrite) {
                     write(event.server)
                     requiredWrite = false
@@ -266,7 +266,7 @@ class WirelessNetworkSavedData : SavedData() {
             val clamped = maxOutputs.coerceIn(1, 990000)
             if (net.maxOutputsPerInput != clamped) {
                 net.maxOutputsPerInput = clamped
-                net.refreshConnections()
+                net.needsRefresh = true
                 INSTANCE.setDirty()
             }
             return STATUS.SUCCESS

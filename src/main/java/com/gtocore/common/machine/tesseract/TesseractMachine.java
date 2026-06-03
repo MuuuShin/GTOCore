@@ -14,6 +14,7 @@ import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler;
 import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
+import com.gregtechceu.gtceu.core.ILevel;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -103,7 +104,7 @@ public class TesseractMachine extends MetaMachine implements IFancyUIMachine, IM
             LazyOptional<T> result = null;
             call = true;
             if (blockEntityReference == null) {
-                var be = getLevel().getBlockEntity(pos);
+                var be = ILevel.getCachedBlockEntity(getLevel(), pos);
                 if (be != null) {
                     blockEntityReference = new WeakReference<>(be);
                     result = be.getCapability(cap, side);
@@ -111,7 +112,7 @@ public class TesseractMachine extends MetaMachine implements IFancyUIMachine, IM
             } else {
                 var blockEntity = blockEntityReference.get();
                 if (blockEntity == null || blockEntity.isRemoved()) {
-                    blockEntity = getLevel().getBlockEntity(pos);
+                    blockEntity = ILevel.getCachedBlockEntity(getLevel(), pos);
                     if (blockEntity != null) {
                         blockEntityReference = new WeakReference<>(blockEntity);
                         result = blockEntity.getCapability(cap, side);

@@ -16,6 +16,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler;
 import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
+import com.gregtechceu.gtceu.core.ILevel;
 
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -136,7 +137,7 @@ public class DirectedTesseractMachine extends MetaMachine implements
         if (dim == null) {
             return null;
         }
-        var be = dim.getBlockEntity(target.pos().pos());
+        var be = ILevel.getCachedBlockEntity(dim, target.pos().pos());
         blockEntityReference[index] = new WeakReference<>(be);
         if (be != null) {
             return be.isRemoved() ? null : be;
@@ -230,7 +231,7 @@ public class DirectedTesseractMachine extends MetaMachine implements
         if (dim == null) {
             return null;
         }
-        var be = dim.getBlockEntity(target.pos().pos());
+        var be = ILevel.getCachedBlockEntity(dim, target.pos().pos());
         if (be == null) {
             return null;
         }

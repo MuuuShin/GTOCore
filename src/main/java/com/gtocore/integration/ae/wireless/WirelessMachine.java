@@ -284,7 +284,7 @@ public interface WirelessMachine extends IGridConnectedMachine, ISync, IBindable
                         setConnectedNetworkId(defaultId);
                     }
                 }
-                WirelessNetworkSavedData.write(player.level());
+                WirelessNetworkSavedData.write(player);
             }
         }
         self().requestSync();
@@ -379,47 +379,48 @@ public interface WirelessMachine extends IGridConnectedMachine, ISync, IBindable
     }
 
     default int getWorkloadChannels() {
-        if (getGridNode() == null) return 0;
-        var defaultWorkload = getGridNode().hasFlag(GridFlags.REQUIRE_CHANNEL) ? 1 : 0;
+        var gridNode = getGridNode();
+        if (gridNode == null) return 0;
+        if (isOnline()) {
+            return gridNode.getUsedChannels();
+        }
+        var defaultWorkload = gridNode.hasFlag(GridFlags.REQUIRE_CHANNEL) ? 1 : 0;
         var mm = self();
-        var adjacent = mm.getPos().relative(mm.getFrontFacing());
-        if (getHolder().getLevel().isLoaded(adjacent)) {
-            IGrid grid = null;
-            IGridNode node;
-            switch (getHolder().getLevel().getBlockEntity(adjacent)) {
-                case IGridConnectedBlockEntity nodeHost -> {
-                    grid = nodeHost.getMainNode().getGrid();
-                    node = nodeHost.getMainNode().getNode();
+        IGrid grid = null;
+        IGridNode node;
+        switch (mm.getNeighbor(mm.getFrontFacing())) {
+            case IGridConnectedBlockEntity nodeHost -> {
+                grid = nodeHost.getMainNode().getGrid();
+                node = nodeHost.getMainNode().getNode();
+            }
+            case AEMultiBlockEntity multiBlock -> {
+                node = multiBlock.getGridNode(mm.getFrontFacing().getOpposite());
+                if (node != null) {
+                    grid = node.getGrid();
                 }
-                case AEMultiBlockEntity multiBlock -> {
-                    node = multiBlock.getGridNode(mm.getFrontFacing().getOpposite());
+            }
+            case MetaMachineBlockEntity metaMachine -> {
+                if (metaMachine.getMetaMachine() instanceof IGridConnectedMachine gridMachine) {
+                    node = gridMachine.getGridNode();
                     if (node != null) {
                         grid = node.getGrid();
                     }
-                }
-                case MetaMachineBlockEntity metaMachine -> {
-                    if (metaMachine.getMetaMachine() instanceof IGridConnectedMachine gridMachine) {
-                        node = gridMachine.getGridNode();
-                        if (node != null) {
-                            grid = node.getGrid();
-                        }
-                    } else {
-                        return defaultWorkload;
-                    }
-                }
-                case null, default -> {
+                } else {
                     return defaultWorkload;
                 }
             }
-            if (node == null || grid == null || !node.getConnectedSides().contains(mm.getFrontFacing().getOpposite())) {
+            case null, default -> {
                 return defaultWorkload;
             }
-            if (getNodeType() == NodeType.SOURCE) {
-                return Math.min(node.getUsedChannels(), getMaxWorkloadChannels());
-            }
-            if (node.getMaxChannels() > 0) {
-                return Math.min(node.getMaxChannels() + 1, getMaxWorkloadChannels());
-            }
+        }
+        if (node == null || grid == null || !node.getConnectedSides().contains(mm.getFrontFacing().getOpposite())) {
+            return defaultWorkload;
+        }
+        if (getNodeType() == NodeType.SOURCE) {
+            return Math.min(node.getUsedChannels(), getMaxWorkloadChannels());
+        }
+        if (node.getMaxChannels() > 0) {
+            return Math.min(node.getMaxChannels() + 1, getMaxWorkloadChannels());
         }
         return defaultWorkload;
     }

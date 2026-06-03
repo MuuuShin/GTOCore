@@ -1,5 +1,7 @@
 package com.gtocore.mixin.arseng;
 
+import com.gregtechceu.gtceu.core.ILevel;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -54,7 +56,7 @@ public abstract class ScribesTileMixin extends ModdedTile {
                 worldPosition.south(6).west(6).above(2));
 
         for (var pos : area) {
-            var be = level.getBlockEntity(pos);
+            var be = ILevel.getCachedBlockEntity(level, pos);
 
             if (be != null) {
                 var hasExtracted = new AtomicBoolean(false);

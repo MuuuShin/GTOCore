@@ -8,6 +8,7 @@ import com.gtolib.api.network.NetworkPack;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
+import com.gregtechceu.gtceu.core.ILevel;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -95,7 +96,7 @@ public class TesseractTargetMarker implements IInteractionItem {
                 return;
             }
             if (player.isShiftKeyDown()) {
-                if (level.getBlockEntity(pos) instanceof MetaMachineBlockEntity mbe &&
+                if (ILevel.getCachedBlockEntity(level, pos) instanceof MetaMachineBlockEntity mbe &&
                         mbe.getMetaMachine() instanceof ITesseractMarkerInteractable interactable &&
                         interactable.onMarkerInteract(player, getAllPatternFaces(itemStack))) {
                     event.setCancellationResult(InteractionResult.SUCCESS);
@@ -212,7 +213,7 @@ public class TesseractTargetMarker implements IInteractionItem {
     public static final NetworkPack COPY_CONFIG_C2S = NetworkPack.registerC2S("copy_tesseract_marker_config", (pl, buf) -> {
         var pos = buf.readBlockPos();
         if (isTesseractTargetMarker(pl.getMainHandItem()) &&
-                pl.level().getBlockEntity(pos) instanceof MetaMachineBlockEntity mbe &&
+                ILevel.getCachedBlockEntity(pl.level(), pos) instanceof MetaMachineBlockEntity mbe &&
                 mbe.getMetaMachine() instanceof ITesseractMarkerInteractable interactable) {
             copyConfigFrom(interactable, pl.getMainHandItem());
             pl.displayClientMessage(Component.translatable(IMPORT_SUCCESS_TEXT), true);

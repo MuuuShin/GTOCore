@@ -20,6 +20,7 @@ import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.client.util.TooltipHelper;
 import com.gregtechceu.gtceu.common.machine.multiblock.steam.SteamParallelMultiblockMachine;
+import com.gregtechceu.gtceu.core.ILevel;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -173,7 +174,7 @@ public class MonitorMachine extends AbstractInfoProviderMonitor implements IMach
         }
         Level level = getLevel();
         CompoundTag tags = new CompoundTag();
-        tile = Objects.requireNonNull(getLevel()).getBlockEntity(pos);
+        tile = ILevel.asyncGetBlockEntity(level, pos);
         if (tile != null) {
             if (accessor == null) {
                 accessor = new BlockAccessor() {
