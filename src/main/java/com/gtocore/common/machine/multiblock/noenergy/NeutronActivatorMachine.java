@@ -119,18 +119,12 @@ public class NeutronActivatorMachine extends NoEnergyMultiblockMachine implement
 
     @Override
     public boolean handleTickRecipe(GTRecipe recipe) {
-        return super.handleTickRecipe(recipe) && working();
-    }
-
-    boolean working() {
-        if (getRecipeLogic().getLastRecipe() != null) {
-            int evt = (int) (getRecipeLogic().getLastRecipe().data.getInt(GTORecipeDataKeys.EVT) * 1000 * getEVtMultiplier());
-            if (eV < evt) {
-                setIdleReason(IdleReason.NEUTRON_KINETIC_ENERGY_NOT_SATISFIES);
-                return false;
-            } else {
-                eV -= evt;
-            }
+        int evt = (int) (recipe.data.getInt(GTORecipeDataKeys.EVT) * 1000 * getEVtMultiplier());
+        if (eV < evt) {
+            setIdleReason(IdleReason.NEUTRON_KINETIC_ENERGY_NOT_SATISFIES);
+            return false;
+        } else {
+            eV -= evt;
         }
         return true;
     }

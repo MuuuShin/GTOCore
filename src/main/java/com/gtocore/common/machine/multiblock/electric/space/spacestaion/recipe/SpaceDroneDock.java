@@ -75,7 +75,7 @@ public class SpaceDroneDock extends RecipeExtension {
         base = base * base;
         recipe.duration = (int) (recipe.duration * (0.1 + 6.384 / base / base));
         recipe = ParallelLogic.accurateParallel(this, unit, recipe, maxParallel);
-
+        if (recipe == null) return null;
         unit.inputItem(inputHolder.value);
         outputItem(outputHolder.value);
 

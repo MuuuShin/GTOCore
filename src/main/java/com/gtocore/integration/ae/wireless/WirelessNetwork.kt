@@ -108,7 +108,7 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
 
             WirelessMachine.NodeType.CHILD -> {
                 outputNodes.add(node)
-                getAvailableInput()?.let {
+                getAvailableInput(node)?.let {
                     createConnection(it, node)
                 } ?: run {
                     needsRefresh = true
@@ -143,9 +143,29 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
         nodeInfoTable.remove(node)
     }
 
-    fun getAvailableInput(): WirelessMachine? {
-        for (input in inputNodes) {
-            if (isNodeValid(input) && connections.getInt(input) < maxOutputsPerInput) return input
+    fun getAvailableInput(output: WirelessMachine): WirelessMachine? {
+        val pathingService: IPathingService? = output.mainNode?.grid?.pathingService
+        if (pathingService?.channelMode !== ChannelMode.INFINITE) {
+            val validInputs = inputNodes.filter { isNodeValid(it) }
+            if (validInputs.isEmpty()) return null
+
+            data class InputCapacity(val input: WirelessMachine, var remainingCapacity: Int, var conns: Int = 0) : Comparable<InputCapacity> {
+                override fun compareTo(other: InputCapacity) = other.remainingCapacity.compareTo(this.remainingCapacity) // 降序
+
+                fun remainingLinks(): Int = maxOutputsPerInput - conns
+            }
+
+            return validInputs.map { input ->
+                InputCapacity(input, input.maxWorkloadChannels - input.workloadChannels)
+            }.toList().asSequence().filter { it.remainingLinks() > 0 }.filter { it.remainingCapacity >= output.workloadChannels }
+                .maxWithOrNull(
+                    compareBy<InputCapacity> { it.remainingLinks() }
+                        .thenBy { it.remainingCapacity },
+                )?.input
+        } else {
+            for (input in inputNodes) {
+                if (isNodeValid(input) && connections.getInt(input) < maxOutputsPerInput) return input
+            }
         }
         return null
     }

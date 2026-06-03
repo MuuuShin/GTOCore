@@ -358,7 +358,9 @@ public interface WirelessMachine extends IGridConnectedMachine, ISync, IBindable
         String syncConnId = connId;
         getNetworkListCache().set(
                 WirelessNetworkSavedData.Companion.getNetworkSummaries(getRequesterUUID(), syncConnId));
+        getNetworkListCache().markAsChanged();
         getUnassignedOutputCount().set(net != null ? net.getUnassignedOutputCount() : 0);
+        getUnassignedOutputCount().markAsChanged();
         // Only sync topology for connected network
         if (syncConnId.isEmpty()) {
             getTopologyCache().set(List.of());
@@ -367,9 +369,12 @@ public interface WirelessMachine extends IGridConnectedMachine, ISync, IBindable
                     WirelessNetworkSavedData.Companion.getTopologySummaries(getRequesterUUID())
                             .stream().filter(t -> t.getNetworkId().equals(syncConnId)).toList());
         }
+        getTopologyCache().markAsChanged();
         getNodeTypeSync().set(getNodeType().ordinal());
+        getNodeTypeSync().markAsChanged();
         if (self().getLevel() != null) {
             WirelessNetworkSavedData.write(Objects.requireNonNull(self().getLevel()));
+            self().syncToClient();
         }
     }
 

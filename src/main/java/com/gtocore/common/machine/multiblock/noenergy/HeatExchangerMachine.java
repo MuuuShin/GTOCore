@@ -57,6 +57,7 @@ public final class HeatExchangerMachine extends NoEnergyMultiblockMachine implem
                 doExplosion(Math.min(10, hs / 10000));
                 return false;
             }
+            return true;
         }
         return false;
     }

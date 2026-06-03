@@ -79,7 +79,7 @@ public final class NeutronVortexMachine extends NeutronActivatorMachine implemen
     }
 
     @Override
-    protected boolean working() {
+    public boolean handleTickRecipe(@NotNull GTRecipe recipe) {
         return true;
     }
 
