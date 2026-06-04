@@ -6,7 +6,7 @@ import net.minecraft.world.phys.Vec3;
 
 import com.gto.datasynclib.datasream.codec.DataCodec;
 import com.gto.datasynclib.datasream.data.Data;
-import com.gto.datasynclib.datasream.data.MapData;
+import com.gto.datasynclib.datasream.data.ListData;
 import com.gto.datasynclib.datasream.data.NullData;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -48,18 +48,18 @@ public final class ParticleBeam {
         @Override
         public ParticleBeam decode(@NotNull Data data, int dataVersion) {
             if (data.isNull()) return empty();
-            var map = data.getMap();
-            var definition = Particles.REGISTRY_KEY.dataCodec().decode(map.get(PARTICLE_KEY), dataVersion);
+            var listData = data.asListData();
+            var definition = listData.get(0, Particles.REGISTRY_KEY.dataCodec(), dataVersion);
             if (definition == null) {
                 definition = Particles.EMPTY;
             }
             return new ParticleBeam(
                     definition,
-                    map.get("energy").getDouble(),
-                    map.get("focus").getDouble(),
-                    map.get("quantity").getLong(),
-                    VEC3_DATA_CODEC.decode(map.get("position"), dataVersion),
-                    VEC3_DATA_CODEC.decode(map.get("velocity"), dataVersion));
+                    listData.getDouble(1),
+                    listData.getDouble(2),
+                    listData.getLong(3),
+                    listData.get(4, VEC3_DATA_CODEC, dataVersion),
+                    listData.get(5, VEC3_DATA_CODEC, dataVersion));
         }
 
         @Override
@@ -67,18 +67,17 @@ public final class ParticleBeam {
             if (obj.isEmpty()) {
                 return NullData.INSTANCE;
             }
-            var map = new MapData();
-            map.put(PARTICLE_KEY, Particles.REGISTRY_KEY.dataCodec().encode(obj.definition));
-            map.putDouble("energy", obj.energy);
-            map.putDouble("focus", obj.focus);
-            map.putLong("quantity", obj.amount);
-            map.put("position", VEC3_DATA_CODEC.encode(obj.position));
-            map.put("velocity", VEC3_DATA_CODEC.encode(obj.velocity));
-            return map;
+            var listData = new ListData();
+            listData.add(Particles.REGISTRY_KEY.dataCodec(), obj.definition);
+            listData.addDouble(obj.energy);
+            listData.addDouble(obj.focus);
+            listData.addLong(obj.amount);
+            listData.add(VEC3_DATA_CODEC, obj.position);
+            listData.add(VEC3_DATA_CODEC, obj.velocity);
+            return listData;
         }
     };
 
-    public static final String PARTICLE_KEY = "particle";
     private final ParticleDefinition definition;
     private long amount;
     private double energy;
