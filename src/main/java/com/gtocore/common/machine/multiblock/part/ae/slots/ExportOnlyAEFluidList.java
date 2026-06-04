@@ -43,7 +43,7 @@ public class ExportOnlyAEFluidList extends NotifiableContentHandler implements I
         this.inventory = new ExportOnlyAEFluidSlot[slots];
         for (int i = 0; i < slots; i++) {
             this.inventory[i] = slotFactory.get();
-            this.inventory[i].setOnContentsChangedAndfreeze(this::onContentsChanged);
+            this.inventory[i].setHandler(this);
         }
     }
 

@@ -39,7 +39,7 @@ public final class HeatExchangerMachine extends NoEnergyMultiblockMachine implem
     @Nullable
     @Override
     public GTRecipe getRealRecipe(@NotNull RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {
-        water = recipe.fluidInputs.getFirst().inner.getFluid() == Fluids.WATER;
+        water = recipe.fluidInputs.get(1).inner.getFluid() == Fluids.WATER;
         var result = ParallelLogic.accurateParallel(this, unit, getRecipeBuilder()
                 .inputFluids(recipe.fluidInputs.getFirst())
                 .outputFluids(recipe.fluidOutputs.getFirst())

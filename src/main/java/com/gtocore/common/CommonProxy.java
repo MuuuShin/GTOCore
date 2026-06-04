@@ -7,6 +7,7 @@ import com.gtocore.client.KeyMessage;
 import com.gtocore.client.Message;
 import com.gtocore.common.block.BlockMap;
 import com.gtocore.common.data.*;
+import com.gtocore.common.data.GTOCodecs;
 import com.gtocore.common.data.translation.GTOItemTooltips;
 import com.gtocore.common.forge.ForgeCommonEvent;
 import com.gtocore.common.machine.tesseract.TesseractDirectedTarget;
@@ -61,7 +62,7 @@ import net.minecraftforge.registries.RegisterEvent;
 
 import appeng.api.features.GridLinkables;
 import appeng.api.networking.pathing.ChannelMode;
-import appeng.api.stacks.AEKeyTypes;
+import appeng.api.stacks.*;
 import appeng.core.AEConfig;
 import appeng.hotkeys.HotkeyActions;
 import appeng.items.tools.powered.WirelessTerminalItem;
@@ -105,6 +106,7 @@ public class CommonProxy {
     }
 
     private static void init() {
+        GTOCodecs.init();
         GTOCreativeModeTabs.init();
         GTOEntityTypes.init();
         if (!GTCEu.isDataGen() && Mods.FTBQUESTS.isLoaded()) {

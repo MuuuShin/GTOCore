@@ -44,7 +44,7 @@ public class ExportOnlyAEItemList extends NotifiableContentHandler implements IC
         this.inventory = new ExportOnlyAEItemSlot[slots];
         for (int i = 0; i < slots; i++) {
             this.inventory[i] = slotFactory.get();
-            this.inventory[i].setOnContentsChangedAndfreeze(this::onContentsChanged);
+            this.inventory[i].setHandler(this);
         }
     }
 

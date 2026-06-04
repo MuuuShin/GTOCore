@@ -1,6 +1,5 @@
 package com.gtocore.common.machine.multiblock.part.ae;
 
-import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.config.GTOConfig;
 
 import com.gtolib.GTOCore;
