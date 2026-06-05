@@ -1782,7 +1782,7 @@ object GTOMachineTooltips {
         function("可安装最多64个拓展模块" translatedTo "Can install up to 64 expansion modules")
         increase("提升电压等级可为模块提供大幅耗时减免" translatedTo "Increasing voltage tier can provide large Duration reductions for modules")
         increase("额外提升为模块提供的并行数" translatedTo " Additional increase in the parallelism provided by the module")
-        command("运行前需提供128*(电压等级-7)的算力" translatedTo "Before starting, it is necessary to provide 128 * (Voltage tier - 7) computation power")
+        command("运行前需提供128*(电压等级-7)的算力" translatedTo "Before starting, it is necessary to provide 128 * (voltage tier - 7) computation power")
         increase("连接的模块将获得0.707倍耗时的速度加成" translatedTo "Connected modules will receive a 0.707x Duration speed bonus")
     }
 
