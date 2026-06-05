@@ -1137,7 +1137,7 @@ object GTOMachineTooltips {
         section("模块运行优化系统" translatedTo "Module Operation Optimization System")
         function("可安装最多12个拓展模块" translatedTo "Can install up to 12 expansion modules")
         increase("提升电压等级可为模块提供耗时减免" translatedTo "Increasing voltage tier can provide Duration reductions for modules")
-        command("运行前需提供128*(电压等级-7)的算力" translatedTo "Before starting, it is necessary to provide 128 * (Voltage tier - 7) computation power")
+        command("运行前需提供128*(电压等级-7)的算力" translatedTo "Before starting, it is necessary to provide 128 * (voltage tier - 7) computation power")
     }
 
     // 工业屠宰场
