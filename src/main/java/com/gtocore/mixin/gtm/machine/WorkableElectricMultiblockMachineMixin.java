@@ -215,8 +215,8 @@ public abstract class WorkableElectricMultiblockMachineMixin extends WorkableMul
     @Override
     public VoidingMode getVoidingMode() {
         var mode = this.voidingMode;
-        if (mode==null ) {
-           return this.voidingMode = VoidingMode.VOID_NONE;
+        if (mode == null) {
+            return this.voidingMode = VoidingMode.VOID_NONE;
         }
         return mode;
     }
