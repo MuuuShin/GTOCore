@@ -311,7 +311,6 @@ public final class GTAEMachines {
             .overlayTieredHullRenderer("me_pattern_buffer")
             .langValue("ME Pattern Buffer")
             .genLang("ME样板总成")
-            .notAllowSharedTooltips()
             .tooltips(GTOMachineTooltips.INSTANCE.getMePatternHatchTooltips().invoke(36).getSupplier())
             .meAutoConnectable()
             .register();
@@ -328,6 +327,7 @@ public final class GTAEMachines {
             .tooltips(Component.translatable("block.gtceu.pattern_buffer_proxy.desc.0"),
                     Component.translatable("block.gtceu.pattern_buffer_proxy.desc.1"),
                     Component.translatable("block.gtceu.pattern_buffer_proxy.desc.2"),
+                    Component.translatable("gtocore.machine.pattern_buffer_proxy.tooltip.0"),
                     Component.translatable("gtceu.part_sharing.enabled"))
             .register();
 }

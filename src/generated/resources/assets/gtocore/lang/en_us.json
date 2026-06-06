@@ -5497,6 +5497,7 @@
   "gtocore.machine.part.ae.storage_access.import": "Import to ME Storage",
   "gtocore.machine.part.ae.storage_access.rate_setting": "Import/Export Rate Setting",
   "gtocore.machine.pattern.error.tier": "§cMust use blocks of the same tier§r",
+  "gtocore.machine.pattern_buffer_proxy.tooltip.0": "Can be bound to an ME Pattern Buffer with a flash drive",
   "gtocore.machine.primitive_magic_energy.tooltip.0": "Endlessly absorbs the energy from ender crystals above the machine, if the energy capacity is full, the machine will explode",
   "gtocore.machine.primitive_magic_energy.tooltip.1": "Requires a constant mana input of [X] EU/s (Voltage × Current). Failure cause an explosion",
   "gtocore.machine.primordial_scanning_station.tooltip.0": "Precision multi-block scanner.",

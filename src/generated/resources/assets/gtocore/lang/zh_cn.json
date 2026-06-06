@@ -5625,6 +5625,7 @@
   "gtocore.machine.part.ae.storage_access.import": "导入到ME存储器",
   "gtocore.machine.part.ae.storage_access.rate_setting": "导入/导出速率设置",
   "gtocore.machine.pattern.error.tier": "§c必须使用同种等级方块§r",
+  "gtocore.machine.pattern_buffer_proxy.tooltip.0": "可使用闪存绑定到ME样板总成",
   "gtocore.machine.primitive_magic_energy.tooltip.0": "无尽地吸收机器上方末地水晶的能量，如果能量已满，机器将会爆炸",
   "gtocore.machine.primitive_magic_energy.tooltip.1": "每秒需输入同电压x电流的魔力，否则爆炸",
   "gtocore.machine.primordial_scanning_station.tooltip.0": "精密的多方块扫描仪。",

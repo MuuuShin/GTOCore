@@ -102,6 +102,7 @@ final class MachineLang {
         addCNEN("gtocore.machine.wireless_data_transmitter_hatch.to_bind", "源仓数据读取完成，请右键靶仓进行绑定", "Source hatch data reading completed, please right-click the target hatch to bind");
         addCNEN("gtocore.machine.wireless_data_transmitter_hatch.bind", "已绑定无线光学数据靶仓(%s)", "Bound wireless optical data target hatch (%s)");
         addCNEN("gtocore.machine.wireless_data_transmitter_hatch.unbind", "未绑定无线光学数据靶仓", "Wireless optical data target hatch not bound");
+        addCNEN("gtocore.machine.pattern_buffer_proxy.tooltip.0", "可使用闪存绑定到ME样板总成", "Can be bound to an ME Pattern Buffer with a flash drive");
         addCNEN("gtocore.machine.wireless_data_receiver_hatch.tooltip.0", "需要使用闪存右键无线光学数据靶仓和无线光学数据源仓进行绑定", "Use the flash drive to right-click and bind the wireless optical data target hatch and the wireless optical data source hatch");
         addCNEN("gtocore.machine.wireless_data_receiver_hatch.to_bind", "靶仓数据读取完成，请右键源仓进行绑定", "Target hatch data reading completed, please right-click the source hatch to bind");
         addCNEN("gtocore.machine.wireless_data_receiver_hatch.bind", "已绑定无线光学数据源仓(%s)", "Bound wireless optical data source hatch (%s)");
