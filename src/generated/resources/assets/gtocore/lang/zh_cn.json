@@ -1755,6 +1755,7 @@
   "ceres_orbit.gtocore.name": "谷神星轨道",
   "config.gtocore.option.aeGridKey": "AE2 网格存储键",
   "config.gtocore.option.aeLog": "[调试] AE2 和同步日志",
+  "config.gtocore.option.aeTerminalPageSwitchStyleSelector": "AE 终端页面切换样式重做",
   "config.gtocore.option.aeWirelessLog": "[调试] AE2 无线网络调试日志",
   "config.gtocore.option.batchProcessingMaxDuration": "批处理模式最大持续时间",
   "config.gtocore.option.blinkRange": "旅行手杖瞬移范围（格）",

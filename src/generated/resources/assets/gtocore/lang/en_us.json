@@ -1627,6 +1627,7 @@
   "ceres_orbit.gtocore.name": "Ceres Orbit",
   "config.gtocore.option.aeGridKey": "AE2 Grid Storage Key",
   "config.gtocore.option.aeLog": "[Debug] AE2 & Sync Logging",
+  "config.gtocore.option.aeTerminalPageSwitchStyleSelector": "AE Terminal Page Switch Style Rework",
   "config.gtocore.option.aeWirelessLog": "[Debug] AE2 & Sync Logging",
   "config.gtocore.option.batchProcessingMaxDuration": "Batch Processing Max Duration",
   "config.gtocore.option.blinkRange": "Staff of Travelling Blink Range (blocks)",
