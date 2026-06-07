@@ -5,7 +5,9 @@ import com.gtolib.api.machine.feature.IHeaterMachine;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 
 import net.minecraft.core.Direction;
@@ -43,6 +45,11 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeate
     @NotNull
     public GTRecipeType getRecipeType() {
         return GTRecipeTypes.STEAM_BOILER_RECIPES;
+    }
+
+    @Override
+    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
+        return recipe;
     }
 
     @Override

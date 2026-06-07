@@ -8,6 +8,7 @@ import com.gtolib.api.machine.feature.IHeaterMachine;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.fluids.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.handler.ICustomRecipeLogicHolder;
@@ -44,6 +45,11 @@ public class ManaHeaterMachine extends SimpleManaMachine implements IHeaterMachi
     @NotNull
     public GTRecipeType getRecipeType() {
         return GTORecipeTypes.MANA_HEATER_RECIPES;
+    }
+
+    @Override
+    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
+        return recipe;
     }
 
     @Override
