@@ -5867,7 +5867,7 @@
   "gtocore.player.organ.you_wing_is_broken": "Your wing is broken",
   "gtocore.player.organ.you_wing_need_to_charge": "Your wing need to charge",
   "gtocore.player_exp_status.mysterious_boost_potion.success": "You seem to be granted with some mysterious ability ......",
-  "gtocore.pulse_machine_maintenance.times": "Total Resolved: %s Problems",
+  "gtocore.pulse_machine_maintenance.times": "Total mana used for maintenance: %s times",
   "gtocore.reach_limit": "Reach Limit",
   "gtocore.recipe.coil.uruium": "Uruium",
   "gtocore.recipe.efficiency": "Total Energy Cost Multiplier: %s",
