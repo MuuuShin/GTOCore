@@ -11,7 +11,7 @@ public class GameRendererMixin {
      * @author .
      * @reason Disable night vision blink effect
      */
-    @Overwrite(remap = false)
+    @Overwrite
     public static float getNightVisionScale(LivingEntity livingEntity, float nanoTime) {
         return 1.0F;
     }
