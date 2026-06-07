@@ -5995,7 +5995,7 @@
   "gtocore.player.organ.you_wing_is_broken": "你的翅膀已損壞",
   "gtocore.player.organ.you_wing_need_to_charge": "你的翅膀需要充電",
   "gtocore.player_exp_status.mysterious_boost_potion.success": "你似乎被賦予了某種神秘能力...",
-  "gtocore.pulse_machine_maintenance.times": "累計已解決：%s個問題",
+  "gtocore.pulse_machine_maintenance.times": "總分發維護用魔力：%s 次",
   "gtocore.reach_limit": "達到極限",
   "gtocore.recipe.coil.uruium": "超級熱熔",
   "gtocore.recipe.efficiency": "總耗能倍率：%s",
