@@ -1,7 +1,5 @@
 package com.gtocore.common.machine.multiblock.part.ae
 
-import com.gtocore.api.gui.ktflexible.multiPageAdvanced
-import com.gtocore.api.gui.ktflexible.textBlock
 import com.gtocore.common.data.machines.GTAEMachines
 import com.gtocore.common.machine.multiblock.part.ae.widget.slot.AEPatternViewSlotWidgetKt
 import com.gtocore.eio_travel.logic.TravelSavedData
@@ -34,11 +32,9 @@ import appeng.api.networking.IGridNodeListener
 import appeng.api.networking.crafting.ICraftingProvider
 import appeng.api.stacks.AEItemKey
 import appeng.api.stacks.KeyCounter
-import appeng.crafting.pattern.EncodedPatternItem
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity
-import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.gui.GuiTextures
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel
 import com.gregtechceu.gtceu.api.gui.fancy.FancyMachineUIWidget
@@ -47,18 +43,20 @@ import com.gregtechceu.gtceu.api.machine.TickableSubscription
 import com.gregtechceu.gtceu.api.machine.feature.IDropSaveMachine
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController
-import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType
+import com.gregtechceu.gtceu.api.recipe.handler.IO
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler
 import com.gregtechceu.gtceu.utils.TaskHandler
 import com.gregtechceu.gtceu.utils.asm.EmptyMethodChecker
+import com.gto.datasynclib.annotations.SaveToDisk
 import com.gto.datasynclib.annotations.SyncToClient
 import com.gto.datasynclib.listener.IntNotifiableHolder
+import com.gto.datasynclib.util.DataCodecs
 import com.gtolib.api.ae2.MyPatternDetailsHelper
 import com.gtolib.api.ae2.pattern.IParallelPatternDetails
 import com.gtolib.api.annotation.DataGeneratorScanned
 import com.gtolib.api.annotation.language.RegisterLanguage
-import com.gtolib.api.capability.ISync
 import com.gtolib.api.gui.ktflexible.*
 import com.gtolib.api.machine.feature.IEnhancedRecipeLogicMachine
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup
@@ -83,13 +81,12 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     ICraftingProvider,
     WirelessMachine,
     IInteractedMachine,
-    ISync,
     IExtendedPatternContainer,
     IDropSaveMachine {
     override fun onUse(state: BlockState?, world: Level?, pos: BlockPos?, player: Player?, hand: InteractionHand?, hit: BlockHitResult?): InteractionResult? {
         if (!isRemote) {
             newPageField.set(newPageField.get())
-            newPageField.markAsDirty()
+            newPageField.markAsChanged()
             syncToClient()
         }
         return super.onUse(state, world, pos, player, hand, hit)
@@ -125,18 +122,18 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     }
 
     // ==================== 持久化属性 ====================
-    @Persisted
-    @DescSynced
-    var patternInventory: CustomItemStackHandler = CustomItemStackHandler(maxPatternCount)
+    @SaveToDisk
+    @SyncToClient
+    val patternInventory: CustomItemStackHandler = CustomItemStackHandler(maxPatternCount)
 
-    @Persisted
-    private var internalInventory: Array<AbstractInternalSlot> = createInternalSlotArray()
+    @SaveToDisk
+    private val internalInventory: Array<AbstractInternalSlot> = createInternalSlotArray()
 
     @SyncToClient
-    @Persisted
+    @SaveToDisk
     var customName: String = ""
 
-    @Persisted
+    @SaveToDisk
     var showInTravelNetwork: Boolean = defaultShowInTravel()
 
     // ==================== 运行时属性 ====================
@@ -172,6 +169,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
 
     open fun onPatternChange(index: Int) {
         if (isRemote) return
+        onChanged()
 
         val internalInv = getInternalInventory()[index]
         val newPattern = patternInventory.getStackInSlot(index)
@@ -214,6 +212,8 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
         detailsInit = false
         level?.let { TravelSavedData.getTravelData(it).removeTravelTargetAt(it, holder.blockPos) }
     }
+
+    override fun canShared(): Boolean = false
 
     override fun addedToController(controller: IMultiController) {
         super.addedToController(controller)
@@ -272,7 +272,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
                                 (
                                     if (controller is IEnhancedRecipeLogicMachine) {
                                         Stream.of(
-                                            *controller.recipeTypes,
+                                            *controller.availableRecipeTypes,
                                         )
                                             .map { r: GTRecipeType? -> Component.translatable("gtceu." + r!!.registryName.path) }
                                             .collect(
@@ -317,8 +317,8 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     // ==================== 其他接口实现 ====================
     override fun getGrid(): IGrid? = mainNode.grid
 
-    override fun getRecipeHandlers(): List<RecipeHandlerList> = emptyList()
-    override fun getHandlerList(): RecipeHandlerList = RecipeHandlerList.NO_DATA
+    override fun getRecipeHandlers(): List<RecipeHandlerUnit> = emptyList()
+    override fun getHandlerUnit(): RecipeHandlerUnit = RecipeHandlerUnit.NO_DATA
     override fun isWorkingEnabled(): Boolean = true
     override fun setWorkingEnabled(ignored: Boolean) {}
     override fun isDistinct(): Boolean = true
@@ -353,52 +353,17 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     lateinit var freshWidgetGroup: FreshWidgetGroupAbstract
     override fun createUIWidget(): Widget {
         freshWidgetGroup = rootFresh(176, 148) {
-            val chunked: List<List<List<Int>>> = (0 until maxPatternCount).chunked(9).chunked(6)
             vBox(width = availableWidth, style = { spacing = 3 }) {
-                hBox(height = 12, alwaysVerticalCenter = true) {
-                    blank(width = 7)
-                    textBlock(maxWidth = this@vBox.availableWidth, textSupplier = {
-                        when (onlineField) {
-                            true -> Component.translatable("gtceu.gui.me_network.online")
-                            false -> Component.translatable("gtceu.gui.me_network.offline")
-                        }
-                    })
-                    blank(width = 9)
-                    textBlock(maxWidth = this@vBox.availableWidth, textSupplier = {
-                        Component.translatable(AE_NAME)
-                    })
-                    field(height = 12, getter = { customName }, setter = {
-                        customName = it
-                        TravelUtils.requireResync(level!!)
-                    })
-                }
+                buildHeader(this, this@MEPatternPartMachineKt)
                 val height1 = this@rootFresh.availableHeight - 24 - 16
                 val pageWidget =
-                    multiPageAdvanced(width = this@vBox.availableWidth, runOnUpdate = ::runOnUpdate, height = height1, pageSelector = newPageField) {
-                        chunked.forEach { pageIndices ->
-                            page {
-                                vScroll(width = this@vBox.availableWidth, height = height1) {
-                                    vBox(width = this@vBox.availableWidth, alwaysHorizonCenter = true) {
-                                        buildToolBoxContent()
-                                        pageIndices.forEach { lineIndices ->
-                                            hBox(height = 18) {
-                                                lineIndices.forEach { index ->
-                                                    widget(createPatternSlot(index))
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (chunked.isEmpty()) {
-                            page {
-                                textBlock(maxWidth = this.availableWidth, textSupplier = {
-                                    Component.translatable(NOT_simple)
-                                })
-                            }
-                        }
-                    }
+                    createPatternPageWidget(
+                        container = this,
+                        machine = this@MEPatternPartMachineKt,
+                        pageHeight = height1,
+                        buildToolBoxContent = { buildToolBoxContent() },
+                        emptyPageTextSupplier = { Component.translatable(NOT_simple) },
+                    )
                 val wid = this@vBox.availableWidth - 2 * 2
                 if (pageWidget.getMaxPageSize() > 1) {
                     hBox(height = 13, style = { spacing = 2 }) {
@@ -409,7 +374,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
                                 onPagePrev()
                                 if (!isRemote) {
                                     newPageField.set((newPageField.get() - 1).coerceAtLeast(0))
-                                    newPageField.markAsDirty()
+                                    newPageField.markAsChanged()
                                     syncToClient()
                                 }
                             },
@@ -423,7 +388,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
                                 onPageNext()
                                 if (!isRemote) {
                                     newPageField.set((newPageField.get() + 1).coerceAtMost(pageWidget.getMaxPageSize() - 1))
-                                    newPageField.markAsDirty()
+                                    newPageField.markAsChanged()
                                     syncToClient()
                                 }
                             },
@@ -477,7 +442,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     open fun convertPattern(pattern: IPatternDetails, index: Int): IPatternDetails = pattern
 
     open fun decodePattern(stack: ItemStack, index: Int): IPatternDetails? {
-        val pattern = MyPatternDetailsHelper.decodePattern(stack, holder.self, getGrid()) ?: return null
+        val pattern = MyPatternDetailsHelper.decodePattern(stack, holder, getGrid()) ?: return null
         return IParallelPatternDetails.of(convertPattern(pattern, index), level, 1)
     }
 
@@ -493,33 +458,22 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
         }
     }
 
+    open fun createPatternSlotWidget(index: Int): AEPatternViewSlotWidgetKt = AEPatternViewSlotWidgetKt(
+        0,
+        0,
+        index,
+        getApplyIndex(),
+        patternInventory,
+        { onMouseClicked(-1) },
+    ) { onMouseClicked(index) }
+
     fun createPatternSlot(index: Int): AEPatternViewSlotWidgetKt {
-        val slot = AEPatternViewSlotWidgetKt(
-            0,
-            0,
-            index,
-            getApplyIndex(),
-            patternInventory,
-            { onMouseClicked(-1) },
-        ) { onMouseClicked(index) }
+        val slot = createPatternSlotWidget(index)
 
-        slot.inner.setOccupiedTexture(GuiTextures.SLOT)
-        slot.inner.setItemHook { stack ->
-            when (val item = stack.item) {
-                is EncodedPatternItem -> {
-                    val output = item.getOutput(stack)
-                    if (!output.isEmpty) output else stack
-                }
-
-                else -> stack
-            }
-        }
         slot.inner.setChangeListener { onPatternChange(index) }
         slot.inner.setOnAddedTooltips { _, tooltips ->
             appendHoverTooltips(index)?.let { tooltips.add(it) }
         }
-        slot.inner.setBackground(GuiTextures.SLOT, GuiTextures.PATTERN_OVERLAY)
-
         return slot
     }
     open fun VBoxBuilder.buildToolBoxContent() {}

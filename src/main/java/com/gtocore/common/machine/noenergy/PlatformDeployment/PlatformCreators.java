@@ -1,6 +1,7 @@
 package com.gtocore.common.machine.noenergy.PlatformDeployment;
 
 import com.gtolib.GTOCore;
+import com.gtolib.utils.MultiBlockFileReader;
 import com.gtolib.utils.RLUtils;
 
 import com.gregtechceu.gtceu.utils.TaskHandler;
@@ -134,62 +135,53 @@ class PlatformCreators {
         Map<ChunkPos, LevelChunk> chunkCache = new HashMap<>();
 
         // 结构文件写入
-        try (BufferedWriter writer = Files.newBufferedWriter(structurePath, StandardCharsets.UTF_8)) {
-            GTOCore.LOGGER.info("Starting structure export");
-            writer.write(String.format(".size(%d, %d, %d)", dx, dy, dz));
-            writer.newLine();
-            writer.flush();
+        GTOCore.LOGGER.info("Starting structure export");
 
-            // 遍历Z层
-            for (int outZ = 0; outZ < dz; outZ++) {
-                List<String> ySlices = new ArrayList<>(dy); // 预分配容量
+        // 遍历Z层
+        List<String[]> zSlices = new ArrayList<>();
+        for (int outZ = 0; outZ < dz; outZ++) {
+            List<String> ySlices = new ArrayList<>(dy); // 预分配容量
 
-                for (int outY = 0; outY < dy; outY++) {
-                    StringBuilder xChars = new StringBuilder(dx); // 预分配容量
+            for (int outY = 0; outY < dy; outY++) {
+                StringBuilder xChars = new StringBuilder(dx); // 预分配容量
 
-                    for (int outX = 0; outX < dx; outX++) {
-                        // 坐标转换
-                        int[] transformed = transformCoords(outX, outZ, dx, dz, rotation, xMirror, zMirror);
-                        int rx = transformed[0];
-                        int rz = transformed[1];
+                for (int outX = 0; outX < dx; outX++) {
+                    // 坐标转换
+                    int[] transformed = transformCoords(outX, outZ, dx, dz, rotation, xMirror, zMirror);
+                    int rx = transformed[0];
+                    int rz = transformed[1];
 
-                        // 世界坐标计算
-                        int worldX = minX + rx;
-                        int worldY = minY + outY;
-                        int worldZ = minZ + rz;
+                    // 世界坐标计算
+                    int worldX = minX + rx;
+                    int worldY = minY + outY;
+                    int worldZ = minZ + rz;
 
-                        // 获取BlockState（修复Chunk缓存逻辑）
-                        mutablePos.set(worldX, worldY, worldZ);
-                        BlockState originalState = getCachedBlockState(level, mutablePos, chunkCache);
+                    // 获取BlockState（修复Chunk缓存逻辑）
+                    mutablePos.set(worldX, worldY, worldZ);
+                    BlockState originalState = getCachedBlockState(level, mutablePos, chunkCache);
 
-                        // 变换BlockState
-                        BlockState transformedState = transformBlockState(originalState, rotation, xMirror, zMirror);
+                    // 变换BlockState
+                    BlockState transformedState = transformBlockState(originalState, rotation, xMirror, zMirror);
 
-                        // 更新映射表
-                        if (!stateToChar.containsKey(transformedState)) {
-                            stateToChar.put(transformedState, nextChar);
-                            nextChar = getNextValidChar((char) (nextChar + 1));
-                        }
-                        xChars.append(stateToChar.get(transformedState));
-
-                        // 进度汇报
-                        if (++progress[0] % PROGRESS_THRESHOLD == 0 || progress[0] == totalBlocks) {
-                            double percent = (double) progress[0] / totalBlocks * 100;
-                            GTOCore.LOGGER.info(String.format("Export progress: %d / %d blocks (%.2f%%)",
-                                    progress[0], totalBlocks, percent));
-                        }
+                    // 更新映射表
+                    if (!stateToChar.containsKey(transformedState)) {
+                        stateToChar.put(transformedState, nextChar);
+                        nextChar = getNextValidChar((char) (nextChar + 1));
                     }
-                    ySlices.add(String.format("\"%s\"", xChars));
-                }
+                    xChars.append(stateToChar.get(transformedState));
 
-                // 写入当前层并Flush
-                writer.write(String.format(".aisle(%s)", String.join(", ", ySlices)));
-                writer.newLine();
-                writer.flush();
+                    // 进度汇报
+                    if (++progress[0] % PROGRESS_THRESHOLD == 0 || progress[0] == totalBlocks) {
+                        double percent = (double) progress[0] / totalBlocks * 100;
+                        GTOCore.LOGGER.info(String.format("Export progress: %d / %d blocks (%.2f%%)",
+                                progress[0], totalBlocks, percent));
+                    }
+                }
+                ySlices.add(xChars.toString());
             }
-        } catch (IOException e) {
-            GTOCore.LOGGER.error("Failed to write structure file", e);
+            zSlices.add(ySlices.toArray(new String[0]));
         }
+        MultiBlockFileReader.save(structurePath.toFile(), zSlices.toArray(new String[0][]));
 
         // 生成映射文件
         Char2ReferenceLinkedOpenHashMap<BlockState> charToState = new Char2ReferenceLinkedOpenHashMap<>();
@@ -294,7 +286,7 @@ class PlatformCreators {
      * 从数据包加载映射
      */
     static Char2ReferenceOpenHashMap<BlockState> loadMappingFromJson(ResourceLocation resLoc) {
-        String resourcePath = String.format("assets/%s/%s", resLoc.getNamespace(), resLoc.getPath());
+        String resourcePath = String.format("platforms/%s/%s", resLoc.getNamespace(), resLoc.getPath());
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(Objects.requireNonNull(
                         PlatformCreators.class.getClassLoader().getResourceAsStream(resourcePath)),

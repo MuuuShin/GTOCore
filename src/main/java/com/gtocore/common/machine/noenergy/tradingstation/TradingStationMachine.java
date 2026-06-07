@@ -13,7 +13,6 @@ import com.gtolib.utils.WalletUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.IControllable;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.FancyMachineUIWidget;
 import com.gregtechceu.gtceu.api.gui.fancy.IFancyUIProvider;
@@ -28,6 +27,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
@@ -46,6 +46,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.hepdd.gtmthings.utils.TeamUtil;
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
@@ -56,8 +57,6 @@ import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.gui.widget.layout.Layout;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -80,24 +79,24 @@ public class TradingStationMachine extends MetaMachine implements IFancyUIMachin
 
     /** 输入输出存储 */
     @Getter
-    @Persisted
-    @DescSynced
+    @SaveToDisk
+    @SyncToClient
     private final NotifiableItemStackHandler inputItem;
     @Getter
-    @Persisted
-    @DescSynced
+    @SaveToDisk
+    @SyncToClient
     private final NotifiableItemStackHandler outputItem;
     @Getter
-    @Persisted
-    @DescSynced
+    @SaveToDisk
+    @SyncToClient
     private final NotifiableFluidTank inputFluid;
     @Getter
-    @Persisted
-    @DescSynced
+    @SaveToDisk
+    @SyncToClient
     private final NotifiableFluidTank outputFluid;
 
     /** 其他位置存储 */
-    @Persisted
+    @SaveToDisk
     private final CustomItemStackHandler cardHandler;
 
     private static final int Item_slots_in_a_row = 4;
@@ -105,17 +104,17 @@ public class TradingStationMachine extends MetaMachine implements IFancyUIMachin
 
     /** 玩家信息 */
     @Getter
-    @Persisted
+    @SaveToDisk
     private UUID uuid;
     @Getter
-    @Persisted
+    @SaveToDisk
     List<UUID> sharedUUIDs = new ArrayList<>();
     @Getter
-    @Persisted
+    @SaveToDisk
     private UUID teamUUID;
 
     /** 交易信息 */
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private int groupSelected = 0;
     private int shopSelected = -1;
@@ -385,13 +384,13 @@ public class TradingStationMachine extends MetaMachine implements IFancyUIMachin
                 WidgetGroup mainGroup = new DraggableScrollableWidgetGroup(4, 4, 169, height)
                         .setBackground(GuiTextures.DISPLAY).setYScrollBarWidth(2).setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1));
 
-                int itemHigh = inputItem.getSize() / Item_slots_in_a_row;
+                int itemHigh = inputItem.getSlots() / Item_slots_in_a_row;
                 WidgetGroup Item_slot = new WidgetGroup(2, 4, 168, itemHigh * 18 + 10);
                 Item_slot.addWidget(new ComponentPanelWidget(0, 0, List.of(Component.translatable("gtocore.trading_station.item_storage"))));
                 for (int y = 0; y < itemHigh; y++) {
                     for (int x = 0; x < Item_slots_in_a_row; x++) {
                         int slotIndex = y * Item_slots_in_a_row + x;
-                        if (inputItem.getSize() > slotIndex) {
+                        if (inputItem.getSlots() > slotIndex) {
                             Item_slot.addWidget(new SlotWidget(inputItem, slotIndex, x * 18, 10 + y * 18, true, true)
                                     .setBackground(GuiTextures.SLOT));
                             Item_slot.addWidget(new SlotWidget(outputItem, slotIndex, x * 18 + Item_slots_in_a_row * 18 + 18, 10 + y * 18, true, false)
@@ -433,13 +432,13 @@ public class TradingStationMachine extends MetaMachine implements IFancyUIMachin
                 WidgetGroup mainGroup = new DraggableScrollableWidgetGroup(4, 4, 169, height)
                         .setBackground(GuiTextures.DISPLAY).setYScrollBarWidth(2).setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1));
 
-                int fluidHigh = inputFluid.getSize() / Fluid_slots_in_a_row;
+                int fluidHigh = inputFluid.getTanks() / Fluid_slots_in_a_row;
                 WidgetGroup Fluid_slot = new WidgetGroup(2, 4, 168, fluidHigh * 18 + 10);
                 Fluid_slot.addWidget(new ComponentPanelWidget(0, 0, List.of(Component.translatable("gtocore.trading_station.fluid_storage"))));
                 for (int y = 0; y < fluidHigh; y++) {
                     for (int x = 0; x < Fluid_slots_in_a_row; x++) {
                         int slotIndex = y * Fluid_slots_in_a_row + x;
-                        if (inputFluid.getSize() > slotIndex) {
+                        if (inputFluid.getTanks() > slotIndex) {
                             Fluid_slot.addWidget(new TankWidget(inputFluid, slotIndex, x * 18, 10 + y * 18, true, true)
                                     .setBackground(GuiTextures.SLOT_DARK));
                             Fluid_slot.addWidget(new TankWidget(outputFluid, slotIndex, x * 18 + Fluid_slots_in_a_row * 18 + 18, 10 + y * 18, true, true)
@@ -803,16 +802,16 @@ public class TradingStationMachine extends MetaMachine implements IFancyUIMachin
     // ********* 自动输出实现 ********* //
     /////////////////////////////////////
 
-    @Persisted
+    @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private Direction outputFacingItems = Direction.DOWN;
-    @Persisted
+    @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private Direction outputFacingFluids = Direction.DOWN;
-    @Persisted
+    @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private boolean autoOutputItems = false;
-    @Persisted
+    @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private boolean autoOutputFluids = false;
     @Nullable
@@ -942,7 +941,7 @@ public class TradingStationMachine extends MetaMachine implements IFancyUIMachin
     // ********** 是否运行中 ********** //
     /////////////////////////////////////
 
-    @Persisted
+    @SaveToDisk
     private boolean working = false;
 
     @Override

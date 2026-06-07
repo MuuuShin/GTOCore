@@ -20,12 +20,11 @@ import net.minecraftforge.fml.common.Mod
 
 import com.fast.fastcollection.O2OOpenCacheHashMap
 import com.gregtechceu.gtceu.GTCEu
-import com.gto.datasynclib.CombinationCodec
+import com.gto.datasynclib.DataSyncCodec
 import com.gto.datasynclib.datasream.codec.ByteStreamCodec
 import com.gto.datasynclib.datasream.codec.ByteStreamDecoder
 import com.gto.datasynclib.datasream.codec.ByteStreamEncoder
 import com.gto.datasynclib.listener.ObjNotifiableHolder
-import com.gtolib.api.capability.ISync
 import com.gtolib.api.network.NetworkPack
 import com.hepdd.gtmthings.utils.TeamUtil
 import com.lowdragmc.lowdraglib.LDLib
@@ -131,7 +130,7 @@ class WirelessNetworkSavedData : SavedData() {
         @JvmStatic
         @SubscribeEvent
         fun onTickEnd(event: ServerTickEvent) {
-            if (event.phase == TickEvent.Phase.END && event.server != null && !event.server.isCurrentlySaving) {
+            if (event.phase == TickEvent.Phase.END && event.server != null && !event.server.isCurrentlySaving && event.server.tickCount % 10 == 5) {
                 if (requiredWrite) {
                     write(event.server)
                     requiredWrite = false
@@ -267,7 +266,7 @@ class WirelessNetworkSavedData : SavedData() {
             val clamped = maxOutputs.coerceIn(1, 990000)
             if (net.maxOutputsPerInput != clamped) {
                 net.maxOutputsPerInput = clamped
-                net.refreshConnections()
+                net.needsRefresh = true
                 INSTANCE.setDirty()
             }
             return STATUS.SUCCESS
@@ -490,8 +489,8 @@ enum class STATUS {
 /**
  * 创建用于同步网络摘要列表的 ISync.ObjectSyncedField。
  */
-fun createNetworkSummarySyncField(sync: ISync): ObjNotifiableHolder<List<NetworkSummary>> = ObjNotifiableHolder.create(
-    CombinationCodec.of(
+fun createNetworkSummarySyncField(): ObjNotifiableHolder<List<NetworkSummary>> = ObjNotifiableHolder.create(
+    DataSyncCodec.of(
         ByteStreamCodec.of(
             ByteStreamEncoder.collection
                 { buf, s ->
@@ -523,8 +522,8 @@ fun createNetworkSummarySyncField(sync: ISync): ObjNotifiableHolder<List<Network
 /**
  * 创建用于同步拓扑信息列表的 ISync.ObjectSyncedField。
  */
-fun createTopologySyncField(sync: ISync): ObjNotifiableHolder<List<TopologySummary>> = ObjNotifiableHolder.create(
-    CombinationCodec.of(
+fun createTopologySyncField(): ObjNotifiableHolder<List<TopologySummary>> = ObjNotifiableHolder.create(
+    DataSyncCodec.of(
         ByteStreamCodec.of(
             ByteStreamEncoder.collection { buf, topo ->
 

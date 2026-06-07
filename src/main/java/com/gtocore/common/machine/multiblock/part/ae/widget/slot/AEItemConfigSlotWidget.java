@@ -52,7 +52,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
             ItemStack stack = config.what() instanceof AEItemKey key ? new ItemStack(key.getItem()) : ItemStack.EMPTY;
             drawItemStack(graphics, stack, stackX, stackY, 0xFFFFFFFF, null);
 
-            if (!parentWidget.isStocking()) {
+            if (parentWidget.showAmount()) {
                 String amountStr = TextFormattingUtil.formatLongToCompactString(config.amount(), 4);
                 drawStringFixedCorner(graphics, amountStr, stackX + 17, stackY + 17, 16777215, true, 0.5f);
             }
@@ -93,7 +93,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
             if (button == 1) {
                 writeClientAction(REMOVE_ID, buf -> {});
 
-                if (!parentWidget.isStocking()) {
+                if (parentWidget.showAmount()) {
                     this.parentWidget.disableAmountClient();
                 }
             } else if (button == 0) {

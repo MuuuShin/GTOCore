@@ -32,7 +32,7 @@ import com.hollingsworth.arsnouveau.setup.registry.ItemsRegistry;
 import io.github.lounode.extrabotany.common.item.ExtraBotanyItems;
 import vazkii.botania.common.block.BotaniaBlocks;
 import vazkii.botania.common.item.BotaniaItems;
-import vectorwing.farmersdelight.common.tag.ForgeTags;
+import vectorwing.farmersdelight.common.tag.CommonTags;
 
 import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.api.fluids.store.FluidStorageKeys.GAS;
@@ -115,7 +115,7 @@ public final class ArsNouveauRecipes {
                     new Ingredient[] { Ingredient.of(ItemsRegistry.CONJURATION_ESSENCE), Ingredient.of(ItemsRegistry.AIR_ESSENCE), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE) });
 
             EnchantingApparatusRecipe("enchanting_earth_essence", Ingredient.of(ItemsRegistry.SOURCE_GEM), new ItemStack(ItemsRegistry.EARTH_ESSENCE), 5000, false,
-                    new Ingredient[] { Ingredient.of(Items.IRON_INGOT), Ingredient.of(ItemTags.DIRT), Ingredient.of(ForgeTags.SEEDS), Ingredient.of(RegistriesUtils.getItemStack("gtocore:gnome_bucket")) });
+                    new Ingredient[] { Ingredient.of(Items.IRON_INGOT), Ingredient.of(ItemTags.DIRT), Ingredient.of(CommonTags.Items.SEEDS), Ingredient.of(RegistriesUtils.getItemStack("gtocore:gnome_bucket")) });
             EnchantingApparatusRecipe("enchanting_air_essence", Ingredient.of(ItemsRegistry.SOURCE_GEM), new ItemStack(ItemsRegistry.AIR_ESSENCE), 5000, false,
                     new Ingredient[] { Ingredient.of(Items.FEATHER), Ingredient.of(ItemTags.ARROWS), Ingredient.of(ItemsRegistry.WILDEN_WING), Ingredient.of(RegistriesUtils.getItemStack("gtocore:sylph_bucket")) });
             EnchantingApparatusRecipe("enchanting_water_essence", Ingredient.of(ItemsRegistry.SOURCE_GEM), new ItemStack(ItemsRegistry.WATER_ESSENCE), 5000, false,
@@ -358,7 +358,7 @@ public final class ArsNouveauRecipes {
                     new Ingredient[] { Ingredient.of(ItemsRegistry.CONJURATION_ESSENCE), Ingredient.of(ItemsRegistry.AIR_ESSENCE), Ingredient.of(ItemsRegistry.MANIPULATION_ESSENCE) }, new FluidStack[0]);
 
             MultiblockImbuementRecipe(5, true, "enchanting_earth_essence", Ingredient.of(ItemsRegistry.SOURCE_GEM), new ItemStack(ItemsRegistry.EARTH_ESSENCE), 5000,
-                    new Ingredient[] { Ingredient.of(Items.IRON_INGOT), Ingredient.of(ItemTags.DIRT), Ingredient.of(ForgeTags.SEEDS) }, new FluidStack[] { Gnome.getFluid(GAS, 1000) });
+                    new Ingredient[] { Ingredient.of(Items.IRON_INGOT), Ingredient.of(ItemTags.DIRT), Ingredient.of(CommonTags.Items.SEEDS) }, new FluidStack[] { Gnome.getFluid(GAS, 1000) });
             MultiblockImbuementRecipe(5, true, "enchanting_air_essence", Ingredient.of(ItemsRegistry.SOURCE_GEM), new ItemStack(ItemsRegistry.AIR_ESSENCE), 5000,
                     new Ingredient[] { Ingredient.of(Items.FEATHER), Ingredient.of(ItemTags.ARROWS), Ingredient.of(ItemsRegistry.WILDEN_WING) }, new FluidStack[] { Sylph.getFluid(GAS, 1000) });
             MultiblockImbuementRecipe(5, true, "enchanting_water_essence", Ingredient.of(ItemsRegistry.SOURCE_GEM), new ItemStack(ItemsRegistry.WATER_ESSENCE), 5000,
@@ -400,7 +400,7 @@ public final class ArsNouveauRecipes {
         // 多方块特供配方
         {
             MultiblockImbuementRecipe2(5, true, "enchanting_earth_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.EARTH_ESSENCE, 64), 4000,
-                    new Ingredient[] { Ingredient.of(Items.IRON_INGOT), Ingredient.of(ItemTags.DIRT), Ingredient.of(ForgeTags.SEEDS) }, new FluidStack[] { Gnome.getFluid(LIQUID, 500) });
+                    new Ingredient[] { Ingredient.of(Items.IRON_INGOT), Ingredient.of(ItemTags.DIRT), Ingredient.of(CommonTags.Items.SEEDS) }, new FluidStack[] { Gnome.getFluid(LIQUID, 500) });
             MultiblockImbuementRecipe2(5, true, "enchanting_air_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.AIR_ESSENCE, 64), 4000,
                     new Ingredient[] { Ingredient.of(Items.FEATHER), Ingredient.of(ItemTags.ARROWS), Ingredient.of(ItemsRegistry.WILDEN_WING) }, new FluidStack[] { Sylph.getFluid(LIQUID, 500) });
             MultiblockImbuementRecipe2(5, true, "enchanting_water_essence_lot", new ItemStack(ItemsRegistry.SOURCE_GEM, 64), new ItemStack(ItemsRegistry.WATER_ESSENCE, 64), 4000,

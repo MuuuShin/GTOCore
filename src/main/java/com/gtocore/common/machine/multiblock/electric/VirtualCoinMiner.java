@@ -8,27 +8,26 @@ import com.gtolib.api.annotation.DataGeneratorScanned;
 import com.gtolib.api.annotation.language.RegisterLanguage;
 import com.gtolib.api.machine.feature.ICustomElectricMachine;
 import com.gtolib.api.machine.multiblock.ElectricMultiblockMachine;
-import com.gtolib.api.machine.trait.CustomRecipeLogic;
-import com.gtolib.api.recipe.Recipe;
-import com.gtolib.api.recipe.RecipeBuilder;
-import com.gtolib.utils.MachineUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfigurator;
 import com.gregtechceu.gtceu.api.gui.widget.LongInputWidget;
-import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
+import com.gregtechceu.gtceu.api.recipe.handler.ICustomRecipeLogicHolder;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import dev.shadowsoffire.placebo.color.GradientColor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -36,17 +35,18 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.gregtechceu.gtceu.api.GTValues.*;
+import static com.gregtechceu.gtceu.api.GTValues.EV;
+import static com.gregtechceu.gtceu.api.GTValues.VA;
 
 @DataGeneratorScanned
-public class VirtualCoinMiner extends ElectricMultiblockMachine implements ICustomElectricMachine {
+public class VirtualCoinMiner extends ElectricMultiblockMachine implements ICustomElectricMachine, ICustomRecipeLogicHolder {
 
-    @Persisted
+    @SaveToDisk
     @Getter
     private long cwuLimitConfig = 256L;
-    @Persisted
+    @SaveToDisk
     private long cwuBuffer = 0L;
-    @Persisted
+    @SaveToDisk
     private long coinBuffer = 0L;
     private long eut = 0L;
 
@@ -54,18 +54,8 @@ public class VirtualCoinMiner extends ElectricMultiblockMachine implements ICust
         super(holder);
     }
 
-    private Recipe getRecipe() {
-        if (getOwner() == null) return null;
-        return RecipeBuilder.ofRaw().duration(20).inputFluids(GTMaterials.PCBCoolant.getFluid(), 20).buildRawRecipe();
-    }
-
     @Override
-    public RecipeLogic createRecipeLogic(Object... args) {
-        return new CustomRecipeLogic(this, this::getRecipe);
-    }
-
-    @Override
-    public boolean handleTickRecipe(@Nullable Recipe recipe) {
+    public boolean handleTickRecipe(@Nullable GTRecipe recipe) {
         if (recipe != null) {
             var cwuAvailable = requestCWU(cwuLimitConfig, true);
             eut = cwuAvailable * VA[EV];
@@ -92,11 +82,11 @@ public class VirtualCoinMiner extends ElectricMultiblockMachine implements ICust
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         if (cwuBuffer > 0) {
             coinBuffer += VirtualCoinSavedData.accumulateCoinWork(getOwnerUUID(), cwuBuffer);
-            if (MachineUtils.outputItem(this, ChemicalHelper.getItem(GTOTagPrefix.COIN, GTMaterials.Gold), coinBuffer)) {
+            if (outputItem(ChemicalHelper.getItem(GTOTagPrefix.COIN, GTMaterials.Gold), coinBuffer)) {
                 coinBuffer = 0L;
             }
             cwuBuffer = 0L;
@@ -117,6 +107,12 @@ public class VirtualCoinMiner extends ElectricMultiblockMachine implements ICust
     @Override
     public boolean isActivated() {
         return recipeLogic.isActive();
+    }
+
+    @Override
+    public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
+        if (getOwner() == null) return null;
+        return getRecipeBuilder().duration(20).inputFluids(GTMaterials.PCBCoolant, 20).build();
     }
 
     private record ParallelConfigurator(VirtualCoinMiner machine) implements IFancyConfigurator {

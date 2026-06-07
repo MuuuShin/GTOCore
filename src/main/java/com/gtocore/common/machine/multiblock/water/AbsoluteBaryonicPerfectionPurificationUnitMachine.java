@@ -3,14 +3,13 @@ package com.gtocore.common.machine.multiblock.water;
 import com.gtocore.common.data.GTOItems;
 import com.gtocore.common.data.GTOMaterials;
 
-import com.gtolib.api.recipe.RecipeRunner;
-
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.fluids.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.ItemBusPartMachine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -19,8 +18,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,20 +41,20 @@ public final class AbsoluteBaryonicPerfectionPurificationUnitMachine extends Wat
     private static final Fluid QUARK_GLUON = GTOMaterials.QuarkGluon.getFluid(FluidStorageKeys.PLASMA);
     private static final Fluid STABLE_BARYONIC_MATTER = GTOMaterials.StableBaryonicMatter.getFluid();
 
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private Item catalyst1;
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private Item catalyst2;
 
-    @Persisted
+    @SaveToDisk
     private long inputCount;
 
-    @Persisted
+    @SaveToDisk
     private boolean successful;
 
-    @Persisted
+    @SaveToDisk
     private final List<ItemStack> outputs = new ArrayList<>();
 
     private final List<ItemBusPartMachine> busMachines = new ArrayList<>();
@@ -97,8 +96,8 @@ public final class AbsoluteBaryonicPerfectionPurificationUnitMachine extends Wat
     }
 
     @Override
-    public boolean onWorking() {
-        if (!super.onWorking()) return false;
+    public void onWorking() {
+        super.onWorking();
         if (getOffsetTimer() % 20 == 0) {
             boolean successful = false;
             for (ItemBusPartMachine bus : busMachines) {
@@ -125,25 +124,24 @@ public final class AbsoluteBaryonicPerfectionPurificationUnitMachine extends Wat
                 }
             }
         }
-        return true;
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         outputs.forEach(this::outputItem);
         outputs.clear();
         if (successful) outputFluid(WaterPurificationPlantMachine.GradePurifiedWater8, inputCount * 9 / 10);
     }
 
     @Override
-    long before() {
+    long prepareRecipe(RecipeHandlerUnit unit) {
         eut = 0;
         successful = false;
-        inputCount = Math.min(parallel(), getFluidAmount(WaterPurificationPlantMachine.GradePurifiedWater7)[0]);
+        inputCount = Math.min(parallel(), unit.getFluidAmount(true, WaterPurificationPlantMachine.GradePurifiedWater7)[0]);
         if (inputCount > 0) {
             recipe = getRecipeBuilder().duration(WaterPurificationPlantMachine.DURATION).inputFluids(WaterPurificationPlantMachine.GradePurifiedWater7, inputCount).buildRawRecipe();
-            if (RecipeRunner.matchRecipe(this, recipe)) {
+            if (matchRecipe(unit, recipe)) {
                 int a = GTValues.RNG.nextInt(6);
                 int b;
                 do {

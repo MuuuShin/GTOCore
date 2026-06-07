@@ -40,7 +40,6 @@ import com.gtolib.utils.register.BlockRegisterUtils;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.data.RotationState;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
@@ -50,6 +49,7 @@ import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.machine.steam.SimpleSteamMachine;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.client.renderer.machine.*;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
@@ -68,8 +68,8 @@ import it.unimi.dsi.fastutil.Function;
 import it.unimi.dsi.fastutil.Pair;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.api.capability.recipe.IO.IN;
 import static com.gregtechceu.gtceu.api.machine.multiblock.PartAbility.PARALLEL_HATCH;
+import static com.gregtechceu.gtceu.api.recipe.handler.IO.IN;
 import static com.gtocore.common.machine.multiblock.part.maintenance.ACMHatchPartMachine.LANG_PLACEMENT_TOOLTIP;
 import static com.gtocore.utils.register.MachineRegisterUtils.*;
 
@@ -306,15 +306,14 @@ public final class GTOMachines {
             (tier, builder) -> builder
                     .langValue("%s Programmable Hatch".formatted(GTOValues.VNFR[tier]))
                     .allRotation()
-                    .abilities(PartAbility.IMPORT_ITEMS)
+                    .abilities(PartAbility.IMPORT_ITEMS, GTOPartAbility.DUAL_INPUT)
                     .renderer(() -> new OverlayTieredMachineRenderer(tier, GTCEu.id("block/machine/part/dual_hatch.import")))
                     .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"),
                             Component.translatable("gtocore.machine.programmablec_hatch.extra_tooltip.0"),
                             Component.translatable("gtocore.machine.programmablec_hatch.extra_tooltip.1"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity", tier * tier),
                             Component.translatable("gtceu.universal.tooltip.fluid_storage_capacity_mult", tier, DualHatchPartMachine.getTankCapacity(DualHatchPartMachine.INITIAL_TANK_CAPACITY, tier)),
-                            Component.translatable("gtocore.machine.programmablec_hatch.extra_tooltip.2"),
-                            Component.translatable("gtceu.part_sharing.enabled"))
+                            Component.translatable("gtocore.machine.programmablec_hatch.extra_tooltip.2"))
                     .allowCoverOnFront(true)
                     .register(),
             tiersBetween(LV, MAX));
@@ -852,7 +851,7 @@ public final class GTOMachines {
             .tier(ZPM)
             .langValue("Huge Input Bus")
             .allRotation()
-            .abilities(PartAbility.IMPORT_ITEMS, GTOPartAbility.ITEMS_INPUT)
+            .abilities(PartAbility.IMPORT_ITEMS, GTOPartAbility.ITEMS_INPUT_BUS)
             .tooltipsKey("gtceu.part_sharing.enabled")
             .renderer(() -> new OverlayTieredMachineRenderer(ZPM, GTCEu.id("block/machine/part/item_bus.import")))
             .register();

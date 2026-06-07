@@ -4,7 +4,7 @@ import com.gtocore.integration.emi.multipage.MultiblockInfoEmiRecipe;
 
 import com.gtolib.api.gui.PatternSlotWidget;
 import com.gtolib.api.gui.SelectedSlotWidget;
-import com.gtolib.api.item.ItemHandlerModifiable;
+import com.gtolib.api.item.ItemStackHandler;
 import com.gtolib.api.machine.MultiblockDefinition;
 import com.gtolib.api.machine.feature.multiblock.IMultiStructureMachine;
 
@@ -19,7 +19,6 @@ import com.gregtechceu.gtceu.api.pattern.BlockPattern;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
 import com.gregtechceu.gtceu.api.pattern.predicates.SimplePredicate;
-import com.gregtechceu.gtceu.common.block.LampBlock;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.integration.xei.handlers.item.CycleItemStackHandler;
 
@@ -29,7 +28,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -42,6 +40,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import com.google.common.collect.ObjectArrays;
+import com.gto.registrate.ICustomfCategoryFill;
 import com.lowdragmc.lowdraglib.client.scene.WorldSceneRenderer;
 import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;
 import com.lowdragmc.lowdraglib.client.utils.RenderUtils;
@@ -272,7 +271,7 @@ public final class PatternPreview extends WidgetGroup {
         }
         slotWidgets = new PatternSlotWidget[itemList.size()];
         for (int i = 0; i < slotWidgets.length; i++) {
-            slotWidgets[i] = new PatternSlotWidget(new ItemHandlerModifiable(itemList.get(i)), i, 4 + i * 18, 0);
+            slotWidgets[i] = new PatternSlotWidget(new ItemStackHandler(itemList.get(i)), i, 4 + i * 18, 0);
             scrollableWidgetGroup.addWidget(slotWidgets[i]);
         }
     }
@@ -305,9 +304,13 @@ public final class PatternPreview extends WidgetGroup {
             List<List<ItemStack>> candidateStacks = new ArrayList<>();
             List<List<Component>> predicateTips = new ArrayList<>();
             for (SimplePredicate simplePredicate : predicates) {
-                List<ItemStack> itemStacks = simplePredicate.getCandidates();
-                if (isLampStacks(itemStacks)) { // 如果是gtceu的灯，展开为8个变体灯
-                    itemStacks = expandLampStacks(itemStacks);
+                List<ItemStack> itemStacks = new ArrayList<>();
+                for (ItemStack stack : simplePredicate.getCandidates()) {
+                    if (stack.getItem() instanceof ICustomfCategoryFill customfCategoryFill) {
+                        customfCategoryFill.fillItemCategory(itemStacks::add);
+                    } else {
+                        itemStacks.add(stack);
+                    }
                 }
                 if (!itemStacks.isEmpty()) {
                     candidateStacks.add(itemStacks);
@@ -323,23 +326,6 @@ public final class PatternPreview extends WidgetGroup {
                 addWidget(candidates[i]);
             }
         }
-    }
-
-    private static List<ItemStack> expandLampStacks(List<ItemStack> stacks) {
-        LinkedHashMap<String, ItemStack> variants = new LinkedHashMap<>();
-        for (ItemStack stack : stacks) {
-            LampBlock lamp = (LampBlock) ((BlockItem) stack.getItem()).getBlock();
-            for (int meta = 0; meta < 8; meta++) {
-                ItemStack variant = lamp.getStackFromIndex(meta);
-                variants.put(variant.getItem().toString() + "|" + String.valueOf(variant.getTag()), variant);
-            }
-        }
-        return new ArrayList<>(variants.values());
-    }
-
-    private static boolean isLampStacks(List<ItemStack> stacks) {
-        return !stacks.isEmpty() &&
-                stacks.stream().allMatch(stack -> stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof LampBlock);
     }
 
     private void loadControllerFormed(LongSet poses, IMultiController controllerBase, int index) {
@@ -383,8 +369,8 @@ public final class PatternPreview extends WidgetGroup {
             LEVEL.addBlock(BlockPos.of(entry.getLongKey()), entry.getValue());
         }
         if (controllerBase != null) {
-            controllerBase.self().holder.getSelf().setLevel(LEVEL);
-            LEVEL.setInnerBlockEntity(controllerBase.self().holder.getSelf());
+            controllerBase.self().holder.setLevel(LEVEL);
+            LEVEL.setInnerBlockEntity(controllerBase.self().holder);
         }
         Long2ObjectOpenHashMap<TraceabilityPredicate> predicateMap = controllerBase == null ? null : new Long2ObjectOpenHashMap<>();
         if (controllerBase != null) {

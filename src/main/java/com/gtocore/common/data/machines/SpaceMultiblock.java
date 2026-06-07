@@ -1,6 +1,6 @@
 package com.gtocore.common.data.machines;
 
-import com.gtocore.api.machine.part.ILargeSpaceStationMachine;
+import com.gtocore.api.machine.ILargeSpaceStationMachine;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.client.renderer.machine.SpaceElevatorConnectorModuleRenderer;
 import com.gtocore.common.data.GTOBlocks;
@@ -42,8 +42,8 @@ import java.util.stream.Stream;
 
 import static com.gregtechceu.gtceu.api.machine.multiblock.PartAbility.*;
 import static com.gregtechceu.gtceu.api.pattern.Predicates.*;
+import static com.gtocore.api.machine.ILargeSpaceStationMachine.ConnectType.*;
 import static com.gtocore.api.machine.part.GTOPartAbility.DRONE_HATCH;
-import static com.gtocore.api.machine.part.ILargeSpaceStationMachine.ConnectType.*;
 import static com.gtocore.api.pattern.GTOPredicates.autoSpaceMachineAbilities;
 import static com.gtocore.api.pattern.GTOPredicates.light;
 import static com.gtocore.utils.register.MachineRegisterUtils.multiblock;
@@ -455,6 +455,7 @@ public class SpaceMultiblock {
             .tooltips(GTOMachineTooltips.INSTANCE.getFunctionSpaceStationModuleTooltips().getSupplier())
             .recipeTypes(GTORecipeTypes.SPACE_SMELTING_RECIPES)
             .recipeTypes(GTORecipeTypes.ALLOY_BLAST_RECIPES)
+            .recipeTypes(GTORecipeTypes.BLAST_RECIPES)
             .block(GTOBlocks.SMELTING_CONTROL_CASING)
             .pattern(definition -> FactoryBlockPattern.start(definition)
                     .aisle("                                             ", "                                             ", "                                             ", "                                             ", "                                             ", "                                             ", "                 M M       M M               ", "                 M M       M M               ", "                 M M       M M               ", "                 M M       M M               ", "                 M M       M M               ", "                                             ", "                                             ", "                                             ", "                                             ", "                                             ", "                                             ")

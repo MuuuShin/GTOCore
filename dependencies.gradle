@@ -88,7 +88,7 @@ dependencies {
     modImplementation("curse.maven:ars-meteorites-1278083:7125271")
 
     modImplementation("curse.maven:glodium-957920:5006780")
-    modImplementation("curse.maven:ex-pattern-provider-892005:7986603")
+    modImplementation("curse.maven:ex-pattern-provider-892005:8203753")
 
     modImplementation("curse.maven:merequester-688367:5689932")
 
@@ -155,8 +155,9 @@ dependencies {
     modImplementation("curse.maven:pipez-443900:6945379")
     modRuntimeOnly("curse.maven:laserio-uel-1168178:6773950")
 
-    modCompileOnly("curse.maven:xaeros-world-map-317780:6212637")
-    modCompileOnly("curse.maven:xaeros-minimap-263420:6306155")
+    modCompileOnly("xaero.lib:xaerolib-forge-1.20.1:1.1.15")
+    modCompileOnly("xaero.map:xaeroworldmap-forge-1.20.1:1.40.16")
+    modCompileOnly("xaero.minimap:xaerominimap-forge-1.20.1:25.3.13")
 
     modCompileOnly("curse.maven:athena-841890:5176879")
 

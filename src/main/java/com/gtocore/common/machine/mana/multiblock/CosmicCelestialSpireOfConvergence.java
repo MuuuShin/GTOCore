@@ -6,13 +6,14 @@ import com.gtocore.common.data.GTOBlocks;
 import com.gtocore.common.machine.mana.CelestialHandler;
 
 import com.gtolib.api.GTOValues;
-import com.gtolib.api.recipe.Recipe;
-import com.gtolib.api.recipe.modifier.ParallelLogic;
 import com.gtolib.utils.ClientUtil;
 import com.gtolib.utils.RegistriesUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.ConditionalSubscriptionHandler;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
+import com.gregtechceu.gtceu.api.recipe.modifier.ParallelLogic;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -24,12 +25,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -40,21 +40,21 @@ public class CosmicCelestialSpireOfConvergence extends ManaMultiblockMachine {
     private final CelestialHandler celestialHandler;
 
     @Getter
-    @Persisted
+    @SaveToDisk
     private long solaris = 0;
     @Getter
-    @Persisted
+    @SaveToDisk
     private long lunara = 0;
     @Getter
-    @Persisted
+    @SaveToDisk
     private long voidflux = 0;
     @Getter
-    @Persisted
+    @SaveToDisk
     private long stellarm = 0;
 
     private CelestialHandler.Mode mode = CelestialHandler.Mode.OVERWORLD;
 
-    @Persisted
+    @SaveToDisk
     private short accelerate = 0;
 
     private int timing;
@@ -67,8 +67,7 @@ public class CosmicCelestialSpireOfConvergence extends ManaMultiblockMachine {
     }
 
     @Override
-    protected @Nullable Recipe getRealRecipe(@NotNull Recipe recipe) {
-        if (!super.beforeWorking(recipe)) return null;
+    public GTRecipe getRealRecipe(@NotNull RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {
         int solarisCost = recipe.data.getInt(SOLARIS);
         int lunaraCost = recipe.data.getInt(LUNARA);
         int voidfluxCost = recipe.data.getInt(VOIDFLUX);
@@ -83,7 +82,7 @@ public class CosmicCelestialSpireOfConvergence extends ManaMultiblockMachine {
         else if (anyCost > 0)
             parallel = (this.solaris + this.lunara + this.voidflux + this.stellarm) / anyCost;
         if (parallel == 0) return null;
-        recipe = ParallelLogic.accurateParallel(this, recipe, parallel);
+        recipe = ParallelLogic.accurateParallel(this, unit, recipe, parallel);
 
         if (recipe == null) return null;
         parallel = recipe.parallels;

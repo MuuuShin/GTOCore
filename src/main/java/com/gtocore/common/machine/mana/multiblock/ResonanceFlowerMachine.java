@@ -4,13 +4,14 @@ import com.gtocore.common.data.GTOItems;
 import com.gtocore.common.data.GTORecipeDataKeys;
 
 import com.gtolib.api.machine.feature.multiblock.IStorageMultiblock;
-import com.gtolib.api.recipe.Recipe;
-import com.gtolib.api.recipe.modifier.ParallelLogic;
 import com.gtolib.utils.RegistriesUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IDropSaveMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
+import com.gregtechceu.gtceu.api.recipe.modifier.ParallelLogic;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -24,10 +25,9 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,32 +38,32 @@ import static com.lowdragmc.lowdraglib.LDLib.random;
 public class ResonanceFlowerMachine extends ManaMultiblockMachine implements IStorageMultiblock, IDropSaveMachine {
 
     // 时间消耗波动系数
-    @Persisted
+    @SaveToDisk
     private double timeFluctuationCoefficient = 1.0D;
     // 元素消耗波动系数
-    @Persisted
+    @SaveToDisk
     private double elementalFluctuationCoefficient = 1.0D;
 
     // 剩余的锚定时间
-    @Persisted
+    @SaveToDisk
     private int stableTime = 0;
 
     // TODO 使用Map<GTRecipeDefinition, CompoundTag>重写
     // 存储信息
-    @Persisted
+    @SaveToDisk
     private final List<CompoundTag> recipeIncremental = new ArrayList<>();
     private static final int MAX_SIZE = 10;
     private static final String NBT_KEY_RECIPE_INCREMENTAL = "RecipeIncremental";
 
     // 额外共鸣输入
-    @Persisted
+    @SaveToDisk
     private int frequency = Integer.MAX_VALUE;
-    @Persisted
+    @SaveToDisk
     private ItemStack resonanceItem = ItemStack.EMPTY;
-    @Persisted
+    @SaveToDisk
     private FluidStack resonanceFluid = FluidStack.EMPTY;
 
-    @Persisted
+    @SaveToDisk
     protected final NotifiableItemStackHandler machineStorage;
 
     public ResonanceFlowerMachine(MetaMachineBlockEntity holder) {
@@ -82,7 +82,7 @@ public class ResonanceFlowerMachine extends ManaMultiblockMachine implements ISt
     }
 
     @Override
-    protected @Nullable Recipe getRealRecipe(@NotNull Recipe recipe) {
+    public GTRecipe getRealRecipe(@NotNull RecipeHandlerUnit unit, GTRecipe recipe) {
         resetResonance();
 
         String id = recipe.definition.id.getPath();
@@ -102,18 +102,18 @@ public class ResonanceFlowerMachine extends ManaMultiblockMachine implements ISt
 
         double durationMultiplier = recipe.duration * timeFluctuationCoefficient * (float) tierEffect[0];
         recipe.duration = (int) Math.max(1, durationMultiplier);
-        long maxContentParallel = Math.min(ParallelLogic.getMaxContentParallel(this, recipe), (long) tierEffect[1]);
+        long maxContentParallel = ParallelLogic.getMaxContentParallelAmount(this, unit, recipe, (long) tierEffect[1]);
 
         addEntry(id, maxContentParallel);
         upgradeEntry(id);
         updateStableTime();
 
-        return ParallelLogic.accurateParallel(this, recipe, maxContentParallel);
+        return ParallelLogic.accurateParallel(this, unit, recipe, maxContentParallel);
     }
 
     @Override
-    public void onRecipeFinish() {
-        super.onRecipeFinish();
+    public void afterWorking() {
+        super.afterWorking();
         resetResonance();
 
         updateStableTime();
@@ -122,8 +122,8 @@ public class ResonanceFlowerMachine extends ManaMultiblockMachine implements ISt
     }
 
     @Override
-    public boolean onWorking() {
-        if (super.onWorking()) {
+    public boolean handleTickRecipe(GTRecipe recipe) {
+        if (super.handleTickRecipe(recipe)) {
             if (frequency > 0 && getRecipeLogic().getProgress() % frequency == 0 && getRecipeLogic().getProgress() != 0) {
                 if (!resonanceFluid.isEmpty()) {
                     return inputFluid(resonanceFluid);

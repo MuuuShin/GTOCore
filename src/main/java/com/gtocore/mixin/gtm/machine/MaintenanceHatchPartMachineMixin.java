@@ -1,10 +1,11 @@
 package com.gtocore.mixin.gtm.machine;
 
+import com.gtocore.common.machine.mana.multiblock.PulseMachineMaintenancePedestal;
+
 import com.gtolib.GTOCore;
 import com.gtolib.api.GTOValues;
 import com.gtolib.api.machine.feature.IDroneInteractionMachine;
 import com.gtolib.api.machine.feature.multiblock.IDroneControlCenterMachine;
-import com.gtolib.api.machine.trait.IEnhancedRecipeLogic;
 import com.gtolib.api.misc.Drone;
 import com.gtolib.api.recipe.IdleReason;
 import com.gtolib.utils.MathUtil;
@@ -15,9 +16,11 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMaintenanceMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiController;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredPartMachine;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.MaintenanceHatchPartMachine;
 
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,6 +39,8 @@ public abstract class MaintenanceHatchPartMachineMixin extends WorkableTieredPar
     protected int timeActive;
     @Unique
     private IDroneControlCenterMachine gtolib$cache;
+    @Unique
+    private PulseMachineMaintenancePedestal gto$manaCenter;
 
     protected MaintenanceHatchPartMachineMixin(MetaMachineBlockEntity holder, int tier) {
         super(holder, tier);
@@ -54,6 +59,14 @@ public abstract class MaintenanceHatchPartMachineMixin extends WorkableTieredPar
     @SuppressWarnings("all")
     public void setNetMachineCache(IDroneControlCenterMachine cache) {
         gtolib$cache = cache;
+        var oldManaCenter = gto$manaCenter;
+        if (oldManaCenter != null) {
+            oldManaCenter.removeProblem(this);
+        }
+        gto$manaCenter = cache instanceof PulseMachineMaintenancePedestal m ? m : null;
+        if (gto$manaCenter != null) {
+            gto$manaCenter.addProblem(this, this::fixAllMaintenanceProblems);
+        }
     }
 
     @Override
@@ -79,9 +92,9 @@ public abstract class MaintenanceHatchPartMachineMixin extends WorkableTieredPar
      * @reason .
      */
     @Overwrite(remap = false)
-    public @Nullable GTRecipe modifyRecipe(IWorkableMultiController controller, @NotNull GTRecipe recipe) {
+    public @Nullable GTRecipe modifyRecipe(IWorkableMultiController controller, RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {
         if (hasMaintenanceProblems()) {
-            ((IEnhancedRecipeLogic) controller.getRecipeLogic()).gtolib$setIdleReason(IdleReason.MAINTENANCE_BROKEN.reason());
+            IdleReason.MAINTENANCE_BROKEN.reason(controller);
             return null;
         }
         var durationMultiplier = getDurationMultiplier();
@@ -107,6 +120,20 @@ public abstract class MaintenanceHatchPartMachineMixin extends WorkableTieredPar
     @Override
     public void onUnload() {
         super.onUnload();
+        if (gto$manaCenter != null) {
+            gto$manaCenter.removeProblem(this);
+        }
         removeNetMachineCache();
+    }
+
+    @Override
+    public boolean firstTestMachine(IDroneControlCenterMachine machine) {
+        Level level = machine.getLevel();
+        if (level == null) return false;
+        if (testMachine(machine) && machine.hasDrone(self().getPos(), d -> d.getCharge() > 0)) {
+            return true;
+        }
+        return machine instanceof PulseMachineMaintenancePedestal p &&
+                p.inRange(getPos());
     }
 }

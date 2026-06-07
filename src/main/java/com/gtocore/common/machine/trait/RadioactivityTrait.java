@@ -6,14 +6,14 @@ import com.gtocore.data.IdleReason;
 
 import com.gtolib.api.machine.feature.multiblock.IMultiblockTraitHolder;
 import com.gtolib.api.machine.trait.MultiblockTrait;
-import com.gtolib.api.recipe.Recipe;
 
-import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 
 import net.minecraft.network.chat.Component;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +22,7 @@ import java.util.Set;
 
 public class RadioactivityTrait extends MultiblockTrait {
 
-    @Persisted
+    @SaveToDisk
     private int recipeRadioactivity;
 
     private final Set<RadiationHatchPartMachine> radiationHatchPartMachines = new ReferenceOpenHashSet<>();
@@ -50,10 +50,10 @@ public class RadioactivityTrait extends MultiblockTrait {
     }
 
     @Override
-    public Recipe modifyRecipe(@NotNull Recipe recipe) {
+    public GTRecipe modifyRecipe(RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {
         recipeRadioactivity = recipe.data.getInt(GTORecipeDataKeys.RADIOACTIVITY);
         if (recipeRadioactivity > 0 && outside()) {
-            if (machine instanceof IRecipeLogicMachine recipeLogicMachine) IdleReason.setIdleReason(recipeLogicMachine, IdleReason.RADIATION);
+            IdleReason.RADIATION.setReason(machine);
             return null;
         }
         return recipe;

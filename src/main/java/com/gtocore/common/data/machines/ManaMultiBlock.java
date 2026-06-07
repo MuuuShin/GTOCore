@@ -14,7 +14,6 @@ import com.gtolib.GTOCore;
 import com.gtolib.api.annotation.NewDataAttributes;
 import com.gtolib.api.machine.ManaDistributorMachine;
 import com.gtolib.api.machine.MultiblockDefinition;
-import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 import com.gtolib.utils.MultiBlockFileReader;
 import com.gtolib.utils.RLUtils;
 import com.gtolib.utils.RegistriesUtils;
@@ -26,6 +25,8 @@ import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.MultiblockShapeInfo;
+import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
+import com.gregtechceu.gtceu.client.renderer.machine.WorkableSidedCasingMachineRenderer;
 import com.gregtechceu.gtceu.common.data.GCYMBlocks;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
@@ -33,11 +34,13 @@ import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 
+import dev.shadowsoffire.apotheosis.Apotheosis;
 import vazkii.botania.common.block.BotaniaBlocks;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static com.gregtechceu.gtceu.api.machine.multiblock.PartAbility.*;
 import static com.gregtechceu.gtceu.api.pattern.Predicates.*;
@@ -61,7 +64,7 @@ public final class ManaMultiBlock {
             .tooltipsText("符文编号：", "Rune number:")
             .tooltipsSupplier(() -> Collections.singletonList(ManaAlloyBlastSmelterMachine.getRunes()))
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(16))
-            .recipeModifier(RecipeModifierFunction.overclocking(0.5, 1, 0.5))
+            .recipeModifier(RecipeModifier.overclocking(0.5, 1, 0.5))
             .recipeTypes(GTORecipeTypes.ALLOY_BLAST_RECIPES)
             .block(GTOBlocks.MANASTEEL_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
@@ -289,7 +292,7 @@ public final class ManaMultiBlock {
             .nonYAxisRotation()
             .parallelizableTooltips()
             .recipeTypes(GTORecipeTypes.MANA_GARDEN_RECIPES, GTORecipeTypes.MANA_GARDEN_FUEL)
-            .recipeModifier(RecipeModifierFunction.HATCH_PARALLEL)
+            .recipeModifier(RecipeModifier.HATCH_PARALLEL)
             .block(RegistriesUtils.getSupplierBlock("botania:livingrock"))
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(RegistriesUtils.getBlock("botania:livingrock")))
@@ -371,7 +374,7 @@ public final class ManaMultiBlock {
             .tooltipsSupplier(GTOMachineTooltips.INSTANCE.getAlchemicalDeviceTooltips().getSupplier())
             .tooltipsSupplier(GTOMachineTooltips.INSTANCE.getLargeAlchemicalDeviceTooltips().getSupplier())
             .moduleTooltips(new PartAbility[0])
-            .recipeModifiers(RecipeModifierFunction.HATCH_PARALLEL)
+            .recipeModifiers(RecipeModifier.HATCH_PARALLEL)
             .recipeTypes(GTORecipeTypes.ALCHEMY_CAULDRON_RECIPES)
             .block(GCYMBlocks.CASING_CORROSION_PROOF)
             .pattern(definition -> FactoryBlockPattern.start(definition)
@@ -588,5 +591,36 @@ public final class ManaMultiBlock {
                     .where(' ', any())
                     .build())
             .workableCasingRenderer(GTOCore.id("block/casings/manasteel_casing"), GTCEu.id("block/multiblock/cleanroom"))
+            .register();
+
+    // 脉冲机器维护基座
+    public static final MultiblockMachineDefinition PULSE_MACHINE_MAINTENANCE_PEDESTAL = multiblock("pulse_machine_maintenance_pedestal", "脉冲机器维护基座", PulseMachineMaintenancePedestal::new)
+            .nonYAxisRotation()
+            .block(RegistriesUtils.getSupplierBlock("apotheosis:stoneshelf"))
+            .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
+            .tooltips(GTOMachineTooltipsA.INSTANCE.getPulseMachineMaintenancePedestalTooltips().getSupplier())
+            .pattern(definition -> FactoryBlockPattern.start(definition)
+                    .aisle("   BB", "     ", "     ", "     ", "     ", "     ", "     ", "     ")
+                    .aisle(" AABA", "     ", "     ", "     ", "     ", "     ", "     ", "     ")
+                    .aisle(" ACB ", "  D  ", "  E  ", "     ", "     ", "  F  ", "  G  ", "  F  ")
+                    .aisle("BABB ", "     ", "     ", "     ", "     ", "     ", "     ", "     ")
+                    .aisle("AA   ", "     ", "     ", "     ", "     ", "     ", "     ", "     ")
+                    .where('A', blocks(Blocks.CHISELED_QUARTZ_BLOCK))
+                    .where('B', blocks(RegistriesUtils.getBlock("ars_nouveau:smooth_sourcestone")))
+                    .where('C', blocks(RegistriesUtils.getBlock("gtceu:opal_block")))
+                    .where('D', controller(definition))
+                    .where('E', blocks(RegistriesUtils.getBlock("apotheosis:stoneshelf")))
+                    .where('F', blocks(RegistriesUtils.getBlock("botania:natura_pylon")))
+                    .where('G', blocks(ManaMachine.PULSE_CORE.get()))
+                    .where(' ', any())
+                    .build())
+            .renderer(() -> {
+                var r = new WorkableSidedCasingMachineRenderer("", GTCEu.id("block/multiblock/implosion_compressor"));
+                r.setTextureOverride(Map.of(
+                        "bottom", RLUtils.mc("block/polished_andesite"),
+                        "top", RLUtils.mc("block/polished_andesite"),
+                        "side", RLUtils.fromNamespaceAndPath(Apotheosis.MODID, "blocks/stoneshelf")));
+                return r;
+            })
             .register();
 }

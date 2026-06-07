@@ -26,21 +26,21 @@ import appeng.api.networking.IManagedGridNode
 import appeng.api.networking.security.IActionSource
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity
-import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.gui.fancy.TabsWidget
 import com.gregtechceu.gtceu.api.item.tool.GTToolType
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart
 import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine
-import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable
+import com.gregtechceu.gtceu.api.recipe.handler.IO
+import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler
+import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder
+import com.gto.datasynclib.annotations.SaveToDisk
 import com.gto.datasynclib.annotations.SyncToClient
 import com.gto.datasynclib.listener.IntNotifiableHolder
 import com.gto.datasynclib.listener.ObjNotifiableHolder
-import com.gtolib.api.capability.ISync
 import com.gtolib.api.machine.feature.IMEPartMachine
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.mojang.datafixers.util.Pair
 
@@ -58,12 +58,11 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
     WorkableTieredIOPartMachine(holder, GTValues.LuV, io),
     WirelessMachine,
     IMEPartMachine,
-    ISync,
     IDistinctPart,
     IMachineLife {
 
     // ==================== AE2 Grid ====================
-    @Persisted
+    @SaveToDisk
     private val nodeHolder: GridNodeHolder = GridNodeHolder(this)
 
     @SyncToClient
@@ -71,14 +70,14 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
 
     val actionSourceField: IActionSource = IActionSource.ofMachine { nodeHolder.getMainNode().node }
 
-    @Persisted
+    @SaveToDisk
     protected var distinctField: Boolean = false
 
-    @Persisted
+    @SaveToDisk
     var isAllFacing: Boolean = false
 
-    override fun getItemHandlerCap(side: Direction?, useCoverCapability: Boolean): IItemHandlerModifiable? = null
-    override fun getFluidHandlerCap(side: Direction?, useCoverCapability: Boolean): IFluidHandlerModifiable? = null
+    override fun getItemHandlerCap(side: Direction?, useCoverCapability: Boolean): ICustomItemStackHandler? = null
+    override fun getFluidHandlerCap(side: Direction?, useCoverCapability: Boolean): ICustomFluidStackHandler? = null
 
     override fun tintColor(index: Int): Int = if (index == 9) realColor else -1
 
@@ -112,14 +111,10 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
     }
 
     // ==================== WirelessMachine - Node Type ====================
-    var nodeTyp: WirelessMachine.NodeType? = WirelessMachine.NodeType.CHILD
-    override fun getNodeType(): WirelessMachine.NodeType? = nodeTyp
-    override fun setNodeType(type: WirelessMachine.NodeType) {
-        nodeTyp = type
-    }
+    override fun getNodeType(): WirelessMachine.NodeType? = WirelessMachine.NodeType.CHILD
 
     // ==================== WirelessMachine - Persisted State ====================
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private var _connectedNetworkId: String = ""
 
@@ -128,24 +123,15 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
         _connectedNetworkId = id
     }
 
-    var lastNeighbor: Block? = null
-    override fun onNeighborChanged(block: Block, fromPos: BlockPos, isMoving: Boolean) {
-        super<WorkableTieredIOPartMachine>.onNeighborChanged(block, fromPos, isMoving)
-
-        if (lastNeighbor === block) return
-        super<WirelessMachine>.onNeighborChanged(fromPos)
-        lastNeighbor = block
-    }
-
     // ==================== WirelessMachine - Sync Fields ====================
     @SyncToClient
-    private val _networkListCache: ObjNotifiableHolder<List<NetworkSummary>> = createNetworkSummarySyncField(this)
+    private val _networkListCache: ObjNotifiableHolder<List<NetworkSummary>> = createNetworkSummarySyncField()
 
     @SyncToClient
     private val _unassignedOutputCount: IntNotifiableHolder = IntNotifiableHolder.create()
 
     @SyncToClient
-    private val _topologyCache: ObjNotifiableHolder<List<TopologySummary>> = createTopologySyncField(this)
+    private val _topologyCache: ObjNotifiableHolder<List<TopologySummary>> = createTopologySyncField()
 
     @SyncToClient
     private val _nodeTypeSync: IntNotifiableHolder = IntNotifiableHolder.create()
@@ -184,20 +170,20 @@ abstract class MEPartMachine(holder: MetaMachineBlockEntity, io: IO) :
         }
         if (isRemote) return
         onWirelessLoad()
-        getHandlerList().isDistinct = distinctField
-        getHandlerList().color = paintingColor
+        handlerUnit.isDistinct = distinctField
+        handlerUnit.color = paintingColor
     }
 
     override fun getMainNode(): IManagedGridNode = nodeHolder.getMainNode()
 
     override fun onPaintingColorChanged(color: Int) {
-        handlerList.setColor(color, true)
+        handlerUnit.setColor(color, true)
     }
 
     override fun isDistinct(): Boolean = distinctField
     override fun setDistinct(isDistinct: Boolean) {
         this.distinctField = isDistinct
-        handlerList.setDistinctAndNotify(isDistinct)
+        handlerUnit.setDistinctAndNotify(isDistinct)
     }
 
     override fun setOnline(isOnline: Boolean) {

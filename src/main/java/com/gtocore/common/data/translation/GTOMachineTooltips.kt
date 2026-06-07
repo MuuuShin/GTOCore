@@ -1137,7 +1137,7 @@ object GTOMachineTooltips {
         section("模块运行优化系统" translatedTo "Module Operation Optimization System")
         function("可安装最多12个拓展模块" translatedTo "Can install up to 12 expansion modules")
         increase("提升电压等级可为模块提供耗时减免" translatedTo "Increasing voltage tier can provide Duration reductions for modules")
-        command("运行前需提供128*(机器等级-7)的算力" translatedTo "Before starting, it is necessary to provide 128 * (tier - 7) computation power")
+        command("运行前需提供128*(电压等级-7)的算力" translatedTo "Before starting, it is necessary to provide 128 * (voltage tier - 7) computation power")
     }
 
     // 工业屠宰场
@@ -1544,17 +1544,26 @@ object GTOMachineTooltips {
         "gtocore.cosmic_neutronium", 1.5f,
         "gtocore.eternity", 1.6f,
     )
+    val MATERIAL_TIER_MAP: ImmutableMap<String?, String?> = ImmutableMap.of<String?, String?>(
+        "gtceu.iron", "ZPM",
+        "gtceu.iridium", "UV",
+        "gtocore.orichalcum", "UHV",
+        "gtocore.infuscolium", "UEV",
+        "gtocore.draconium", "UIV",
+        "gtocore.cosmic_neutronium", "UXV",
+        "gtocore.eternity", "OpV",
+    )
     val NanitesIntegratedProcessingCenterTooltips = ComponentListSupplier {
         setTranslationPrefix("nanites_integrated_processing_center")
 
         section(ComponentSlang.RunningRequirements)
         command("安装对应模块解锁对应配方" translatedTo "Install the corresponding module to unlock the corresponding recipe")
         increase("主机中放入纳米蜂群可减少污染概率" translatedTo "Placing nanites in the host can reduce pollution probability")
-        content("每放入一个纳米蜂群，污染概率减少数如下所示" translatedTo "Each nanite placed reduces pollution probability as follows")
+        content("每放入一个纳米蜂群，最低主机电压和污染概率减少数如下所示" translatedTo "Each nanite placed requires the minimum voltage and reduces pollution probability as follows")
         MATERIAL_MAP.forEach { (material: String?, reduction: Float?) ->
             info(
                 Component.translatable("material.$material").toComponentSupplier() +
-                    (": -$reduction%").toLiteralSupplier(),
+                    ("[${MATERIAL_TIER_MAP[material]}]: -$reduction%").toLiteralSupplier(),
             )
         }
     }
@@ -1745,6 +1754,7 @@ object GTOMachineTooltips {
 
         section(ComponentSlang.RunningRequirements)
         command("在主机内更改机器模式以引导不同的结构" translatedTo "Change recipe type in the controller to guide different structures")
+        important("机器模式为等离子冷凝模式时才可以运行等离子冷凝配方" translatedTo "Must be in Plasma Condenser mode to run Plasma Condenser recipe")
         info("真空冷冻机/雾化冷凝：P:0，等离子冷凝：P:1" translatedTo "Vacuum Freezer/Atomization Condensation: P:0, Plasma Condenser: P:1")
         info("引导后可使用终端搭建指定结构，无视\"模块搭建\"设置" translatedTo "After guiding, you can use the terminal to build the specified structure, ignoring \"Module Build\" setting")
     }
@@ -1773,7 +1783,7 @@ object GTOMachineTooltips {
         function("可安装最多64个拓展模块" translatedTo "Can install up to 64 expansion modules")
         increase("提升电压等级可为模块提供大幅耗时减免" translatedTo "Increasing voltage tier can provide large Duration reductions for modules")
         increase("额外提升为模块提供的并行数" translatedTo " Additional increase in the parallelism provided by the module")
-        command("运行前需提供128*(机器等级-7)的算力" translatedTo "Before starting, it is necessary to provide 128 * (tier - 7) computation power")
+        command("运行前需提供128*(电压等级-7)的算力" translatedTo "Before starting, it is necessary to provide 128 * (voltage tier - 7) computation power")
         increase("连接的模块将获得0.707倍耗时的速度加成" translatedTo "Connected modules will receive a 0.707x Duration speed bonus")
     }
 
@@ -2001,7 +2011,7 @@ object GTOMachineTooltips {
         command("时间消耗波动系数[0.05 ~ 20] · 元素消耗波动系数[0.1 ~ 16]" translatedTo "Time consumption fluctuation coefficient [0.05~20] · Element consumption fluctuation coefficient [0.1~16]")
         command("向主机存储放入物品延长稳定次数" translatedTo "Add items to host storage to extend stable time")
         info("放入§b下界之星§r：每颗增加5次的稳定次数" translatedTo "Put §bNether Star§r: +5 of the stable time per star")
-        info("放入§b共鸣之花§r：每个增加10000000次的稳定次数" translatedTo "Put §bResonance Flower§r: +10000000 for each stable time")
+        info("放入§b稳定核心§r：每个增加10000000次的稳定次数" translatedTo "Put §bStabilizer Core§r: +10000000 for each stable time")
 
         section("共鸣消耗" translatedTo "Resonance Consumption")
         function("配方带共鸣标签时，按频率消耗指定资源" translatedTo "Recipes with resonance tags consume specified resources at set frequency")

@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiController;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTDamageTypes;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -22,8 +23,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.google.common.collect.ImmutableMap;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import lombok.Getter;
 
 import java.util.Map;
@@ -44,7 +45,7 @@ public final class BallHatchPartMachine extends WorkableItemPartMachine implemen
         GRINDBALL = grindball.build();
     }
 
-    @Persisted
+    @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private boolean isWorking;
 
@@ -62,9 +63,8 @@ public final class BallHatchPartMachine extends WorkableItemPartMachine implemen
     }
 
     @Override
-    public boolean beforeWorking(IWorkableMultiController controller, GTRecipe recipe) {
+    public void beforeWorking(IWorkableMultiController controller, RecipeHandlerUnit unit, GTRecipe recipe) {
         isWorking = true;
-        return true;
     }
 
     @Override

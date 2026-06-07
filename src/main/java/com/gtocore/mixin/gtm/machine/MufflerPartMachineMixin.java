@@ -1,6 +1,7 @@
 package com.gtocore.mixin.gtm.machine;
 
 import com.gtocore.common.item.ItemMap;
+import com.gtocore.common.machine.mana.multiblock.PulseMachineMaintenancePedestal;
 
 import com.gtolib.api.GTOValues;
 import com.gtolib.api.machine.feature.IAirScrubberInteractor;
@@ -8,7 +9,6 @@ import com.gtolib.api.machine.feature.IDroneInteractionMachine;
 import com.gtolib.api.machine.feature.IGTOMufflerMachine;
 import com.gtolib.api.machine.feature.multiblock.IDroneControlCenterMachine;
 import com.gtolib.api.misc.Drone;
-import com.gtolib.utils.MachineUtils;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
@@ -22,6 +22,7 @@ import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredPartMachine;
+import com.gregtechceu.gtceu.api.recipe.handler.IRecipeHandlerHolder;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.machine.electric.AirScrubberMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.MufflerPartMachine;
@@ -32,14 +33,15 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.utils.Position;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -57,7 +59,7 @@ import java.util.List;
 public abstract class MufflerPartMachineMixin extends WorkableTieredPartMachine implements IGTOMufflerMachine, IDroneInteractionMachine, IAirScrubberInteractor {
 
     @Unique
-    @Persisted
+    @SaveToDisk
     private boolean gtocore$isWorkingEnabled;
     @Shadow(remap = false)
     @Final
@@ -74,6 +76,8 @@ public abstract class MufflerPartMachineMixin extends WorkableTieredPartMachine 
     private IDroneControlCenterMachine gtolib$cache;
     @Unique
     private AirScrubberMachine gtolib$airScrubberCache;
+    @Unique
+    private PulseMachineMaintenancePedestal gto$manaCenter;
     @Unique
     private int gto$chanceOfNotProduceAsh = 100;
     @Unique
@@ -103,6 +107,28 @@ public abstract class MufflerPartMachineMixin extends WorkableTieredPartMachine 
     @Unique
     public void setNetMachineCache(IDroneControlCenterMachine cache) {
         gtolib$cache = cache;
+        var oldManaCenter = gto$manaCenter;
+        if (oldManaCenter != null) {
+            oldManaCenter.removeProblem(this);
+        }
+        gto$manaCenter = cache instanceof PulseMachineMaintenancePedestal m ? m : null;
+        if (gto$manaCenter != null) {
+            gto$manaCenter.addProblem(this, this::gto$clear4dusts);
+        }
+    }
+
+    @Unique
+    private void gto$clear4dusts() {
+        int remainingClears = 4;
+        for (int i = 0; i < inventory.size; i++) {
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (stack.getCount() > 0) {
+                int toClear = Math.min(stack.getCount(), remainingClears);
+                stack.shrink(toClear);
+                remainingClears -= toClear;
+                if (remainingClears <= 0) break;
+            }
+        }
     }
 
     @Unique
@@ -118,7 +144,7 @@ public abstract class MufflerPartMachineMixin extends WorkableTieredPartMachine 
             ItemStack stack = inventory.stacks[i];
             if (stack.getCount() > 0) {
                 inventory.setStackInSlot(i, ItemStack.EMPTY);
-                MachineUtils.outputItem(centerMachine, stack);
+                ((IRecipeHandlerHolder) centerMachine).outputItem(stack);
             }
         }
     }
@@ -214,7 +240,7 @@ public abstract class MufflerPartMachineMixin extends WorkableTieredPartMachine 
     public void recoverItemsTable(ItemStack recoveryItems) {
         AirScrubberMachine machine = getAirScrubberMachine();
         if (machine != null && GTValues.RNG.nextInt(machine.getTier() << 1 + 1) > 1) {
-            MachineUtils.outputItem(machine, recoveryItems);
+            machine.outputItem(recoveryItems);
             return;
         }
         CustomItemStackHandler.insertItemStackedFast(inventory, recoveryItems);
@@ -266,5 +292,16 @@ public abstract class MufflerPartMachineMixin extends WorkableTieredPartMachine 
             e.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 80, 2));
             e.addEffect(new MobEffectInstance(MobEffects.POISON, 40, 1));
         });
+    }
+
+    @Override
+    public boolean firstTestMachine(IDroneControlCenterMachine machine) {
+        Level level = machine.getLevel();
+        if (level == null) return false;
+        if (testMachine(machine) && machine.hasDrone(self().getPos(), d -> d.getCharge() > 0)) {
+            return true;
+        }
+        return machine instanceof PulseMachineMaintenancePedestal p &&
+                p.inRange(getPos());
     }
 }

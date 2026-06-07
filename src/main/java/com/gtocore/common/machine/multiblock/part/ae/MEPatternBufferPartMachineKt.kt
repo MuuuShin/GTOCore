@@ -2,15 +2,6 @@ package com.gtocore.common.machine.multiblock.part.ae
 
 import com.gtocore.api.gui.ktflexible.textBlock
 import com.gtocore.common.data.GTORecipes
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt.Companion.add_recipe_msg
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt.Companion.circuit_special
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt.Companion.clear_recipe_slot
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt.Companion.clear_recipe_slot_msg
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt.Companion.fluid_special
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt.Companion.item_special
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt.Companion.no_recipe
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt.Companion.recipe_special
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachineKt.Companion.view_recipe
 
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.FriendlyByteBuf
@@ -22,20 +13,16 @@ import net.minecraft.world.item.ItemStack
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity
 import com.gregtechceu.gtceu.api.gui.GuiTextures
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget
-import com.gregtechceu.gtceu.api.gui.widget.TankWidget
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour
 import com.gtolib.api.annotation.DataGeneratorScanned
 import com.gtolib.api.annotation.language.RegisterLanguage
 import com.gtolib.api.gui.ktflexible.VBoxBuilder
-import com.gtolib.api.gui.ktflexible.blank
 import com.gtolib.api.gui.ktflexible.field
 import com.gtolib.api.gui.ktflexible.iconButton
 import com.gtolib.api.network.NetworkPack
 import com.gtolib.api.recipe.RecipeBuilder
 import com.lowdragmc.lowdraglib.gui.util.DrawerHelper
-import com.lowdragmc.lowdraglib.gui.widget.Widget
-import com.lowdragmc.lowdraglib.jei.IngredientIO
 import dev.emi.emi.api.EmiApi
 
 import java.util.function.IntSupplier
@@ -103,6 +90,15 @@ open class MEPatternBufferPartMachineKt(holder: MetaMachineBlockEntity, maxPatte
         @RegisterLanguage(cn = "低存量库存触发阈值", en = "Low stock triggering threshold")
         const val low_stock_triggering_threshold: String = "gtceu.ae.pattern_part_machine.low_stock_triggering_threshold"
 
+        @RegisterLanguage(cn = "被动输入乘数", en = "Passive input multiplier")
+        const val passive_input_multiplier: String = "gtceu.ae.pattern_part_machine.passive_input_multiplier"
+
+        @RegisterLanguage(
+            cn = "按照设定的倍数调整被动输入的数量。例如，设定为10时，按样板配置的数量x10进行被动输入。",
+            en = "Adjust the quantity of passive input according to the set multiplier. For example, when set to 10, passive input will be performed according to the quantity configured in the pattern x10.",
+        )
+        const val passive_input_multiplier_tooltip: String = "gtceu.ae.pattern_part_machine.passive_input_multiplier_tooltip"
+
         val SET_ID_CHANNEL: NetworkPack = NetworkPack.registerC2S(
             "me_pattern_buffer_set_id_channel",
         ) { player: ServerPlayer, buf: FriendlyByteBuf ->
@@ -153,7 +149,7 @@ open class MEPatternBufferPartMachineKt(holder: MetaMachineBlockEntity, maxPatte
     override fun runOnUpdate() = run {
         if (isRemote) {
             configuratorField.set(-1)
-            configuratorField.markAsDirty()
+            configuratorField.markAsChanged()
             syncToServer()
         }
     }
@@ -200,45 +196,21 @@ open class MEPatternBufferPartMachineKt(holder: MetaMachineBlockEntity, maxPatte
                         }
                     }
                     val fluidHandler: Array<CustomFluidTank> = getInternalInventory()[configuratorField.get()].shareTank.storages
-                    textBlock(maxWidth = width, textSupplier = { Component.translatable(fluid_special) })
-                    fluidHandler.indices.chunked(9).forEach { indices ->
-                        hBox(height = 18) {
-                            indices.forEach { index ->
-                                widget(
-                                    TankWidget(
-                                        fluidHandler[index],
-                                        0,
-                                        0,
-                                        18,
-                                        18,
-                                        true,
-                                        true,
-                                    ).setBackground(GuiTextures.FLUID_SLOT),
-                                )
-                            }
-                        }
-                    }
+                    buildFluidSection(this, width, fluidHandler)
                     val circuitHandler = getInternalInventory()[configuratorField.get()].circuitInventory.storage
-                    textBlock(maxWidth = width, textSupplier = { Component.translatable(circuit_special) })
-                    hBox(height = 18, style = { spacing = 4 }) {
-                        widget(
-                            SlotWidget(circuitHandler, 0, 0, 0, false, false).apply {
-                                setBackgroundTexture(GuiTextures.SLOT)
-                                setIngredientIO(IngredientIO.RENDER_ONLY)
-                            },
-                        )
-                        field(
-                            height = 18,
-                            getter = { IntCircuitBehaviour.getCircuitConfiguration(getInternalInventory()[configuratorField.get()].circuitInventory.storage.getStackInSlot(0)).toString() },
-                            setter = {
-                                val circuit = when {
-                                    it.toIntOrNull() == null -> 0
-                                    else -> it.toInt().coerceAtMost(32).coerceAtLeast(0)
-                                }
-                                getInternalInventory()[configuratorField.get()].circuitInventory.storage.setStackInSlot(0, if (circuit == 0) ItemStack.EMPTY else IntCircuitBehaviour.stack(circuit))
-                            },
-                        )
-                    }
+                    buildCircuitSection(
+                        container = this,
+                        width = width,
+                        circuitSlot = createReadOnlyCircuitSlot(circuitHandler),
+                        getter = { IntCircuitBehaviour.getCircuitConfiguration(getInternalInventory()[configuratorField.get()].circuitInventory.storage.getStackInSlot(0)).toString() },
+                        setter = {
+                            val circuit = when {
+                                it.toIntOrNull() == null -> 0
+                                else -> it.toInt().coerceAtMost(32).coerceAtLeast(0)
+                            }
+                            getInternalInventory()[configuratorField.get()].circuitInventory.storage.setStackInSlot(0, if (circuit == 0) ItemStack.EMPTY else IntCircuitBehaviour.stack(circuit))
+                        },
+                    )
                     textBlock(maxWidth = width, textSupplier = { Component.translatable(recipe_special) })
                     hBox(height = 18, style = { spacing = 4 }) {
                         iconButton(tooltips = {
@@ -275,14 +247,7 @@ open class MEPatternBufferPartMachineKt(holder: MetaMachineBlockEntity, maxPatte
                             getInternalInventory()[configuratorField.get()].setRecipe(null)
                         }
                     }
-                    blank(height = 4)
-                    widget(object : Widget(0, 0, availableWidth, 3) {
-                        override fun drawInBackground(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
-                            super.drawInBackground(graphics, mouseX, mouseY, partialTicks)
-                            DrawerHelper.drawSolidRect(graphics, positionX, positionY, sizeWidth, sizeHeight, 0xFFFFFFFF.toInt())
-                        }
-                    })
-                    blank(height = 4)
+                    buildSectionDivider(this)
                 }
             }
         }

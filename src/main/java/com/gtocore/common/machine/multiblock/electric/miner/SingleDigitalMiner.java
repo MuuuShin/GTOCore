@@ -20,13 +20,13 @@ import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
+import com.gregtechceu.gtceu.utils.TaskHandler;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -35,13 +35,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.hepdd.gtmthings.api.gui.widget.SimpleNumberInputWidget;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import lombok.Getter;
 import lombok.Setter;
@@ -59,7 +59,7 @@ public class SingleDigitalMiner extends SimpleTieredMachine implements IDigitalM
     // modify from gtmt
 
     private static final int BORDER_WIDTH = 3;
-    @Persisted
+    @SaveToDisk
     protected final CustomItemStackHandler filterInventory;
     private final int maximumRadius;
     @Nullable
@@ -76,17 +76,17 @@ public class SingleDigitalMiner extends SimpleTieredMachine implements IDigitalM
     // miner property
     @Getter
     @Setter
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private int minerRadius;
     @Getter
     @Setter
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private int minHeight;
     @Getter
     @Setter
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private int maxHeight;
     private int silkLevel;
@@ -152,7 +152,7 @@ public class SingleDigitalMiner extends SimpleTieredMachine implements IDigitalM
         if (!isRemote()) {
             filterChange();
             if (getLevel() instanceof ServerLevel serverLevel) {
-                serverLevel.getServer().tell(new TickTask(0, this::updateAutoOutputSubscription));
+                TaskHandler.enqueueTask(serverLevel, this::updateAutoOutputSubscription);
             }
             exportItemSubs = exportItems.addChangedListener(this::updateAutoOutputSubscription);
         }

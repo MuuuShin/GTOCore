@@ -8,9 +8,7 @@ import com.gtocore.common.data.GTORecipeDataKeys;
 
 import com.gtolib.api.machine.feature.multiblock.ITierCasingMachine;
 import com.gtolib.api.machine.multiblock.NoEnergyMultiblockMachine;
-import com.gtolib.api.machine.trait.CustomRecipeLogic;
 import com.gtolib.api.machine.trait.TierCasingTrait;
-import com.gtolib.api.recipe.Recipe;
 import com.gtolib.api.recipe.TierDataKey;
 import com.gtolib.utils.ClientUtil;
 import com.gtolib.utils.MultiBlockFileReader;
@@ -19,9 +17,11 @@ import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.pattern.BlockPattern;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
+import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
+import com.gregtechceu.gtceu.api.recipe.handler.ICustomRecipeLogicHolder;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -32,27 +32,26 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gtocore.common.block.BlockMap.GRAVITONFLOWMAP;
-import static com.gtolib.api.GTOValues.GRAVITON_FLOW_TIER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class GodForgeMachine extends NoEnergyMultiblockMachine implements ITierCasingMachine {
+public final class GodForgeMachine extends NoEnergyMultiblockMachine implements ITierCasingMachine, ICustomRecipeLogicHolder {
 
     @SyncToClient
-    @Persisted
+    @SaveToDisk
     public float color;
     private boolean isRemoved = false;
     public long rotation;
     public int timer;
     @SyncToClient
-    @Persisted
+    @SaveToDisk
     public int tier;
 
     private TickableSubscription rotationSubscription;
@@ -191,12 +190,8 @@ public final class GodForgeMachine extends NoEnergyMultiblockMachine implements 
                 .build();
     }
 
-    private Recipe getRecipe() {
-        return getRecipeBuilder().inputFluids(Fluids.WATER, 100).duration(20).buildRawRecipe();
-    }
-
     @Override
-    public RecipeLogic createRecipeLogic(Object... args) {
-        return new CustomRecipeLogic(this, this::getRecipe, true);
+    public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
+        return getRecipeBuilder().inputFluids(Fluids.WATER, 100).duration(20).build();
     }
 }

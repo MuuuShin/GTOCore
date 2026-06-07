@@ -12,12 +12,10 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.Level
 
 import appeng.api.networking.GridHelper
-import appeng.api.networking.IGrid
 import appeng.api.networking.IGridConnection
 import appeng.api.networking.pathing.ChannelMode
 import appeng.api.networking.pathing.ControllerState
 import appeng.api.networking.pathing.IPathingService
-import appeng.core.AEConfig
 import com.gregtechceu.gtceu.GTCEu
 import com.hepdd.gtmthings.api.capability.IBindable
 import com.lowdragmc.lowdraglib.LDLib
@@ -29,8 +27,6 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 
 import java.util.*
-import kotlin.compareTo
-import kotlin.dec
 
 /**
  * 无线网络。每个网络有源节点（提供AE网络）和子节点（使用AE网络）。
@@ -112,11 +108,7 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
 
             WirelessMachine.NodeType.CHILD -> {
                 outputNodes.add(node)
-                getAvailableInput()?.let {
-                    createConnection(it, node)
-                } ?: run {
-                    needsRefresh = true
-                }
+                connectionAvailableInput(node)
             }
         }
     }
@@ -147,11 +139,15 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
         nodeInfoTable.remove(node)
     }
 
-    fun getAvailableInput(): WirelessMachine? {
+    fun connectionAvailableInput(output: WirelessMachine) {
+        val pathingService: IPathingService? = output.mainNode?.grid?.pathingService
+        val isInfinite = pathingService?.channelMode === ChannelMode.INFINITE
+        val outputWorkload = if (isInfinite) 0 else output.workloadChannels
         for (input in inputNodes) {
-            if (isNodeValid(input) && connections.getInt(input) < maxOutputsPerInput) return input
+            if (isNodeValid(input) && connections.getInt(input) < maxOutputsPerInput && (isInfinite || input.maxWorkloadChannels - input.workloadChannels >= outputWorkload)) {
+                if (createConnection(input, output)) return
+            }
         }
-        return null
     }
 
     fun createConnection(input: WirelessMachine, output: WirelessMachine): Boolean {
@@ -214,19 +210,6 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
             if (inputNodes.isEmpty()) return
             assignNodesGreedy()
         } else {
-            if (inputNodes.isEmpty()) {
-                val orphan = outputNodes.firstOrNull { isNodeValid(it) } ?: return
-                orphan.switchNodeType(WirelessMachine.NodeType.SOURCE)
-                return
-            }
-            if (inputNodes.size > 1) {
-                inputNodes.drop(1).forEach {
-                    if (isNodeValid(it)) {
-                        it.switchNodeType(WirelessMachine.NodeType.CHILD)
-                    }
-                }
-                return
-            }
             assignNodesInfinity()
         }
 
@@ -242,61 +225,66 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
     }
 
     fun assignNodesInfinity() {
-        val inputs = ReferenceOpenHashSet<WirelessMachine>()
-        inputNodes.forEach {
-            if (isNodeValid(it)) inputs.add(it)
-        }
-        val input = inputs.firstOrNull() ?: return
+        val it = inputNodes.iterator()
         var conns = 0
-        for (output in outputNodes) {
+        var next: WirelessMachine? = null
+        a@ for (output in outputNodes) {
             if (!isNodeValid(output)) continue
-            if (conns >= maxOutputsPerInput) break
-            createConnection(input, output)
-            conns++
-        }
-    }
-
-    fun assignNodesGreedy() {
-        val validInputs = inputNodes.filter { isNodeValid(it) }
-        val validOutputs = outputNodes.filter { isNodeValid(it) }
-
-        if (validInputs.isEmpty()) return
-
-        data class InputCapacity(val input: WirelessMachine, var remainingCapacity: Int, var conns: Int = 0) : Comparable<InputCapacity> {
-            override fun compareTo(other: InputCapacity) = other.remainingCapacity.compareTo(this.remainingCapacity) // 降序
-
-            fun remainingLinks(): Int = maxOutputsPerInput - conns
-        }
-
-        val inputCapacities = validInputs.map { input ->
-            InputCapacity(input, input.maxWorkloadChannels - input.workloadChannels)
-        }.toList()
-
-        for (output in validOutputs) {
-            val outputWorkload = output.workloadChannels
-            val bestInput = inputCapacities
-                .asSequence()
-                .filter { it.remainingLinks() > 0 }
-                .filter { it.remainingCapacity >= outputWorkload }
-                .maxWithOrNull(
-                    compareBy<InputCapacity> { it.remainingLinks() }
-                        .thenBy { it.remainingCapacity },
-                )
-                ?: continue
-
-            if (createConnection(bestInput.input, output)) {
-                bestInput.remainingCapacity -= outputWorkload
-                bestInput.conns++
+            while (true) {
+                if (next === null) {
+                    if (it.hasNext()) {
+                        next = it.next()
+                        conns = 0
+                        if (!isNodeValid(next)) {
+                            next = null
+                            continue
+                        }
+                    } else {
+                        break@a
+                    }
+                }
+                if (conns >= maxOutputsPerInput) {
+                    next = null
+                    continue
+                }
+                if (createConnection(next, output)) {
+                    conns++
+                    break
+                }
             }
         }
     }
 
-    /**
-     * 当某个源节点掉线时调用。尝试将其子节点重新分配到其他源节点。
-     */
-    fun handleInputOffline(offlineInput: WirelessMachine) {
-        if (!inputNodes.contains(offlineInput)) return
-        refreshConnections()
+    fun assignNodesGreedy() {
+        val it = inputNodes.iterator()
+        var conns = 0
+        var next: WirelessMachine? = null
+        a@ for (output in outputNodes) {
+            if (!isNodeValid(output)) continue
+            while (true) {
+                if (next === null) {
+                    if (it.hasNext()) {
+                        next = it.next()
+                        conns = 0
+                        if (!isNodeValid(next)) {
+                            next = null
+                            continue
+                        }
+                    } else {
+                        break@a
+                    }
+                }
+                val outputWorkload = output.workloadChannels
+                if (conns >= maxOutputsPerInput || next.maxWorkloadChannels - next.workloadChannels < outputWorkload) {
+                    next = null
+                    continue
+                }
+                if (createConnection(next, output)) {
+                    conns++
+                    break
+                }
+            }
+        }
     }
 
     fun getUnassignedOutputCount(): Int {

@@ -7,21 +7,21 @@ import com.gtocore.common.machine.trait.RadioactivityTrait;
 import com.gtolib.api.annotation.DataGeneratorScanned;
 import com.gtolib.api.annotation.language.RegisterLanguage;
 import com.gtolib.api.machine.feature.multiblock.IMultiblockTraitHolder;
-import com.gtolib.api.machine.trait.IEnhancedRecipeLogic;
 import com.gtolib.api.recipe.IdleReason;
-import com.gtolib.api.recipe.Recipe;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 import com.google.common.collect.ImmutableSet;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -30,10 +30,10 @@ import java.util.Set;
 @DataGeneratorScanned
 public class SpaceBioResearchModule extends RecipeExtension {
 
-    @Persisted
+    @SaveToDisk
     private final RadioactivityTrait radioactivityTrait;
 
-    @Persisted
+    @SaveToDisk
     private int radioactivity = 80;
 
     public SpaceBioResearchModule(MetaMachineBlockEntity metaMachineBlockEntity) {
@@ -42,17 +42,16 @@ public class SpaceBioResearchModule extends RecipeExtension {
     }
 
     @Override
-    public Recipe getRealRecipe(@NotNull Recipe recipe) {
+    public GTRecipe getRealRecipe(@NotNull RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {
         if (!isWorkspaceReady()) {
             setIdleReason(IdleReason.CANNOT_WORK_IN_SPACE);
             return null;
         }
         if (recipe.data.contains(GTORecipeDataKeys.FILTER_CASING) && recipe.data.getInt(GTORecipeDataKeys.FILTER_CASING) > core.getTypes().size()) {
-            ((IEnhancedRecipeLogic) getRecipeLogic())
-                    .gtolib$setIdleReason(Component.translatable(LANGUAGE_INSUFFICIENT_CLEANROOM));
+            setIdleReason(Component.translatable(LANGUAGE_INSUFFICIENT_CLEANROOM));
             return null;
         }
-        return super.getRealRecipe(recipe);
+        return super.getRealRecipe(unit, recipe);
     }
 
     @Override

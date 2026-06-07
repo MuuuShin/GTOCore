@@ -3,8 +3,8 @@ package com.gtocore.common.machine.multiblock.part.ae;
 import com.gtolib.api.machine.trait.InaccessibleInfiniteTank;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.list.AEListGridWidget;
 import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage;
 
@@ -13,10 +13,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGridNodeListener;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -24,7 +24,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class MEOutputHatchPartMachine extends StatusTrackedMEPartMachine {
 
-    @Persisted
+    @SaveToDisk
     private final KeyStorage internalBuffer;
     private final InaccessibleInfiniteTank tank;
 

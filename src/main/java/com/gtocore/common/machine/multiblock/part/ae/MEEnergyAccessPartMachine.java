@@ -6,8 +6,8 @@ import com.gtolib.api.machine.multiblock.TierCasingMultiblockMachine;
 import com.gtolib.utils.MathUtil;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import appeng.api.config.AccessRestriction;
@@ -22,7 +22,6 @@ import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import org.jetbrains.annotations.NotNull;
 
-import static com.gtolib.api.GTOValues.GLASS_TIER;
 import static java.lang.Math.min;
 
 public class MEEnergyAccessPartMachine extends MEPartMachine implements IAEPowerStorage {

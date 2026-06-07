@@ -4,11 +4,7 @@ import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.client.renderer.machine.*;
 import com.gtocore.common.block.FusionCasings;
-import com.gtocore.common.data.GTOBlocks;
-import com.gtocore.common.data.GTOMachines;
-import com.gtocore.common.data.GTOMaterials;
-import com.gtocore.common.data.GTORecipeDataKeys;
-import com.gtocore.common.data.GTORecipeTypes;
+import com.gtocore.common.data.*;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
 import com.gtocore.common.data.translation.GTOMachineTooltipsA;
@@ -38,20 +34,18 @@ import com.gtolib.api.lang.CNEN;
 import com.gtolib.api.machine.MultiblockDefinition;
 import com.gtolib.api.machine.multiblock.CoilCrossRecipeMultiblockMachine;
 import com.gtolib.api.recipe.RecipeType;
-import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 import com.gtolib.utils.MultiBlockFileReader;
 import com.gtolib.utils.RegistriesUtils;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.pattern.*;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.client.renderer.machine.FusionReactorRenderer;
 import com.gregtechceu.gtceu.common.data.*;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine;
@@ -66,9 +60,7 @@ import net.minecraft.world.level.block.Blocks;
 
 import earth.terrarium.adastra.common.registry.ModItems;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.gregtechceu.gtceu.api.GTValues.LuV;
@@ -107,7 +99,7 @@ public final class MultiBlockD {
             .nonYAxisRotation()
             .recipeTypes(GTORecipeTypes.COSMOS_SIMULATION_RECIPES)
             .tooltips(GTOMachineTooltips.INSTANCE.getEyeOfHarmonyTooltips().getSupplier())
-            .fromSourceTooltips("GTNH")
+            .fromSourceTooltips("GregTech: New Horizon")
             .block(GTBlocks.HIGH_POWER_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
@@ -159,7 +151,6 @@ public final class MultiBlockD {
             .register();
 
     public static final MultiblockMachineDefinition HYPERDIMENSIONAL_PLASMA_FUSION_CORE = multiblock("hyperdimensional_plasma_fusion_core", "高维等离子聚变核心", DimensionallyTranscendentPlasmaForgeMachine::new)
-            .disabledCombined()
             .nonYAxisRotation()
             .recipeTypes(GTORecipeTypes.DIMENSIONALLY_TRANSCENDENT_PLASMA_FORGE_RECIPES)
             .recipeTypes(GTORecipeTypes.STELLAR_FORGE_RECIPES)
@@ -338,13 +329,12 @@ public final class MultiBlockD {
     public static final MultiblockMachineDefinition COLD_ICE_FREEZER = multiblock("cold_ice_freezer", "寒冰冷冻机", ColdIceFreezerMachine::new)
             .allRotation()
             .moduleTooltips(new PartAbility[] { ACCELERATE_HATCH, EXTRA_ENERGY_HATCH }, new RecipeType[] { ATOMIZATION_CONDENSATION_RECIPES })
-            .disabledCombined()
             .recipeTypes(GTRecipeTypes.VACUUM_RECIPES, ATOMIZATION_CONDENSATION_RECIPES)
             .durationMultiplierTooltips(0.5)
             .tooltips(GTOMachineStories.INSTANCE.getColdIceFreezerTooltips().getSupplier())
             .tooltips(GTOMachineTooltips.INSTANCE.getColdIceFreezerTooltips().getSupplier())
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(64))
-            .recipeModifiers(RecipeModifierFunction.overclocking(0.5, 1, 0.5))
+            .recipeModifiers(RecipeModifier.overclocking(0.5, 1, 0.5))
             .block(GTOBlocks.COLD_ICE_CASING)
             .pattern(definition -> FactoryBlockPattern.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
                     .aisle("AAAAA", " BBB ", " BGB ", " BBB ", "AAAAA")
@@ -391,7 +381,7 @@ public final class MultiBlockD {
                     .where(' ', any())
                     .build())
             .workableCasingRenderer(GTOCore.id("block/casings/cold_ice_casing"), GTCEu.id("block/multiblock/vacuum_freezer"))
-            .recoveryStacks((machine, recipe) -> machine.getLevel() instanceof ServerLevel l && l.random.nextFloat() < 0.1f ?
+            .recoveryStacks((m, r) -> m.getLevel() instanceof ServerLevel l && l.random.nextFloat() < 0.1f ?
                     ModItems.ICE_SHARD.get().getDefaultInstance() :
                     ChemicalHelper.get(TagPrefix.dust, GTMaterials.Ice))
             .register();
@@ -533,7 +523,7 @@ public final class MultiBlockD {
                     h -> h.addLines("机器内纳米蜂群数量，机器等级每超过配方一级，获得的并行x2", "The number of Nano Swarms in the machine; for each machine tier above the recipe tier, the obtained parallel is doubled"),
                     c -> c.addCommentLines("公式 : 纳米蜂群数量 * 2^(机器等级 - 配方等级), 算去吧", "Formula: Number of Nano Swarms * 2^(Machine Tier - Recipe Tier), do the math")))
             .laserTooltips()
-            .fromSourceTooltips("GTNH")
+            .fromSourceTooltips("GregTech: New Horizon")
             .block(GTOBlocks.NAQUADAH_ALLOY_CASING)
             .pattern(definition -> NanoForgeMachine.getBlockPattern(1, definition))
             .shapeInfos(definition -> {
@@ -552,7 +542,7 @@ public final class MultiBlockD {
             .tooltips(GTOMachineStories.INSTANCE.getIsaMillTooltips().getSupplier())
             .perfectOCTooltips()
             .perfectOverclock()
-            .fromSourceTooltips("GTNH")
+            .fromSourceTooltips("GregTech: New Horizon")
             .block(GTOBlocks.INCONEL_625_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
@@ -571,7 +561,7 @@ public final class MultiBlockD {
             .workableCasingRenderer(GTOCore.id("block/casings/inconel_625_casing"), GTCEu.id("block/multiblock/gcym/large_maceration_tower"))
             .recoveryStacks((m, r) -> {
                 if (r == null) return ItemStack.EMPTY;
-                return ((ItemIngredient) r.outputs.get(ItemRecipeCapability.CAP).getFirst().inner).getInnerItemStack().copyWithCount(1);
+                return r.itemOutputs.getFirst().inner.getInnerItemStack().copyWithCount(1);
             })
             .register();
 
@@ -580,7 +570,7 @@ public final class MultiBlockD {
             .tooltips(GTOMachineStories.INSTANCE.getNeutronActivatorTooltips().getSupplier())
             .tooltips(GTOMachineTooltips.INSTANCE.getNeutronActivatorTooltips().getSupplier())
             .parallelizableTooltips()
-            .fromSourceTooltips("GTNH")
+            .fromSourceTooltips("GregTech: New Horizon")
             .recipeTypes(GTORecipeTypes.NEUTRON_ACTIVATOR_RECIPES)
             .block(GTBlocks.CASING_STAINLESS_CLEAN)
             .pattern(definition -> FactoryBlockPattern.start(definition, RelativeDirection.RIGHT, RelativeDirection.BACK, RelativeDirection.UP)
@@ -666,13 +656,14 @@ public final class MultiBlockD {
                     .aisle("FOF", "RTR", "DAG", "#Y#")
                     .where('S', controller(definition))
                     .where('F', blocks(GTBlocks.CASING_STEEL_SOLID.get())
-                            .or(abilities(IMPORT_FLUIDS).setMaxGlobalLimited(4).setPreviewCount(1))
+                            .or(blocks(IMPORT_FLUIDS.getAllBlocks().stream().filter(b -> !DUAL_INPUT.getAllBlocks().contains(b))
+                                    .toArray(Block[]::new)).setMaxGlobalLimited(4).setPreviewCount(1))
                             .or(abilities(PARALLEL_HATCH).setMaxGlobalLimited(1)))
                     .where('O', abilities(EXPORT_ITEMS).addTooltips(Component.translatable("gtceu.multiblock.pattern.location_end")))
                     .where('Y', blocks(GTBlocks.CASING_STEEL_SOLID.get())
                             .or(abilities(INPUT_ENERGY).setMaxGlobalLimited(2).setPreviewCount(1))
                             .or(abilities(INPUT_LASER).setMaxGlobalLimited(2)))
-                    .where('I', abilities(GTOPartAbility.ITEMS_INPUT))
+                    .where('I', abilities(GTOPartAbility.ITEMS_INPUT_BUS))
                     .where('G', blocks(GTBlocks.CASING_GRATE.get()))
                     .where('D', blocks(GTBlocks.CASING_GRATE.get())
                             .or(abilities(OPTICAL_DATA_RECEPTION).setExactLimit(1)))
@@ -714,7 +705,7 @@ public final class MultiBlockD {
             .recipeTypes(GTRecipeTypes.DUMMY_RECIPES)
             .tooltips(GTOMachineStories.INSTANCE.getSpaceElevatorTooltips().getSupplier())
             .tooltips(GTOMachineTooltips.INSTANCE.getSpaceElevatorTooltips().getSupplier())
-            .fromSourceTooltips("GTNH")
+            .fromSourceTooltips("GregTech: New Horizon")
             .block(GTOBlocks.SPACE_ELEVATOR_MECHANICAL_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
@@ -729,7 +720,7 @@ public final class MultiBlockD {
                     .where('I', air())
                     .where('J', blocks(GTOBlocks.SPACE_ELEVATOR_POWER_CORE.get()))
                     .where('X', blocks(GTOBlocks.SPACE_ELEVATOR_MECHANICAL_CASING.get())
-                            .or(abilities(GTOPartAbility.ITEMS_INPUT).setExactLimit(1))
+                            .or(abilities(GTOPartAbility.ITEMS_INPUT_BUS).setExactLimit(1))
                             .or(abilities(INPUT_ENERGY).setExactLimit(1))
                             .or(abilities(COMPUTATION_DATA_RECEPTION).setExactLimit(1)))
                     .where(' ', any())
@@ -994,7 +985,7 @@ public final class MultiBlockD {
     public static final MultiblockMachineDefinition GOD_FORGE = multiblock("god_forge", "诸神之锻炉", GodForgeMachine::new)
             .nonYAxisRotation()
             .recipeTypes(GTRecipeTypes.DUMMY_RECIPES)
-            .fromSourceTooltips("GTNH")
+            .fromSourceTooltips("GregTech: New Horizon")
             .block(GTOBlocks.TRANSCENDENTALLY_AMPLIFIED_MAGNETIC_CONFINEMENT_CASING)
             .pattern(GodForgeMachine::getBlockPattern)
             .renderer(GodforgeRenderer::new)

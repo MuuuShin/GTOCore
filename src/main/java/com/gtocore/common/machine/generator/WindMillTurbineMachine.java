@@ -10,7 +10,6 @@ import com.gtolib.api.machine.part.ItemPartMachine;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.ITickSubscription;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.IFancyTooltip;
 import com.gregtechceu.gtceu.api.gui.fancy.TooltipsPanel;
@@ -20,6 +19,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.ChatFormatting;
@@ -37,9 +37,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import earth.terrarium.adastra.api.planets.Planet;
 import earth.terrarium.adastra.api.planets.PlanetApi;
@@ -58,10 +58,10 @@ public final class WindMillTurbineMachine extends TieredEnergyMachine implements
 
     @DynamicInitialValue(key = "wind_mill_turbine.amperage_out", typeKey = KEY_AMPERAGE_OUT, easyValue = "2", normalValue = "1", expertValue = "1", cn = "输出电流", cnComment = "风力涡轮机的最大输出电流。", en = "Output Amperage", enComment = "The maximum output amperage of the wind turbine.")
     private static int amperage_out = 2;
-    @Persisted
+    @SaveToDisk
     private final NotifiableItemStackHandler inventory;
     @Getter
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private float spinSpeed;
     @Getter

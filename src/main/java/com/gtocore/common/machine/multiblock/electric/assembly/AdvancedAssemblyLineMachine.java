@@ -4,22 +4,18 @@ import com.gtocore.common.machine.multiblock.part.HugeBusPartMachine;
 import com.gtocore.data.IdleReason;
 
 import com.gtolib.api.machine.multiblock.ElectricMultiblockMachine;
-import com.gtolib.api.recipe.Recipe;
-import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
-import com.gtolib.utils.MathUtil;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
-import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
-import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
+import com.gregtechceu.gtceu.api.recipe.content.Content;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.FluidHatchPartMachine;
@@ -31,16 +27,12 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputBusPartMachine;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputHatchPartMachine;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 public final class AdvancedAssemblyLineMachine extends ElectricMultiblockMachine {
 
@@ -53,40 +45,25 @@ public final class AdvancedAssemblyLineMachine extends ElectricMultiblockMachine
 
     @Nullable
     @Override
-    protected Recipe getRealRecipe(@NotNull Recipe recipe) {
-        var config = ConfigHolder.INSTANCE.machines;
-
-        if (config.orderedAssemblyLineItems) {
-            if (!checkItemInputs(recipe)) {
-                setIdleReason(IdleReason.ORDERED_ITEM);
-                return null;
-            }
-        }
-
-        if (config.orderedAssemblyLineFluids) {
-            if (!checkFluidInputs(recipe)) {
-                setIdleReason(IdleReason.ORDERED_FLUID);
-                return null;
-            }
-        }
-        return RecipeModifierFunction.laserLossOverclocking(this, RecipeModifierFunction.hatchParallel(this, recipe));
+    public GTRecipe getRealRecipe(@NotNull RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {
+        recipe = RecipeModifier.hatchParallel(this, unit, recipe);
+        if (recipe == null) return null;
+        return RecipeModifier.laserLossOverclocking(this, unit, recipe);
     }
 
     /**
      * 检查给定配方的物品输入是否与机器的物品存储区有序匹配。
      */
     private boolean checkItemInputs(GTRecipe recipe) {
-        var inputs = recipe.inputs.get(ItemRecipeCapability.CAP);
-        if (inputs == null) return true;
+        var inputs = recipe.itemInputs;
+        if (inputs.isEmpty()) return true;
         if (itemStackTransfers.size() < inputs.size()) return false;
-
         for (int i = 0; i < inputs.size(); i++) {
-            var content = inputs.get(i).inner;
-            if (content instanceof ItemIngredient ingredient && !ingredient.isEmpty()) {
-                if (!matchItem(this.itemStackTransfers.get(i), ingredient)) return false;
+            var content = inputs.get(i);
+            if (!content.isEmpty()) {
+                if (!matchItem(this.itemStackTransfers.get(i), content)) return false;
             }
         }
-
         return true;
     }
 
@@ -94,24 +71,22 @@ public final class AdvancedAssemblyLineMachine extends ElectricMultiblockMachine
      * 检查给定配方的流体输入是否与机器的流体存储区有序匹配。
      */
     private boolean checkFluidInputs(GTRecipe recipe) {
-        var inputs = recipe.inputs.get(FluidRecipeCapability.CAP);
-        if (inputs == null) return true;
+        var inputs = recipe.fluidInputs;
+        if (inputs.isEmpty()) return true;
         if (fluidTankTransfers.size() < inputs.size()) return false;
-
         for (int i = 0; i < inputs.size(); i++) {
-            var content = inputs.get(i).inner;
-            if (content instanceof FluidIngredient ingredient && !ingredient.isEmpty()) {
-                if (!matchFluid(this.fluidTankTransfers.get(i), ingredient)) return false;
+            var content = inputs.get(i);
+            if (!content.isEmpty()) {
+                if (!matchFluid(this.fluidTankTransfers.get(i), content)) return false;
             }
         }
-
         return true;
     }
 
     /**
      * 验证给定的存储区是否仅包含与当前需求匹配的唯一种类物品。
      */
-    private boolean matchItem(CustomItemStackHandler storage, ItemIngredient currentIngredient) {
+    private boolean matchItem(CustomItemStackHandler storage, Content<ItemIngredient> currentIngredient) {
         Item item = Items.AIR;
         for (int slot = 0; slot < storage.getSlots(); slot++) {
             var stack = storage.getStackInSlot(slot);
@@ -122,7 +97,7 @@ public final class AdvancedAssemblyLineMachine extends ElectricMultiblockMachine
                     return false;
                 }
 
-                if (!currentIngredient.testItem(providedItem)) {
+                if (!currentIngredient.inner.testItem(providedItem)) {
                     return false;
                 }
 
@@ -136,7 +111,7 @@ public final class AdvancedAssemblyLineMachine extends ElectricMultiblockMachine
     /**
      * 验证给定的流体存储区是否与当前需求匹配。
      */
-    private boolean matchFluid(CustomFluidTank[] storage, FluidIngredient currentIngredient) {
+    private boolean matchFluid(CustomFluidTank[] storage, Content<FluidIngredient> currentIngredient) {
         var fluid = Fluids.EMPTY;
         for (var tank : storage) {
             var providedFluid = tank.getFluid().getFluid();
@@ -146,7 +121,7 @@ public final class AdvancedAssemblyLineMachine extends ElectricMultiblockMachine
                     return false;
                 }
 
-                if (!currentIngredient.testFluid(providedFluid)) {
+                if (!currentIngredient.inner.testFluid(providedFluid)) {
                     return false;
                 }
 
@@ -157,8 +132,88 @@ public final class AdvancedAssemblyLineMachine extends ElectricMultiblockMachine
     }
 
     @Override
-    public RecipeLogic createRecipeLogic(Object... args) {
-        return new AssemblyLineLogic(this);
+    public boolean matchRecipeInput(RecipeHandlerUnit unit, GTRecipe recipe) {
+        var config = ConfigHolder.INSTANCE.machines;
+        if (config.orderedAssemblyLineItems) {
+            if (!checkItemInputs(recipe)) {
+                setIdleReason(IdleReason.ORDERED_ITEM);
+                return false;
+            }
+        } else {
+            var items = RecipeHelper.copyContents(recipe.itemInputs, 1);
+            if (!unit.handleRecipeItem(IO.IN, recipe, items, true)) {
+                return false;
+            }
+        }
+        if (config.orderedAssemblyLineFluids) {
+            if (!checkFluidInputs(recipe)) {
+                setIdleReason(IdleReason.ORDERED_FLUID);
+                return false;
+            }
+        } else {
+            var fluids = RecipeHelper.copyContents(recipe.fluidInputs, 1);
+            return unit.handleRecipeFluid(IO.IN, recipe, fluids, true);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean handleRecipeInput(RecipeHandlerUnit unit, GTRecipe recipe) {
+        var items = RecipeHelper.copyAndRoll(recipe, recipe.itemInputs);
+        var fluids = RecipeHelper.copyAndRoll(recipe, recipe.fluidInputs);
+        if (ConfigHolder.INSTANCE.machines.orderedAssemblyLineItems) {
+            if (!consumeOrderedItemInputs(items)) {
+                return false;
+            }
+        } else {
+            if (!unit.handleRecipeItem(IO.IN, recipe, items, false)) {
+                return false;
+            }
+        }
+        if (ConfigHolder.INSTANCE.machines.orderedAssemblyLineFluids) {
+            return consumeOrderedFluidInputs(fluids);
+        } else {
+            return unit.handleRecipeFluid(IO.IN, recipe, fluids, false);
+        }
+    }
+
+    private boolean consumeOrderedItemInputs(List<Content<ItemIngredient>> items) {
+        if (items.isEmpty()) return true;
+        var machineInputs = itemStackTransfers;
+        if (machineInputs.size() < items.size()) return false;
+        for (int i = 0; i < items.size(); i++) {
+            var inputSlot = machineInputs.get(i);
+            var recipeInput = items.get(i);
+            boolean tested = false;
+            for (int j = 0; j < inputSlot.size; j++) {
+                var stack = inputSlot.getStackInSlot(j);
+                if (stack.isEmpty() || (!tested && !recipeInput.inner.test(stack))) continue;
+                tested = true;
+                recipeInput.shrink(inputSlot.extract(j, recipeInput.getIntAmount(), false));
+                if (recipeInput.amount <= 0) break;
+            }
+            if (recipeInput.amount > 0) return false;
+        }
+        return true;
+    }
+
+    private boolean consumeOrderedFluidInputs(List<Content<FluidIngredient>> fluids) {
+        if (fluids.isEmpty()) return true;
+        var machineInputs = fluidTankTransfers;
+        if (machineInputs.size() < fluids.size()) return false;
+        for (int i = 0; i < fluids.size(); i++) {
+            var inputTankArray = machineInputs.get(i);
+            var recipeInput = fluids.get(i);
+            for (var tankInHatch : inputTankArray) {
+                if (tankInHatch.isEmpty() || !recipeInput.inner.test(tankInHatch.getFluid())) continue;
+                recipeInput.shrink(tankInHatch.drain(recipeInput.getIntAmount(), IFluidHandler.FluidAction.EXECUTE).getAmount());
+                if (recipeInput.amount <= 0) break;
+            }
+            if (recipeInput.amount > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -195,97 +250,7 @@ public final class AdvancedAssemblyLineMachine extends ElectricMultiblockMachine
             }
             case HugeBusPartMachine hugeBusPartMachine -> itemStackTransfers.add(hugeBusPartMachine.getInventory().storage);
             case FluidHatchPartMachine fluidHatchPartMachine -> fluidTankTransfers.add(fluidHatchPartMachine.tank.getStorages());
-            case CreativeInputBusPartMachine creativeInputBusPartMachine -> itemStackTransfers.add(creativeInputBusPartMachine.getInventory().storage);
-            case CreativeInputHatchPartMachine creativeInputHatchPartMachine -> fluidTankTransfers.add(creativeInputHatchPartMachine.tank.getStorages());
             default -> {}
-        }
-    }
-
-    private static class AssemblyLineLogic extends RecipeLogic {
-
-        private AssemblyLineLogic(IRecipeLogicMachine machine) {
-            super(machine);
-        }
-
-        @NotNull
-        @Override
-        public AdvancedAssemblyLineMachine getMachine() {
-            return (AdvancedAssemblyLineMachine) super.getMachine();
-        }
-
-        @Override
-        protected boolean handleRecipeIO(GTRecipe recipe, IO io) {
-            if (!(io == IO.IN)) {
-                return super.handleRecipeIO(recipe, io);
-            }
-            if (ConfigHolder.INSTANCE.machines.orderedAssemblyLineItems) {
-                if (!consumeOrderedItemInputs(recipe)) {
-                    return false;
-                }
-            } else {
-                var items = recipe.getInputContents(ItemRecipeCapability.CAP);
-                if (!RecipeHelper.handleRecipe(this.machine, recipe, io, Map.of(ItemRecipeCapability.CAP, items), chanceCaches, false)) {
-                    return false;
-                }
-            }
-            if (ConfigHolder.INSTANCE.machines.orderedAssemblyLineFluids) {
-                return consumeOrderedFluidInputs(recipe);
-            } else {
-                var fluids = recipe.getInputContents(FluidRecipeCapability.CAP);
-                return RecipeHelper.handleRecipe(this.machine, recipe, io, Map.of(FluidRecipeCapability.CAP, fluids), chanceCaches, false);
-            }
-        }
-
-        private boolean consumeOrderedItemInputs(GTRecipe recipe) {
-            var itemInputs = recipe.inputs.getOrDefault(ItemRecipeCapability.CAP, Collections.emptyList());
-            if (itemInputs.isEmpty()) return true;
-            var machineInputs = getMachine().itemStackTransfers;
-            if (machineInputs.size() < itemInputs.size()) return false;
-            for (int i = 0; i < itemInputs.size(); i++) {
-                var inputSlot = machineInputs.get(i);
-                var recipeInput = ItemRecipeCapability.CAP.of(itemInputs.get(i));
-                boolean tested = false;
-                var amount = recipeInput.amount;
-                for (int j = 0; j < inputSlot.size; j++) {
-                    var stack = inputSlot.getStackInSlot(j);
-                    if (stack.isEmpty() || (!tested && !recipeInput.test(stack))) continue;
-                    tested = true;
-                    amount -= inputSlot.extractItem(j, MathUtil.saturatedCast(amount), false).getCount();
-                    if (amount <= 0) break;
-                }
-                if (amount > 0) return false;
-            }
-            return true;
-        }
-
-        private boolean consumeOrderedFluidInputs(GTRecipe recipe) {
-            var fluidInputs = recipe.inputs.getOrDefault(FluidRecipeCapability.CAP, Collections.emptyList());
-            if (fluidInputs.isEmpty()) return true;
-
-            var machineInputs = getMachine().fluidTankTransfers;
-            if (machineInputs.size() < fluidInputs.size()) return false;
-
-            for (int i = 0; i < fluidInputs.size(); i++) {
-                var inputTankArray = machineInputs.get(i);
-                var recipeInput = FluidRecipeCapability.CAP.of(fluidInputs.get(i));
-                long amountToDrain = recipeInput.amount;
-
-                for (var tankInHatch : inputTankArray) {
-                    if (tankInHatch.isEmpty() || !recipeInput.test(tankInHatch.getFluid())) {
-                        continue;
-                    }
-                    var drainedStack = tankInHatch.drain(MathUtil.saturatedCast(amountToDrain), IFluidHandler.FluidAction.EXECUTE);
-                    amountToDrain -= drainedStack.getAmount();
-                    if (amountToDrain <= 0) {
-                        break;
-                    }
-                }
-
-                if (amountToDrain > 0) {
-                    return false;
-                }
-            }
-            return true;
         }
     }
 }

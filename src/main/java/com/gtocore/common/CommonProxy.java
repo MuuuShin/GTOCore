@@ -7,11 +7,10 @@ import com.gtocore.client.KeyMessage;
 import com.gtocore.client.Message;
 import com.gtocore.common.block.BlockMap;
 import com.gtocore.common.data.*;
+import com.gtocore.common.data.GTOCodecs;
 import com.gtocore.common.data.translation.GTOItemTooltips;
 import com.gtocore.common.forge.ForgeCommonEvent;
 import com.gtocore.common.machine.tesseract.TesseractDirectedTarget;
-import com.gtocore.common.syncdata.GTORecipePayload;
-import com.gtocore.common.syncdata.GenericStackPayload;
 import com.gtocore.config.GTOConfig;
 import com.gtocore.config.SparkRange;
 import com.gtocore.data.Data;
@@ -38,16 +37,13 @@ import com.gtolib.api.ae2.me2in1.emi.CategoryMappingSubMenu;
 import com.gtolib.api.ae2.stacks.TagPrefixKeyType;
 import com.gtolib.api.item.IItem;
 import com.gtolib.api.player.IEnhancedPlayer;
+import com.gtolib.api.player.attribute.PlayerAttributes;
 import com.gtolib.api.registries.ScanningClass;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.common.data.GTMaterialBlocks;
-import com.gregtechceu.gtceu.common.data.GTSyncedFieldAccessors;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine;
-import com.gregtechceu.gtceu.syncdata.*;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -59,7 +55,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
@@ -68,14 +63,13 @@ import net.minecraftforge.registries.RegisterEvent;
 
 import appeng.api.features.GridLinkables;
 import appeng.api.networking.pathing.ChannelMode;
-import appeng.api.stacks.AEKeyTypes;
-import appeng.api.stacks.GenericStack;
+import appeng.api.stacks.*;
 import appeng.core.AEConfig;
 import appeng.hotkeys.HotkeyActions;
 import appeng.items.tools.powered.WirelessTerminalItem;
 
-import com.lowdragmc.lowdraglib.syncdata.payload.FriendlyBufPayload;
-import com.lowdragmc.lowdraglib.syncdata.payload.NbtTagPayload;
+import com.gto.datasynclib.DataSyncCodec;
+import com.gto.datasynclib.datasream.codec.ByteStreamCodec;
 import de.mari_023.ae2wtlib.AE2wtlib;
 import de.mari_023.ae2wtlib.TextConstants;
 import de.mari_023.ae2wtlib.hotkeys.Ae2WTLibLocatingService;
@@ -88,7 +82,6 @@ import java.util.function.Supplier;
 
 import static com.gtolib.api.registries.GTORegistration.GTO;
 import static com.lowdragmc.lowdraglib.syncdata.TypedPayloadRegistries.register;
-import static com.lowdragmc.lowdraglib.syncdata.TypedPayloadRegistries.registerSimple;
 import static de.mari_023.ae2wtlib.wut.WUTHandler.terminalNames;
 import static de.mari_023.ae2wtlib.wut.WUTHandler.wirelessTerminals;
 
@@ -110,22 +103,11 @@ public class CommonProxy {
     }
 
     public static void earlyStartup() {
-        GTSyncedFieldAccessors.EVENT.removeListener(GTSyncedFieldAccessors.class);
-        GTSyncedFieldAccessors.EVENT.addListener(CommonProxy.class, () -> {
-            register(FriendlyBufPayload.class, FriendlyBufPayload::new, GTSyncedFieldAccessors.GT_RECIPE_TYPE_ACCESSOR, 1000);
-            register(NbtTagPayload.class, NbtTagPayload::new, VirtualTankAccessor.INSTANCE, 2);
-            register(NbtTagPayload.class, NbtTagPayload::new, VirtualItemStorageAccessor.INSTANCE, 2);
-            register(NbtTagPayload.class, NbtTagPayload::new, VirtualRedstoneAccessor.INSTANCE, 2);
-            registerSimple(MaterialPayload.class, MaterialPayload::new, Material.class, 1);
-            registerSimple(GTORecipePayload.class, GTORecipePayload::new, GTRecipe.class, 100);
-            registerSimple(FluidStackPayload.class, FluidStackPayload::new, FluidStack.class, -1);
-            registerSimple(TesseractDirectedTarget.Payload.class, TesseractDirectedTarget.Payload::new, TesseractDirectedTarget.class, 10);
-            registerSimple(GenericStackPayload.class, GenericStackPayload::new, GenericStack.class, 10);
-        });
         GTEMIPlugin.init();
     }
 
     private static void init() {
+        GTOCodecs.init();
         GTOCreativeModeTabs.init();
         GTOEntityTypes.init();
         if (!GTCEu.isDataGen() && Mods.FTBQUESTS.isLoaded()) {
@@ -150,6 +132,7 @@ public class CommonProxy {
         } else {
             AEConfig.instance().setChannelModel(ChannelMode.INFINITE);
         }
+        PlayerAttributes.init();
 
         FusionReactorMachine.registerFusionTier(GTValues.UHV, " (MKIV)");
         FusionReactorMachine.registerFusionTier(GTValues.UEV, " (MKV)");
@@ -180,6 +163,7 @@ public class CommonProxy {
         }
         Message.init();
         GTOItemTooltips.INSTANCE.initLanguage();
+        DataSyncCodec.register(TesseractDirectedTarget.class, ByteStreamCodec.of(TesseractDirectedTarget.CODEC), TesseractDirectedTarget.CODEC);
     }
 
     public static void afterStartup() {

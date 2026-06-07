@@ -106,6 +106,7 @@ final class MachineLang {
         addCNEN("gtocore.machine.wireless_data_receiver_hatch.to_bind", "靶仓数据读取完成，请右键源仓进行绑定", "Target hatch data reading completed, please right-click the source hatch to bind");
         addCNEN("gtocore.machine.wireless_data_receiver_hatch.bind", "已绑定无线光学数据源仓(%s)", "Bound wireless optical data source hatch (%s)");
         addCNEN("gtocore.machine.wireless_data_receiver_hatch.unbind", "未绑定无线光学数据源仓", "Wireless optical data source hatch not bound");
+        addCNEN("gtocore.machine.pattern_buffer_proxy.tooltip.0", "手持闪存潜行右键§6ME样板总成§f，然后右键§6ME样板总成镜像§f绑定。", "Hold a flash drive and sneak-right-click the §6ME Pattern Buffer§f, then right-click the §6ME Pattern Buffer Proxy§f to bind them.");
         addCNEN("gtocore.machine.need", "需要: %s", "Need: %s");
         addCNEN("gtocore.machine.advanced_infinite_driller.not_fluid_head", "无钻头", "No drill head");
         addCNEN("gtocore.machine.advanced_infinite_driller.heat", "最大温度: %sK / 工作温度: %sK", "Max Temperature: %sK / Operating Temperature: %sK");
@@ -163,7 +164,7 @@ final class MachineLang {
         addCNEN("gtocore.machine.monitor.mana.pool.2", "池/s)", "Pools per Second)");
         addCNEN("gtocore.machine.monitor.mana.increase", "每秒魔力增长: ", "Mana Growth Per Second: ");
         addCNEN("gtocore.machine.monitor.mana.decrease", "每秒魔力消耗: ", "Mana Consumption Per Second: ");
-        addCNEN("gtocore.machine.monitor.cwu.capacity", "当前网络可请求算力/最大算力: %s/%s CWU", "Current Network (Requestable/Max) Hashrate: %s/%s CWU");
+        addCNEN("gtocore.machine.monitor.cwu.capacity", "当前网络可请求算力: %s CWU", "Current Network Requestable Hashrate: %s CWU");
         addCNEN("gtocore.machine.monitor.cwu.used", "（平均使用算力: %s CWU）", "(Average Used Hashrate: %s CWU)");
         addCNEN("gtocore.machine.monitor.eu.no_container", "警告：无限能源塔绑定信息缺失！", "Warning: Infinite Energy Tower binding information is missing!");
         addCNEN("gtocore.machine.monitor.eu.fullness", "能量塔能量存量: %s%%", "Energy Tower Energy Storage: %s%%");

@@ -3,20 +3,19 @@ package com.gtocore.common.machine.multiblock.part;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.ITickSubscription;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
-import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
+import com.gregtechceu.gtceu.api.recipe.GTRecipeBuilder;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
+import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
 import com.gregtechceu.gtceu.common.recipe.condition.DimensionCondition;
-import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
+import com.gregtechceu.gtceu.utils.TaskHandler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -29,10 +28,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +43,7 @@ public final class InfiniteIntakeHatchPartMachine extends WorkableTieredIOPartMa
 
     private TickableSubscription intakeSubs;
 
-    @Persisted
+    @SaveToDisk
     private final NotifiableFluidTank tank;
 
     @SyncToClient(notifyUpdate = true)
@@ -60,12 +58,12 @@ public final class InfiniteIntakeHatchPartMachine extends WorkableTieredIOPartMa
     }
 
     public static void init(GTRecipeBuilder recipeBuilder) {
-        for (var condition : recipeBuilder.conditions) {
+        for (var condition : recipeBuilder.getConditions()) {
             if (condition instanceof DimensionCondition dimensionCondition) {
                 var dim = dimensionCondition.dimension;
-                var fluids = RecipeHelper.getOutputContents(recipeBuilder, FluidRecipeCapability.CAP);
+                var fluids = recipeBuilder.getFluidOutputs();
                 if (!fluids.isEmpty()) {
-                    AIR_MAP.put(dim, fluids.getFirst().getFluid());
+                    AIR_MAP.put(dim, fluids.getFirst().inner.getFluid());
                     break;
                 }
             }
@@ -74,7 +72,7 @@ public final class InfiniteIntakeHatchPartMachine extends WorkableTieredIOPartMa
 
     @Override
     @Nullable
-    public IItemHandlerModifiable getItemHandlerCap(@Nullable Direction side, boolean useCoverCapability) {
+    public ICustomItemStackHandler getItemHandlerCap(@Nullable Direction side, boolean useCoverCapability) {
         return null;
     }
 
@@ -82,7 +80,7 @@ public final class InfiniteIntakeHatchPartMachine extends WorkableTieredIOPartMa
     public void onLoad() {
         super.onLoad();
         if (getLevel() instanceof ServerLevel serverLevel) {
-            serverLevel.getServer().tell(new TickTask(0, this::updateTankSubscription));
+            TaskHandler.enqueueTask(serverLevel, this::updateTankSubscription);
         } else {
             particleSubscription = subscribeClientTick(particleSubscription, this::particleTick, 5);
         }
@@ -97,7 +95,7 @@ public final class InfiniteIntakeHatchPartMachine extends WorkableTieredIOPartMa
 
     @Override
     public void onPaintingColorChanged(int color) {
-        getHandlerList().setColor(color, true);
+        getHandlerUnit().setColor(color, true);
     }
 
     @Override

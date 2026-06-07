@@ -8,10 +8,7 @@ import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
 import com.gtocore.common.machine.generator.MagicEnergyMachine;
 import com.gtocore.common.machine.mana.*;
-import com.gtocore.common.machine.mana.part.MEManaAmplifierPartMachine;
-import com.gtocore.common.machine.mana.part.ManaExtractHatchPartMachine;
-import com.gtocore.common.machine.mana.part.ManaHatchPartMachine;
-import com.gtocore.common.machine.mana.part.WirelessManaHatchPartMachine;
+import com.gtocore.common.machine.mana.part.*;
 
 import com.gtolib.GTOCore;
 import com.gtolib.api.GTOValues;
@@ -20,8 +17,8 @@ import com.gtolib.api.machine.mana.ManaAmplifierPartMachine;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.client.renderer.machine.SimpleGeneratorMachineRenderer;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
@@ -182,16 +179,23 @@ public final class ManaMachine {
             .nonYAxisRotation()
             .workableManaTieredHullRenderer(4, GTOCore.id("block/multiblock/area_destruction_tools"))
             .register();
+
     public static final MachineDefinition AE_MANA_INTERFACE = machine("me_mana_interface", "ME魔力接口", MEManaInterface::new)
             .tier(ZPM)
             .tooltips(GTOMachineTooltips.INSTANCE.getAEManaInterfaceTooltips().getSupplier())
             .allRotation()
             .workableManaTieredHullRenderer(7, GTOCore.id("block/multiblock/mana"))
             .register();
+
     public static final MachineDefinition XP_OBELISK = machine("exp_obelisk", "经验方尖碑", ExperienceObelisk::new)
             .tier(ULV)
             .tooltips(GTOMachineTooltips.INSTANCE.getExperienceObeliskTooltips().getSupplier())
             .allRotation()
             .workableManaTieredHullRenderer(0, GTOCore.id("block/multiblock/mana"))
+            .register();
+
+    public static final MachineDefinition PULSE_CORE = machine("pulse_core", "脉冲核心", PulseMachineMaintenanceCore::new)
+            .allRotation()
+            .workableManaTieredHullRenderer(2, GTOCore.id("block/multiblock/pulse_core"))
             .register();
 }

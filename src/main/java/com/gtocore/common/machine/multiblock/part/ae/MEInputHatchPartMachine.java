@@ -5,13 +5,13 @@ import com.gtocore.common.machine.multiblock.part.ae.slots.ExportOnlyAEFluidSlot
 import com.gtocore.common.machine.multiblock.part.ae.widget.AEFluidConfigWidget;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
 import com.gregtechceu.gtceu.api.machine.feature.IDataStickInteractable;
 import com.gregtechceu.gtceu.api.machine.trait.CircuitHandler;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -30,10 +30,10 @@ import appeng.api.storage.MEStorage;
 
 import gto_ae.helpers.facility_management.WorkingStatus;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.utils.Position;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,10 +46,10 @@ public class MEInputHatchPartMachine extends StatusTrackedMEPartMachine implemen
     @Nullable
     private TickableSubscription autoIOSubs;
 
-    @Persisted
+    @SaveToDisk
     final ExportOnlyAEFluidList aeFluidHandler;
 
-    @Persisted
+    @SaveToDisk
     protected final NotifiableItemStackHandler circuitInventory;
 
     public MEInputHatchPartMachine(MetaMachineBlockEntity holder) {
@@ -115,10 +115,10 @@ public class MEInputHatchPartMachine extends StatusTrackedMEPartMachine implemen
                 long inserted = networkInv.insert(exceedFluid.what(), exceedFluid.amount(), Actionable.MODULATE, this.getActionSourceField());
                 throughputCounter.add(exceedFluid.what(), inserted);
                 if (inserted > 0) {
-                    aeTank.drain(inserted, false, true);
+                    aeTank.extract(inserted, false, true);
                     continue;
                 } else {
-                    aeTank.drain(total, false, true);
+                    aeTank.extract(total, false, true);
                 }
             }
             GenericStack reqFluid = aeTank.requestStack();

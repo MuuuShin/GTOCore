@@ -9,13 +9,13 @@ import com.gtolib.api.network.NetworkPack;
 import com.gtolib.utils.ServerUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -30,12 +30,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.util.holder.IntObjectHolder;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -83,17 +83,13 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
         }, ServerUtils.getServer());
     }
 
-    @Persisted
+    @SaveToDisk
     private final NotifiableItemStackHandler inventory;
-
-    private final List<PlatformBlockType.PlatformPreset> presets = PlatformTemplateStorage.initializePresets();
-    private final int maxGroup;
 
     public PlatformDeploymentMachine(MetaMachineBlockEntity holder) {
         super(holder);
         inventory = new NotifiableItemStackHandler(this, 27, IO.NONE, IO.BOTH);
         inventory.addChangedListener(this::examineMaterial);
-        maxGroup = presets.size();
     }
 
     @Override
@@ -132,59 +128,59 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
 
     // ------------------- 第一步：选择预设 -------------------
     // 是否已完成预设选择
-    @Persisted
+    @SaveToDisk
     private boolean presetConfirm = false;
     // 当前查看的预设组索引
-    @Persisted
+    @SaveToDisk
     private int checkGroup = 0;
     // 显示的预设编号
-    @Persisted
+    @SaveToDisk
     private int checkId = 0;
     // 保存的预设组编号
-    @Persisted
+    @SaveToDisk
     private int saveGroup = 0;
     // 保存的预设编号
-    @Persisted
+    @SaveToDisk
     private int saveId = 0;
     // 是否显示预览
-    @Persisted
+    @SaveToDisk
     private boolean preview = false;
     // 是否高亮
-    @Persisted
+    @SaveToDisk
     private boolean highlight = false;
 
     // ------------------- 第二步：选择偏移 -------------------
     // X方向区块偏移
-    @Persisted
+    @SaveToDisk
     private int offsetX = 0;
     // Z方向区块偏移
-    @Persisted
+    @SaveToDisk
     private int offsetZ = 0;
     // Y方向高度偏移
-    @Persisted
+    @SaveToDisk
     private int offsetY = -1;
 
     // X方向区块偏移修改大小
-    @Persisted
+    @SaveToDisk
     private int adjustX = 0;
     // Z方向区块偏移修改大小
-    @Persisted
+    @SaveToDisk
     private int adjustZ = 0;
     // Y方向偏移修改大小
-    @Persisted
+    @SaveToDisk
     private int adjustY = 0;
     // 坐标点
-    @Persisted
+    @SaveToDisk
     private BlockPos pos1 = new BlockPos(0, 0, 0);
-    @Persisted
+    @SaveToDisk
     private BlockPos pos2 = new BlockPos(0, 0, 0);
 
     // ------------------- 第三步：确认放置 -------------------
     // 库存的原料量
-    @Persisted
+    @SaveToDisk
     private final int[] materialInventory = new int[] { 0, 0, 0 };
     // 库存是否充足
-    @Persisted
+    @SaveToDisk
     private boolean insufficient = false;
     // 原料物品
     private static final List<List<IntObjectHolder<Item>>> ITEM_VALUE_HOLDERS = List.of(
@@ -203,28 +199,28 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
 
     // ------------------- 第四步：运行中 -------------------
     // 任务是否完成
-    @Persisted
+    @SaveToDisk
     private boolean taskCompleted = true;
     // 跳过空气
-    @Persisted
+    @SaveToDisk
     private boolean skipAir = true;
     // 光照更新
-    @Persisted
+    @SaveToDisk
     private boolean updateLight = true;
     // 速度
-    @Persisted
+    @SaveToDisk
     private int speed = 50;
     // X轴对称
-    @Persisted
+    @SaveToDisk
     private boolean xMirror = false;
     // Z轴对称
-    @Persisted
+    @SaveToDisk
     private boolean zMirror = false;
     // Y轴旋转
-    @Persisted
+    @SaveToDisk
     private int rotation = 0;
     // 可导出
-    @Persisted
+    @SaveToDisk
     private boolean canExport = false;
 
     private int progress = 0;
@@ -345,8 +341,8 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
 
                 Component leftBtn1 = ComponentPanelWidget.withButton(Component.literal(" [ ← ] "), "previous_group_plas");
                 Component leftBtn2 = ComponentPanelWidget.withButton(Component.literal(" [ ← ] "), "previous_group");
-                Component empty1 = Component.literal(" ".repeat(15 - ((checkGroup + 1) / 10 + maxGroup / 10 + 5) / 2));
-                textList.add(Component.empty().append(leftBtn1).append(leftBtn2).append(empty1).append(Component.literal("<" + (checkGroup + 1) + "/" + maxGroup + ">")));
+                Component empty1 = Component.literal(" ".repeat(15 - ((checkGroup + 1) / 10 + PlatformTemplateStorage.preset.size() / 10 + 5) / 2));
+                textList.add(Component.empty().append(leftBtn1).append(leftBtn2).append(empty1).append(Component.literal("<" + (checkGroup + 1) + "/" + PlatformTemplateStorage.preset.size() + ">")));
 
                 int totalIds = getPlatformPreset(checkGroup).structures().size();
                 Component leftBtn3 = ComponentPanelWidget.withButton(Component.literal(" [ ← ] "), "previous_id_plas");
@@ -604,19 +600,19 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
                 int maxId = getPlatformPreset(checkGroup).structures().size() - 1;
                 switch (componentData) {
                     case "next_group" -> {
-                        checkGroup = Mth.clamp(checkGroup + 1, 0, maxGroup - 1);
+                        checkGroup = Mth.clamp(checkGroup + 1, 0, PlatformTemplateStorage.preset.size() - 1);
                         checkId = 0;
                     }
                     case "previous_group" -> {
-                        checkGroup = Mth.clamp(checkGroup - 1, 0, maxGroup - 1);
+                        checkGroup = Mth.clamp(checkGroup - 1, 0, PlatformTemplateStorage.preset.size() - 1);
                         checkId = 0;
                     }
                     case "next_group_plas" -> {
-                        checkGroup = Mth.clamp(checkGroup + 10, 0, maxGroup - 1);
+                        checkGroup = Mth.clamp(checkGroup + 10, 0, PlatformTemplateStorage.preset.size() - 1);
                         checkId = 0;
                     }
                     case "previous_group_plas" -> {
-                        checkGroup = Mth.clamp(checkGroup - 10, 0, maxGroup - 1);
+                        checkGroup = Mth.clamp(checkGroup - 10, 0, PlatformTemplateStorage.preset.size() - 1);
                         checkId = 0;
                     }
 
@@ -814,11 +810,11 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
 
     private PlatformBlockType.PlatformPreset getPlatformPreset(int group) {
         try {
-            return presets.get(group);
+            return PlatformTemplateStorage.preset.get(group);
         } catch (IndexOutOfBoundsException | NullPointerException e) {
             checkGroup = 0;
             saveGroup = 0;
-            return presets.getFirst();
+            return PlatformTemplateStorage.preset.getFirst();
         }
     }
 
@@ -915,7 +911,7 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
         List<IntObjectHolder<ItemStack>> extraMaterials = structure.extraMaterials();
         Map<Item, Integer> inventoryCount = new HashMap<>();
         int coordinateCards = 0;
-        for (int i = 0; i < inventory.getSize(); i++) {
+        for (int i = 0; i < inventory.getSlots(); i++) {
             ItemStack stack = inventory.getStackInSlot(i);
             if (stack.isEmpty()) continue;
             inventoryCount.put(stack.getItem(), inventoryCount.getOrDefault(stack.getItem(), 0) + stack.getCount());
@@ -947,7 +943,7 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
         for (IntObjectHolder<ItemStack> holder : extraMaterials) {
             Item item = holder.obj.getItem();
             int remaining = holder.number;
-            for (int i = 0; i < inventory.getSize() && remaining > 0; i++) {
+            for (int i = 0; i < inventory.getSlots() && remaining > 0; i++) {
                 ItemStack stack = inventory.getStackInSlot(i);
                 if (stack.getItem() == item) {
                     int take = Math.min(stack.getCount(), remaining);
@@ -1004,7 +1000,7 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
 
         if (canExport) {
             BlockPos p1 = null, p2 = null;
-            for (int i = 0; i < inventory.getSize() && (p1 == null || p2 == null); i++) {
+            for (int i = 0; i < inventory.getSlots() && (p1 == null || p2 == null); i++) {
                 ItemStack stack = inventory.getStackInSlot(i);
                 if (stack.is(GTOItems.COORDINATE_CARD.asItem())) {
                     if (p1 == null) p1 = getStoredCoordinates(stack);
@@ -1092,7 +1088,7 @@ public class PlatformDeploymentMachine extends MetaMachine implements IFancyUIMa
         if (!(getLevel() instanceof ServerLevel serverLevel)) return;
         BlockPos pos1 = null;
         BlockPos pos2 = null;
-        for (int i = 0; i < inventory.getSize(); i++) {
+        for (int i = 0; i < inventory.getSlots(); i++) {
             ItemStack stack = inventory.getStackInSlot(i);
             if (stack.getItem() == GTOItems.COORDINATE_CARD.asItem()) {
                 if (pos1 == null) pos1 = getStoredCoordinates(stack);

@@ -4,8 +4,8 @@ import com.gtolib.api.machine.trait.InaccessibleInfiniteHandler;
 import com.gtolib.api.machine.trait.InaccessibleInfiniteTank;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.list.AEListGridWidget;
 import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage;
 
@@ -14,10 +14,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGridNodeListener;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.utils.Position;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -26,9 +26,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public class MEDualOutputPartMachine extends StatusTrackedMEPartMachine {
 
-    @Persisted
+    @SaveToDisk
     private final KeyStorage internalBuffer;
-    @Persisted
+    @SaveToDisk
     private final KeyStorage internalTankBuffer;
     private final InaccessibleInfiniteHandler handler;
     private final InaccessibleInfiniteTank tank;

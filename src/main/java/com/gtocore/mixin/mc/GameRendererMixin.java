@@ -13,6 +13,6 @@ public class GameRendererMixin {
      */
     @Overwrite
     public static float getNightVisionScale(LivingEntity livingEntity, float nanoTime) {
-        return 1.0f;
+        return 1.0F;
     }
 }

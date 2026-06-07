@@ -7,11 +7,8 @@ import com.gtocore.common.data.GTOMachines;
 import com.gtocore.common.data.GTOMaterials;
 import com.gtocore.common.data.GTORecipeDataKeys;
 
-import com.gtolib.api.machine.feature.IElectricMachine;
 import com.gtolib.api.machine.feature.multiblock.IMultiStructureMachine;
 import com.gtolib.api.machine.trait.ElectricTrait;
-import com.gtolib.api.recipe.Recipe;
-import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
@@ -19,15 +16,19 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfiguratorButton;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
+import com.gregtechceu.gtceu.api.machine.feature.IElectricMachine;
 import com.gregtechceu.gtceu.api.pattern.BlockPattern;
 import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
+import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 
 import net.minecraft.network.chat.Component;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +42,7 @@ public final class NeutronVortexMachine extends NeutronActivatorMachine implemen
 
     private static final Int2ObjectOpenHashMap<BlockPattern> PATTERNS = new Int2ObjectOpenHashMap<>(3, 0.9F);
 
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private boolean energy;
 
@@ -54,15 +55,15 @@ public final class NeutronVortexMachine extends NeutronActivatorMachine implemen
 
     @Nullable
     @Override
-    protected Recipe getRealRecipe(@NotNull Recipe recipe) {
+    public GTRecipe getRealRecipe(@NotNull RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {
         if (energy) {
             int ev = (recipe.data.getInt(GTORecipeDataKeys.EV_MAX) + recipe.data.getInt(GTORecipeDataKeys.EV_MIN)) * 5;
             eV = ev * 100000;
             recipe.duration = recipe.duration / 5;
             recipe.eut = ev;
-            return RecipeModifierFunction.hatchParallel(this, recipe);
+            return RecipeModifier.hatchParallel(this, unit, recipe);
         }
-        return super.getRealRecipe(recipe);
+        return super.getRealRecipe(unit, recipe);
     }
 
     @Override
@@ -78,7 +79,7 @@ public final class NeutronVortexMachine extends NeutronActivatorMachine implemen
     }
 
     @Override
-    protected boolean working() {
+    public boolean handleTickRecipe(@NotNull GTRecipe recipe) {
         return true;
     }
 
@@ -212,7 +213,7 @@ public final class NeutronVortexMachine extends NeutronActivatorMachine implemen
     }
 
     @Override
-    public @NotNull IEnergyContainer gtolib$getEnergyContainer() {
+    public @NotNull IEnergyContainer getEnergyContainer() {
         return electricTrait.getEnergyContainer();
     }
 }

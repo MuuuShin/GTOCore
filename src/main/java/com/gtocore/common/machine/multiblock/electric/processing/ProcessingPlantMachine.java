@@ -1,11 +1,8 @@
 package com.gtocore.common.machine.multiblock.electric.processing;
 
-import com.gtocore.api.gui.configurators.MultiMachineModeFancyConfigurator;
 import com.gtocore.common.data.GTORecipeDataKeys;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.machine.multiblock.electric.space.spacestaion.AbstractSpaceStation;
-import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachine;
-import com.gtocore.common.machine.multiblock.part.ae.MEWildcardPatternBufferPartMachine;
 
 import com.gtolib.GTOCore;
 import com.gtolib.api.gui.ParallelConfigurator;
@@ -14,10 +11,7 @@ import com.gtolib.api.machine.feature.multiblock.ITierCasingMachine;
 import com.gtolib.api.machine.multiblock.StorageMultiblockMachine;
 import com.gtolib.api.machine.trait.CustomParallelTrait;
 import com.gtolib.api.machine.trait.TierCasingTrait;
-import com.gtolib.api.recipe.Recipe;
-import com.gtolib.api.recipe.RecipeType;
 import com.gtolib.api.recipe.TierDataKey;
-import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 import com.gtolib.utils.MachineUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
@@ -26,7 +20,12 @@ import com.gregtechceu.gtceu.api.item.MetaMachineItem;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.feature.ICleanroomProvider;
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IWorkableMultiPart;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
+import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.CleanroomMachine;
 
@@ -35,11 +34,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -101,12 +99,9 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
         return c;
     }
 
-    @Nullable
-    private GTRecipeType[] recipeTypeCache = { GTRecipeTypes.DUMMY_RECIPES };
-
     private boolean mismatched;
 
-    @Persisted
+    @SaveToDisk
     private final CustomParallelTrait customParallelTrait;
 
     private final TierCasingTrait tierCasingTrait;
@@ -143,34 +138,41 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
     }
 
     @Override
-    protected boolean beforeWorking(Recipe recipe) {
+    public boolean checkConditions(RecipeHandlerUnit unit, GTRecipeDefinition recipe) {
         if (mismatched || isEmpty()) return false;
-        return super.beforeWorking(recipe);
+        return super.checkConditions(unit, recipe);
     }
 
     @Nullable
     @Override
-    protected Recipe getRealRecipe(Recipe recipe) {
+    protected GTRecipe getRealRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
         if (!mismatched && !isEmpty()) {
-            return RecipeModifierFunction.overclocking(this, recipe, false, 0.9, 0.8, 0.5);
+            return RecipeModifier.overclocking(this, unit, recipe, false, 0.9, 0.8, 0.5);
         }
         return null;
     }
 
     @Override
-    public GTRecipeType[] getRecipeTypes() {
-        return recipeTypeCache;
-    }
-
-    @Override
-    public RecipeType getRecipeType() {
-        return (RecipeType) getRecipeTypes()[getActiveRecipeType()];
-    }
-
-    @Override
-    public void onStructureFormed() {
-        super.onStructureFormed();
-        update();
+    public GTRecipeType[] getAvailableRecipeTypes() {
+        var cache = availableRecipeTypesCache;
+        if (cache == null) {
+            mismatched = false;
+            cache = new GTRecipeType[] { GTRecipeTypes.DUMMY_RECIPES };
+            if (machineStorage.storage.getStackInSlot(0).getItem() instanceof MetaMachineItem metaMachineItem) {
+                MachineDefinition definition = metaMachineItem.getDefinition();
+                if (tier != definition.getTier()) {
+                    mismatched = true;
+                }
+                cache = definition.getRecipeTypes();
+                availableRecipeTypesCache = cache;
+                for (var p : getParts()) {
+                    if (p instanceof IWorkableMultiPart part) {
+                        part.setAvailableRecipeTypes(cache);
+                    }
+                }
+            }
+        }
+        return cache;
     }
 
     @Override
@@ -192,30 +194,6 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
         if (mismatched) textList.add(Component.translatable("gtocore.machine.processing_plant.mismatched").withStyle(ChatFormatting.RED));
     }
 
-    private void update() {
-        recipeTypeCache = new GTRecipeType[] { GTRecipeTypes.DUMMY_RECIPES };
-        mismatched = false;
-        if (machineStorage.storage.getStackInSlot(0).getItem() instanceof MetaMachineItem metaMachineItem) {
-            MachineDefinition definition = metaMachineItem.getDefinition();
-            if (tier != definition.getTier()) {
-                mismatched = true;
-            }
-            recipeTypeCache = definition.getRecipeTypes();
-            onMultiblockRecipeTypeChange(this);
-        }
-    }
-
-    private static void onMultiblockRecipeTypeChange(ProcessingPlantMachine machine) {
-        Arrays.stream(machine.getParts())
-                .filter(MEPatternBufferPartMachine.class::isInstance)
-                .map(MEPatternBufferPartMachine.class::cast)
-                .forEach(m -> {
-                    m.getRecipeTypes().clear();
-                    m.getRecipeTypes().addAll(MultiMachineModeFancyConfigurator.extractRecipeTypes(m.getControllers()));
-                });
-        MEWildcardPatternBufferPartMachine.onMultiblockRecipeTypeChange(machine);
-    }
-
     @Override
     public void onMachineChanged() {
         customParallelTrait.onStructureInvalid();
@@ -224,8 +202,8 @@ public final class ProcessingPlantMachine extends StorageMultiblockMachine imple
                 getRecipeLogic().markLastRecipeDirty();
             }
             getRecipeLogic().updateTickSubscription();
-            update();
             customParallelTrait.onStructureFormed();
+            availableRecipeTypesCache = null;
         }
     }
 

@@ -7,30 +7,29 @@ import com.gtocore.common.data.machines.MultiBlockC;
 
 import com.gtolib.api.machine.feature.multiblock.IStorageMultiblock;
 import com.gtolib.api.machine.multiblock.CoilCrossRecipeMultiblockMachine;
-import com.gtolib.api.recipe.Recipe;
 import com.gtolib.utils.MachineUtils;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
 import net.minecraft.network.chat.Component;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
+import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -66,8 +65,8 @@ public final class NanitesIntegratedMachine extends CoilCrossRecipeMultiblockMac
 
     final IntOpenHashSet module = new IntOpenHashSet();
 
-    @DescSynced
-    @Persisted
+    @SyncToClient
+    @SaveToDisk
     private final NotifiableItemStackHandler machineStorage;
 
     public NanitesIntegratedMachine(MetaMachineBlockEntity holder) {
@@ -80,30 +79,26 @@ public final class NanitesIntegratedMachine extends CoilCrossRecipeMultiblockMac
 
     @Override
     public void onMachineChanged() {
+        chance = 0;
         if (isEmpty()) {
-            chance = 0;
             return;
         }
         Material material = ChemicalHelper.getMaterialEntry(getStorageStack().getItem()).material();
-        if (MATERIAL_TIER_MAP.get(material) > getTier()) return;
-        chance = (int) (getStorageStack().getCount() * MATERIAL_MAP.get(material));
+        if (!MATERIAL_TIER_MAP.containsKey(material) || MATERIAL_TIER_MAP.get(material) > getTier()) return;
+        chance = Math.min(100, (int) (getStorageStack().getCount() * MATERIAL_MAP.get(material)));
     }
 
     static void trimRecipe(GTRecipe recipe, int chance) {
         if (GTValues.RNG.nextInt(100) < chance) {
-            var input = new ArrayList<>(recipe.inputs.get(ItemRecipeCapability.CAP));
-            input.removeFirst();
-            var output = new ArrayList<>(recipe.outputs.get(ItemRecipeCapability.CAP));
-            output.removeFirst();
-            recipe.inputs.put(ItemRecipeCapability.CAP, input);
-            recipe.outputs.put(ItemRecipeCapability.CAP, output);
+            recipe.itemInputs = RecipeHelper.trimLast(recipe.itemInputs, recipe.itemInputs.size() - 1);
+            recipe.itemOutputs = RecipeHelper.trimLast(recipe.itemOutputs, recipe.itemOutputs.size() - 1);
         }
     }
 
     @Override
-    public Recipe fullModifyRecipe(@NotNull Recipe recipe) {
+    public GTRecipe fullModifyRecipe(@NotNull RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {
         if (module.contains(recipe.data.getInt(GTORecipeDataKeys.MODULE))) {
-            recipe = super.fullModifyRecipe(recipe);
+            recipe = super.fullModifyRecipe(unit, recipe);
             if (recipe != null) {
                 trimRecipe(recipe, chance);
                 return recipe;

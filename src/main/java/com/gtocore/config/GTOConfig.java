@@ -98,6 +98,7 @@ public final class GTOConfig {
         ConfigHolder.INSTANCE.worldgen.oreVeins.oreIndicators = true;
         ConfigHolder.INSTANCE.worldgen.oreVeins.oreGenerationChunkCacheSize = 512;
         ConfigHolder.INSTANCE.worldgen.oreVeins.oreIndicatorChunkCacheSize = 2048;
+        ConfigHolder.INSTANCE.machines.batchDuration = INSTANCE.gamePlay.batchProcessingMaxDuration;
         ConfigHolder.INSTANCE.machines.recipeProgressLowEnergy = difficulty == 3;
         ConfigHolder.INSTANCE.machines.requireGTToolsForBlocks = difficulty > 1;
         ConfigHolder.INSTANCE.machines.shouldWeatherOrTerrainExplosion = difficulty == 3;
@@ -312,10 +313,9 @@ public final class GTOConfig {
         public boolean lightningRodEffect = true;
 
         @Configurable
-        @Configurable.Comment({ "启用内置夜视。该效果也可在游戏内按绑定热键切换", "Enable built-in night vision. This effect can also be toggled in-game by pressing the bound hotkey"
-        })
-        @RegisterLanguage(namePrefix = "config.gtocore.option", en = "Built-in Night Vision", cn = "内置夜视")
-        public boolean nightVision = false;
+        @Configurable.Comment({ "AE 终端在切换页面时使用选择器替代循环顺序切换", "AE Terminals use a selector instead of cycling through pages when switching pages" })
+        @RegisterLanguage(namePrefix = "config.gtocore.option", en = "AE Terminal Page Switch Style Rework", cn = "AE 终端页面切换样式重做")
+        public boolean aeTerminalPageSwitchStyleSelector = false;
 
         @Configurable
         @Configurable.Comment({ "禁用后将渲染视角外，且渲染器被标记为Global的机器，一些高级特效机器需要开启此选项才能正常渲染", "When turned disable, machines that are outside the field of view and whose renderer is marked as Global will be rendered. Some advanced effect machines need to turn on this option to render properly" })
@@ -353,6 +353,25 @@ public final class GTOConfig {
             @Configurable.Range(min = 0, max = 100)
             @Configurable.Gui.Slider
             public int wirelessEnergyHUDDefaultY = 75;
+
+            @Configurable
+            @Configurable.Comment({ "启用客户端属性 HUD 显示", "Enable Client Attributes HUD display" })
+            @RegisterLanguage(namePrefix = "config.gtocore.option", en = "Client Attributes HUD Enabled", cn = "客户端属性 HUD 启用")
+            public boolean clientAttributesHUDEnabled = false;
+
+            @Configurable
+            @Configurable.Comment({ "客户端属性 HUD 的默认 X 相对位置", "0意味着屏幕左侧，100意味着屏幕右侧", "The default X relative position of the Client Attributes HUD", "0 means the left side of the screen, 100 means the right side of the screen" })
+            @RegisterLanguage(namePrefix = "config.gtocore.option", en = "Client Attributes HUD Default X", cn = "客户端属性 HUD 默认 X 位置")
+            @Configurable.Range(min = 0, max = 100)
+            @Configurable.Gui.Slider
+            public int clientAttributesHUDDefaultX = 8;
+
+            @Configurable
+            @Configurable.Comment({ "客户端属性 HUD 的默认 Y 相对位置", "0意味着屏幕顶部，100意味着屏幕底部", "The default Y relative position of the Client Attributes HUD", "0 means the top of the screen, 100 means the bottom of the screen" })
+            @RegisterLanguage(namePrefix = "config.gtocore.option", en = "Client Attributes HUD Default Y", cn = "客户端属性 HUD 默认 Y 位置")
+            @Configurable.Range(min = 0, max = 100)
+            @Configurable.Gui.Slider
+            public int clientAttributesHUDDefaultY = 12;
 
             @Configurable
             @Configurable.Comment({ "无线能量 HUD 显示的历史秒数", "例如：设为30则显示过去30秒的能量变化情况", "The number of historical seconds displayed by the Wireless Energy HUD", "For example: setting it to 30 will show the energy changes over the past 30 seconds" })

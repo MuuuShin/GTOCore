@@ -7,6 +7,7 @@ import com.gtolib.api.network.NetworkPack;
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
+import com.gregtechceu.gtceu.core.ILevel;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -588,7 +589,7 @@ public final class Manager {
                 lastRefreshTime = level.getGameTime();
                 informationProviders.clear();
                 for (GridFacedPoint point : points()) {
-                    var blockEntity = level.getBlockEntity(point.toBlockPos());
+                    var blockEntity = ILevel.getCachedBlockEntity(level, point.toBlockPos());
                     if (blockEntity instanceof MetaMachineBlockEntity be &&
                             be.getMetaMachine() instanceof IInformationProvider provider) {
                         informationProviders.add(provider);

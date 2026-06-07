@@ -65,6 +65,8 @@ object GTOAEParts {
                 .buildSingle(),
             ComponentBuilder.create("支持编码、管理样板，并支持批量编码、自动填充配方等功能。", "supports encoding and managing patterns, batch encoding, auto-filling recipes, and more.") { p -> p }
                 .buildSingle(),
+            ComponentBuilder.create("拖曳任意子面板的右下角以调整其大小。", "Drag the bottom-right corner of any subpanel to adjust its size.") { p -> p }
+                .buildSingle(),
         ),
     )
 

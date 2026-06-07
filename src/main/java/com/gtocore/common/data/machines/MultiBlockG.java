@@ -4,11 +4,7 @@ import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.client.renderer.machine.ArrayMachineRenderer;
 import com.gtocore.client.renderer.machine.CustomPartRenderer;
-import com.gtocore.common.data.GTOBlocks;
-import com.gtocore.common.data.GTOMachines;
-import com.gtocore.common.data.GTOMaterials;
-import com.gtocore.common.data.GTORecipeDataKeys;
-import com.gtocore.common.data.GTORecipeTypes;
+import com.gtocore.common.data.*;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
 import com.gtocore.common.data.translation.GTOMachineTooltipsA;
@@ -36,7 +32,6 @@ import com.gtolib.api.machine.impl.DroneControlCenterMachine;
 import com.gtolib.api.machine.impl.MECPUMachine;
 import com.gtolib.api.machine.impl.WirelessChargerMachine;
 import com.gtolib.api.machine.multiblock.*;
-import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 import com.gtolib.utils.MultiBlockFileReader;
 import com.gtolib.utils.RLUtils;
 import com.gtolib.utils.RegistriesUtils;
@@ -48,6 +43,7 @@ import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
+import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.common.data.*;
 
 import net.minecraft.core.BlockPos;
@@ -77,7 +73,7 @@ public final class MultiBlockG {
     public static final MultiblockMachineDefinition LARGE_COKE_OVEN = multiblock("large_coke_oven", "大型焦炉", LargeCokeOvenMachine::new)
             .nonYAxisRotation()
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(8))
-            .recipeModifiers(RecipeModifierFunction.accurateParallel(8))
+            .recipeModifiers(RecipeModifier.accurateParallel(8))
             .recipeTypes(GTRecipeTypes.COKE_OVEN_RECIPES)
             .block(GTBlocks.CASING_COKE_BRICKS)
             .pattern(definition -> MultiBlockFileReader.start(definition)
@@ -196,7 +192,7 @@ public final class MultiBlockG {
     public static final MultiblockMachineDefinition POLYMERIZATION_REACTOR = multiblock("polymerization_reactor", "聚合反应器", CoilMultiblockMachine.createCoilMachine(false, false))
             .nonYAxisRotation()
             .recipeTypes(GTORecipeTypes.POLYMERIZATION_REACTOR_RECIPES)
-            .recipeModifier(RecipeModifierFunction.coilReductionOverclock(0.5))
+            .recipeModifier(RecipeModifier.coilReductionOverclock(0.5))
             .tooltips(GTOMachineStories.INSTANCE.getPolymerizationReactorTooltips().getSupplier())
             .tooltips(GTOMachineTooltips.INSTANCE.getPolymerizationReactorTooltips().getSupplier())
             .parallelizableTooltips()

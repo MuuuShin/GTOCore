@@ -10,9 +10,7 @@ import com.gtocore.common.machine.multiblock.part.research.ExResearchCoolerPartM
 
 import com.gtolib.api.item.IItem;
 import com.gtolib.api.machine.multiblock.StorageMultiblockMachine;
-import com.gtolib.api.recipe.Recipe;
 import com.gtolib.api.recipe.RecipeBuilder;
-import com.gtolib.api.recipe.RecipeDefinition;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
@@ -21,6 +19,9 @@ import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.machine.ConditionalSubscriptionHandler;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCABridgePartMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCAComponentPartMachine;
@@ -28,17 +29,17 @@ import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCAComputation
 import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCACoolerPartMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
+import com.gregtechceu.gtceu.utils.TaskHandler;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import com.google.common.collect.ImmutableMap;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import earth.terrarium.adastra.common.registry.ModItems;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import lombok.Setter;
@@ -80,9 +81,9 @@ public final class SupercomputingCenterMachine extends StorageMultiblockMachine 
     @Setter
     private ThermalConductorHatchPartMachine ThermalConductorHatchPart;
     private final ConditionalSubscriptionHandler maxCWUtModificationSubs;
-    @Persisted
+    @SaveToDisk
     private int machineTier = 1;
-    @Persisted
+    @SaveToDisk
     private int maxCWUtModification;
     private boolean incompatible;
     private boolean canBridge;
@@ -91,10 +92,11 @@ public final class SupercomputingCenterMachine extends StorageMultiblockMachine 
     private int coolingAmountProvided;
     private int coolantAmount;
     private final Reference2IntOpenHashMap<IItem> componentsMap = new Reference2IntOpenHashMap<>();
+    private int lastTimeStamp;;
     private long allocatedCWUt;
     private long cacheCWUt;
     private long maxEUt;
-    private RecipeDefinition runRecipe;
+    private GTRecipeDefinition runRecipe;
     @Nullable
     private TickableSubscription tickSubs;
 
@@ -268,7 +270,7 @@ public final class SupercomputingCenterMachine extends StorageMultiblockMachine 
     public void onLoad() {
         super.onLoad();
         if (getLevel() instanceof ServerLevel serverLevel) {
-            serverLevel.getServer().tell(new TickTask(0, this::updateTickSubscription));
+            TaskHandler.enqueueTask(serverLevel, this::updateTickSubscription);
         }
     }
 
@@ -291,8 +293,12 @@ public final class SupercomputingCenterMachine extends StorageMultiblockMachine 
     }
 
     private void tick() {
-        cacheCWUt = allocatedCWUt;
-        allocatedCWUt = 0;
+        var timer = getOffsetTimer();
+        if (lastTimeStamp != timer) {
+            lastTimeStamp = timer;
+            cacheCWUt = allocatedCWUt;
+            allocatedCWUt = 0;
+        }
     }
 
     @Override
@@ -318,12 +324,18 @@ public final class SupercomputingCenterMachine extends StorageMultiblockMachine 
     }
 
     @Override
-    public Recipe fullModifyRecipe(Recipe recipe) {
+    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
         // prevent any modification to mock the original behavior of setupRecipe
         return recipe;
     }
 
     private long requestCWUt(boolean simulate, long cwu) {
+        var timer = getOffsetTimer();
+        if (lastTimeStamp != timer) {
+            lastTimeStamp = timer;
+            cacheCWUt = allocatedCWUt;
+            allocatedCWUt = 0;
+        }
         long toAllocate = Math.min(cwu, getAdjustedMaxCWU() - allocatedCWUt);
         if (!simulate) {
             this.allocatedCWUt += toAllocate;
@@ -339,17 +351,14 @@ public final class SupercomputingCenterMachine extends StorageMultiblockMachine 
             if (getRecipeLogic().isWorking()) {
                 return requestCWUt(false, cwu);
             } else if (!getRecipeLogic().isSuspend()) {
-                if (getRecipeLogic().checkMatchedRecipeAvailable(runRecipe) && getRecipeLogic().isWorking()) {
-                    return requestCWUt(false, cwu);
+                for (var u : getInputUnits()) {
+                    if (getRecipeLogic().checkMatchedRecipeAvailable(u, runRecipe) && getRecipeLogic().isWorking()) {
+                        return requestCWUt(false, cwu);
+                    }
                 }
             }
         }
         return 0;
-    }
-
-    @Override
-    public long getMaxCWU() {
-        return getAdjustedMaxCWU() - cacheCWUt;
     }
 
     private long getAdjustedMaxCWU() {

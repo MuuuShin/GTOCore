@@ -66,7 +66,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
             if (!stack.isEmpty()) {
                 DrawerHelper.drawFluidForGui(graphics, FluidHelperImpl.toFluidStack(stack), config.amount(), stackX,
                         stackY, 16, 16);
-                if (!parentWidget.isStocking()) {
+                if (parentWidget.showAmount()) {
                     String amountStr = FormattingUtil.formatNumberReadable(config.amount(), true,
                             FormattingUtil.DECIMAL_FORMAT_0F, "B");
                     drawStringFixedCorner(graphics, amountStr, stackX + 17, stackY + 17, 16777215, true, 0.5f);
@@ -117,7 +117,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
                 // Right click to clear
                 writeClientAction(REMOVE_ID, buf -> {});
 
-                if (!parentWidget.isStocking()) {
+                if (parentWidget.showAmount()) {
                     this.parentWidget.disableAmountClient();
                 }
             } else if (button == 0) {
@@ -283,9 +283,9 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
         if (handler == null) return -1;
         int maxAttempts = isShiftKeyDown ? currentStack.getCount() : 1;
 
-        if (fluidTank.getFluidAmount() > 0) {
+        if (!fluidTank.getStack().isEmpty()) {
             boolean performedFill = false;
-            FluidStack initialFluid = fluidTank.getFluid();
+            FluidStack initialFluid = fluidTank.getStack();
             for (int i = 0; i < maxAttempts; i++) {
                 FluidActionResult result = FluidUtil.tryFillContainer(currentStack, fluidTank, Integer.MAX_VALUE, null,
                         false);

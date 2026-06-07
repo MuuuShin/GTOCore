@@ -3,11 +3,7 @@ package com.gtocore.common.data.machines;
 import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.client.renderer.machine.PrimitiveDistillationRenderer;
-import com.gtocore.common.data.GTOBlocks;
-import com.gtocore.common.data.GTOMachines;
-import com.gtocore.common.data.GTOMaterials;
-import com.gtocore.common.data.GTORecipeDataKeys;
-import com.gtocore.common.data.GTORecipeTypes;
+import com.gtocore.common.data.*;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
 import com.gtocore.common.data.translation.GTOMachineTooltipsA;
@@ -31,7 +27,6 @@ import com.gtolib.GTOCore;
 import com.gtolib.api.machine.MultiblockDefinition;
 import com.gtolib.api.machine.feature.multiblock.ITierCasingMachine;
 import com.gtolib.api.machine.multiblock.*;
-import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 import com.gtolib.utils.MultiBlockFileReader;
 
 import com.gregtechceu.gtceu.GTCEu;
@@ -44,6 +39,7 @@ import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.MultiblockShapeInfo;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
+import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.common.data.*;
 import com.gregtechceu.gtceu.common.data.machines.GTMultiMachines;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
@@ -544,7 +540,7 @@ public final class MultiBlockC {
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.INSTANCE.getChemicalVaporDepositionTooltips().getSupplier())
             .recipeTypes(GTORecipeTypes.CHEMICAL_VAPOR_DEPOSITION_RECIPES)
-            .recipeModifiers((machine, recipe) -> RecipeModifierFunction.recipeReduction(recipe, 1, Math.log(900) / Math.log(((ICoilMachine) machine).getTemperature())), RecipeModifierFunction.OVERCLOCKING)
+            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.log(900) / Math.log(((ICoilMachine) m).getTemperature())), RecipeModifier.OVERCLOCKING)
             .block(GTBlocks.CASING_PTFE_INERT)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get()))
@@ -568,7 +564,7 @@ public final class MultiBlockC {
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.INSTANCE.getPhysicalVaporDepositionTooltips().getSupplier())
             .recipeTypes(GTORecipeTypes.PHYSICAL_VAPOR_DEPOSITION_RECIPES)
-            .recipeModifiers((machine, recipe) -> RecipeModifierFunction.recipeReduction(recipe, 1, Math.sqrt(1.0D / ((ITierCasingMachine) machine).getCasingTier(GTORecipeDataKeys.GLASS_TIER))), RecipeModifierFunction.OVERCLOCKING)
+            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.sqrt(1.0D / ((ITierCasingMachine) m).getCasingTier(GTORecipeDataKeys.GLASS_TIER))), RecipeModifier.OVERCLOCKING)
             .block(GTBlocks.PLASTCRETE)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_TUNGSTENSTEEL_ROBUST.get()))

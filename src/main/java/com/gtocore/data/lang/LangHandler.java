@@ -20,6 +20,7 @@ import com.gtolib.api.data.Dimension;
 import com.gtolib.api.lang.CNEN;
 import com.gtolib.api.lang.SimplifiedChineseLanguageProvider;
 import com.gtolib.api.lang.TraditionalChineseLanguageProvider;
+import com.gtolib.api.player.attribute.PlayerAttributes;
 import com.gtolib.api.recipe.IdleReason;
 import com.gtolib.api.registries.GTOMachineBuilder;
 import com.gtolib.api.registries.MultiblockBuilder;
@@ -83,6 +84,7 @@ public final class LangHandler {
         ScanningClass.LANG.forEach(LangHandler::addCNEN);
         DynamicInitialData.LANG.forEach(LangHandler::addCNEN);
         TranslationKeyProvider.LANG.forEach(LangHandler::addCNEN);
+        PlayerAttributes.NAMES.forEach((k, v) -> addCNEN(k.getLangKey(), v));
         GTOTrade.init();
         TradeLang.LANG.forEach(LangHandler::addCNEN);
         for (var reasons : IdleReason.values()) {
@@ -391,9 +393,10 @@ public final class LangHandler {
         addCNEN("gtocore.ae.appeng.me2in1.add_mapping", "添加配方搜索映射", "Add Recipe Search Mapping");
         addCNEN("gtocore.ae.appeng.me2in1.add_mapping.desc", "单击打开EMI中的配方，然后点击想要自定义映射的目录中配方的\"+\"按钮以添加映射。自定义的配方映射保存于config/me2in1category.json中。", "Click to open the recipe in EMI, then click the \"+\" button of the recipe in the directory you want to customize the mapping for to add the mapping. The custom recipe mappings are saved in config/me2in1category.json.");
         addCNEN("gtocore.ae.appeng.me2in1.config_mapping", "配置配方搜索映射", "Configure Recipe Search Mapping");
-        addCNEN("gtocore.ae.appeng.me2in1.panel.bufferPanel", "样板缓存区", "Patterns Output");
-        addCNEN("gtocore.ae.appeng.me2in1.panel.mePanel", "ME存储区", "ME Storage");
-        addCNEN("gtocore.ae.appeng.me2in1.panel.encodingModePanel", "编码区", "Encoding Configs");
+        addCNEN("gtocore.ae.appeng.me2in1.panel.bufferPanel", "样板缓存面板", "Pattern Output Panel");
+        addCNEN("gtocore.ae.appeng.me2in1.panel.mePanel", "ME存储面板", "ME Storage Panel");
+        addCNEN("gtocore.ae.appeng.me2in1.panel.exPatternTerminalPanel", "样板管理面板", "Pattern Access Panel");
+        addCNEN("gtocore.ae.appeng.me2in1.panel.encodingModePanel", "编码面板", "Encoding Panel");
         addCNEN("gtocore.ae.appeng.craft.add_missing_to_emi", "收藏缺失", "Bookmark Missing");
         addCNEN("gtocore.ae.appeng.craft.add_missing_to_emi.desc", "将缺失的物品添加到EMI书签页", "Add missing items to EMI bookmark page");
         addCNEN("gtocore.ae.appeng.craft.missing_start", "缺失合成", "Missing Crafting");
@@ -522,6 +525,7 @@ public final class LangHandler {
 
         addCNEN("gtocore.message.otherside_pass_required", "你感受到来自幽冥的隔绝感...", "You feel a sense of isolation from the Other Side...");
         addCNEN("gtocore.message.otherside_pass_required.1", "似乎需要伪装成幽冥中最强大的生物之一，才能通过这里。", "It seems you need to disguise yourself as one of the most powerful beings in the Other Side to pass through here.");
+        addCNEN("key.gtocore.movable_hud_toggle", "HUD 调节", "HUD Editing key");
     }
 
     public static void enInitialize(LanguageProvider provider) {

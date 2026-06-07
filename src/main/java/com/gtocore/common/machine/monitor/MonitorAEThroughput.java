@@ -15,19 +15,18 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.AmountFormat;
 
 import com.google.common.collect.ImmutableList;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.hepdd.gtmthings.api.misc.EnergyStat;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,9 +48,9 @@ public class MonitorAEThroughput extends AbstractAEInfoMonitor {
     private CompoundTag displayingEntry = new CompoundTag();
     private final EnergyStat[] stats = new EnergyStat[2];
     private final long[] lastAmount = new long[] { 0, 0 };
-    @Persisted
+    @SaveToDisk
     private final AEItem aeItem = new AEItem();
-    @Persisted
+    @SaveToDisk
     private final AEFluid aeFluid = new AEFluid();
     @SyncToClient
     private final long[] currentAmount = new long[] { 0, 0 };
@@ -268,11 +267,6 @@ public class MonitorAEThroughput extends AbstractAEInfoMonitor {
 
         public @Nullable AEKey getCurrent() {
             return getInventory()[0].getConfig() == null ? null : getInventory()[0].getConfig().what();
-        }
-
-        @Override
-        public @NotNull ItemStack getStackInSlot(int slot) {
-            return ItemStack.EMPTY;
         }
     }
 

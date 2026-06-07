@@ -1,6 +1,5 @@
 package com.gtocore.common.machine.multiblock.part.ae;
 
-import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.config.GTOConfig;
 
 import com.gtolib.GTOCore;
@@ -13,14 +12,11 @@ import com.gtolib.api.annotation.language.RegisterLanguage;
 import com.gtolib.api.fluid.IFluid;
 import com.gtolib.api.gui.ktflexible.VBoxBuilder;
 import com.gtolib.api.item.IItem;
-import com.gtolib.api.recipe.RecipeDefinition;
 import com.gtolib.api.recipe.RecipeType;
 import com.gtolib.utils.GTOUtils;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.*;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
@@ -29,13 +25,13 @@ import com.gregtechceu.gtceu.api.gui.widget.PhantomFluidWidget;
 import com.gregtechceu.gtceu.api.item.MetaMachineItem;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
-import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
-import com.gregtechceu.gtceu.utils.collection.FastObjectArrayList;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -55,6 +51,7 @@ import appeng.crafting.pattern.AEProcessingPattern;
 import appeng.crafting.pattern.ProcessingPatternItem;
 
 import com.fast.recipesearch.IntLongMap;
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.util.holder.ObjHolder;
 import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior;
 import com.hepdd.gtmthings.data.CustomItems;
@@ -62,7 +59,6 @@ import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.gui.widget.layout.Align;
 import com.lowdragmc.lowdraglib.misc.ItemStackTransfer;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.utils.Position;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -74,7 +70,10 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -91,30 +90,30 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
     private int scannedPatterns = 0;
     @Getter
     @Setter
-    @Persisted
+    @SaveToDisk
     private int patternPriority = 0;
     @Getter
-    @Persisted
+    @SaveToDisk
     private int maxFluidsOutput = 1;
     @Getter
-    @Persisted
+    @SaveToDisk
     private int maxItemsOutput = 1;
-    @Persisted
+    @SaveToDisk
     private final CustomItemStackHandler blacklistedItems;
-    @Persisted
+    @SaveToDisk
     private final ItemStackTransfer blacklistedItemsStorageTransfer;
-    @Persisted
+    @SaveToDisk
     private final CustomFluidTank[] blacklistedFluids;
-    @Persisted
+    @SaveToDisk
     private final CustomItemStackHandler blacklistedAltProcessableMachines;
-    @Persisted
+    @SaveToDisk
     private final ItemStackTransfer blacklistedAltProcessableMachinesStorageTransfer;
     private final Int2ReferenceOpenHashMap<Material> blacklistedMaterials = new Int2ReferenceOpenHashMap<>();
     private final ReferenceOpenHashSet<Material> blacklistedMaterialSet = new ReferenceOpenHashSet<>();
     private final IntSet blacklistedAltProcessableItemIds = new IntOpenHashSet();
     private final IntSet blacklistedAltProcessableFluidIds = new IntOpenHashSet();
-    private final SearchRecipeCapabilityHolder searchHolder = new SearchRecipeCapabilityHolder();
-    private final RecipeHandlerList sharedSearchHandlers;
+    private final SearchRecipeHandlerUnit searchHolder = new SearchRecipeHandlerUnit();
+    private final RecipeHandlerUnit sharedSearchHandlers;
 
     public MEWildcardPatternBufferPartMachine(@NotNull MetaMachineBlockEntity holder) {
         super(holder, 1);
@@ -139,7 +138,7 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
         getInternalInventory()[0].shareInventory.addChangedListener(requestPatternUpdateIfUnlocked);
         getInternalInventory()[0].setShouldLockRecipe(false);
         var slot = getInternalInventory()[0];
-        sharedSearchHandlers = RecipeHandlerList.of(IO.IN,
+        sharedSearchHandlers = RecipeHandlerUnit.of(IO.IN,
                 slot.circuitInventory, slot.shareInventory, slot.shareTank,
                 circuitInventorySimulated, shareInventory, shareTank);
     }
@@ -276,7 +275,7 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
             AtomicLong validatingPatterns = new AtomicLong();
 
             // var patterns = super.getAvailablePatterns();
-            var newPatterns = new FastObjectArrayList<IPatternDetails>();
+            var newPatterns = new ArrayList<IPatternDetails>();
             var templates = new WildcardPatternTemplate[patterns.size()];
             var searchContext = new SearchContext();
 
@@ -384,13 +383,13 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
     // ========== Pattern Validation ==========
 
     private AEProcessingPattern validatePattern(IntLongMap inputMap, GenericStack[] sparseOutput) {
-        ObjHolder<RecipeDefinition> valid = new ObjHolder<>();
-        if (recipeType == GTORecipeTypes.HATCH_COMBINED) {
+        ObjHolder<GTRecipeDefinition> valid = new ObjHolder<>();
+        if (recipeType == null) {
             if (!getRecipeTypes().isEmpty()) {
                 for (var rt : getRecipeTypes()) {
-                    if (searchRecipe(rt, inputMap, r -> {
+                    if (searchRecipe(rt, inputMap, (u, r) -> {
                         if (checkProb(r)) {
-                            valid.value = (RecipeDefinition) r;
+                            valid.value = r;
                             recipeType = r.recipeType;
                             return true;
                         }
@@ -399,9 +398,9 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
                 }
             }
         } else {
-            searchRecipe(recipeType, inputMap, r -> {
+            searchRecipe(recipeType, inputMap, (u, r) -> {
                 if (checkProb(r)) {
-                    valid.value = (RecipeDefinition) r;
+                    valid.value = r;
                     return true;
                 }
                 return false;
@@ -443,19 +442,19 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
     }
 
     private boolean checkProb(GTRecipeDefinition recipe) {
-        for (var ingredient : recipe.getInputContents(ItemRecipeCapability.CAP)) {
+        for (var ingredient : recipe.itemInputs) {
             if (ingredient.chance != 10000 && ingredient.chance != 0) return false;
         }
-        for (var ingredient : recipe.getInputContents(FluidRecipeCapability.CAP)) {
+        for (var ingredient : recipe.fluidInputs) {
             if (ingredient.chance != 10000 && ingredient.chance != 0) return false;
         }
         return true;
     }
 
-    private boolean searchRecipe(GTRecipeType type, IntLongMap inputMap, java.util.function.Predicate<GTRecipeDefinition> canHandle) {
+    private boolean searchRecipe(GTRecipeType type, IntLongMap inputMap, java.util.function.BiPredicate<RecipeHandlerUnit, GTRecipeDefinition> canHandle) {
         searchHolder.use(inputMap);
         try {
-            return type.findRecipe(searchHolder, canHandle);
+            return searchHolder.findRecipe(type, canHandle);
         } finally {
             searchHolder.clear();
         }
@@ -482,34 +481,11 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
         return key;
     }
 
-    private static final class SearchRecipeCapabilityHolder implements IRecipeCapabilityHolder {
-
-        private final SearchRecipeHandlerList handlerList = new SearchRecipeHandlerList();
-
-        private void use(IntLongMap inputMap) {
-            handlerList.use(inputMap);
-        }
-
-        private void clear() {
-            handlerList.clear();
-        }
-
-        @Override
-        public @NotNull Map<IO, List<RecipeHandlerList>> getCapabilitiesProxy() {
-            return Map.of(IO.IN, List.of(handlerList));
-        }
-
-        @Override
-        public @NotNull Map<IO, Map<RecipeCapability<?>, List<IRecipeHandler<?>>>> getCapabilitiesFlat() {
-            return Map.of();
-        }
-    }
-
-    private static final class SearchRecipeHandlerList extends RecipeHandlerList {
+    private static final class SearchRecipeHandlerUnit extends RecipeHandlerUnit {
 
         private IntLongMap inputMap = IntLongMap.EMPTY;
 
-        private SearchRecipeHandlerList() {
+        private SearchRecipeHandlerUnit() {
             super(IO.IN, null);
         }
 
@@ -522,7 +498,7 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
         }
 
         @Override
-        public IntLongMap getIngredientMap(@NotNull GTRecipeType type) {
+        public IntLongMap getSearchMap(@NotNull GTRecipeType type) {
             return inputMap;
         }
     }
@@ -537,7 +513,7 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
             var cachedInput = sharedInputCache.get(type);
             if (cachedInput == null) {
                 var cached = new IntLongMap();
-                sharedSearchHandlers.getIngredientMap(type).copyTo(cached);
+                sharedSearchHandlers.getSearchMap(type).copyTo(cached);
                 sharedInputCache.put(type, cached);
                 cachedInput = cached;
             }
@@ -629,7 +605,7 @@ public class MEWildcardPatternBufferPartMachine extends MEPatternBufferPartMachi
     }
 
     private @Nullable GTRecipeType getCurrentSearchType() {
-        if (recipeType != GTORecipeTypes.HATCH_COMBINED) {
+        if (recipeType != null) {
             return recipeType;
         }
         var recipeTypes = getRecipeTypes();

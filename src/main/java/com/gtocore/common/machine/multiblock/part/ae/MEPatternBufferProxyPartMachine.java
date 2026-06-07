@@ -5,13 +5,14 @@ import com.gtocore.common.machine.trait.ProxySlotRecipeHandler;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.IWailaDisplayProvider;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IDataStickInteractable;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine;
-import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.client.util.TooltipHelper;
+import com.gregtechceu.gtceu.utils.TaskHandler;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -19,7 +20,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -27,9 +27,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.ITooltip;
@@ -47,7 +47,7 @@ import static com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartM
 public final class MEPatternBufferProxyPartMachine extends WorkableTieredIOPartMachine implements IMachineLife, IDataStickInteractable, IWailaDisplayProvider {
 
     private ProxySlotRecipeHandler proxySlotRecipeHandler = ProxySlotRecipeHandler.DEFAULT;
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     @Nullable
     private BlockPos bufferPos;
@@ -69,7 +69,7 @@ public final class MEPatternBufferProxyPartMachine extends WorkableTieredIOPartM
     public void onLoad() {
         super.onLoad();
         if (getLevel() instanceof ServerLevel level) {
-            level.getServer().tell(new TickTask(0, () -> this.setBuffer(bufferPos)));
+            TaskHandler.enqueueTask(level, () -> this.setBuffer(bufferPos));
         }
     }
 
@@ -85,7 +85,7 @@ public final class MEPatternBufferProxyPartMachine extends WorkableTieredIOPartM
     }
 
     @Override
-    public List<RecipeHandlerList> getRecipeHandlers() {
+    public List<RecipeHandlerUnit> getRecipeHandlers() {
         return proxySlotRecipeHandler.getProxySlotHandlers();
     }
 
@@ -108,6 +108,7 @@ public final class MEPatternBufferProxyPartMachine extends WorkableTieredIOPartM
         } else {
             buffer = null;
         }
+        if (buffer == null) proxySlotRecipeHandler.updateProxy(null);
     }
 
     @Nullable

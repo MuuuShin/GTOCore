@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableSet;
 
 public class MERequestableInputBusMachine extends MEInputBusPartMachine implements ICraftingRequester {
 
-    MultiCraftingTracker craftingTracker = new MultiCraftingTracker(this, aeItemHandler.getSize());
+    MultiCraftingTracker craftingTracker = new MultiCraftingTracker(this, aeItemHandler.getConfigurableSlots());
 
     public MERequestableInputBusMachine(MetaMachineBlockEntity holder) {
         super(holder);
@@ -29,7 +29,7 @@ public class MERequestableInputBusMachine extends MEInputBusPartMachine implemen
         }
         var cg = grid.getCraftingService();
         MEStorage networkInv = grid.getStorageService().getInventory();
-        for (int i = 0; i < this.aeItemHandler.getSize(); i++) {
+        for (int i = 0; i < this.aeItemHandler.getConfigurableSlots(); i++) {
             var aeTank = this.aeItemHandler.getInventory()[i];
             GenericStack exceedFluid = aeTank.exceedStack();
             if (exceedFluid != null) {
@@ -37,10 +37,10 @@ public class MERequestableInputBusMachine extends MEInputBusPartMachine implemen
                 long inserted = networkInv.insert(exceedFluid.what(), exceedFluid.amount(), Actionable.MODULATE, this.getActionSourceField());
                 throughputCounter.add(exceedFluid.what(), inserted);
                 if (inserted > 0) {
-                    aeTank.extractItem(inserted, false, true);
+                    aeTank.extract(inserted, false, true);
                     continue;
                 } else {
-                    aeTank.extractItem(total, false, true);
+                    aeTank.extract(total, false, true);
                 }
             }
             GenericStack reqFluid = aeTank.requestStack();

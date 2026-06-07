@@ -1,7 +1,7 @@
 package com.gtocore.common.machine.multiblock.electric.space.spacestaion;
 
 import com.gtocore.api.gui.GTOGuiTextures;
-import com.gtocore.api.machine.part.ILargeSpaceStationMachine;
+import com.gtocore.api.machine.ILargeSpaceStationMachine;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.common.data.GTOBlocks;
 import com.gtocore.common.data.GTOMaterials;
@@ -24,11 +24,11 @@ import com.gregtechceu.gtceu.common.data.GTMachines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
+import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -37,12 +37,12 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.gregtechceu.gtceu.api.pattern.Predicates.*;
-import static com.gtocore.api.machine.part.ILargeSpaceStationMachine.ConnectType.MODULE;
+import static com.gtocore.api.machine.ILargeSpaceStationMachine.ConnectType.MODULE;
 
 @DataGeneratorScanned
 public class WorkspaceExtension extends Extension implements IMultiStructureMachine {
 
-    @Persisted
+    @SaveToDisk
     @SyncToClient
     private int length = 2;
 

@@ -6,9 +6,10 @@ import com.gtolib.api.ae2.stacks.IAEItemKey;
 import com.gtolib.api.recipe.RecipeType;
 import com.gtolib.utils.MathUtil;
 
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.content.Content;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
 import com.gregtechceu.gtceu.utils.function.ObjLongPredicate;
 
@@ -85,45 +86,38 @@ public class ExportOnlyAEStockingItemList extends ExportOnlyAEItemList {
     }
 
     @Override
-    public IntLongMap getIngredientMap(@NotNull GTRecipeType type) {
-        if (machine.isWorkingEnabled()) {
-            if (changed) {
-                if (!machine.isOnline()) return IntLongMap.EMPTY;
-                var grid = machine.getMainNode().getGrid();
-                if (grid == null) return IntLongMap.EMPTY;
-                AEKeyMap<AEKey> map = null;
-                intIngredientMap.clear();
-                boolean specialConverter = ((RecipeType) type).specialConverter;
-                int time = machine.getOffsetTimer();
-                for (var i : inventory) {
-                    if (i.config == null) continue;
-                    var stock = i.stock;
-                    if (stock == null) continue;
-                    if (stock.what() instanceof AEItemKey itemKey) {
-                        if (map == null) {
-                            map = grid.getStorageService().getCachedInventory().getMap();
-                            if (map.isEmpty()) return IntLongMap.EMPTY;
-                        }
-                        var amount = ((ExportOnlyAEStockingItemSlot) i).refresh(map, stock.amount(), itemKey, time);
-                        if (amount < 1) continue;
-                        if (specialConverter) {
-                            type.convertItem(i.getReadOnlyStack(), amount, intIngredientMap);
-                        } else {
-                            ((IAEItemKey) (Object) itemKey).gtolib$convert(amount, intIngredientMap);
-                        }
+    public void fillSearchMap(@NotNull GTRecipeType type, @NotNull IntLongMap map) {
+        if (machine.isWorkingEnabled() && machine.isOnline()) {
+            var grid = machine.getMainNode().getGrid();
+            if (grid == null) return;
+            AEKeyMap<AEKey> keyMap = null;
+            boolean specialConverter = ((RecipeType) type).specialConverter;
+            int time = machine.getOffsetTimer();
+            for (var i : inventory) {
+                if (i.config == null) continue;
+                var stock = i.stock;
+                if (stock == null) continue;
+                if (stock.what() instanceof AEItemKey itemKey) {
+                    if (keyMap == null) {
+                        keyMap = grid.getStorageService().getCachedInventory().getMap();
+                        if (keyMap.isEmpty()) return;
+                    }
+                    var amount = ((ExportOnlyAEStockingItemSlot) i).refresh(keyMap, stock.amount(), itemKey, time);
+                    if (amount < 1) continue;
+                    if (specialConverter) {
+                        type.convertItem(i.getReadOnlyStack(), amount, map);
+                    } else {
+                        ((IAEItemKey) (Object) itemKey).gtolib$convert(amount, map);
                     }
                 }
-                changed = false;
             }
-            return intIngredientMap;
         }
-        return IntLongMap.EMPTY;
     }
 
     @Override
-    public List<ItemIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<ItemIngredient> left, boolean simulate) {
-        if (machine.isWorkingEnabled()) return super.handleRecipeInner(io, recipe, left, simulate);
-        return left;
+    public boolean handleRecipeItem(IO io, GTRecipe recipe, List<Content<ItemIngredient>> items, boolean simulate) {
+        if (machine.isWorkingEnabled()) return super.handleRecipeItem(io, recipe, items, simulate);
+        return false;
     }
 
     @Override
@@ -180,7 +174,7 @@ public class ExportOnlyAEStockingItemList extends ExportOnlyAEItemList {
         }
 
         @Override
-        public long extractItem(long amount, boolean simulate, boolean notify) {
+        public long extract(long amount, boolean simulate, boolean notify) {
             if (this.stock != null && this.config != null) {
                 if (!machine.isOnline()) return 0;
                 var grid = machine.getMainNode().getGrid();
@@ -200,31 +194,6 @@ public class ExportOnlyAEStockingItemList extends ExportOnlyAEItemList {
                 }
             }
             return 0;
-        }
-
-        @Override
-        public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-            if (slot == 0 && this.stock != null && this.config != null) {
-                if (!machine.isOnline()) return ItemStack.EMPTY;
-                var grid = machine.getMainNode().getGrid();
-                if (grid == null) return ItemStack.EMPTY;
-                var key = stock.what();
-                long extracted = simulate ? stock.amount() : grid.getStorageService().getInventory().extract(key, amount, Actionable.MODULATE, machine.getActionSource());
-                if (extracted > 0) {
-                    ItemStack resultStack = key instanceof AEItemKey itemKey ? itemKey.toStack((int) extracted) : ItemStack.EMPTY;
-                    if (!simulate) {
-                        machine.getThroughputCounter().remove(stock.what(), extracted);
-                        this.stock = ExportOnlyAESlot.copy(stock, stock.amount() - extracted);
-                        if (this.stock.amount() == 0) {
-                            this.stock = null;
-                            stack = null;
-                        } else if (stack != null) stack.setCount(MathUtil.saturatedCast(stock.amount()));
-                        onContentsChanged();
-                    }
-                    return resultStack;
-                }
-            }
-            return ItemStack.EMPTY;
         }
 
         @Override

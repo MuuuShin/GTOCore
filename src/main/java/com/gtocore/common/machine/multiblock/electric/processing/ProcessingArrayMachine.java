@@ -6,20 +6,20 @@ import com.gtolib.api.item.MachineItemStackHandler;
 import com.gtolib.api.machine.feature.multiblock.IArrayMachine;
 import com.gtolib.api.machine.feature.multiblock.IParallelMachine;
 import com.gtolib.api.machine.multiblock.TierCasingMultiblockMachine;
-import com.gtolib.api.recipe.Recipe;
-import com.gtolib.api.recipe.RecipeType;
-import com.gtolib.api.recipe.modifier.ParallelLogic;
-import com.gtolib.api.recipe.modifier.RecipeModifierFunction;
 import com.gtolib.utils.MachineUtils;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.item.MetaMachineItem;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
+import com.gregtechceu.gtceu.api.recipe.modifier.ParallelLogic;
+import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 
@@ -29,8 +29,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.gto.datasynclib.annotations.SaveToDisk;
+import com.gto.datasynclib.annotations.SyncToClient;
 import lombok.Getter;
 
 import java.util.List;
@@ -43,10 +43,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public final class ProcessingArrayMachine extends TierCasingMultiblockMachine implements IParallelMachine, IArrayMachine {
 
     private MachineDefinition machineDefinitionCache;
-    private GTRecipeType[] RecipeTypeCache;
     @Getter
-    @DescSynced
-    @Persisted
+    @SyncToClient
+    @SaveToDisk
     private final NotifiableItemStackHandler inventory;
     private final int arrayTier;
 
@@ -77,32 +76,18 @@ public final class ProcessingArrayMachine extends TierCasingMultiblockMachine im
     }
 
     @Override
-    public GTRecipeType[] getRecipeTypes() {
-        return recipeTypes();
-    }
-
-    @Override
-    public RecipeType getRecipeType() {
-        return (RecipeType) recipeTypes()[getActiveRecipeType()];
-    }
-
-    @Override
     public int getTier() {
         MachineDefinition definition = getMachineDefinition();
         return Math.min(definition == null ? 0 : definition.getTier(), tier);
     }
 
     @Override
-    protected boolean beforeWorking(Recipe recipe) {
-        if (inventory.getStackInSlot(0).isEmpty()) return false;
-        return super.beforeWorking(recipe);
-    }
-
-    @Override
     @Nullable
-    public Recipe getRealRecipe(Recipe recipe) {
+    public GTRecipe getRealRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
         if (!inventory.getStackInSlot(0).isEmpty()) {
-            return RecipeModifierFunction.laserLossOverclocking(this, ParallelLogic.accurateParallel(this, recipe, getMaxParallel()));
+            recipe = ParallelLogic.accurateParallel(this, unit, recipe, getMaxParallel());
+            if (recipe == null) return null;
+            return RecipeModifier.laserLossOverclocking(this, unit, recipe);
         }
         return null;
     }
@@ -144,15 +129,5 @@ public final class ProcessingArrayMachine extends TierCasingMultiblockMachine im
     @Override
     public MachineDefinition getMachineDefinitionCache() {
         return this.machineDefinitionCache;
-    }
-
-    @Override
-    public void setRecipeTypeCache(final GTRecipeType[] RecipeTypeCache) {
-        this.RecipeTypeCache = RecipeTypeCache;
-    }
-
-    @Override
-    public GTRecipeType[] getRecipeTypeCache() {
-        return this.RecipeTypeCache;
     }
 }
