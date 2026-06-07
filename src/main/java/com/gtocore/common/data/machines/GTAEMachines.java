@@ -160,7 +160,6 @@ public final class GTAEMachines {
             .tier(ZPM)
             .allRotation()
             .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS, GTOPartAbility.DUAL_INPUT)
-            .notAllowSharedTooltips()
             .renderer(() -> new OverlayTieredMachineRenderer(ZPM, GTCEu.id("block/machine/part/me_pattern_buffer")))
             .register();
 
@@ -172,7 +171,6 @@ public final class GTAEMachines {
             .tier(UHV)
             .allRotation()
             .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS, GTOPartAbility.DUAL_INPUT)
-            .notAllowSharedTooltips()
             .renderer(() -> new OverlayTieredMachineRenderer(UHV, GTOCore.id("block/machine/part/me_pattern_buffer_red")))
             .register();
 
@@ -183,7 +181,6 @@ public final class GTAEMachines {
             .meAutoConnectable()
             .allRotation()
             .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS, GTOPartAbility.DUAL_INPUT)
-            .notAllowSharedTooltips()
             .renderer(() -> new OverlayTieredMachineRenderer(UV, GTCEu.id("block/machine/part/me_pattern_buffer")))
             .register();
 
@@ -194,7 +191,6 @@ public final class GTAEMachines {
             .tier(UHV)
             .allRotation()
             .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS, GTOPartAbility.DUAL_INPUT)
-            .notAllowSharedTooltips()
             .renderer(() -> new OverlayTieredMachineRenderer(UHV, GTCEu.id("block/machine/part/me_pattern_buffer")))
             .register();
 
@@ -311,7 +307,6 @@ public final class GTAEMachines {
             .overlayTieredHullRenderer("me_pattern_buffer")
             .langValue("ME Pattern Buffer")
             .genLang("ME样板总成")
-            .notAllowSharedTooltips()
             .tooltips(GTOMachineTooltips.INSTANCE.getMePatternHatchTooltips().invoke(36).getSupplier())
             .meAutoConnectable()
             .register();
@@ -326,6 +321,7 @@ public final class GTAEMachines {
             .langValue("ME Pattern Buffer Proxy")
             .genLang("ME样板总成镜像")
             .tooltips(Component.translatable("block.gtceu.pattern_buffer_proxy.desc.0"),
+                    Component.translatable("gtocore.machine.pattern_buffer_proxy.tooltip.0"),
                     Component.translatable("block.gtceu.pattern_buffer_proxy.desc.1"),
                     Component.translatable("block.gtceu.pattern_buffer_proxy.desc.2"),
                     Component.translatable("gtceu.part_sharing.enabled"))

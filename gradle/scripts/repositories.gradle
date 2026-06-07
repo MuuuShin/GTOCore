@@ -15,6 +15,11 @@ repositories {
         filter { includeGroup("dev.emi") }
     }
 
+    exclusiveContent { // Xaero's
+        forRepository { maven { url = "https://chocolateminecraft.com/maven/" } }
+        filter { includeGroupAndSubgroups("xaero") }
+    }
+
     maven {
         url "https://maven.shadowsoffire.dev/releases"
         content {

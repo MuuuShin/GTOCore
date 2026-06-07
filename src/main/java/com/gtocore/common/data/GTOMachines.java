@@ -308,7 +308,6 @@ public final class GTOMachines {
                     .allRotation()
                     .abilities(PartAbility.IMPORT_ITEMS, GTOPartAbility.DUAL_INPUT)
                     .renderer(() -> new OverlayTieredMachineRenderer(tier, GTCEu.id("block/machine/part/dual_hatch.import")))
-                    .notAllowSharedTooltips()
                     .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"),
                             Component.translatable("gtocore.machine.programmablec_hatch.extra_tooltip.0"),
                             Component.translatable("gtocore.machine.programmablec_hatch.extra_tooltip.1"),
