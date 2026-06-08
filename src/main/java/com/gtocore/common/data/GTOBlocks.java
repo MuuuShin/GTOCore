@@ -333,6 +333,8 @@ public final class GTOBlocks {
     public static final BlockEntry<Block> QUANTUM_GLASS = createGlassCasingBlock("quantum_glass", "量子玻璃", GTOCore.id("block/casings/quantum_glass"));
     public static final BlockEntry<Block> FERMI_ENERGY_GAP_TRANSITION_GLASS = createGlassCasingBlock("fermi_energy_gap_transition_glass", "费米能隙跃迁玻璃", GTOCore.id("block/casings/fermi_energy_gap_transition_glass"));
     public static final BlockEntry<Block> PLASMA_FIELD_GLASS = createGlassCasingBlock("plasma_field_glass", "等离子体场玻璃", GTOCore.id("block/casings/plasma_field_glass"));
+    public static final BlockEntry<Block> ELECTROMAGNETIC_SHIELDING_GLASS = createGlassCasingBlock("electromagnetic_shielding_glass", "电磁屏蔽玻璃", GTOCore.id("block/casings/electromagnetic_shielding_glass"));
+    public static final BlockEntry<Block> CHAOS_SHIELDING_GLASS = createGlassCasingBlock("chaos_shielding_glass", "混沌屏蔽玻璃", GTOCore.id("block/casings/chaos_shielding_glass"));
 
     public static final BlockEntry<Block> FORCE_FIELD_GLASS = createGlassCasingBlock("force_field_glass", "力场玻璃", GTOCore.id("block/force_field_glass"));
     public static final BlockEntry<Block> SPATIALLY_TRANSCENDENT_GRAVITATIONAL_LENS_BLOCK = createGlassCasingBlock("spatially_transcendent_gravitational_lens_block", "超空间引力透镜块", GTOCore.id("block/spatially_transcendent_gravitational_lens_block"));
