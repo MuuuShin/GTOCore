@@ -3,15 +3,16 @@ package com.gtocore.common.machine.mana;
 import com.gtocore.common.data.GTOMaterials;
 import com.gtocore.common.data.GTORecipeTypes;
 
-import com.gtolib.api.machine.feature.IHeaterMachine;
+import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
+import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.fluids.store.FluidStorageKeys;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.handler.ICustomRecipeLogicHolder;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 
 import net.minecraft.core.Direction;
@@ -19,26 +20,29 @@ import net.minecraft.world.level.material.Fluid;
 
 import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class ManaHeaterMachine extends SimpleManaMachine implements IHeaterMachine, ICustomRecipeLogicHolder {
+public class ManaHeaterMachine extends SimpleManaMachine implements IHeatContainerMachine, ICustomRecipeLogicHolder {
 
     private static final Fluid SALAMANDER = GTOMaterials.Salamander.getFluid(FluidStorageKeys.GAS);
-
-    @SaveToDisk
-    @SyncToClient(notifyUpdate = true)
-    private int temperature = 293;
 
     /// an indicator used to determine if the salamander input is present
     /// **used by client renderer**
     @SaveToDisk
     @SyncToClient(notifyUpdate = true)
     private boolean salamanderInput = false;
-    private TickableSubscription tickSubs;
+
+    @Getter
+    @SaveToDisk
+    @SyncToClient
+    private final NotifiableHeatContainer heatContainer;
 
     public ManaHeaterMachine(MetaMachineBlockEntity holder) {
         super(holder, 2, t -> 8000);
+        heatContainer = new NotifiableHeatContainer(this, IO.OUT, 2400, 4, 0.4, 0.01);
+        heatContainer.handler.setSideIOCondition(s -> s == Direction.UP);
+        heatContainer.handler.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
     }
 
     @Override
@@ -53,64 +57,13 @@ public class ManaHeaterMachine extends SimpleManaMachine implements IHeaterMachi
     }
 
     @Override
-    public int getOutputSignal(@Nullable Direction side) {
-        return getSignal(side);
-    }
-
-    @Override
-    public boolean canConnectRedstone(@NotNull Direction side) {
-        return true;
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        if (!isRemote()) {
-            tickSubs = subscribeServerTick(tickSubs, () -> {
-                tickUpdate();
-                if (temperature > getMaxTemperature()) getRecipeLogic().markLastRecipeDirty();
-                getRecipeLogic().updateTickSubscription();
-            }, 20);
-        }
-    }
-
-    @Override
-    public void onUnload() {
-        super.onUnload();
-        if (tickSubs != null) {
-            tickSubs.unsubscribe();
-            tickSubs = null;
-        }
-    }
-
-    @Override
     public void onWorking() {
         super.onWorking();
-        if (getOffsetTimer() % 10 == 0 && getMaxTemperature() > temperature + 10) {
+        if (getOffsetTimer() % 10 == 0 && heatContainer.getMaxTemperature() > heatContainer.getTemperature() + 10) {
             var hasSalamander = inputFluid(SALAMANDER, 10);
             this.salamanderInput = hasSalamander;
-            raiseTemperature(hasSalamander ? 10 : 2);
+            heatContainer.addHeatUnrestricted(hasSalamander ? 40 : 16, false);
         }
-    }
-
-    @Override
-    public int getHeatCapacity() {
-        return 8;
-    }
-
-    @Override
-    public int getMaxTemperature() {
-        return 2400;
-    }
-
-    @Override
-    public void setTemperature(final int temperature) {
-        this.temperature = temperature;
-    }
-
-    @Override
-    public int getTemperature() {
-        return this.temperature;
     }
 
     public boolean hasSalamanderInput() {
@@ -119,7 +72,12 @@ public class ManaHeaterMachine extends SimpleManaMachine implements IHeaterMachi
 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
-        if (temperature >= getMaxTemperature()) return null;
+        if (heatContainer.getTemperature() >= heatContainer.getMaxTemperature()) return null;
         return getRecipeBuilder().duration(20).MANAt(16).build();
+    }
+
+    @Override
+    public boolean alwaysSearchRecipe() {
+        return true;
     }
 }

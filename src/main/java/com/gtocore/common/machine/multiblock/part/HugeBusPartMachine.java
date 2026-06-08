@@ -118,7 +118,7 @@ public final class HugeBusPartMachine extends WorkableTieredIOPartMachine implem
 
     private void updateInventorySubscription() {
         var level = getLevel();
-        if (level != null && isWorkingEnabled() && blockEntityDirectionCache.hasAdjacentItemHandler(getLevel(), getPos(), getFrontFacing())) {
+        if (level != null && isWorkingEnabled() && holder.blockEntityDirectionCache.hasAdjacentItemHandler(getLevel(), getPos(), getFrontFacing())) {
             autoIOSubs = subscribeServerTick(autoIOSubs, this::autoIO, 40);
         } else if (autoIOSubs != null) {
             autoIOSubs.unsubscribe();

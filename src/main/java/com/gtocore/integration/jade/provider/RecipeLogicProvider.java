@@ -7,7 +7,7 @@ import com.gtolib.api.annotation.language.RegisterLanguage;
 import com.gtolib.api.machine.feature.ICustomElectricMachine;
 import com.gtolib.api.machine.feature.multiblock.ICrossRecipeMachine;
 import com.gtolib.api.machine.mana.feature.IManaEnergyMachine;
-import com.gtolib.api.recipe.RecipeHelper;
+import com.gtolib.api.recipe.extension.MANATRecipeExtension;
 import com.gtolib.utils.NumberUtils;
 
 import com.gregtechceu.gtceu.GTCEu;
@@ -186,7 +186,7 @@ public final class RecipeLogicProvider implements IBlockComponentProvider, IServ
         if (recipe != null) {
             var machine = capability.getMachine();
             long EUt = recipe.eut;
-            var Manat = RecipeHelper.getMANAt(recipe);
+            var Manat = MANATRecipeExtension.getMANAt(recipe);
             boolean isSteam = false;
             if (machine instanceof IDummyEnergyMachine energyMachine && !energyMachine.jade()) {
                 EUt = 0;
@@ -218,9 +218,9 @@ public final class RecipeLogicProvider implements IBlockComponentProvider, IServ
             if (originRecipe != null) {
                 var originEUt = originRecipe.eut;
                 var origin = new CompoundTag();
-                if (originEUt != EUt || RecipeHelper.getMANAt(recipe) != RecipeHelper.getMANAt(originRecipe)) {
+                if (originEUt != EUt || MANATRecipeExtension.getMANAt(recipe) != MANATRecipeExtension.getMANAt(originRecipe)) {
                     origin.putLong("EUt", originEUt);
-                    origin.putLong("Manat", RecipeHelper.getMANAt(originRecipe));
+                    origin.putLong("Manat", MANATRecipeExtension.getMANAt(originRecipe));
                 }
                 var maxProgress = originRecipe.duration;
                 if (maxProgress > 0) {

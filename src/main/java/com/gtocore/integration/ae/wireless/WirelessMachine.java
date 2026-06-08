@@ -388,7 +388,7 @@ public interface WirelessMachine extends IGridConnectedMachine, ISync, IBindable
         var mm = self();
         IGrid grid = null;
         IGridNode node;
-        switch (mm.getNeighbor(mm.getFrontFacing())) {
+        switch (mm.holder.getNeighborBlockEntity(mm.getFrontFacing())) {
             case IGridConnectedBlockEntity nodeHost -> {
                 grid = nodeHost.getMainNode().getGrid();
                 node = nodeHost.getMainNode().getNode();
