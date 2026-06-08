@@ -2,13 +2,13 @@ package com.gtocore.common.machine.electric;
 
 import com.gtocore.common.data.GTORecipeTypes;
 
-import com.gtolib.api.machine.feature.IHeaterMachine;
+import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
+import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
 import com.gtolib.api.machine.trait.NotifiableSafeEnergyContainer;
 import com.gtolib.api.recipe.RecipeBuilder;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.WorkableTieredMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
@@ -25,19 +25,24 @@ import net.minecraft.core.Direction;
 
 import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class ElectricHeaterMachine extends WorkableTieredMachine implements IHeaterMachine, ICustomRecipeLogicHolder {
+public final class ElectricHeaterMachine extends WorkableTieredMachine implements IHeatContainerMachine, ICustomRecipeLogicHolder {
 
     public static final int MaxTemperature = 1200;
+
+    @Getter
     @SaveToDisk
-    @SyncToClient(notifyUpdate = true)
-    private int temperature = 273;
-    private TickableSubscription tickSubs;
+    @SyncToClient
+    private final NotifiableHeatContainer heatContainer;
 
     public ElectricHeaterMachine(MetaMachineBlockEntity holder) {
         super(holder, 1, t -> 8000);
+        heatContainer = new NotifiableHeatContainer(this, IO.OUT, MaxTemperature, 2, 0.3, 0.01);
+        heatContainer.handler.setSideIOCondition(s -> s == Direction.UP);
+        heatContainer.handler.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
     }
 
     @Override
@@ -75,67 +80,21 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
     }
 
     @Override
-    public int getOutputSignal(@Nullable Direction side) {
-        return getSignal(side);
-    }
-
-    @Override
-    public boolean canConnectRedstone(@NotNull Direction side) {
-        return true;
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        if (!isRemote()) {
-            tickSubs = subscribeServerTick(tickSubs, () -> {
-                tickUpdate();
-                if (temperature > MaxTemperature) getRecipeLogic().markLastRecipeDirty();
-                getRecipeLogic().updateTickSubscription();
-            }, 20);
-        }
-    }
-
-    @Override
-    public void onUnload() {
-        super.onUnload();
-        if (tickSubs != null) {
-            tickSubs.unsubscribe();
-            tickSubs = null;
-        }
-    }
-
-    @Override
     public void onWorking() {
         super.onWorking();
-        if (getOffsetTimer() % 10 == 0 && MaxTemperature > temperature + 4) {
-            raiseTemperature(4);
+        if (getOffsetTimer() % 10 == 0 && MaxTemperature > getHeatContainer().getTemperature() + 4) {
+            getHeatContainer().addHeatUnrestricted(16, false);
         }
-    }
-
-    @Override
-    public int getHeatCapacity() {
-        return 6;
-    }
-
-    @Override
-    public int getMaxTemperature() {
-        return MaxTemperature;
-    }
-
-    @Override
-    public void setTemperature(final int temperature) {
-        this.temperature = temperature;
-    }
-
-    @Override
-    public int getTemperature() {
-        return this.temperature;
     }
 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
-        if (temperature >= MaxTemperature) return null;
+        if (getHeatContainer().getTemperature() >= MaxTemperature) return null;
         return RecipeBuilder.ofRaw().duration(20).EUt(30).build();
+    }
+
+    @Override
+    public boolean alwaysSearchRecipe() {
+        return true;
     }
 }

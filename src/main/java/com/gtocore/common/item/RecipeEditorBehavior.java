@@ -82,6 +82,7 @@ import it.unimi.dsi.fastutil.objects.Reference2CharLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
 import java.util.*;
+import java.util.function.BiPredicate;
 
 public final class RecipeEditorBehavior implements IItemUIFactory, IFancyUIProvider {
 
@@ -201,7 +202,7 @@ public final class RecipeEditorBehavior implements IItemUIFactory, IFancyUIProvi
         GTRecipeTypeUI recipeUI = new GTRecipeTypeUI(machine.recipeType) {
 
             @Override
-            protected WidgetGroup addInventorySlotGroup(boolean isOutputs, boolean isSteam, boolean isHighPressure) {
+            protected WidgetGroup addInventorySlotGroup(boolean isOutputs, boolean isSteam, boolean isHighPressure, BiPredicate predicate) {
                 int maxCount = 0;
                 int totalR = 0;
                 TreeMap<RecipeInfo, Integer> map = new TreeMap<>(RecipeInfo.COMPARATOR);
@@ -257,8 +258,8 @@ public final class RecipeEditorBehavior implements IItemUIFactory, IFancyUIProvi
             @Override
             public IEditableUI<WidgetGroup, RecipeHolder> createEditableUITemplate(boolean isSteam, boolean isHighPressure) {
                 return new IEditableUI.Normal<>(() -> {
-                    var inputs = addInventorySlotGroup(false, isSteam, isHighPressure);
-                    var outputs = addInventorySlotGroup(true, isSteam, isHighPressure);
+                    var inputs = addInventorySlotGroup(false, isSteam, isHighPressure, (a, b) -> true);
+                    var outputs = addInventorySlotGroup(true, isSteam, isHighPressure, (a, b) -> true);
                     var maxWidth = Math.max(inputs.getSize().width, outputs.getSize().width);
                     var group = new WidgetGroup(0, 0, 2 * maxWidth + 40, Math.max(inputs.getSize().height, outputs.getSize().height));
                     var size = group.getSize();

@@ -1,44 +1,41 @@
 package com.gtocore.common.machine.noenergy;
 
 import com.gtolib.api.machine.SimpleNoEnergyMachine;
-import com.gtolib.api.machine.feature.IHeaterMachine;
+import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
+import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
+import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 
 import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeaterMachine {
+public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatContainerMachine, IExplosionMachine {
 
     public static final int MaxTemperature = 800;
 
+    @Getter
     @SaveToDisk
-    @SyncToClient(notifyUpdate = true)
-    private int temperature = 293;
-    private TickableSubscription tickSubs;
+    @SyncToClient
+    private final NotifiableHeatContainer heatContainer;
 
     public HeaterMachine(MetaMachineBlockEntity holder) {
         super(holder, 0, i -> 8000);
-    }
-
-    @Override
-    public int getOutputSignal(@Nullable Direction side) {
-        return getSignal(side);
-    }
-
-    @Override
-    public boolean canConnectRedstone(@NotNull Direction side) {
-        return true;
+        heatContainer = new NotifiableHeatContainer(this, IO.OUT, MaxTemperature, 1, 0.2, 0.01);
+        heatContainer.handler.setSideIOCondition(s -> s != getFrontFacing() && s != Direction.DOWN);
+        heatContainer.handler.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
     }
 
     @Override
@@ -61,51 +58,19 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeate
     }
 
     @Override
-    public void onLoad() {
-        super.onLoad();
-        if (!isRemote()) {
-            tickSubs = subscribeServerTick(tickSubs, () -> {
-                Level level = getLevel();
-                if (level == null) return;
-                tickUpdate();
-                this.requestSync();
-                setEnabled(level.getBlockState(getPos().relative(getFrontFacing())).isAir());
-            }, 20);
-        }
-    }
-
-    @Override
-    public void onUnload() {
-        super.onUnload();
-        if (tickSubs != null) {
-            tickSubs.unsubscribe();
-            tickSubs = null;
-        }
+    public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {
+        super.onNeighborChanged(block, fromPos, isMoving);
+        Level level = getLevel();
+        if (level == null) return;
+        var enabled = level.getBlockState(getPos().relative(getFrontFacing())).isAir();
+        setEnabled(enabled);
     }
 
     @Override
     public void onWorking() {
         super.onWorking();
-        if (getOffsetTimer() % 10 == 0) raiseTemperature(1);
-    }
-
-    @Override
-    public int getHeatCapacity() {
-        return 4;
-    }
-
-    @Override
-    public int getMaxTemperature() {
-        return MaxTemperature;
-    }
-
-    @Override
-    public void setTemperature(final int temperature) {
-        this.temperature = temperature;
-    }
-
-    @Override
-    public int getTemperature() {
-        return this.temperature;
+        if (getOffsetTimer() % 20 == 0) {
+            heatContainer.addHeatUnrestricted(8, false);
+        }
     }
 }

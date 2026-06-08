@@ -891,7 +891,7 @@ public class TradingStationMachine extends MetaMachine implements IFancyUIMachin
 
     private void updateAutoOutputSubscription() {
         if (getLevel() == null || isRemote()) return;
-        if ((autoOutputItems && !outputItem.isEmpty() && getOutputFacingItems() != null && blockEntityDirectionCache.hasAdjacentItemHandler(getLevel(), getPos(), getOutputFacingItems())) || (autoOutputFluids && !outputFluid.isEmpty() && getOutputFacingFluids() != null && blockEntityDirectionCache.hasAdjacentFluidHandler(getLevel(), getPos(), getOutputFacingFluids()))) {
+        if ((autoOutputItems && !outputItem.isEmpty() && getOutputFacingItems() != null && holder.blockEntityDirectionCache.hasAdjacentItemHandler(getLevel(), getPos(), getOutputFacingItems())) || (autoOutputFluids && !outputFluid.isEmpty() && getOutputFacingFluids() != null && holder.blockEntityDirectionCache.hasAdjacentFluidHandler(getLevel(), getPos(), getOutputFacingFluids()))) {
             autoOutputSubs = subscribeServerTick(autoOutputSubs, this::autoOutput, 20);
         } else if (autoOutputSubs != null) {
             autoOutputSubs.unsubscribe();

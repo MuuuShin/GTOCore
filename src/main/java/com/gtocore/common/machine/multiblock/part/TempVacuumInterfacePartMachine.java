@@ -1,47 +1,26 @@
 package com.gtocore.common.machine.multiblock.part;
 
-import com.gtocore.api.machine.ITempPartMachine;
+import com.gtocore.api.machine.IHeatContainerPart;
 import com.gtocore.api.machine.IVacuumPartMachine;
 
+import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
+
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
+import com.gregtechceu.gtceu.api.recipe.handler.IO;
 
 import com.gto.datasynclib.annotations.SaveToDisk;
+import lombok.Getter;
 
-public class TempVacuumInterfacePartMachine extends MultiblockPartMachine implements ITempPartMachine, IVacuumPartMachine {
+public class TempVacuumInterfacePartMachine extends MultiblockPartMachine implements IHeatContainerPart, IVacuumPartMachine {
 
+    @Getter
     @SaveToDisk
-    private int temperature = 293;
-
-    private TickableSubscription tickableSubscription;
+    private final NotifiableHeatContainer heatContainer;
 
     public TempVacuumInterfacePartMachine(MetaMachineBlockEntity holder) {
         super(holder);
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        tickableSubscription = subscribeServerTick(tickableSubscription, this::tickUpdate, 20);
-    }
-
-    @Override
-    public void onUnload() {
-        super.onUnload();
-        if (tickableSubscription != null) {
-            tickableSubscription.unsubscribe();
-            tickableSubscription = null;
-        }
-    }
-
-    @Override
-    public int getTemperature() {
-        return temperature;
-    }
-
-    @Override
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
+        heatContainer = new NotifiableHeatContainer(this, IO.IN, 3600, 1, 24, 0.1);
+        heatContainer.handler.setSideIOCondition(s -> s == getFrontFacing());
     }
 }

@@ -103,7 +103,7 @@ public class MonitorCWU extends AbstractInfoProviderMonitor implements IOpticalC
         protected IOpticalComputationProvider getOpticalNetProvider() {
             IOpticalComputationProvider p = null;
             for (Direction direction : Direction.values()) {
-                BlockEntity blockEntity = machine.getNeighbor(direction);
+                BlockEntity blockEntity = machine.holder.getNeighborBlockEntity(direction);
                 if (blockEntity != null) {
                     var cap = GTCapabilityHelper.getComputation(blockEntity, direction.getOpposite());
                     if (cap instanceof IOpticalComputationHatch hatch && hatch.isTransmitter() && hatch != machine) {

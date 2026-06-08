@@ -4,6 +4,7 @@ import com.gtocore.common.data.GTOMachines;
 
 import com.gtolib.api.annotation.DataGeneratorScanned;
 import com.gtolib.api.annotation.language.RegisterLanguage;
+import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.ICleanroomReceiver;
@@ -11,7 +12,6 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.IntInputWidget;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.ICleanroomProvider;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineModifyDrops;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
@@ -46,8 +46,6 @@ import java.util.function.Supplier;
 @DataGeneratorScanned
 public class ModularHatchPartMachine extends ACMHatchPartMachine implements IModularMaintenance, IMachineModifyDrops {
 
-    private TickableSubscription tickSubs;
-
     @SaveToDisk
     private final NotifiableItemStackHandler temperatureModuleInv;
     @SaveToDisk
@@ -56,8 +54,6 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
     private final NotifiableItemStackHandler vacuumModuleInv;
     @SaveToDisk
     private final NotifiableItemStackHandler cleanroomModuleInv;
-    @SaveToDisk
-    private int temperature = 293;
     @SaveToDisk
     private int activeTemperature = 293;
     @SaveToDisk
@@ -81,6 +77,10 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
     private IntInputWidget gravityWidget;
     private IntInputWidget temperatureWidget;
 
+    @Getter
+    @SaveToDisk
+    private final NotifiableHeatContainer heatContainer;
+
     public ModularHatchPartMachine(MetaMachineBlockEntity metaTileEntityId) {
         super(metaTileEntityId);
 
@@ -99,38 +99,13 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
         cleanroomModuleInv = new NotifiableItemStackHandler(this, 1, IO.NONE, IO.BOTH, SingleCustomItemStackHandler::new);
         cleanroomModuleInv.setFilter(stack -> Wrapper.CLEAN_CHECK.containsKey(stack.getItem()));
         cleanroomModuleInv.addChangedListener(this::onConditionChange);
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        if (!isRemote()) {
-            tickSubs = subscribeServerTick(tickSubs, this::tickUpdate, 20);
-        }
-    }
-
-    @Override
-    public void onUnload() {
-        super.onUnload();
-        if (tickSubs != null) {
-            tickSubs.unsubscribe();
-            tickSubs = null;
-        }
+        heatContainer = new NotifiableHeatContainer(this, IO.IN, MAX_TEMPERATURE, 1, 24, 0.1);
+        heatContainer.handler.setSideIOCondition(s -> s == getFrontFacing());
     }
 
     @Override
     public int getCurrentGravity() {
         return gravityMode ? currentGravity : 1;
-    }
-
-    @Override
-    public int getTemperature() {
-        return temperatureMode ? activeTemperature : temperature;
-    }
-
-    @Override
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
     }
 
     @Override
@@ -152,7 +127,7 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
     private static final int textWidth = 160;
 
     private static final int MIN_TEMPERATURE = 273;
-    private static final int MAX_TEMPERATURE = 2273;
+    private static final int MAX_TEMPERATURE = 4800;
     private static final int MIN_GRAVITY = 0;
     private static final int MAX_GRAVITY = 100;
 
@@ -172,7 +147,7 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
                         .setBackground(GuiTextures.SLOT)
                         .setHoverTooltips(Component.translatable(TOOLTIP_KEY, Wrapper.TEMPERATURE_CHECK.getDefaultInstance().getDisplayName(), Component.translatable(TEMPERATURE_FUNC))))
                 .addWidget(getConfigPanel(xlabel, ylabel + y++ * rowHeight,
-                        () -> Component.translatable("gtocore.machine.current_temperature", getTemperature()),
+                        () -> Component.translatable("gtocore.machine.current_temperature", getHeatContainer().getTemperature()),
                         () -> temperatureMode ?
                                 Component.translatable(TEMPERATURE_CONFIG) :
                                 Component.translatable(TOOLTIP_REQUIRED_KEY, getDisplayName(TEMPERATURE_SHORT_NAME)),
@@ -329,11 +304,6 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
     @Override
     public boolean showFancyTooltip() {
         return super.showFancyTooltip();
-    }
-
-    @Override
-    public int getMaxTemperature() {
-        return MAX_TEMPERATURE;
     }
 
     private static class Wrapper {
