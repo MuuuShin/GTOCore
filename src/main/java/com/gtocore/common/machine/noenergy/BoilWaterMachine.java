@@ -48,6 +48,11 @@ public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IRe
     }
 
     @Override
+    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
+        return recipe;
+    }
+
+    @Override
     public void onLoad() {
         super.onLoad();
         if (!isRemote()) {

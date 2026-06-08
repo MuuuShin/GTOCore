@@ -79,24 +79,8 @@ public final class RecipeLogicProvider implements IBlockComponentProvider, IServ
                 } else {
                     var EUt = recipeInfo.getLong("EUt");
                     var Manat = recipeInfo.getLong("Manat");
-                    boolean isSteam = false;
-                    if (blockAccessor.getBlockEntity() instanceof MetaMachineBlockEntity mbe) {
-                        var machine = mbe.getMetaMachine();
-                        if (machine instanceof IDummyEnergyMachine energyMachine && !energyMachine.jade()) {
-                            return;
-                        } else if (machine instanceof SimpleSteamMachine ssm) {
-                            EUt = (long) (EUt * ssm.getConversionRate());
-                            isSteam = true;
-                        } else if (machine instanceof SteamParallelMultiblockMachine smb) {
-                            EUt = (long) (EUt * smb.getConversionRate());
-                            isSteam = true;
-                        } else if (EUt > 0 && machine instanceof IManaEnergyMachine) {
-                            Manat += EUt;
-                            EUt = 0;
-                        }
-                    }
                     List<Component> list = new java.util.ArrayList<>();
-                    getEUtTooltip(list, EUt, isSteam, recipeInfo.contains("voltage") ? recipeInfo.getLong("voltage") : -1);
+                    getEUtTooltip(list, EUt, recipeInfo.getBoolean("isSteam"), recipeInfo.contains("voltage") ? recipeInfo.getLong("voltage") : -1);
                     tooltip.addAll(list);
 
                     if (Manat != 0) {
@@ -200,28 +184,42 @@ public final class RecipeLogicProvider implements IBlockComponentProvider, IServ
         var recipeInfo = new CompoundTag();
         var recipe = capability.getLastRecipe();
         if (recipe != null) {
-            var inputEUt = recipe.getInputEUt();
-            var outputEUt = recipe.getOutputEUt();
-            recipeInfo.putLong("EUt", inputEUt - outputEUt);
-            recipeInfo.putLong("Manat", RecipeHelper.getMANAt(recipe));
+            var machine = capability.getMachine();
+            long EUt = recipe.eut;
+            var Manat = RecipeHelper.getMANAt(recipe);
+            boolean isSteam = false;
+            if (machine instanceof IDummyEnergyMachine energyMachine && !energyMachine.jade()) {
+                EUt = 0;
+            } else if (machine instanceof SimpleSteamMachine ssm) {
+                EUt = (long) (EUt * ssm.getConversionRate());
+                isSteam = true;
+            } else if (machine instanceof SteamParallelMultiblockMachine smb) {
+                EUt = (long) (EUt * smb.getConversionRate());
+                isSteam = true;
+            } else if (EUt > 0 && machine instanceof IManaEnergyMachine) {
+                Manat += EUt;
+                EUt = 0;
+            }
+            if (isSteam) recipeInfo.putBoolean("isSteam", true);
+            if (EUt != 0) recipeInfo.putLong("EUt", EUt);
+            if (Manat != 0) recipeInfo.putLong("Manat", Manat);
             recipeInfo.putLong("voltage", getVoltage(capability));
 
-            if (capability.machine instanceof ICustomElectricMachine machine && machine.isActivated()) {
-                recipeInfo.putDouble("totalEu", machine.getTotalEu());
-                if (machine.isGenerator()) {
+            if (machine instanceof ICustomElectricMachine electricMachine && electricMachine.isActivated()) {
+                recipeInfo.putDouble("totalEu", electricMachine.getTotalEu());
+                if (electricMachine.isGenerator()) {
                     recipeInfo.putBoolean("isGenerator", true);
                 }
             }
             var originRecipe = capability.getLastOriginRecipe();
-            if (originRecipe == null && capability.machine instanceof ICrossRecipeMachine c) {
+            if (originRecipe == null && machine instanceof ICrossRecipeMachine c) {
                 originRecipe = c.getLastRecipes().stream().findFirst().orElse(null);
             }
             if (originRecipe != null) {
-                var originInputEUt = originRecipe.getInputEUt();
-                var originOutputEUt = originRecipe.getOutputEUt();
+                var originEUt = originRecipe.eut;
                 var origin = new CompoundTag();
-                if (originInputEUt != inputEUt || originOutputEUt != outputEUt || RecipeHelper.getMANAt(recipe) != RecipeHelper.getMANAt(originRecipe)) {
-                    origin.putLong("EUt", originInputEUt - originOutputEUt);
+                if (originEUt != EUt || RecipeHelper.getMANAt(recipe) != RecipeHelper.getMANAt(originRecipe)) {
+                    origin.putLong("EUt", originEUt);
                     origin.putLong("Manat", RecipeHelper.getMANAt(originRecipe));
                 }
                 var maxProgress = originRecipe.duration;

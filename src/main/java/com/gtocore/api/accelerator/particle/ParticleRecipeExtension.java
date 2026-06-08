@@ -2,14 +2,13 @@ package com.gtocore.api.accelerator.particle;
 
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
-import com.gregtechceu.gtceu.api.recipe.expand.ContentExpander;
+import com.gregtechceu.gtceu.api.recipe.extension.RecipeExtension;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.IRecipeHandlerHolder;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 
 import com.fast.recipesearch.IntLongMap;
 import com.gto.datasynclib.DataSyncCodec;
-import com.gto.datasynclib.datasream.DataComponentKey;
 import com.gto.datasynclib.datasream.codec.DataCodec;
 import com.gto.datasynclib.datasream.codec.DataDecoder;
 import com.gto.datasynclib.datasream.codec.DataEncoder;
@@ -20,17 +19,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public final class ParticleExpander extends DataComponentKey<List<ParticleBeam>> implements ContentExpander {
+public final class ParticleRecipeExtension extends RecipeExtension<List<ParticleBeam>> {
 
-    public static final ParticleExpander INSTANCE = new ParticleExpander();
+    public static final ParticleRecipeExtension INSTANCE = new ParticleRecipeExtension();
 
-    private ParticleExpander() {
-        super("particle", DataSyncCodec.of(DataCodec.of(DataEncoder.collection(ParticleBeam.DATA_CODEC), DataDecoder.list(ParticleBeam.DATA_CODEC))));
-    }
-
-    @Override
-    public boolean isTick() {
-        return false;
+    private ParticleRecipeExtension() {
+        super("particle", DataSyncCodec.of(DataCodec.of(DataEncoder.collection(ParticleBeam.DATA_CODEC), DataDecoder.list(ParticleBeam.DATA_CODEC))), false);
     }
 
     @Override
