@@ -20,6 +20,14 @@ import static com.gtocore.common.data.GTORecipeTypes.*;
 public final class Temporary {
 
     public static void init() {
+        ASSEMBLER_RECIPES.builder("quicksilver")
+                .inputItems(TagPrefix.pipeNonupleFluid, GTMaterials.Copper, 1)
+                .inputItems(TagPrefix.plate, GTMaterials.Copper, 2)
+                .outputItems(GTOBlocks.HEAT_PIPES[0].asItem())
+                .duration(200)
+                .EUt(7)
+                .save();
+
         FUSION_RECIPES.builder("quicksilver")
                 .inputFluids(GTOMaterials.AstralSilver, 576)
                 .inputFluids(GTOMaterials.Gaia, 144)

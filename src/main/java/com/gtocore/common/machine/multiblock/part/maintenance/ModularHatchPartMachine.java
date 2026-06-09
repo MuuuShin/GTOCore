@@ -101,6 +101,9 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
         cleanroomModuleInv.addChangedListener(this::onConditionChange);
         heatContainer = new NotifiableHeatContainer(this, IO.IN, MAX_TEMPERATURE, 1, 24, 0.1);
         heatContainer.handler.setSideIOCondition(s -> s == getFrontFacing());
+        heatContainer.addChangedListener(() -> {
+            if (temperatureMode) heatContainer.handler.setCurrentHeat(activeTemperature);
+        });
     }
 
     @Override
@@ -257,6 +260,7 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
 
     private void setActiveTemperature(int activeTemperature) {
         this.activeTemperature = Mth.clamp(activeTemperature, MIN_TEMPERATURE, MAX_TEMPERATURE);
+        heatContainer.handler.setCurrentHeat(activeTemperature);
     }
 
     @Override

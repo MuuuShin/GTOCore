@@ -1,0 +1,19 @@
+package com.gtocore.common.data;
+
+import com.gtocore.common.blockentity.HeatPipeBlockEntity;
+
+import com.gregtechceu.gtceu.common.blockentity.*;
+
+import com.gto.registrate.util.entry.BlockEntityEntry;
+
+import static com.gtolib.api.registries.GTORegistration.GTO;
+
+public class GTOBlockEntities {
+
+    public static void init() {}
+
+    public static final BlockEntityEntry<HeatPipeBlockEntity> HEAT_PIPE = GTO
+            .blockEntity("heat_pipe", HeatPipeBlockEntity::new)
+            .validBlocks(GTOBlocks.HEAT_PIPES)
+            .register();
+}

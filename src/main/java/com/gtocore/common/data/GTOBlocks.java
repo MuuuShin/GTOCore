@@ -1,14 +1,16 @@
 package com.gtocore.common.data;
 
 import com.gtocore.common.block.*;
+import com.gtocore.common.item.HeatPipeBlockItem;
+import com.gtocore.common.pipe.heat.HeatPipeType;
 
 import com.gtolib.GTOCore;
-import com.gtolib.api.registries.GTORegistration;
 import com.gtolib.utils.RLUtils;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.ActiveBlock;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
+import com.gregtechceu.gtceu.data.recipe.CustomTags;
 
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.tags.BlockTags;
@@ -25,13 +27,19 @@ import com.gto.registrate.util.nullness.NonNullBiConsumer;
 
 import static com.gtocore.common.block.BlockMap.*;
 import static com.gtocore.common.block.GlowingBlock.createStarStone;
+import static com.gtolib.api.registries.GTORegistration.GTO;
 import static com.gtolib.utils.register.BlockRegisterUtils.*;
 
 public final class GTOBlocks {
 
+    public static final BlockEntry<HeatPipeBlock>[] HEAT_PIPES = new BlockEntry[HeatPipeType.values().length];
+
     public static void init() {
-        GTORegistration.GTO.removeDefaultCreativeTab();
+        GTO.removeDefaultCreativeTab();
         REACTOR_CORE = createStoneBlock("reactor_core", "远古反应核", GTOCore.id("block/multiblock/ancient_reactor_core/overlay_front"));
+        GTO.defaultCreativeTab(GTOCreativeModeTabs.GTO_MATERIAL_PIPE);
+        registerPipeBlocks();
+        GTOBlockEntities.init();
     }
 
     public static final BlockEntry<GelidCryotheumBlock> GELID_CRYOTHEUM = block("gelid_cryotheum", "极寒之凛冰", GelidCryotheumBlock::new)
@@ -620,4 +628,24 @@ public final class GTOBlocks {
     public static final BlockEntry<Block> THE_CHAOS_CASING = createCasingBlock("the_chaos_casing", "混沌之铭符", GTOCore.id("block/casings/the_chaos_casing"));
     // 天辉凝聚之镜 the_solaris_lens
     public static final BlockEntry<Block> THE_SOLARIS_LENS = createGlassCasingBlock("the_solaris_lens", "天辉凝聚之镜", GTOCore.id("block/casings/the_solaris_lens"));
+
+    private static void registerPipeBlocks() {
+        for (int i = 0; i < HeatPipeType.values().length; ++i) {
+            var type = HeatPipeType.values()[i];
+            var entry = GTO
+                    .block("%s_heat_pipe".formatted(type.getSerializedName()), (p) -> new HeatPipeBlock(p, type))
+                    .initialProperties(() -> Blocks.IRON_BLOCK)
+                    .properties(p -> p.dynamicShape().noOcclusion().forceSolidOn())
+                    .blockstate(NonNullBiConsumer.noop())
+                    .defaultLoot()
+                    .tag(CustomTags.MINEABLE_WITH_WRENCH)
+                    .addLayer(() -> RenderType::cutoutMipped)
+                    .color(() -> HeatPipeBlock::tintedColor)
+                    .item(HeatPipeBlockItem::new)
+                    .model(NonNullBiConsumer.noop())
+                    .build()
+                    .register();
+            HEAT_PIPES[i] = entry;
+        }
+    }
 }
