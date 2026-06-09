@@ -21,6 +21,7 @@ import net.minecraft.world.level.material.Fluids;
 import com.gto.datasynclib.annotations.SaveToDisk;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IHeatContainerMachine, IExplosionMachine, ICustomRecipeLogicHolder {
 
@@ -34,6 +35,17 @@ public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IHe
         super(holder, 0, i -> 16000);
         heatContainer = new NotifiableHeatContainer(this, IO.IN, 600, 2, 0.6, 0.01);
         heatContainer.handler.setSideIOCondition(s -> s == Direction.DOWN);
+        heatContainer.addChangedListener(this::updateSignal);
+    }
+
+    @Override
+    public int getOutputSignal(@Nullable Direction side) {
+        return heatContainer.getSignal();
+    }
+
+    @Override
+    public boolean canConnectRedstone(@NotNull Direction side) {
+        return true;
     }
 
     @Override

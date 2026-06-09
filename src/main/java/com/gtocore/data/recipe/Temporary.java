@@ -20,10 +20,18 @@ import static com.gtocore.common.data.GTORecipeTypes.*;
 public final class Temporary {
 
     public static void init() {
-        ASSEMBLER_RECIPES.builder("quicksilver")
-                .inputItems(TagPrefix.pipeNonupleFluid, GTMaterials.Copper, 1)
+        ASSEMBLER_RECIPES.builder("heat_pipes")
+                .inputItems(TagPrefix.pipeNormalFluid, GTMaterials.Copper, 1)
                 .inputItems(TagPrefix.plate, GTMaterials.Copper, 2)
                 .outputItems(GTOBlocks.HEAT_PIPES[0].asItem())
+                .duration(200)
+                .EUt(7)
+                .save();
+
+        ASSEMBLER_RECIPES.builder("heat_interface")
+                .inputItems(TagPrefix.plate, GTMaterials.Steel, 2)
+                .circuitMeta(17)
+                .outputItems(GTOItems.HEAT_INTERFACE.asItem())
                 .duration(200)
                 .EUt(7)
                 .save();

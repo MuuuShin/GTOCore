@@ -2,9 +2,9 @@ package com.gtocore.common.pipe.heat;
 
 import com.gtocore.common.blockentity.HeatPipeBlockEntity;
 
+import com.gtolib.GTOCore;
 import com.gtolib.api.capability.IHeatContainer;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.pipenet.PipeNetWalker;
 
@@ -28,7 +28,7 @@ public final class HeatNetWalker extends PipeNetWalker<HeatPipeBlockEntity, Heat
             walker.traversePipeNet();
             return walker.routes;
         } catch (Exception e) {
-            GTCEu.LOGGER.error("error while create net data for energynet", e);
+            GTOCore.LOGGER.error("error while create net data for pipe net", e);
         }
         return null;
     }
