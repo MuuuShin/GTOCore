@@ -10,9 +10,12 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 
+import appeng.client.gui.Rects;
+
 import com.teamresourceful.resourcefulconfig.common.config.impl.ConfigParser;
 import earth.terrarium.adastra.client.config.AdAstraConfigClient;
 import earth.terrarium.adastra.client.screens.player.OverlayScreen;
+import earth.terrarium.adastra.common.items.armor.JetSuitItem;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -98,6 +101,9 @@ public class AdAstraHUD implements IMoveableHUD {
 
     @Override
     public Rect2i getBounds(int screenWidth, int screenHeight) {
+        if (Minecraft.getInstance().player != null && !JetSuitItem.hasFullSet(Minecraft.getInstance().player)) {
+            return Rects.ZERO;
+        }
         int x = AdAstraConfigClient.oxygenBarX;
         int y = AdAstraConfigClient.oxygenBarY;
         return new Rect2i(x, y, getHudWidth(), getHudHeight());
