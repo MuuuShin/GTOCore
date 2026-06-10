@@ -22,7 +22,7 @@ public final class HeatDetectorCover extends DetectorCover {
 
     @Override
     protected void update() {
-        var container = GTCapabilityHelper.getBlockEntityGTCapability(IHeatContainer.class, coverHolder.holder(), attachedSide);
+        var container = GTCapabilityHelper.getBlockEntityGTCapability(IHeatContainer.class, coverHolder.holder(), null);
         if (container == null) return;
         setRedstoneSignalOutput(container.getSignal());
     }

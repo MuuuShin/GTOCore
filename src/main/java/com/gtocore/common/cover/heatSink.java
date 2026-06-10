@@ -47,7 +47,7 @@ public final class heatSink extends CoverBehavior {
         if (container == null) return;
         var heat = container.getCurrentHeat();
         if (heat > 0 && coverHolder.holder().getNeighborBlockState(attachedSide).isAir()) {
-            container.setCurrentHeat(Math.max(0, heat -  80));
+            container.setCurrentHeat((long) Math.max(0, heat - (80 * container.getHeatCapacity())));
         }
     }
 }
