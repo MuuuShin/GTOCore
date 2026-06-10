@@ -1,25 +1,26 @@
-package com.gtocore.common.pipe.heat;
+package com.gtocore.common.pipe.mana;
+
+import com.gtocore.common.data.GTOMaterials;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.pipenet.IPipeType;
-import com.gregtechceu.gtceu.common.data.GTMaterials;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 
 import java.util.Locale;
 
-public enum HeatPipeType implements IPipeType<HeatPipeProperties>, StringRepresentable {
+public enum ManaPipeType implements IPipeType<ManaPipeProperties>, StringRepresentable {
 
-    NORMAL("普通", GTMaterials.Copper);
+    NORMAL("普通", GTOMaterials.Manasteel);
 
-    public static final ResourceLocation TYPE = GTCEu.id("heat");
+    public static final ResourceLocation TYPE = GTCEu.id("mana");
 
     public final String cnName;
     public final Material material;
 
-    HeatPipeType(String cnName, Material material) {
+    ManaPipeType(String cnName, Material material) {
         this.cnName = cnName;
         this.material = material;
     }
@@ -30,7 +31,7 @@ public enum HeatPipeType implements IPipeType<HeatPipeProperties>, StringReprese
     }
 
     @Override
-    public HeatPipeProperties modifyProperties(HeatPipeProperties baseProperties) {
+    public ManaPipeProperties modifyProperties(ManaPipeProperties baseProperties) {
         return baseProperties;
     }
 

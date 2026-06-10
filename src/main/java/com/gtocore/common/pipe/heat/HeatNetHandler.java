@@ -43,11 +43,11 @@ public final class HeatNetHandler implements IHeatContainer {
             long add = heat - heatUsed;
             if (add <= 0) break;
             if (side == path.getTargetFacing() && pos.equals(path.getTargetPipePos())) continue;
-            var dest = path.getHandler(getNet().getLevel());
-            if (dest == null) continue;
+            var handler = path.getHandler(getNet().getLevel());
+            if (handler == null) continue;
             var facing = path.getTargetFacing().getOpposite();
             transfer = true;
-            long accept = dest.acceptHeatFromNetwork(sender, facing, add, temperature, heatCapacity, baseTransferRate, rateMultiplier);
+            long accept = handler.acceptHeatFromNetwork(sender, facing, add, temperature, heatCapacity, baseTransferRate, rateMultiplier);
             transfer = false;
             if (accept == 0) continue;
             heatUsed += accept;

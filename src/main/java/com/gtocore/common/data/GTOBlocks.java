@@ -2,13 +2,16 @@ package com.gtocore.common.data;
 
 import com.gtocore.common.block.*;
 import com.gtocore.common.item.HeatPipeBlockItem;
+import com.gtocore.common.item.ManaPipeBlockItem;
 import com.gtocore.common.pipe.heat.HeatPipeType;
+import com.gtocore.common.pipe.mana.ManaPipeType;
 
 import com.gtolib.GTOCore;
 import com.gtolib.utils.RLUtils;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.ActiveBlock;
+import com.gregtechceu.gtceu.api.item.ITagPrefixItem;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 
@@ -33,6 +36,7 @@ import static com.gtolib.utils.register.BlockRegisterUtils.*;
 public final class GTOBlocks {
 
     public static final BlockEntry<HeatPipeBlock>[] HEAT_PIPES = new BlockEntry[HeatPipeType.values().length];
+    public static final BlockEntry<ManaPipeBlock>[] MANA_PIPES = new BlockEntry[HeatPipeType.values().length];
 
     public static void init() {
         GTO.removeDefaultCreativeTab();
@@ -632,20 +636,38 @@ public final class GTOBlocks {
     private static void registerPipeBlocks() {
         for (int i = 0; i < HeatPipeType.values().length; ++i) {
             var type = HeatPipeType.values()[i];
-            var entry = GTO
-                    .block("%s_heat_pipe".formatted(type.getSerializedName()), (p) -> new HeatPipeBlock(p, type))
+            var entry = block("%s_heat_pipe".formatted(type.getSerializedName()), type.cnName + "热管", (p) -> new HeatPipeBlock(p, type))
                     .initialProperties(() -> Blocks.IRON_BLOCK)
                     .properties(p -> p.dynamicShape().noOcclusion().forceSolidOn())
                     .blockstate(NonNullBiConsumer.noop())
                     .defaultLoot()
                     .tag(CustomTags.MINEABLE_WITH_WRENCH)
                     .addLayer(() -> RenderType::cutoutMipped)
-                    .color(() -> HeatPipeBlock::tintedColor)
+                    .color(() -> () -> HeatPipeBlock.tintedColor(type.material))
                     .item(HeatPipeBlockItem::new)
+                    .color(() -> () -> ITagPrefixItem.tintColor(type.material))
                     .model(NonNullBiConsumer.noop())
                     .build()
                     .register();
             HEAT_PIPES[i] = entry;
+        }
+
+        for (int i = 0; i < ManaPipeType.values().length; ++i) {
+            var type = ManaPipeType.values()[i];
+            var entry = block("%s_mana_pipe".formatted(type.getSerializedName()), type.cnName + "魔力管道", (p) -> new ManaPipeBlock(p, type))
+                    .initialProperties(() -> Blocks.IRON_BLOCK)
+                    .properties(p -> p.dynamicShape().noOcclusion().forceSolidOn())
+                    .blockstate(NonNullBiConsumer.noop())
+                    .defaultLoot()
+                    .tag(CustomTags.MINEABLE_WITH_WRENCH)
+                    .addLayer(() -> RenderType::cutoutMipped)
+                    .color(() -> () -> HeatPipeBlock.tintedColor(type.material))
+                    .item(ManaPipeBlockItem::new)
+                    .color(() -> () -> ITagPrefixItem.tintColor(type.material))
+                    .model(NonNullBiConsumer.noop())
+                    .build()
+                    .register();
+            MANA_PIPES[i] = entry;
         }
     }
 }

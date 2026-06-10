@@ -21,7 +21,6 @@ import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatContainerMachine, IExplosionMachine {
 
@@ -37,17 +36,6 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
         heatContainer = new NotifiableHeatContainer(this, IO.OUT, MaxTemperature, 1, 0.2, 0.01);
         heatContainer.handler.setSideIOCondition(s -> s != getFrontFacing() && s != Direction.DOWN);
         heatContainer.handler.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
-        heatContainer.addChangedListener(this::updateSignal);
-    }
-
-    @Override
-    public int getOutputSignal(@Nullable Direction side) {
-        return heatContainer.getSignal();
-    }
-
-    @Override
-    public boolean canConnectRedstone(@NotNull Direction side) {
-        return true;
     }
 
     @Override

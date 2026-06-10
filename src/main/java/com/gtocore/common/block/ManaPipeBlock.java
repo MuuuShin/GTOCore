@@ -1,18 +1,15 @@
 package com.gtocore.common.block;
 
-import com.gtocore.common.blockentity.HeatPipeBlockEntity;
+import com.gtocore.common.blockentity.ManaPipeBlockEntity;
 import com.gtocore.common.data.GTOBlockEntities;
-import com.gtocore.common.pipe.heat.HeatPipeProperties;
-import com.gtocore.common.pipe.heat.HeatPipeType;
-import com.gtocore.common.pipe.heat.LevelHeatPipeNet;
-
-import com.gtolib.api.capability.IHeatContainer;
+import com.gtocore.common.pipe.mana.LevelManaPipeNet;
+import com.gtocore.common.pipe.mana.ManaPipeProperties;
+import com.gtocore.common.pipe.mana.ManaPipeType;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.block.PipeBlock;
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.client.renderer.block.PipeBlockRenderer;
 
@@ -28,49 +25,50 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
+import vazkii.botania.api.BotaniaForgeCapabilities;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class HeatPipeBlock extends PipeBlock<HeatPipeType, HeatPipeProperties, LevelHeatPipeNet> {
+public class ManaPipeBlock extends PipeBlock<ManaPipeType, ManaPipeProperties, LevelManaPipeNet> {
 
     public final PipeBlockRenderer renderer;
     @Getter
     public final PipeModel pipeModel;
-    private final HeatPipeType pipeType;
-    private final HeatPipeProperties properties;
+    private final ManaPipeType pipeType;
+    private final ManaPipeProperties properties;
 
-    public HeatPipeBlock(Properties properties, HeatPipeType pipeType) {
+    public ManaPipeBlock(Properties properties, ManaPipeType pipeType) {
         super(properties, pipeType);
         this.pipeType = pipeType;
-        this.properties = HeatPipeProperties.INSTANCE;
+        this.properties = ManaPipeProperties.INSTANCE;
         this.pipeModel = new PipeModel(pipeType.getThickness(), () -> GTCEu.id("block/pipe/pipe_side"), () -> GTCEu.id("block/pipe/pipe_normal_in"), null, null);
         this.renderer = new PipeBlockRenderer(this.pipeModel);
     }
 
     @Override
-    public LevelHeatPipeNet getWorldPipeNet(ServerLevel level) {
-        return LevelHeatPipeNet.getOrCreate(level);
+    public LevelManaPipeNet getWorldPipeNet(ServerLevel level) {
+        return LevelManaPipeNet.getOrCreate(level);
     }
 
     @Override
-    public BlockEntityType<? extends PipeBlockEntity<HeatPipeType, HeatPipeProperties>> getBlockEntityType() {
-        return GTOBlockEntities.HEAT_PIPE.get();
+    public BlockEntityType<? extends PipeBlockEntity<ManaPipeType, ManaPipeProperties>> getBlockEntityType() {
+        return GTOBlockEntities.MANA_PIPE.get();
     }
 
     @Override
-    public HeatPipeProperties createRawData(BlockState pState, @Nullable ItemStack pStack) {
-        return HeatPipeProperties.INSTANCE;
+    public ManaPipeProperties createRawData(BlockState pState, @Nullable ItemStack pStack) {
+        return ManaPipeProperties.INSTANCE;
     }
 
     @Override
-    public HeatPipeProperties createProperties(PipeBlockEntity<HeatPipeType, HeatPipeProperties> pipeTile) {
+    public ManaPipeProperties createProperties(PipeBlockEntity<ManaPipeType, ManaPipeProperties> pipeTile) {
         return this.pipeType.modifyProperties(properties);
     }
 
     @Override
-    public HeatPipeProperties getFallbackType() {
-        return HeatPipeProperties.INSTANCE;
+    public ManaPipeProperties getFallbackType() {
+        return ManaPipeProperties.INSTANCE;
     }
 
     @Override
@@ -80,7 +78,7 @@ public class HeatPipeBlock extends PipeBlock<HeatPipeType, HeatPipeProperties, L
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static BlockColor tintedColor(Material material) {
+    public static BlockColor tintedColor() {
         return (blockState, level, blockPos, index) -> {
             if (blockPos != null && level != null && level.getBlockEntity(blockPos) instanceof PipeBlockEntity<?, ?> pipe) {
                 if (!pipe.getFrameMaterial().isNull()) {
@@ -94,17 +92,17 @@ public class HeatPipeBlock extends PipeBlock<HeatPipeType, HeatPipeProperties, L
                     return pipe.getRealColor();
                 }
             }
-            return material.getMaterialRGB();
+            return 0x00A7F7;
         };
     }
 
     @Override
-    public boolean canPipesConnect(PipeBlockEntity<HeatPipeType, HeatPipeProperties> selfTile, Direction side, PipeBlockEntity<HeatPipeType, HeatPipeProperties> sideTile) {
-        return selfTile instanceof HeatPipeBlockEntity && sideTile instanceof HeatPipeBlockEntity;
+    public boolean canPipesConnect(PipeBlockEntity<ManaPipeType, ManaPipeProperties> selfTile, Direction side, PipeBlockEntity<ManaPipeType, ManaPipeProperties> sideTile) {
+        return selfTile instanceof ManaPipeBlockEntity && sideTile instanceof ManaPipeBlockEntity;
     }
 
     @Override
-    public boolean canPipeConnectToBlock(PipeBlockEntity<HeatPipeType, HeatPipeProperties> selfTile, Direction side, @Nullable BlockEntity tile) {
-        return GTCapabilityHelper.getBlockEntityGTCapability(IHeatContainer.class, tile, side.getOpposite()) != null;
+    public boolean canPipeConnectToBlock(PipeBlockEntity<ManaPipeType, ManaPipeProperties> selfTile, Direction side, @Nullable BlockEntity tile) {
+        return GTCapabilityHelper.getBlockEntityCapability(BotaniaForgeCapabilities.MANA_RECEIVER, tile, side.getOpposite()) != null;
     }
 }

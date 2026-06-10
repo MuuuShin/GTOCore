@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.EnumMap;
 
-public class HeatPipeBlockEntity extends PipeBlockEntity<HeatPipeType, HeatPipeProperties> {
+public final class HeatPipeBlockEntity extends PipeBlockEntity<HeatPipeType, HeatPipeProperties> {
 
     @Getter
     private final EnumMap<Direction, HeatNetHandler> handlers = new EnumMap<>(Direction.class);
@@ -40,19 +40,14 @@ public class HeatPipeBlockEntity extends PipeBlockEntity<HeatPipeType, HeatPipeP
     @Override
     public @Nullable <T> T getGTCapability(@NotNull Class<T> cap, @Nullable Direction side) {
         if (cap == IHeatContainer.class) {
-            if (level.isClientSide) return null;
-            if (side != null && !isConnected(side)) return null;
-            if (handlers.isEmpty()) {
-                initHandlers();
+            if ((side == null || isConnected(side)) && !level.isClientSide && checkNetwork()) {
+                return cap.cast(handlers.getOrDefault(side, defaultHandler));
             }
-            checkNetwork();
-            var handler = handlers.getOrDefault(side, defaultHandler);
-            return handler == null ? null : cap.cast(handler);
         }
         return null;
     }
 
-    public void initHandlers() {
+    private void initHandlers() {
         var net = getHeatPipeNet();
         if (net == null) return;
         for (Direction facing : GTUtil.DIRECTIONS) {
@@ -61,7 +56,8 @@ public class HeatPipeBlockEntity extends PipeBlockEntity<HeatPipeType, HeatPipeP
         defaultHandler = new HeatNetHandler(net, this, null);
     }
 
-    public void checkNetwork() {
+    private boolean checkNetwork() {
+        if (handlers.isEmpty()) initHandlers();
         if (defaultHandler != null) {
             var current = getHeatPipeNet();
             if (defaultHandler.getNet() != current) {
@@ -71,6 +67,7 @@ public class HeatPipeBlockEntity extends PipeBlockEntity<HeatPipeType, HeatPipeP
                 }
             }
         }
+        return this.currentPipeNet.get() != null;
     }
 
     private HeatPipeNet getHeatPipeNet() {

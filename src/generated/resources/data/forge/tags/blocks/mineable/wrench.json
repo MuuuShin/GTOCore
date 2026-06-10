@@ -417,6 +417,7 @@
     "gtocore:the_end_casing",
     "gtocore:the_chaos_casing",
     "gtocore:the_solaris_lens",
-    "gtocore:normal_heat_pipe"
+    "gtocore:normal_heat_pipe",
+    "gtocore:normal_mana_pipe"
   ]
 }

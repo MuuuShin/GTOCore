@@ -23,6 +23,7 @@ public final class Temporary {
         ASSEMBLER_RECIPES.builder("heat_pipes")
                 .inputItems(TagPrefix.pipeNormalFluid, GTMaterials.Copper, 1)
                 .inputItems(TagPrefix.plate, GTMaterials.Copper, 2)
+                .circuitMeta(11)
                 .outputItems(GTOBlocks.HEAT_PIPES[0].asItem())
                 .duration(200)
                 .EUt(7)
@@ -32,6 +33,15 @@ public final class Temporary {
                 .inputItems(TagPrefix.plate, GTMaterials.Steel, 2)
                 .circuitMeta(17)
                 .outputItems(GTOItems.HEAT_INTERFACE.asItem())
+                .duration(200)
+                .EUt(7)
+                .save();
+
+        ASSEMBLER_RECIPES.builder("heat_detector_cover")
+                .inputItems(TagPrefix.plate, GTMaterials.Steel, 2)
+                .inputItems(TagPrefix.dust, GTMaterials.RedAlloy, 1)
+                .circuitMeta(18)
+                .outputItems(GTOItems.HEAT_DETECTOR_COVER.asItem())
                 .duration(200)
                 .EUt(7)
                 .save();

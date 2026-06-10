@@ -1,12 +1,15 @@
 package com.gtocore.common.machine.multiblock.noenergy;
 
+import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.machine.multiblock.part.SensorPartMachine;
 
 import com.gtolib.GTOCore;
 import com.gtolib.api.gui.MagicProgressBarProWidget;
 import com.gtolib.api.machine.multiblock.NoEnergyMultiblockMachine;
 import com.gtolib.api.recipe.IdleReason;
+import com.gtolib.api.recipe.RecipeBuilder;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.blockentity.ITickSubscription;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
@@ -63,6 +66,7 @@ import static com.gregtechceu.gtceu.api.pattern.Predicates.abilities;
 public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockMachine implements IExplosionMachine, IDummyEnergyMachine, IDistillationTower {
 
     private static final DataComponentKey<Set<BlockPos>> WATER = DataComponentKey.createNoCodec("water");
+    private static final ResourceLocation WATER_ID = RecipeBuilder.getTypeID(GTCEu.id("distill_water_large"), GTORecipeTypes.DISTILLATION_RECIPES);
 
     @Nullable
     private Set<BlockPos> waterSources = null;
@@ -304,6 +308,7 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
     @Nullable
     @Override
     protected GTRecipe getRealRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
+        if (recipe.definition.id.equals(WATER_ID)) return null;
         if (heat > 400) {
             recipe.duration = (int) (recipe.duration * getDurationMultiplier());
             return recipe;
