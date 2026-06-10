@@ -46,6 +46,24 @@ public final class Temporary {
                 .EUt(7)
                 .save();
 
+        ASSEMBLER_RECIPES.builder("heat_sink")
+                .inputItems(TagPrefix.plate, GTMaterials.Steel, 1)
+                .inputItems(TagPrefix.plate, GTMaterials.Copper, 2)
+                .inputItems(TagPrefix.plate, GTMaterials.Invar, 1)
+                .circuitMeta(18)
+                .outputItems(GTOItems.HEAT_SINK.asItem())
+                .duration(200)
+                .EUt(7)
+                .save();
+
+        ASSEMBLER_RECIPES.builder("mana_pipes")
+                .inputItems(TagPrefix.plate, GTOMaterials.Manasteel, 6)
+                .circuitMeta(18)
+                .outputItems(GTOBlocks.MANA_PIPES[0].asItem())
+                .duration(200)
+                .EUt(120)
+                .save();
+
         FUSION_RECIPES.builder("quicksilver")
                 .inputFluids(GTOMaterials.AstralSilver, 576)
                 .inputFluids(GTOMaterials.Gaia, 144)

@@ -2,9 +2,6 @@ package com.gtocore.common.blockentity;
 
 import com.gtocore.common.pipe.heat.*;
 import com.gtocore.common.pipe.mana.*;
-import com.gtocore.utils.ManaUnification;
-
-import com.gtolib.utils.MathUtil;
 
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -20,8 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
-import gripe._90.arseng.block.entity.IAdvancedSourceTile;
-import gripe._90.arseng.definition.ArsEngCapabilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vazkii.botania.api.BotaniaForgeCapabilities;
@@ -32,7 +27,7 @@ import vazkii.botania.api.mana.ManaReceiver;
 
 import java.lang.ref.WeakReference;
 
-public final class ManaPipeBlockEntity extends PipeBlockEntity<ManaPipeType, ManaPipeProperties> implements ManaCollector, IAdvancedSourceTile {
+public final class ManaPipeBlockEntity extends PipeBlockEntity<ManaPipeType, ManaPipeProperties> implements ManaCollector {
 
     private WeakReference<ManaPipeNet> currentPipeNet = new WeakReference<>(null);
 
@@ -60,10 +55,6 @@ public final class ManaPipeBlockEntity extends PipeBlockEntity<ManaPipeType, Man
                 return BotaniaForgeCapabilities.MANA_RECEIVER.orEmpty(cap, LazyOptional.of(() -> this));
             }
             return LazyOptional.empty();
-        } else if (cap == ArsEngCapabilities.SOURCE_TILE) {
-            if ((side == null || isConnected(side)) && !level.isClientSide && getManaPipeNet() != null) {
-                return ArsEngCapabilities.SOURCE_TILE.orEmpty(cap, LazyOptional.of(() -> this));
-            }
         }
         return super.getCapability(cap, side);
     }
@@ -191,65 +182,5 @@ public final class ManaPipeBlockEntity extends PipeBlockEntity<ManaPipeType, Man
         if (receiver instanceof ManaCollector collector) return collector.getMaxMana();
         if (receiver instanceof ManaPool pool) return pool.getMaxMana();
         return receiver == null ? 0 : 1000000;
-    }
-
-    @Override
-    public int getTransferRate() {
-        return 1000000;
-    }
-
-    @Override
-    public boolean canAcceptSource() {
-        var handler = getManaReceiver();
-        if (handler == null) return false;
-        return !handler.isFull();
-    }
-
-    @Override
-    public int getSource() {
-        var handler = getManaReceiver();
-        if (handler == null) return 0;
-        return MathUtil.saturatedCast(ManaUnification.manaToSource(handler.getCurrentMana()));
-    }
-
-    @Override
-    public int getMaxSource() {
-        var handler = getManaReceiver();
-        if (handler == null) return 0;
-        return MathUtil.saturatedCast(ManaUnification.manaToSource(getMaxMana(handler)));
-    }
-
-    @Override
-    public void setMaxSource(int max) {}
-
-    @Override
-    public int setSource(int source) {
-        return 0;
-    }
-
-    @Override
-    public int addSource(int source) {
-        var handler = getManaReceiver();
-        if (handler == null) return 0;
-        handler.receiveMana(MathUtil.saturatedCast(ManaUnification.sourceToMana(source)));
-        return MathUtil.saturatedCast(ManaUnification.manaToSource(handler.getCurrentMana()));
-    }
-
-    @Override
-    public int removeSource(int source) {
-        var handler = getManaReceiver();
-        if (handler == null) return 0;
-        handler.receiveMana(-MathUtil.saturatedCast(ManaUnification.sourceToMana(source)));
-        return MathUtil.saturatedCast(ManaUnification.manaToSource(handler.getCurrentMana()));
-    }
-
-    @Override
-    public boolean relayCanTakePower() {
-        return true;
-    }
-
-    @Override
-    public boolean sourcelinksCanProvidePower() {
-        return true;
     }
 }
