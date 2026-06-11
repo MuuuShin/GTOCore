@@ -1,6 +1,5 @@
 package com.gtocore.common.blockentity;
 
-import com.gtocore.common.pipe.heat.*;
 import com.gtocore.common.pipe.mana.*;
 
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
@@ -36,7 +35,7 @@ public final class ManaPipeBlockEntity extends PipeBlockEntity<ManaPipeType, Man
     }
 
     @Override
-    public void setConnection(Direction side, boolean connected, boolean fromNeighbor) {
+    public void setConnection(@NotNull Direction side, boolean connected, boolean fromNeighbor) {
         if (!getLevel().isClientSide && connected && !fromNeighbor) {
             if (getNumConnections() >= 2) return;
             BlockEntity tile = getLevel().getBlockEntity(getPipePos().relative(side));
