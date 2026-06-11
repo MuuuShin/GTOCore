@@ -4,7 +4,7 @@ import com.gtocore.common.data.GTOMachines;
 
 import com.gtolib.api.annotation.DataGeneratorScanned;
 import com.gtolib.api.annotation.language.RegisterLanguage;
-import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
+import com.gtolib.api.machine.heat.HeatHandler;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.ICleanroomReceiver;
@@ -79,7 +79,7 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
 
     @Getter
     @SaveToDisk
-    private final NotifiableHeatContainer heatContainer;
+    private final HeatHandler heatContainer;
 
     public ModularHatchPartMachine(MetaMachineBlockEntity metaTileEntityId) {
         super(metaTileEntityId);
@@ -99,10 +99,10 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
         cleanroomModuleInv = new NotifiableItemStackHandler(this, 1, IO.NONE, IO.BOTH, SingleCustomItemStackHandler::new);
         cleanroomModuleInv.setFilter(stack -> Wrapper.CLEAN_CHECK.containsKey(stack.getItem()));
         cleanroomModuleInv.addChangedListener(this::onConditionChange);
-        heatContainer = new NotifiableHeatContainer(this, IO.IN, MAX_TEMPERATURE, 1, 24, 0.1);
-        heatContainer.handler.setSideIOCondition(s -> s == getFrontFacing());
+        heatContainer = new HeatHandler(holder, MAX_TEMPERATURE, 1, 24, 0.1);
+        heatContainer.setSideIOCondition(s -> s == getFrontFacing());
         heatContainer.addChangedListener(() -> {
-            if (temperatureMode) heatContainer.handler.setCurrentHeat(activeTemperature);
+            if (temperatureMode) heatContainer.setCurrentHeat(activeTemperature);
         });
     }
 
@@ -260,7 +260,7 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
 
     private void setActiveTemperature(int activeTemperature) {
         this.activeTemperature = Mth.clamp(activeTemperature, MIN_TEMPERATURE, MAX_TEMPERATURE);
-        heatContainer.handler.setCurrentHeat(activeTemperature);
+        heatContainer.setCurrentHeat(activeTemperature);
     }
 
     @Override

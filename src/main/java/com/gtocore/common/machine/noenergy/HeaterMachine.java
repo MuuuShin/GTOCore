@@ -1,14 +1,13 @@
 package com.gtocore.common.machine.noenergy;
 
 import com.gtolib.api.machine.SimpleNoEnergyMachine;
+import com.gtolib.api.machine.heat.HeatHandler;
 import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
-import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 
@@ -29,13 +28,13 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
     @Getter
     @SaveToDisk
     @SyncToClient
-    private final NotifiableHeatContainer heatContainer;
+    private final HeatHandler heatContainer;
 
     public HeaterMachine(MetaMachineBlockEntity holder) {
         super(holder, 0, i -> 8000);
-        heatContainer = new NotifiableHeatContainer(this, IO.OUT, MaxTemperature, 1, 0.2, 0.01);
-        heatContainer.handler.setSideIOCondition(s -> s != getFrontFacing() && s != Direction.DOWN);
-        heatContainer.handler.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
+        heatContainer = new HeatHandler(holder, MaxTemperature, 1, 0.2, 0.01);
+        heatContainer.setSideIOCondition(s -> s != getFrontFacing() && s != Direction.DOWN);
+        heatContainer.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
     }
 
     @Override

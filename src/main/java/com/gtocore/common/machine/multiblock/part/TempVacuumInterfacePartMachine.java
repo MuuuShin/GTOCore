@@ -3,11 +3,10 @@ package com.gtocore.common.machine.multiblock.part;
 import com.gtocore.api.machine.IHeatContainerPart;
 import com.gtocore.api.machine.IVacuumPartMachine;
 
-import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
+import com.gtolib.api.machine.heat.HeatHandler;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
-import com.gregtechceu.gtceu.api.recipe.handler.IO;
 
 import com.gto.datasynclib.annotations.SaveToDisk;
 import lombok.Getter;
@@ -16,11 +15,11 @@ public class TempVacuumInterfacePartMachine extends MultiblockPartMachine implem
 
     @Getter
     @SaveToDisk
-    private final NotifiableHeatContainer heatContainer;
+    private final HeatHandler heatContainer;
 
     public TempVacuumInterfacePartMachine(MetaMachineBlockEntity holder) {
         super(holder);
-        heatContainer = new NotifiableHeatContainer(this, IO.IN, 3600, 1, 24, 0.1);
-        heatContainer.handler.setSideIOCondition(s -> s == getFrontFacing());
+        heatContainer = new HeatHandler(holder, 3600, 1, 24, 0.1);
+        heatContainer.setSideIOCondition(s -> s == getFrontFacing());
     }
 }

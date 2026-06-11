@@ -1,8 +1,8 @@
 package com.gtocore.common.machine.noenergy;
 
 import com.gtolib.api.machine.SimpleNoEnergyMachine;
+import com.gtolib.api.machine.heat.HeatHandler;
 import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
-import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
@@ -10,7 +10,6 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.handler.ICustomRecipeLogicHolder;
-import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
@@ -28,12 +27,12 @@ public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IHe
 
     @Getter
     @SaveToDisk
-    private final NotifiableHeatContainer heatContainer;
+    private final HeatHandler heatContainer;
 
     public BoilWaterMachine(MetaMachineBlockEntity holder) {
         super(holder, 0, i -> 16000);
-        heatContainer = new NotifiableHeatContainer(this, IO.IN, 600, 2, 0.6, 0.01);
-        heatContainer.handler.setSideIOCondition(s -> s == Direction.DOWN);
+        heatContainer = new HeatHandler(holder, 600, 2, 0.6, 0.01);
+        heatContainer.setSideIOCondition(s -> s == Direction.DOWN);
     }
 
     @Override

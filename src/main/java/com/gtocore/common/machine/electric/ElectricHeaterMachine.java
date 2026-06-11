@@ -2,8 +2,8 @@ package com.gtocore.common.machine.electric;
 
 import com.gtocore.common.data.GTORecipeTypes;
 
+import com.gtolib.api.machine.heat.HeatHandler;
 import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
-import com.gtolib.api.machine.heat.trait.NotifiableHeatContainer;
 import com.gtolib.api.machine.trait.NotifiableSafeEnergyContainer;
 import com.gtolib.api.recipe.RecipeBuilder;
 
@@ -36,13 +36,14 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
     @Getter
     @SaveToDisk
     @SyncToClient
-    private final NotifiableHeatContainer heatContainer;
+    private final HeatHandler heatContainer;
 
     public ElectricHeaterMachine(MetaMachineBlockEntity holder) {
         super(holder, 1, t -> 8000);
-        heatContainer = new NotifiableHeatContainer(this, IO.OUT, MaxTemperature, 2, 0.3, 0.01);
-        heatContainer.handler.setSideIOCondition(s -> s == Direction.UP);
-        heatContainer.handler.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
+        heatContainer = new HeatHandler(holder, MaxTemperature, 2, 0.3, 0.01);
+        heatContainer.setSideIOCondition(s -> s == Direction.UP);
+        heatContainer.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
+        heatContainer.addChangedListener(getRecipeLogic()::updateTickSubscription);
     }
 
     @Override
@@ -82,7 +83,7 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
     @Override
     public void onWorking() {
         super.onWorking();
-        if (getOffsetTimer() % 10 == 0 && MaxTemperature > getHeatContainer().getTemperature() + 4) {
+        if (getOffsetTimer() % 10 == 0 && heatContainer.currentHeat + 16 < heatContainer.maxHeat) {
             getHeatContainer().addHeatUnrestricted(16, false);
         }
     }
