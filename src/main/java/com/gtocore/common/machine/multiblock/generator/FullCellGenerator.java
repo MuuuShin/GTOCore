@@ -141,7 +141,6 @@ public class FullCellGenerator extends ElectricMultiblockMachine {
 
     private GTRecipe getAbsorptionRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
         var fuelEnergyPerUnit = recipe.data.getLong(GTORecipeDataKeys.CONVERTED_ENERGY);
-
         // membrane bonus
         MembraneBonusInfo membraneInfo = null;
         for (int membraneTier = Wrapper.MEMBRANE_MATS.length - 1; membraneTier >= 0; membraneTier--) {
@@ -163,6 +162,7 @@ public class FullCellGenerator extends ElectricMultiblockMachine {
             accumulatedEfficiencyDecay *= efficiencyBonusDecayFactor;
         }
         fuelEnergyPerUnit = (long) (fuelEnergyPerUnit * bonusEfficiency);
+        if (fuelEnergyPerUnit == 0) return null;
         if (sensorPart != null) {
             sensorPart.update((float) bonusEfficiency * 4.0f);
         }
