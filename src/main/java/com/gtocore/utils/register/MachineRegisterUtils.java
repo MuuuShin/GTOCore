@@ -302,8 +302,7 @@ public final class MachineRegisterUtils {
                 .nonYAxisRotation()
                 .recipeTypes(recipeType)
                 .tooltips(GTOMachineTooltips.LargeCombustionTooltips
-                        .invoke(V[tier] << 1, V[tier] * 6, tier > EV, V[tier] << 3)
-                        )
+                        .invoke(V[tier] << 1, V[tier] * 6, tier > EV, V[tier] << 3))
                 .moduleTooltips(new PartAbility[0])
                 .generator()
                 .block(casing)

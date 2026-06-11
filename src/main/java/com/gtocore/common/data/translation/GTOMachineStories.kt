@@ -1525,6 +1525,7 @@ object GTOMachineStories : AutoInitialize<GTOMachineStories>() {
         story("能够高效地进行复杂的化学反应和物质分离" translatedTo "Capable of efficiently performing complex chemical reactions and material separations")
         highlight("工业化学的未来已然到来" translatedTo "The future of industrial chemistry is here")
     }
+
     @JvmField
     val travelAnchorTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("travel_anchor")

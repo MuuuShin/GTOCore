@@ -42,6 +42,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         command("运行需要每秒消耗20mB多氯联苯冷却剂" translatedTo "Consumes 20mB of PCB coolant per second while running")
         command("每提交的1CWU算力需要1920EU的能量支持" translatedTo "Each 1 CWU of computational workload submitted requires 1920 EU of energy support")
     }
+
     @JvmField
     val meInputBufferPartMachineTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("me_input_buffer_part_machine")
@@ -50,6 +51,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         command("ME输入仓室的一种特殊模式，仅能使用样板进行配置" translatedTo "A special mode of the ME input hatch/bus, can only be configured using patterns")
         command("在该模式下，每个槽位使用样板配置一组特定的物品或流体，仓室将从ME网络提取对应的物品与流体" translatedTo "In this mode, each slot is configured with a pattern for a specific group of items or fluids, and the hatch/bus will extract the corresponding items and fluids from the ME network")
     }
+
     @JvmField
     val planetaryGasCollectorTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("planetary_gas_collector")
@@ -100,6 +102,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         command("超净间环境等级由环境维护舱决定" translatedTo "The cleanroom environment level is determined by the Environmental Maintenance Module")
         info("当运行培养缸或生化反应室配方时，提供可调节的0~80Sv背景辐射环境" translatedTo "Provides an adjustable 0~80Sv background radiation environment when running bioreactor or biochemical reaction chamber recipes")
     }
+
     @JvmField
     val spaceElevatorConnectorModuleTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("space_elevator_connector_module")
@@ -156,6 +159,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
 
         command("若高能模块与超频模块存在冲突，请先安装高能模块，再安装超频模块" translatedTo "If there is a conflict between the high-energy module and the overclock module, please install the high-energy module first, then install the overclock module")
     }
+
     @JvmField
     val KuangbiaoGiantNuclearFusionReactorEnergyStorageTooltip = { eut: Long ->
         ComponentListSupplier {
@@ -169,6 +173,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
             command(ComponentSupplier(Component.translatable("gtceu.machine.fusion_reactor.overclocking")))
         }
     }
+
     @JvmField
     val SpaceStationDockingModule = ComponentListSupplier {
         setTranslationPrefix("space_station_docking_module")

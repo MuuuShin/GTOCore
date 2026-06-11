@@ -32,6 +32,7 @@ object GTOMachineTooltips {
         section(ComponentSlang.MainFunction)
         content("存储并管理经验值，以便随时取用" translatedTo "Store and manage experience points for convenient access")
     }
+
     @JvmField
     var AEManaInterfaceTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("me_mana_interface")
@@ -1649,6 +1650,7 @@ object GTOMachineTooltips {
         "gtocore.cosmic_neutronium", "UXV",
         "gtocore.eternity", "OpV",
     )
+
     @JvmField
     val NanitesIntegratedProcessingCenterTooltips = ComponentListSupplier {
         setTranslationPrefix("nanites_integrated_processing_center")
@@ -2280,6 +2282,7 @@ object GTOMachineTooltips {
         info("当拥有更多蒸馏水供给时，空间站会尝试每秒向连接的光伏阵列各输送§b8mB 蒸馏水§r以冷却其太阳能板" translatedTo "When more distilled water supply is available, the space station will attempt to supply each connected photovoltaic array with §b8mB Distilled Water§r per second to cool its solar panels")
         info("运行时每10秒将排出30mB废水" translatedTo "When operating, it will discharge 30mB of Waste Water every 10 seconds")
     }
+
     @JvmField
     val LargeSpaceStationTooltips = ComponentListSupplier {
         setTranslationPrefix("large_space_station")
@@ -2310,6 +2313,7 @@ object GTOMachineTooltips {
         info("§b衔接舱§r：用于连接核心舱/模块仓与其他拓展舱体" translatedTo "§bConnection Module§r: Used to connect the core module with other expansion modules")
         info("§b模块舱§r：提供额外的空间与功能" translatedTo "§bFunctional Module§r: Provides additional space and functions")
     }
+
     @JvmField
     val SpaceStationWorkspaceExtensionTooltips = ComponentListSupplier {
         setTranslationPrefix("space_station_workspace_extension")
@@ -2320,6 +2324,7 @@ object GTOMachineTooltips {
         important(("该模块为变长模块" translatedTo "This module is a variable-length module").scrollExotic())
         important("在搭建模块前请在机器GUI内点击左下调整器调整模块的长度" translatedTo "Before building the module, please click the adjuster in the bottom left of the machine GUI to adjust the length of the module")
     }
+
     @JvmField
     val SpaceStationEnvironmentalMaintenanceModuleTooltips = ComponentListSupplier {
         setTranslationPrefix("space_station_environmental_maintenance_module")
@@ -2333,11 +2338,13 @@ object GTOMachineTooltips {
         )
         highlight("提供无人机仓，可供无人机清理空间站内机器的垃圾，或自动维护机器" translatedTo "Provides a drone bay for drones to clean up machine waste or automatically maintain machines in the space station")
     }
+
     @JvmField
     val NoExtensionAvailableTooltips = ComponentListSupplier {
         setTranslationPrefix("no_extension_available")
         error("该种类空间站舱段无法向外侧安装拓展舱体" translatedTo "This type of space station module cannot install expansion modules on the outside")
     }
+
     @JvmField
     val RecipeExtensionTooltips = ComponentListSupplier {
         setTranslationPrefix("recipe_extension")
@@ -2350,6 +2357,7 @@ object GTOMachineTooltips {
         )
         highlight("则解锁§d激光仓§r/§d超频仓§r/§d线程仓§r等高级舱体的使用权限" translatedTo "The use of advanced modules such as §dLaser Chamber§r/§dOverclocking Chamber§r/§dThread Chamber§r will be unlocked")
     }
+
     @JvmField
     val CoreSpaceStationModuleTooltips = ComponentListSupplier {
         setTranslationPrefix("core_space_station_module")
@@ -2357,6 +2365,7 @@ object GTOMachineTooltips {
         info(ComponentSlang.IsWhatTypeSpaceModule(ComponentSlang.CoreModuleSpaceModule))
         info(ComponentSlang.CanConnectToWhatTypeSpaceModule(listOf(ComponentSlang.ConjunctionModuleSpaceModule)))
     }
+
     @JvmField
     val ConjunctionSpaceStationModuleTooltips = ComponentListSupplier {
         setTranslationPrefix("conjunction_space_station_module")
@@ -2364,6 +2373,7 @@ object GTOMachineTooltips {
         info(ComponentSlang.IsWhatTypeSpaceModule(ComponentSlang.ConjunctionModuleSpaceModule))
         info(ComponentSlang.CanConnectToWhatTypeSpaceModule(listOf(ComponentSlang.ConjunctionModuleSpaceModule, ComponentSlang.FunctionModuleSpaceModule)))
     }
+
     @JvmField
     val FunctionSpaceStationModuleTooltips = ComponentListSupplier {
         setTranslationPrefix("function_space_station_module")
@@ -2371,6 +2381,7 @@ object GTOMachineTooltips {
         info(ComponentSlang.IsWhatTypeSpaceModule(ComponentSlang.FunctionModuleSpaceModule))
         info(ComponentSlang.CanConnectToWhatTypeSpaceModule(listOf(ComponentSlang.ConjunctionModuleSpaceModule)))
     }
+
     @JvmField
     val SpaceDroneDockTooltips = ComponentListSupplier {
         setTranslationPrefix("space_drone_dock")
@@ -2383,12 +2394,14 @@ object GTOMachineTooltips {
         increase("每消耗600,000EU，配方最大并行数+1" translatedTo "For every 600,000EU consumed, the maximum parallelism of the recipe +1")
         decrease("无人机/电池缺电时，配方无法运行" translatedTo "The recipe cannot run when the drone has no power")
     }
+
     @JvmField
     val SpaceStationEnergyConversionModuleTooltips = ComponentListSupplier {
         setTranslationPrefix("space_station_energy_conversion_module")
         section(ComponentSlang.MainFunction)
         highlight("安装后，空间站内的其他拓展舱体将能够使用§d激光仓§r/§d超频仓§r/§d线程仓§r等高级舱体" translatedTo "When installed, other expansion modules in the space station will be able to use advanced modules such as §dLaser Chamber§r/§dOverclocking Chamber§r/§dThread Chamber§r")
     }
+
     @JvmField
     val meRequestableInputBusTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("me_requestable_input_bus")
@@ -2396,6 +2409,7 @@ object GTOMachineTooltips {
         content("将物品从ME网络中提取出来，放入机器中进行加工" translatedTo "Extract items from the ME network and insert them into machines for processing")
         content("提取不出来则会自己下单请求" translatedTo "If items cannot be extracted, it will place its own order request")
     }
+
     @JvmField
     val meRequestableInputHatchTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("me_requestable_input_hatch")
