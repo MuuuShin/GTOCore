@@ -52,8 +52,9 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
     public void setWorkingEnabled(boolean isWorkingAllowed) {}
 
     private void setEnabled(boolean isWorkingAllowed) {
-        if (!isWorkingAllowed && getRecipeLogic().isWorking()) getRecipeLogic().interruptRecipe();
+        if (!isWorkingAllowed) getRecipeLogic().interruptRecipe();
         super.setWorkingEnabled(isWorkingAllowed);
+        heatContainer.subscribeTransfer();
     }
 
     @Override

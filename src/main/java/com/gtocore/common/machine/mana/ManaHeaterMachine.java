@@ -59,10 +59,14 @@ public class ManaHeaterMachine extends SimpleManaMachine implements IHeatContain
     @Override
     public void onWorking() {
         super.onWorking();
-        if (getOffsetTimer() % 10 == 0 && heatContainer.currentHeat + 40 < heatContainer.maxHeat) {
-            var hasSalamander = inputFluid(SALAMANDER, 10);
-            this.salamanderInput = hasSalamander;
-            heatContainer.addHeatUnrestricted(hasSalamander ? 40 : 16, false);
+        if (getOffsetTimer() % 10 == 0) {
+            if (heatContainer.currentHeat + 40 < heatContainer.maxHeat) {
+                var hasSalamander = inputFluid(SALAMANDER, 10);
+                this.salamanderInput = hasSalamander;
+                heatContainer.addHeatUnrestricted(hasSalamander ? 40 : 16, false);
+            } else {
+                getRecipeLogic().resetRecipeLogic();
+            }
         }
     }
 
@@ -72,12 +76,10 @@ public class ManaHeaterMachine extends SimpleManaMachine implements IHeatContain
 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
-        if (heatContainer.getTemperature() >= heatContainer.getMaxTemperature()) return null;
+        if (heatContainer.currentHeat + 40 >= heatContainer.maxHeat) {
+            heatContainer.subscribeTransfer();
+            return null;
+        }
         return getRecipeBuilder().duration(20).MANAt(16).build();
-    }
-
-    @Override
-    public boolean alwaysSearchRecipe() {
-        return true;
     }
 }

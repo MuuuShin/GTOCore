@@ -2,6 +2,7 @@ package com.gtocore.common.machine.electric;
 
 import com.gtocore.common.data.GTORecipeTypes;
 
+import com.gtolib.api.capability.IHeatContainer;
 import com.gtolib.api.machine.heat.HeatHandler;
 import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
 import com.gtolib.api.machine.trait.NotifiableSafeEnergyContainer;
@@ -47,6 +48,14 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
     }
 
     @Override
+    public @Nullable <T> T getGTCapability(Class<T> cap, @Nullable Direction side) {
+        if (cap == IHeatContainer.class && testHeatCapability(side)) {
+            return cap.cast(heatContainer);
+        }
+        return super.getGTCapability(cap, side);
+    }
+
+    @Override
     protected @NotNull NotifiableEnergyContainer createEnergyContainer(Object @NotNull... args) {
         long tierVoltage = GTValues.V[tier];
         return new NotifiableSafeEnergyContainer(this, tierVoltage << 6, tierVoltage, getMaxInputOutputAmperage());
@@ -54,7 +63,7 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
 
     @Override
     protected @NotNull NotifiableFluidTank createImportFluidHandler(Object @NotNull... args) {
-        return new NotifiableFluidTank(this, 0, 0, IO.IN);
+        return new NotifiableFluidTank(this, 0, 0, IO.NONE).setAvailable(false);
     }
 
     @Override
@@ -83,19 +92,21 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
     @Override
     public void onWorking() {
         super.onWorking();
-        if (getOffsetTimer() % 10 == 0 && heatContainer.currentHeat + 16 < heatContainer.maxHeat) {
-            getHeatContainer().addHeatUnrestricted(16, false);
+        if (getOffsetTimer() % 10 == 0) {
+            if (heatContainer.currentHeat + 16 < heatContainer.maxHeat) {
+                getHeatContainer().addHeatUnrestricted(16, false);
+            } else {
+                getRecipeLogic().resetRecipeLogic();
+            }
         }
     }
 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
-        if (getHeatContainer().getTemperature() >= MaxTemperature) return null;
+        if (heatContainer.currentHeat + 16 >= heatContainer.maxHeat) {
+            heatContainer.subscribeTransfer();
+            return null;
+        }
         return RecipeBuilder.ofRaw().duration(20).EUt(30).build();
-    }
-
-    @Override
-    public boolean alwaysSearchRecipe() {
-        return true;
     }
 }
