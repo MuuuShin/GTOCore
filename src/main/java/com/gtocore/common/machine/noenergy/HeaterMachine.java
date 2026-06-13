@@ -34,7 +34,6 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
         super(holder, 0, i -> 8000);
         heatContainer = new HeatHandler(holder, MaxTemperature, 1, 0.2, 0.01);
         heatContainer.setSideIOCondition(s -> s != getFrontFacing() && s != Direction.DOWN);
-        heatContainer.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
     }
 
     @Override
@@ -54,7 +53,6 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
     private void setEnabled(boolean isWorkingAllowed) {
         if (!isWorkingAllowed) getRecipeLogic().interruptRecipe();
         super.setWorkingEnabled(isWorkingAllowed);
-        heatContainer.subscribeTransfer();
     }
 
     @Override

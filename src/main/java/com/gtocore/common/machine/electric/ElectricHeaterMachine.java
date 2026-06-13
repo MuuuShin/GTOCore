@@ -10,6 +10,7 @@ import com.gtolib.api.recipe.RecipeBuilder;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
+import com.gregtechceu.gtceu.api.capability.GTCapability;
 import com.gregtechceu.gtceu.api.machine.WorkableTieredMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
@@ -43,14 +44,14 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
         super(holder, 1, t -> 8000);
         heatContainer = new HeatHandler(holder, MaxTemperature, 2, 0.3, 0.01);
         heatContainer.setSideIOCondition(s -> s == Direction.UP);
-        heatContainer.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
         heatContainer.addChangedListener(getRecipeLogic()::updateTickSubscription);
     }
 
     @Override
-    public @Nullable <T> T getGTCapability(@NotNull Class<T> cap, @Nullable Direction side) {
-        if (cap == IHeatContainer.class && testHeatCapability(side)) {
-            return cap.cast(heatContainer);
+    public @Nullable <T> Object getGTCapability(@NotNull Class<T> cap, @Nullable Direction side) {
+        if (cap == IHeatContainer.class) {
+            if (testHeatCapability(side)) return heatContainer;
+            return GTCapability.EMPTY;
         }
         return super.getGTCapability(cap, side);
     }
@@ -94,7 +95,7 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
         super.onWorking();
         if (getOffsetTimer() % 10 == 0) {
             if (heatContainer.currentHeat + 16 < heatContainer.maxHeat) {
-                getHeatContainer().addHeatUnrestricted(16, false);
+                heatContainer.addHeatUnrestricted(16, false);
             } else {
                 getRecipeLogic().resetRecipeLogic();
             }
@@ -103,10 +104,7 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
-        if (heatContainer.currentHeat + 16 >= heatContainer.maxHeat) {
-            heatContainer.subscribeTransfer();
-            return null;
-        }
+        if (heatContainer.currentHeat + 16 >= heatContainer.maxHeat) return null;
         return RecipeBuilder.ofRaw().duration(20).EUt(30).build();
     }
 }

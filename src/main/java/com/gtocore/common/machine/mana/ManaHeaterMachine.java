@@ -41,7 +41,6 @@ public class ManaHeaterMachine extends SimpleManaMachine implements IHeatContain
         super(holder, 2, t -> 8000);
         heatContainer = new HeatHandler(holder, 2400, 4, 0.4, 0.01);
         heatContainer.setSideIOCondition(s -> s == Direction.UP);
-        heatContainer.setCoolDownCondition(() -> !getRecipeLogic().isWorking());
         heatContainer.addChangedListener(getRecipeLogic()::updateTickSubscription);
     }
 
@@ -76,10 +75,7 @@ public class ManaHeaterMachine extends SimpleManaMachine implements IHeatContain
 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
-        if (heatContainer.currentHeat + 40 >= heatContainer.maxHeat) {
-            heatContainer.subscribeTransfer();
-            return null;
-        }
+        if (heatContainer.currentHeat + 40 >= heatContainer.maxHeat) return null;
         return getRecipeBuilder().duration(20).MANAt(16).build();
     }
 }

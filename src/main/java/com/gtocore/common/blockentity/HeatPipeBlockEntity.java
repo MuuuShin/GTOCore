@@ -5,6 +5,7 @@ import com.gtocore.common.pipe.heat.*;
 import com.gtolib.api.capability.IHeatContainer;
 
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
+import com.gregtechceu.gtceu.api.capability.GTCapability;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.core.BlockPos;
@@ -37,11 +38,12 @@ public final class HeatPipeBlockEntity extends PipeBlockEntity<HeatPipeType, Hea
     }
 
     @Override
-    public @Nullable <T> T getGTCapability(@NotNull Class<T> cap, @Nullable Direction side) {
+    public @Nullable <T> Object getGTCapability(@NotNull Class<T> cap, @Nullable Direction side) {
         if (cap == IHeatContainer.class) {
             if ((side == null || isConnected(side)) && !level.isClientSide && checkNetwork()) {
-                return cap.cast(handlers.getOrDefault(side, defaultHandler));
+                return handlers.getOrDefault(side, defaultHandler);
             }
+            return GTCapability.EMPTY;
         }
         return null;
     }
