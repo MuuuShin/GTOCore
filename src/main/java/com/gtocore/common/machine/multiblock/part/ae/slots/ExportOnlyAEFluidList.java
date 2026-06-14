@@ -76,7 +76,7 @@ public class ExportOnlyAEFluidList extends NotifiableContentHandler implements I
 
     @Override
     public boolean isFluidValid(int i, @NotNull FluidStack fluidStack) {
-        return false;
+        return true;
     }
 
     @Override
@@ -100,6 +100,19 @@ public class ExportOnlyAEFluidList extends NotifiableContentHandler implements I
     @Override
     public boolean supportsFill(int tank) {
         return false;
+    }
+
+    @Override
+    public FluidStack drainInternal(FluidStack resource, FluidAction action) {
+        if (resource.isEmpty()) return FluidStack.EMPTY;
+        var copied = resource.copy();
+        for (var storage : inventory) {
+            var candidate = copied.copy();
+            copied.shrink(storage.drain(candidate, action).getAmount());
+            if (copied.isEmpty()) break;
+        }
+        copied.setAmount(resource.getAmount() - copied.getAmount());
+        return copied;
     }
 
     @Override
