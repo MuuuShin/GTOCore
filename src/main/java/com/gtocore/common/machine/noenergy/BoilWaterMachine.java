@@ -23,8 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IHeatContainerMachine, IExplosionMachine, ICustomRecipeLogicHolder {
 
-    public static final int DrawWaterExplosionLine = 400;
-
     @Getter
     @SaveToDisk
     private final HeatHandler heatContainer;

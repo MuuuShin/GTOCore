@@ -6,6 +6,7 @@ import com.gtocore.api.misc.AutoInitializeImpl;
 import com.gtocore.client.renderer.item.HaloItemRenderer;
 import com.gtocore.client.renderer.item.MaterialsColorMap;
 import com.gtocore.client.renderer.item.OrderItemProviderRenderer;
+import com.gtocore.common.cover.HeatInterfaceCover;
 import com.gtocore.common.cover.PowerAmplifierCover;
 import com.gtocore.common.data.translation.GTOItemTooltips;
 import com.gtocore.common.item.*;
@@ -326,7 +327,8 @@ public final class GTOItems {
             .onRegister(attach(new TooltipBehavior(lines -> lines.add(Component.translatable("gtceu.universal.tooltip.produces_fluid", 10))), new CoverPlaceBehavior(GTOCovers.AIR_VENT)))
             .register();
 
-    public static final ItemEntry<ComponentItem> HEAT_INTERFACE = item("heat_interface", "传热接口", ComponentItem::create)
+    public static final ItemEntry<ComponentItem> HEAT_INTERFACE = item("heat_interface", "导热接口", ComponentItem::create)
+            .toolTips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, "200+600x(Tier+1)"), Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, "Tier+1"), Component.translatable(HeatInterfaceCover.TRANSFER_RATE, "Tier+1"), Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
             .onRegister(attach(new CoverPlaceBehavior(GTOCovers.HEAT_INTERFACE)))
             .register();
 

@@ -35,6 +35,7 @@ public class AlchemyCauldron extends SimpleManaMachine implements IHeatContainer
         super(holder, 3, t -> 16000);
         heatContainer = new HeatHandler(holder, 1600, 0.5, 1.2, 0.02);
         heatContainer.setSideIOCondition(s -> s == Direction.DOWN);
+        heatContainer.addChangedListener(getRecipeLogic()::updateTickSubscription);
     }
 
     @Nullable

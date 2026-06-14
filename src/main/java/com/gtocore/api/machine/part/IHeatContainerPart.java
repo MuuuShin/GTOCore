@@ -1,4 +1,4 @@
-package com.gtocore.api.machine;
+package com.gtocore.api.machine.part;
 
 import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
 

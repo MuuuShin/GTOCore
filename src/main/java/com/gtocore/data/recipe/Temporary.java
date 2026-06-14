@@ -20,42 +20,6 @@ import static com.gtocore.common.data.GTORecipeTypes.*;
 public final class Temporary {
 
     public static void init() {
-        ASSEMBLER_RECIPES.builder("heat_pipes")
-                .inputItems(TagPrefix.pipeNormalFluid, GTMaterials.Copper, 1)
-                .inputItems(TagPrefix.plate, GTMaterials.Copper, 2)
-                .circuitMeta(11)
-                .outputItems(GTOBlocks.HEAT_PIPES[0].asItem())
-                .duration(200)
-                .EUt(7)
-                .save();
-
-        ASSEMBLER_RECIPES.builder("heat_interface")
-                .inputItems(TagPrefix.plate, GTMaterials.Steel, 2)
-                .circuitMeta(17)
-                .outputItems(GTOItems.HEAT_INTERFACE.asItem())
-                .duration(200)
-                .EUt(7)
-                .save();
-
-        ASSEMBLER_RECIPES.builder("heat_detector_cover")
-                .inputItems(TagPrefix.plate, GTMaterials.Steel, 2)
-                .inputItems(TagPrefix.dust, GTMaterials.RedAlloy, 1)
-                .circuitMeta(18)
-                .outputItems(GTOItems.HEAT_DETECTOR_COVER.asItem())
-                .duration(200)
-                .EUt(7)
-                .save();
-
-        ASSEMBLER_RECIPES.builder("heat_sink")
-                .inputItems(TagPrefix.plate, GTMaterials.Steel, 1)
-                .inputItems(TagPrefix.plate, GTMaterials.Copper, 2)
-                .inputItems(TagPrefix.plate, GTMaterials.Invar, 1)
-                .circuitMeta(18)
-                .outputItems(GTOItems.HEAT_SINK.asItem())
-                .duration(200)
-                .EUt(7)
-                .save();
-
         ASSEMBLER_RECIPES.builder("mana_pipes")
                 .inputItems(TagPrefix.plate, GTOMaterials.Manasteel, 6)
                 .circuitMeta(18)

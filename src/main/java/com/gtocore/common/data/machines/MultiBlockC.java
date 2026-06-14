@@ -46,7 +46,6 @@ import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.material.Fluids;
 
 import com.hepdd.gtmthings.data.CustomMachines;
 
@@ -65,39 +64,23 @@ public final class MultiBlockC {
     public static final MultiblockMachineDefinition PRIMITIVE_DISTILLATION_TOWER = multiblock("primitive_distillation_tower", "原始蒸馏塔", PrimitiveDistillationTowerMachine::new)
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.PrimitiveDistillationTowerTooltips)
-            .moduleTooltips(new PartAbility[0])
             .recipeTypes(GTRecipeTypes.DISTILLATION_RECIPES)
             .block(GTBlocks.STEEL_HULL)
             .pattern(definition -> FactoryBlockPattern.start(definition, RelativeDirection.RIGHT, RelativeDirection.BACK, RelativeDirection.UP)
-                    .aisle("I~O", "AAA", "FHF")
+                    .aisle("I~O", "HAH", "FHF")
                     .aisle("BBB", "B B", "BBB").setRepeatable(1, 10)
                     .aisle("BBB", "BCB", "BBB")
                     .where('~', controller(definition))
-                    .where('A', blocks(GTBlocks.FIREBOX_STEEL.get()))
+                    .where('A', blocks(GTBlocks.CASING_STEEL_SOLID.get()))
                     .where('B', blocks(GTBlocks.STEEL_HULL.get()).or(abilities(PartAbility.EXPORT_FLUIDS_1X).setPreviewCount(1).setMaxLayerLimited(1)))
-                    .where('C', blocks(GTBlocks.STEEL_HULL.get()))
+                    .where('C', GTOPredicates.recordPosition(GTOPredicates.DataKeys.A, blocks(GTOMachines.HEAT_HATCH.get())))
                     .where('F', abilities(IMPORT_FLUIDS))
                     .where('I', abilities(IMPORT_ITEMS))
                     .where('O', abilities(EXPORT_ITEMS))
-                    .where('H', blocks(GTBlocks.FIREBOX_STEEL.get())
-                            .or(blocks(GTOMachines.HEAT_SENSOR.get()).setPreviewCount(1)))
+                    .where('H', blocks(GTBlocks.CASING_STEEL_SOLID.get())
+                            .or(blocks(GTOMachines.HEAT_HATCH.get()).setExactLimit(1).setPreviewCount(1))
+                            .or(blocks(GTOMachines.HEAT_SENSOR.get()).setMaxGlobalLimited(1).setPreviewCount(1)))
                     .where(' ', air())
-                    .build())
-            .addSubPattern(definition -> FactoryBlockPattern.start(definition, RelativeDirection.RIGHT, RelativeDirection.BACK, RelativeDirection.UP)
-                    .aisle("H  AAA", "  FFFA", "   AAA")
-                    .aisle("   BCB", "   CGC", "   BCB")
-                    .aisle("   BDB", "   DDD", "   BDB")
-                    .aisle("    E ", "   EEE", "    E ")
-                    .where('A', blocks(GTBlocks.STEEL_HULL.get())
-                            .or(PrimitiveDistillationTowerMachine.WaterSupplyingPredicate.get()))
-                    .where('B', blocks(GCYMBlocks.CASING_INDUSTRIAL_STEAM.get()))
-                    .where('C', blocks(Blocks.GLASS))
-                    .where('D', blocks(GTOBlocks.REINFORCED_WOOD_CASING.get()))
-                    .where('E', GTOPredicates.frame(GTMaterials.Bronze))
-                    .where('F', blocks(GTOBlocks.SOLAR_HEAT_COLLECTOR_PIPE_CASING.get()))
-                    .where('G', fluids(Fluids.WATER))
-                    .where('H', blocks(MultiBlockC.PRIMITIVE_DISTILLATION_TOWER.get()))
-                    .where(' ', any())
                     .build())
             .renderer(PrimitiveDistillationRenderer::new)
             .register();

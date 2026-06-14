@@ -4,6 +4,7 @@ import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.client.renderer.machine.CelestialCondenserRenderer;
 import com.gtocore.client.renderer.machine.ManaHeaterRenderer;
 import com.gtocore.client.renderer.machine.OverlayManaTieredMachineRenderer;
+import com.gtocore.common.cover.HeatInterfaceCover;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
 import com.gtocore.common.machine.generator.MagicEnergyMachine;
@@ -147,6 +148,10 @@ public final class ManaMachine {
             .tooltips(GTOMachineTooltips.AlchemyCauldronTooltips)
             .tooltips(Component.translatable("gtocore.machine.mana_input", Component.literal(GTOValues.MANA[HV] + "/t").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.AQUA))
             .tooltips(workableNoEnergy(GTORecipeTypes.ALCHEMY_CAULDRON_RECIPES, 1600))
+            .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 1600))
+            .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 0.5))
+            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 1))
+            .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.02))
             .nonYAxisRotation()
             .modelRenderer(() -> GTOCore.id("block/machine/alchemy_cauldron"))
             .blockProp(p -> p.noOcclusion().isViewBlocking((state, level, pos) -> false))
@@ -170,6 +175,10 @@ public final class ManaMachine {
             .noRecipeModifier()
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.ManaHeaterTooltips)
+            .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 2400))
+            .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 4))
+            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.4))
+            .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
             .renderer(() -> new ManaHeaterRenderer(MV))
             .register();
 

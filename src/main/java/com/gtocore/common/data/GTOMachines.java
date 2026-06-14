@@ -3,6 +3,7 @@ package com.gtocore.common.data;
 import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.client.renderer.machine.*;
 import com.gtocore.common.blockentity.TesseractBlockEntity;
+import com.gtocore.common.cover.HeatInterfaceCover;
 import com.gtocore.common.data.machines.*;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
@@ -211,6 +212,10 @@ public final class GTOMachines {
             .noRecipeModifier()
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.HeaterMachineTooltips)
+            .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 800))
+            .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 1))
+            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.2))
+            .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
             .renderer(() -> new HeaterRenderer(ULV))
             .register();
 
@@ -223,7 +228,10 @@ public final class GTOMachines {
             .tooltips(GTOMachineTooltips.BoilWaterMachineTooltips)
             .tooltips(Component.translatable("gtocore.machine.boiler.tooltip.warning"))
             .tooltipsKey("gtceu.universal.tooltip.produces_fluid", 48)
-            .tooltipsKey("gtceu.fluid_pipe.max_temperature", 600)
+            .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 600))
+            .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 2))
+            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.6))
+            .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
             .workableTieredHullRenderer(GTCEu.id("block/generators/boiler/lava"))
             .register();
 
@@ -241,6 +249,10 @@ public final class GTOMachines {
             .noRecipeModifier()
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.ElectricHeaterMachineTooltips)
+            .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 1200))
+            .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 2))
+            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.3))
+            .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
             .renderer(() -> new HeaterRenderer(LV))
             .register();
 
@@ -557,10 +569,34 @@ public final class GTOMachines {
             .renderer(() -> new MaintenanceHatchPartRenderer(6, GTCEu.id("block/machine/part/maintenance.full_auto")))
             .register();
 
-    public static final MachineDefinition TEMP_VACUUM_INTERFACE = machine("temp_vacuum_interface", "温度/真空接口", TempVacuumInterfacePartMachine::new)
+    public static final MachineDefinition HEAT_HATCH = machine("heat_hatch", "导热仓", h -> new HeatHatchPartMachine(h, 850, 1, 1))
             .allRotation()
             .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS)
-            .tooltips(GTOMachineTooltips.TempVacuumInterfaceTooltips)
+            .tooltips(GTOMachineTooltips.TempInterfaceTooltips)
+            .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 850))
+            .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 1))
+            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 1))
+            .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
+            .tier(0)
+            .overlayTieredHullRenderer("neutron_sensor")
+            .register();
+
+    public static final MachineDefinition ADVANCED_HEAT_HATCH = machine("advanced_heat_hatch", "高级导热仓", h -> new HeatHatchPartMachine(h, 3600, 2, 4))
+            .allRotation()
+            .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS)
+            .tooltips(GTOMachineTooltips.TempInterfaceTooltips)
+            .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 3600))
+            .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 2))
+            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 4))
+            .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
+            .tier(0)
+            .overlayTieredHullRenderer("neutron_sensor")
+            .register();
+
+    public static final MachineDefinition VACUUM_INTERFACE = machine("vacuum_interface", "真空接口", VacuumInterfacePartMachine::new)
+            .allRotation()
+            .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS)
+            .tooltips(GTOMachineTooltips.VacuumInterfaceTooltips)
             .tier(1)
             .overlayTieredHullRenderer("neutron_sensor")
             .register();

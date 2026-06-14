@@ -455,7 +455,6 @@ object GTOMachineTooltips {
         section(ComponentSlang.RunningRequirements)
         command("输入魔力加热" translatedTo "Input mana to heat")
         increase("如果输入§c火元素蒸汽§r，则加热速度翻5倍" translatedTo "If §cSalamander Vapor§r is input, the heating speed will be 5 times faster")
-        command(ComponentSlang.TemperatureMax(2400))
     }
 
     @JvmField
@@ -551,13 +550,22 @@ object GTOMachineTooltips {
         function("插入不同的自动维护仓以启用不同的功能" translatedTo "Insert different auto-maintenance hatches to enable different functions.")
     }
 
-    // 温度/真空接口
+    // 温度接口
     @JvmField
-    val TempVacuumInterfaceTooltips = ComponentListSupplier {
+    val TempInterfaceTooltips = ComponentListSupplier {
         setTranslationPrefix("temp_vacuum_interface")
 
         section(ComponentSlang.MainFunction)
-        content("与此部件连接可以为多方块机器传导热量并提供真空" translatedTo "Conduct heat and provide vacuum for multiblock machines through connections with this part")
+        content("与此部件连接可以为多方块机器传导热量" translatedTo "Conduct heat for multiblock machines through connections with this part")
+    }
+
+    // 真空接口
+    @JvmField
+    val VacuumInterfaceTooltips = ComponentListSupplier {
+        setTranslationPrefix("temp_vacuum_interface")
+
+        section(ComponentSlang.MainFunction)
+        content("与此部件连接可以为多方块机器提供真空" translatedTo "Provide vacuum for multiblock machines through connections with this part")
     }
 
     // 中子加速器
@@ -694,10 +702,6 @@ object GTOMachineTooltips {
         setTranslationPrefix("boil_water_machine")
         section("需要外部热源工作" translatedTo "Requires external heat source to operate")
         error(("当蒸汽溢出后继续工作会" translatedTo "When steam overflows, continuing to work will ") + ComponentSlang.Explosion)
-        content(
-            ("可能发生爆炸的临界温度为" translatedTo "The critical temperature for explosion is ") +
-                BoilWaterMachine.DrawWaterExplosionLine.toLiteralSupplier().red(),
-        )
     }
 
     // 性能监控器
@@ -833,7 +837,6 @@ object GTOMachineTooltips {
         section("通过燃烧对四周机器进行加热" translatedTo "Burning to heat up around machines")
         content("前方被阻挡后停止加热" translatedTo "Stop heating after front side is blocked.")
         content("根据温度发出红石信号" translatedTo "Emits redstone signal according to the temperature.")
-        command(ComponentSlang.TemperatureMax(HeaterMachine.MaxTemperature))
         error(("机器过热会" translatedTo "When machine is too hot, it will ") + ComponentSlang.Explosion)
         danger(ComponentSlang.BeAwareOfBurn)
     }
@@ -844,7 +847,6 @@ object GTOMachineTooltips {
         setTranslationPrefix("electric_heater_machine")
 
         section("使用电力对四周机器进行加热" translatedTo "Use electricity to heat up around machines")
-        command(ComponentSlang.TemperatureMax(ElectricHeaterMachine.MaxTemperature))
         ok("此机器不会爆炸" translatedTo "This machine will not explode")
         danger(ComponentSlang.BeAwareOfBurn)
     }
@@ -1510,20 +1512,8 @@ object GTOMachineTooltips {
         important("只能处理MV及以下的配方" translatedTo "Can only process recipes of MV tier or lower")
 
         section("热管理机制" translatedTo "Heat Management")
-        info("需要 >400K 的热量才能运行配方" translatedTo "Requires >400K heat to process recipes")
-        info("运行配方会消耗热量，有助于稳定温度" translatedTo "Processing recipes consumes heat, helping to stabilize temperature")
-        info("无燃料时，热量会缓慢散失至298K" translatedTo "Without fuel, it will slowly cool down to 298K (room temperature)")
-
-        command("使用燃料来升温：煤块产热慢但持久；煤/煤粉产热快但消耗快" translatedTo "Use fuel to increase heat: Coal Blocks provide slow, long-lasting heat; Coal/Dust provides fast, short-lived heat")
-
-        info("热量 > 373K 时会消耗水进行冷却" translatedTo "Consumes water for cooling when heat exceeds 373K")
-        function("足量的水(>100mb)才能有效降温" translatedTo "Sufficient water (>100mb) is required for effective cooling")
-        error("注意：水量不足(≤100mb)会适得其反，导致机器异常升温并加速燃料消耗！" translatedTo "Warning: Insufficient water (≤100mb) will backfire, causing extra heat gain and faster fuel consumption!")
-        error("热量超过 850K 将导致爆炸！" translatedTo "Heat exceeding 850K will cause an explosion!")
-
-        section(ComponentSlang.AfterModuleInstallation)
-        info("安装模块后，机器所使用的冷却用水将只会由模块提供" translatedTo "After installing modules, the machine will only use water provided by the modules for cooling")
-        info("机器本体所提供的水将不再参与冷却过程，而是被用于配方的输入" translatedTo "Water provided by the machine itself will no longer be used for cooling, but will instead be used as input for recipes")
+        info("需要 >400K 的热温度才能运行配方" translatedTo "Requires >400K Temperature to process recipes")
+        info("运行配方会按1UH/t速度消耗底部热量，按0.5UH/t速度产生顶部热量" translatedTo "Processing recipes will consume bottom heat at a speed of 1UH/t and generate top heat at a speed of 0.5UH/t")
     }
 
     // 化学气相沉积系统
@@ -2162,8 +2152,6 @@ object GTOMachineTooltips {
     @JvmField
     val AlchemyCauldronTooltips = ComponentListSupplier {
         setTranslationPrefix("alchemy_cauldron")
-
-        command(ComponentSlang.TemperatureMax(1600))
         important("不要用它来做饭" translatedTo "Do not use it for cooking food")
     }
 

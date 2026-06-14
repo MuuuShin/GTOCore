@@ -14,6 +14,7 @@ import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.ICleanroomProvider;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineModifyDrops;
+import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
@@ -99,10 +100,13 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
         cleanroomModuleInv = new NotifiableItemStackHandler(this, 1, IO.NONE, IO.BOTH, SingleCustomItemStackHandler::new);
         cleanroomModuleInv.setFilter(stack -> Wrapper.CLEAN_CHECK.containsKey(stack.getItem()));
         cleanroomModuleInv.addChangedListener(this::onConditionChange);
-        heatContainer = new HeatHandler(holder, MAX_TEMPERATURE, 1, 24, 0.1);
+        heatContainer = new HeatHandler(holder, MAX_TEMPERATURE, 4, 8, 0.01);
         heatContainer.setSideIOCondition(s -> s == getFrontFacing());
         heatContainer.addChangedListener(() -> {
             if (temperatureMode) heatContainer.setCurrentHeat(activeTemperature);
+            for (var c : getControllers()) {
+                if (c instanceof IRecipeLogicMachine machine) machine.getRecipeLogic().updateTickSubscription();
+            }
         });
     }
 

@@ -1,6 +1,6 @@
 package com.gtocore.common.recipe.condition;
 
-import com.gtocore.api.machine.IHeatContainerPart;
+import com.gtocore.api.machine.part.IHeatContainerPart;
 
 import com.gtolib.api.capability.IHeatContainer;
 

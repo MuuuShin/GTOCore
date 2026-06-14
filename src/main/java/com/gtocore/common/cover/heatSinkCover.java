@@ -17,11 +17,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class heatSink extends CoverBehavior {
+public final class heatSinkCover extends CoverBehavior {
 
     private TickableSubscription subscription;
 
-    public heatSink(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide) {
+    public heatSinkCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide) {
         super(definition, coverHolder, attachedSide);
     }
 

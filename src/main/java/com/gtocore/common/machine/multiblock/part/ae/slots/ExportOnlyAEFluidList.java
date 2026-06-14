@@ -2,6 +2,7 @@ package com.gtocore.common.machine.multiblock.part.ae.slots;
 
 import com.gtolib.api.ae2.stacks.IAEFluidKey;
 import com.gtolib.api.recipe.RecipeType;
+import com.gtolib.utils.MathUtil;
 
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableContentHandler;
@@ -104,15 +105,17 @@ public class ExportOnlyAEFluidList extends NotifiableContentHandler implements I
 
     @Override
     public FluidStack drainInternal(FluidStack resource, FluidAction action) {
-        if (resource.isEmpty()) return FluidStack.EMPTY;
-        var copied = resource.copy();
+        var amount = resource.getAmount();
+        if (amount < 1) return FluidStack.EMPTY;
+        var drained = 0;
+        var simulate = action.simulate();
         for (var storage : inventory) {
-            var candidate = copied.copy();
-            copied.shrink(storage.drain(candidate, action).getAmount());
-            if (copied.isEmpty()) break;
+            if (storage.stock != null && storage.stock.what() instanceof AEFluidKey fluidKey && fluidKey.matches(resource)) {
+                drained += MathUtil.saturatedCast(storage.extract(amount - drained, simulate, true));
+                if (drained >= amount) break;
+            }
         }
-        copied.setAmount(resource.getAmount() - copied.getAmount());
-        return copied;
+        return drained > 0 ? ICustomFluidStackHandler.copy(resource, drained) : FluidStack.EMPTY;
     }
 
     @Override

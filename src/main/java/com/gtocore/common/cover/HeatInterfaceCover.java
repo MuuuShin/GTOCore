@@ -1,5 +1,7 @@
 package com.gtocore.common.cover;
 
+import com.gtolib.api.annotation.DataGeneratorScanned;
+import com.gtolib.api.annotation.language.RegisterLanguage;
 import com.gtolib.api.capability.IHeatContainer;
 import com.gtolib.api.machine.heat.HeatHandler;
 
@@ -20,7 +22,17 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
+@DataGeneratorScanned
 public final class HeatInterfaceCover extends CoverBehavior {
+
+    @RegisterLanguage(cn = "最高温度：%s K", en = "Max Temperature: %s K")
+    public static final String MAX_TEMPERATURE = "gtocore.machine.max_temperature";
+    @RegisterLanguage(cn = "热容：%s HU/K", en = "Heat Capacity: %s UH/K")
+    public static final String HEAT_CAPACITY = "gtocore.machine.heat_capacity";
+    @RegisterLanguage(cn = "传热速度：%s HU/t", en = "Heat Transfer Rate：%s HU/t")
+    public static final String TRANSFER_RATE = "gtocore.machine.transfer_rate";
+    @RegisterLanguage(cn = "冷却速度：%s HU/t", en = "Heat Cooldown Rate：%s HU/t")
+    public static final String COOLDOWN_RATE = "gtocore.machine.cooldown_rate";
 
     private MetaMachine machine;
 

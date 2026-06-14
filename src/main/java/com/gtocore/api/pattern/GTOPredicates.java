@@ -314,7 +314,7 @@ public final class GTOPredicates {
 
             @Override
             public boolean testOnly() {
-                return true;
+                return original.testOnly();
             }
 
             @Override
@@ -364,5 +364,7 @@ public final class GTOPredicates {
         public static final DataComponentKey<Set<BlockPos>> YELLOW = DataComponentKey.create("yellow", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
         public static final DataComponentKey<Set<BlockPos>> BLACK = DataComponentKey.create("black", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
         public static final DataComponentKey<Set<BlockPos>> WHITE = DataComponentKey.create("white", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
+        public static final DataComponentKey<Set<BlockPos>> A = DataComponentKey.create("a", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
+        public static final DataComponentKey<Set<BlockPos>> B = DataComponentKey.create("b", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
     }
 }
