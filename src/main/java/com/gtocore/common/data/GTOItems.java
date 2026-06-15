@@ -328,7 +328,7 @@ public final class GTOItems {
             .register();
 
     public static final ItemEntry<ComponentItem> HEAT_INTERFACE = item("heat_interface", "导热接口", ComponentItem::create)
-            .toolTips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, "200+600x(Tier+1)"), Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, "Tier+1"), Component.translatable(HeatInterfaceCover.TRANSFER_RATE, "Tier+1"), Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
+            .toolTips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, "400+600x(Tier+1)"), Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, "Tier+1"), Component.translatable(HeatInterfaceCover.TRANSFER_RATE, "Tier+1"), Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
             .onRegister(attach(new CoverPlaceBehavior(GTOCovers.HEAT_INTERFACE)))
             .register();
 

@@ -46,7 +46,7 @@ public final class HeatInterfaceCover extends CoverBehavior {
     public HeatInterfaceCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide) {
         super(definition, coverHolder, attachedSide);
         var tier = coverHolder.holder() instanceof MetaMachineBlockEntity blockEntity ? blockEntity.definition.getTier() + 1 : 1;
-        handler = new HeatHandler(coverHolder.holder(), 200L + (400L * tier), tier, tier, 0.01);
+        handler = new HeatHandler(coverHolder.holder(), 400L + (400L * tier), tier, tier, 0.01);
         handler.setSideIOCondition(s -> s == attachedSide);
         handler.addChangedListener(() -> {
             if (machine instanceof IRecipeLogicMachine recipeLogicMachine) {
