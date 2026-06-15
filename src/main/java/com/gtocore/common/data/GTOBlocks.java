@@ -9,13 +9,16 @@ import com.gtocore.common.pipe.mana.ManaPipeType;
 import com.gtolib.GTOCore;
 import com.gtolib.utils.RLUtils;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.ActiveBlock;
 import com.gregtechceu.gtceu.api.item.ITagPrefixItem;
+import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
@@ -24,6 +27,7 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraftforge.client.model.generators.ModelFile;
 
 import com.gto.registrate.util.entry.BlockEntry;
 import com.gto.registrate.util.nullness.NonNullBiConsumer;
@@ -449,7 +453,13 @@ public final class GTOBlocks {
     public static final BlockEntry<Block> REINFORCED_STERILE_WATER_PLANT_CASING = createCasingBlock("reinforced_sterile_water_plant_casing", "加固无菌水处理机械方块", GTOCore.id("block/reinforced_sterile_water_plant_casing"));
     public static final BlockEntry<Block> NEUTRONIUM_STABLE_CASING = createCasingBlock("neutronium_stable_casing", "中子稳定机械方块", GTOCore.id("block/neutronium_stable_casing"));
     public static final BlockEntry<Block> STERILE_WATER_PLANT_CASING = createCasingBlock("sterile_water_plant_casing", "无菌水处理机械方块", GTOCore.id("block/sterile_water_plant_casing"));
-    public static final BlockEntry<Block> STABILIZED_NAQUADAH_WATER_PLANT_CASING = createCasingBlock("stabilized_naquadah_water_plant_casing", "稳定硅岩水处理机械方块", GTOCore.id("block/stabilized_naquadah_water_plant_casing"));
+    public static final BlockEntry<Block> STABILIZED_NAQUADAH_WATER_PLANT_CASING = createCasingBlock(
+            "stabilized_naquadah_water_plant_casing", "稳定硅岩水处理机械方块",
+            (ctx, prov) -> prov.simpleBlock(ctx.getEntry(), prov.models().cubeBottomTop("stabilized_naquadah_water_plant_casing",
+                    GTOCore.id("block/stabilized_naquadah_water_plant_casing"),
+                    GTOCore.id("block/stabilized_naquadah_water_plant_casing_top"),
+                    GTOCore.id("block/stabilized_naquadah_water_plant_casing_top"))),
+            Block::new, () -> Blocks.IRON_BLOCK, () -> RenderType::solid);
     public static final BlockEntry<Block> STRENGTHEN_THE_BASE_BLOCK = createCasingBlock("strengthen_the_base_block", "强化基座方块", GTOCore.id("block/casings/strengthen_the_base_block"));
 
     public static final BlockEntry<Block> PVC_PLASTIC_MECHANICAL_HOUSING = createCasingBlock("pvc_plastic_mechanical_housing", "PVC塑料机械外壳", GTOCore.id("block/pvc_plastic_mechanical_housing"));
@@ -514,10 +524,10 @@ public final class GTOBlocks {
     public static final BlockEntry<Block> ACCELERATOR_OBSERVATION_GLASS = createGlassCasingBlock("accelerator_observation_glass", "加速器观察玻璃", GTOCore.id("block/casings/accelerator/accelerator_observation_glass"));
     public static final BlockEntry<Block> ACCELERATOR_PARTICLE_INSTANT_CONDENSATION_CASING = createCasingBlock("accelerator_particle_instant_condensation_casing", "加速器线圈冷凝机械方块", GTOCore.id("block/casings/accelerator/accelerator_particle_instant_condensation_casing"));
 
-    public static final BlockEntry<Block> ACCELERATOR_ELECTROMAGNETIC_COIL_CONSTRAINT_CASING_LUV = createCasingBlock("accelerator_electromagnetic_coil_constraint_casing_luv", "LuV加速器磁约束线圈机械方块", GTOCore.id("block/casings/accelerator/accelerator_electromagnetic_coil_constraint_casing_luv"));
-    public static final BlockEntry<Block> ACCELERATOR_ELECTROMAGNETIC_COIL_CONSTRAINT_CASING_ZPM = createCasingBlock("accelerator_electromagnetic_coil_constraint_casing_zpm", "ZPM加速器磁约束线圈机械方块", GTOCore.id("block/casings/accelerator/accelerator_electromagnetic_coil_constraint_casing_zpm"));
-    public static final BlockEntry<Block> ACCELERATOR_ELECTROMAGNETIC_COIL_CONSTRAINT_CASING_UV = createCasingBlock("accelerator_electromagnetic_coil_constraint_casing_uv", "UV加速器磁约束线圈机械方块", GTOCore.id("block/casings/accelerator/accelerator_electromagnetic_coil_constraint_casing_uv"));
-    public static final BlockEntry<Block> ACCELERATOR_ELECTROMAGNETIC_COIL_CONSTRAINT_CASING_UHV = createCasingBlock("accelerator_electromagnetic_coil_constraint_casing_uhv", "UHV加速器磁约束线圈机械方块", GTOCore.id("block/casings/accelerator/accelerator_electromagnetic_coil_constraint_casing_uhv"));
+    public static final BlockEntry<ActiveBlock> ACCELERATOR_ELECTROMAGNETIC_COIL_CONSTRAINT_CASING_LUV = createAcceleratorCoil("accelerator_electromagnetic_coil_constraint_casing_luv", "LuV加速器磁约束线圈机械方块", GTOCore.id("block/casings/accelerator/accelerator_electromagnetic_coil_constraint_casing_luv"));
+    public static final BlockEntry<ActiveBlock> ACCELERATOR_ELECTROMAGNETIC_COIL_CONSTRAINT_CASING_ZPM = createAcceleratorCoil("accelerator_electromagnetic_coil_constraint_casing_zpm", "ZPM加速器磁约束线圈机械方块", GTOCore.id("block/casings/accelerator/accelerator_electromagnetic_coil_constraint_casing_zpm"));
+    public static final BlockEntry<ActiveBlock> ACCELERATOR_ELECTROMAGNETIC_COIL_CONSTRAINT_CASING_UV = createAcceleratorCoil("accelerator_electromagnetic_coil_constraint_casing_uv", "UV加速器磁约束线圈机械方块", GTOCore.id("block/casings/accelerator/accelerator_electromagnetic_coil_constraint_casing_uv"));
+    public static final BlockEntry<ActiveBlock> ACCELERATOR_ELECTROMAGNETIC_COIL_CONSTRAINT_CASING_UHV = createAcceleratorCoil("accelerator_electromagnetic_coil_constraint_casing_uhv", "UHV加速器磁约束线圈机械方块", GTOCore.id("block/casings/accelerator/accelerator_electromagnetic_coil_constraint_casing_uhv"));
 
     // 耐高压管道机械方块
     public static final BlockEntry<Block> HIGH_PRESSURE_PIPE_CASING = createCasingBlock("high_pressure_pipe_casing", "耐高压管道机械方块", GTOCore.id("block/casings/high_pressure_pipe_casing"));
@@ -671,5 +681,24 @@ public final class GTOBlocks {
                     .register();
             MANA_PIPES[i] = entry;
         }
+    }
+
+    private static BlockEntry<ActiveBlock> createAcceleratorCoil(String name, String cnName, ResourceLocation texture) {
+        return block(name, cnName, ActiveBlock::new)
+                .initialProperties(() -> Blocks.IRON_BLOCK)
+                .properties(p -> p.isValidSpawn((state, level, pos, ent) -> false))
+                .addLayer(() -> RenderType::cutoutMipped)
+                .blockstate((ctx, prov) -> {
+                    ActiveBlock block = ctx.getEntry();
+                    ModelFile inactive = prov.models().cubeAll(ctx.getName(), texture);
+                    ModelFile active = prov.models().withExistingParent(ctx.getName() + "_active", GTCEu.id("block/cube_2_layer/all"))
+                            .texture("bot_all", texture).texture("top_all", texture.withSuffix("_bloom"));
+                    prov.getVariantBuilder(block).partialState().with(ActiveBlock.ACTIVE, false).modelForState().modelFile(inactive).addModel().partialState().with(ActiveBlock.ACTIVE, true).modelForState().modelFile(active).addModel();
+                })
+                .tag(GTToolType.WRENCH.harvestTags.getFirst(), BlockTags.MINEABLE_WITH_PICKAXE)
+                .item(BlockItem::new)
+                .model((ctx, prov) -> prov.cubeAll(prov.name(ctx), texture))
+                .build()
+                .register();
     }
 }
