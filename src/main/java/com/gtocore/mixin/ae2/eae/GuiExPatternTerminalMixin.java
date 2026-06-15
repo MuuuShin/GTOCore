@@ -21,11 +21,11 @@ import appeng.client.gui.widgets.ServerSettingToggleButton;
 import gto_ae.api.config.ExtendedSettings;
 import gto_ae.menu.ShowMolecularAssembler;
 
-import com.fast.fastcollection.OpenCacheHashSet;
 import com.glodblock.github.extendedae.client.button.HighlightButton;
 import com.glodblock.github.extendedae.client.gui.GuiExPatternTerminal;
 import com.glodblock.github.extendedae.container.ContainerExPatternTerminal;
 import com.google.common.collect.HashMultimap;
+import com.gto.fastcollection.OpenCacheHashSet;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

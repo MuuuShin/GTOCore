@@ -41,8 +41,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import com.fast.fastcollection.OpenCacheHashSet;
 import com.gto.datasynclib.datasream.DataComponentKey;
+import com.gto.fastcollection.OpenCacheHashSet;
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
