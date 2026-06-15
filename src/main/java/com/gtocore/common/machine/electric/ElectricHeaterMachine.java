@@ -42,7 +42,7 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
 
     public ElectricHeaterMachine(MetaMachineBlockEntity holder) {
         super(holder, 1, t -> 8000);
-        heatContainer = new HeatHandler(holder, MaxTemperature, 2, 0.3, 0.01);
+        heatContainer = new HeatHandler(holder, MaxTemperature, 2, 0.4, 0.01);
         heatContainer.setSideIOCondition(s -> s == Direction.UP);
         heatContainer.addChangedListener(getRecipeLogic()::updateTickSubscription);
     }
@@ -97,7 +97,7 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
             if (heatContainer.currentHeat + 16 < heatContainer.maxHeat) {
                 heatContainer.addHeatUnrestricted(16, false);
             } else {
-                getRecipeLogic().resetRecipeLogic();
+                getRecipeLogic().markLastRecipeDirty();
             }
         }
     }

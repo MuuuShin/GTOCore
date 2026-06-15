@@ -336,10 +336,6 @@ public final class GTOItems {
             .onRegister(attach(new CoverPlaceBehavior(GTOCovers.HEAT_DETECTOR)))
             .register();
 
-    public static final ItemEntry<ComponentItem> HEAT_SINK = item("heat_sink", "散热片", ComponentItem::create)
-            .onRegister(attach(new CoverPlaceBehavior(GTOCovers.HEAT_SINK)))
-            .register();
-
     public static final ItemEntry<ComponentItem> STEAM_PUMP = item("steam_pump", "蒸汽泵", ComponentItem::create)
             .onRegister(attach(new TooltipBehavior(lines -> {
                 lines.add(Component.translatable("item.gtceu.electric.pump.tooltip"));

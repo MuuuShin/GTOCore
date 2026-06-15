@@ -836,9 +836,16 @@ object GTOMachineTooltips {
 
         section("通过燃烧对四周机器进行加热" translatedTo "Burning to heat up around machines")
         content("前方被阻挡后停止加热" translatedTo "Stop heating after front side is blocked.")
-        content("根据温度发出红石信号" translatedTo "Emits redstone signal according to the temperature.")
         error(("机器过热会" translatedTo "When machine is too hot, it will ") + ComponentSlang.Explosion)
         danger(ComponentSlang.BeAwareOfBurn)
+    }
+
+    // 冷却器
+    @JvmField
+    val CoolerMachineTooltips = ComponentListSupplier {
+        setTranslationPrefix("cooler_machine")
+
+        section("通过消耗水对侧面机器冷却" translatedTo "Cooling the side machine by consuming water")
     }
 
     // 电力加热器
@@ -1507,13 +1514,14 @@ object GTOMachineTooltips {
         setTranslationPrefix("primitive_distillation_tower")
 
         section("运行机制" translatedTo "Operation Mechanics")
-        info("更高的温度和更长的连续运行时间能显著加快配方速度" translatedTo "Higher temperatures and longer continuous operation significantly speed up recipes")
+        info("更高的底部温度和更长的连续运行时间能显著加快配方速度" translatedTo "Higher bottom temperatures and longer continuous operation significantly speed up recipes")
         function("最高13层，每个产物都需要一个对应高度的输出仓" translatedTo "Each fluid product requires a Fluid Hatch at a corresponding Y-level")
+        info("每层都可以不安装输出仓，但是对应层会没有产物" translatedTo "Each layer can operate without installing an output hatch, but the corresponding layer will then produce no output")
         important("只能处理MV及以下的配方" translatedTo "Can only process recipes of MV tier or lower")
 
         section("热管理机制" translatedTo "Heat Management")
-        info("需要 >400K 的热温度才能运行配方" translatedTo "Requires >400K Temperature to process recipes")
-        info("运行配方会按1UH/t速度消耗底部热量，按0.5UH/t速度产生顶部热量" translatedTo "Processing recipes will consume bottom heat at a speed of 1UH/t and generate top heat at a speed of 0.5UH/t")
+        info("需要 >400K 的温温度才能运行配方" translatedTo "Requires >400K Temperature to process recipes")
+        info("运行配方会按1HU/t速度消耗底部热量，按0.5HU/t速度产生顶部热量" translatedTo "Processing recipes will consume bottom heat at a speed of 1HU/t and generate top heat at a speed of 0.5HU/t")
     }
 
     // 化学气相沉积系统

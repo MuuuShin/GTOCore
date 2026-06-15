@@ -428,6 +428,7 @@ public final class GCYMMachines {
             .tooltipsSupplier(GTOMachineTooltipsA.AlloySmelterTooltips)
             .moduleTooltips(new PartAbility[0])
             .allRotation()
+            .upgradable()
             .recipeTypes(ALLOY_BLAST_RECIPES)
             .recipeTypes(ALLOY_SMELTER_RECIPES)
             .recipeModifier((m, u, r) -> {

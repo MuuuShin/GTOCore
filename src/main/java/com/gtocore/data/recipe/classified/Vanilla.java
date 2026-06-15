@@ -716,6 +716,11 @@ final class Vanilla {
                 "BCB",
                 "BDB",
                 'B', new MaterialEntry(TagPrefix.bolt, GTMaterials.WroughtIron), 'D', GTBlocks.STEEL_BRICKS_HULL.asItem(), 'C', new ItemStack(Blocks.FURNACE.asItem()), 'A', new MaterialEntry(TagPrefix.plate, GTMaterials.WroughtIron));
+        VanillaRecipeHelper.addShapedRecipe(GTOCore.id("cooler"), GTOMachines.COOLER.asItem(),
+                "AAA",
+                "BCB",
+                "ADA",
+                'A', new MaterialEntry(TagPrefix.plate, GTMaterials.Steel), 'B', RegistriesUtils.getItem("gtocore:normal_heat_pipe"), 'C', new MaterialEntry(TagPrefix.block, GTMaterials.Glass), 'D', GTBlocks.STEEL_BRICKS_HULL.asItem());
         VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("boiler"), GTOMachines.BOILER.asItem(),
                 "AAA",
                 "A A",

@@ -14,6 +14,7 @@ import com.gtolib.GTOCore;
 import com.gtolib.api.annotation.NewDataAttributes;
 import com.gtolib.api.machine.ManaDistributorMachine;
 import com.gtolib.api.machine.MultiblockDefinition;
+import com.gtolib.api.recipe.GTORecipeModifiers;
 import com.gtolib.utils.MultiBlockFileReader;
 import com.gtolib.utils.RLUtils;
 import com.gtolib.utils.RegistriesUtils;
@@ -64,8 +65,9 @@ public final class ManaMultiBlock {
             .tooltipsText("符文编号：", "Rune number:")
             .tooltipsSupplier(() -> Collections.singletonList(ManaAlloyBlastSmelterMachine.getRunes()))
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(16))
-            .recipeModifier(RecipeModifier.overclocking(0.5, 1, 0.5))
+            .recipeModifiers(GTORecipeModifiers.UPGRADE, GTORecipeModifiers.POWER_AMPLIFIER, RecipeModifier.overclocking(0.5, 1, 0.5))
             .recipeTypes(GTORecipeTypes.ALLOY_BLAST_RECIPES)
+            .upgradable()
             .block(GTOBlocks.MANASTEEL_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(RegistriesUtils.getBlock("botania:livingrock")))

@@ -33,6 +33,7 @@ import com.gtolib.api.annotation.component_builder.StyleBuilder;
 import com.gtolib.api.lang.CNEN;
 import com.gtolib.api.machine.MultiblockDefinition;
 import com.gtolib.api.machine.multiblock.CoilCrossRecipeMultiblockMachine;
+import com.gtolib.api.recipe.GTORecipeModifiers;
 import com.gtolib.api.recipe.RecipeType;
 import com.gtolib.utils.MultiBlockFileReader;
 import com.gtolib.utils.RegistriesUtils;
@@ -334,7 +335,7 @@ public final class MultiBlockD {
             .tooltips(GTOMachineStories.ColdIceFreezerTooltips)
             .tooltips(GTOMachineTooltips.ColdIceFreezerTooltips)
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(64))
-            .recipeModifiers(RecipeModifier.overclocking(0.5, 1, 0.5))
+            .recipeModifiers(GTORecipeModifiers.POWER_AMPLIFIER, RecipeModifier.overclocking(0.5, 1, 0.5))
             .block(GTOBlocks.COLD_ICE_CASING)
             .pattern(definition -> FactoryBlockPattern.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
                     .aisle("AAAAA", " BBB ", " BGB ", " BBB ", "AAAAA")

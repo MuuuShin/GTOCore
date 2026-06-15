@@ -32,7 +32,7 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
 
     public HeaterMachine(MetaMachineBlockEntity holder) {
         super(holder, 0, i -> 8000);
-        heatContainer = new HeatHandler(holder, MaxTemperature, 1, 0.2, 0.01);
+        heatContainer = new HeatHandler(holder, MaxTemperature, 1, 0.4, 0.01);
         heatContainer.setSideIOCondition(s -> s != getFrontFacing() && s != Direction.DOWN);
     }
 
@@ -67,7 +67,7 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
     @Override
     public void onWorking() {
         super.onWorking();
-        if (getOffsetTimer() % 20 == 0) {
+        if (getOffsetTimer() % 10 == 0) {
             heatContainer.addHeatUnrestricted(8, false);
         }
     }

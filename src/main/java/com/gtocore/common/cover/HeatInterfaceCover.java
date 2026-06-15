@@ -27,12 +27,16 @@ public final class HeatInterfaceCover extends CoverBehavior {
 
     @RegisterLanguage(cn = "最高温度：%s K", en = "Max Temperature: %s K")
     public static final String MAX_TEMPERATURE = "gtocore.machine.max_temperature";
-    @RegisterLanguage(cn = "热容：%s HU/K", en = "Heat Capacity: %s UH/K")
+    @RegisterLanguage(cn = "热容：%s HU/K", en = "Heat Capacity: %s HU/K")
     public static final String HEAT_CAPACITY = "gtocore.machine.heat_capacity";
-    @RegisterLanguage(cn = "传热速度：%s HU/t", en = "Heat Transfer Rate：%s HU/t")
-    public static final String TRANSFER_RATE = "gtocore.machine.transfer_rate";
-    @RegisterLanguage(cn = "冷却速度：%s HU/t", en = "Heat Cooldown Rate：%s HU/t")
-    public static final String COOLDOWN_RATE = "gtocore.machine.cooldown_rate";
+    @RegisterLanguage(cn = "传热速度：%s HU/tΔT", en = "Heat Transfer Rate：%s HU/t")
+    public static final String TRANSFER_RATE = "gtocore.machine.heat_transfer_rate";
+    @RegisterLanguage(cn = "自然冷却速度：%s HU/t√ΔT", en = "Natural Cooling Rate：%s HU/t")
+    public static final String COOLDOWN_RATE = "gtocore.machine.heat_cooldown_rate";
+    @RegisterLanguage(cn = "产热速度：%s HU/t", en = "Heat Generation Rate：%s HU/t")
+    public static final String GENERATION_RATE = "gtocore.machine.heat_generation_rate";
+    @RegisterLanguage(cn = "耗热速度：%s HU/t", en = "Heat Consumption Rate：%s HU/t")
+    public static final String CONSUMPTION_RATE = "gtocore.machine.heat_consumption_rate";
 
     private MetaMachine machine;
 

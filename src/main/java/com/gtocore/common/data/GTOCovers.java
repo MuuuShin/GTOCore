@@ -33,8 +33,6 @@ public final class GTOCovers {
 
     static final CoverDefinition HEAT_DETECTOR = GTCovers.register("heat_detector", HeatDetectorCover::new, new SimpleCoverRenderer(GTCEu.id("block/cover/overlay_energy_detector")));
 
-    static final CoverDefinition HEAT_SINK = GTCovers.register("heat_sink", heatSinkCover::new, new SimpleCoverRenderer(GTOCore.id("block/machines/vacuum_pump/overlay_top")));
-
     static final CoverDefinition STEAM_PUMP = GTCovers.register("steam_pump", SteamPumpCover::new, PumpCoverRenderer.INSTANCE);
 
     static final CoverDefinition ELECTRIC_PUMP_ULV = GTCovers.register(

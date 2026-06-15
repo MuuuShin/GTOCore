@@ -27,6 +27,7 @@ import com.gtolib.GTOCore;
 import com.gtolib.api.machine.MultiblockDefinition;
 import com.gtolib.api.machine.feature.multiblock.ITierCasingMachine;
 import com.gtolib.api.machine.multiblock.*;
+import com.gtolib.api.recipe.GTORecipeModifiers;
 import com.gtolib.utils.MultiBlockFileReader;
 
 import com.gregtechceu.gtceu.GTCEu;
@@ -78,8 +79,7 @@ public final class MultiBlockC {
                     .where('I', abilities(IMPORT_ITEMS))
                     .where('O', abilities(EXPORT_ITEMS))
                     .where('H', blocks(GTBlocks.CASING_STEEL_SOLID.get())
-                            .or(blocks(GTOMachines.HEAT_HATCH.get()).setExactLimit(1).setPreviewCount(1))
-                            .or(blocks(GTOMachines.HEAT_SENSOR.get()).setMaxGlobalLimited(1).setPreviewCount(1)))
+                            .or(blocks(GTOMachines.HEAT_HATCH.get()).setExactLimit(1).setPreviewCount(1)))
                     .where(' ', air())
                     .build())
             .renderer(PrimitiveDistillationRenderer::new)
@@ -523,7 +523,7 @@ public final class MultiBlockC {
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.ChemicalVaporDepositionTooltips)
             .recipeTypes(GTORecipeTypes.CHEMICAL_VAPOR_DEPOSITION_RECIPES)
-            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.log(900) / Math.log(((ICoilMachine) m).getTemperature())), RecipeModifier.OVERCLOCKING)
+            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.log(900) / Math.log(((ICoilMachine) m).getTemperature())), GTORecipeModifiers.UPGRADE_OVERCLOCK)
             .block(GTBlocks.CASING_PTFE_INERT)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get()))
@@ -547,7 +547,7 @@ public final class MultiBlockC {
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.PhysicalVaporDepositionTooltips)
             .recipeTypes(GTORecipeTypes.PHYSICAL_VAPOR_DEPOSITION_RECIPES)
-            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.sqrt(1.0D / ((ITierCasingMachine) m).getCasingTier(GTORecipeDataKeys.GLASS_TIER))), RecipeModifier.OVERCLOCKING)
+            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.sqrt(1.0D / ((ITierCasingMachine) m).getCasingTier(GTORecipeDataKeys.GLASS_TIER))), GTORecipeModifiers.UPGRADE_OVERCLOCK)
             .block(GTBlocks.PLASTCRETE)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_TUNGSTENSTEEL_ROBUST.get()))

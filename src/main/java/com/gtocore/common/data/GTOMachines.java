@@ -214,9 +214,25 @@ public final class GTOMachines {
             .tooltips(GTOMachineTooltips.HeaterMachineTooltips)
             .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 800))
             .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 1))
+            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.4))
+            .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
+            .tooltips(Component.translatable(HeatInterfaceCover.GENERATION_RATE, 0.8))
+            .renderer(() -> new HeaterRenderer(ULV))
+            .register();
+
+    public static final MachineDefinition COOLER = machine("cooler", "冷却器", CoolerMachine::new)
+            .tier(ULV)
+            .editableUI(SimpleNoEnergyMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id("cooler"), GTRecipeTypes.STEAM_TURBINE_FUELS))
+            .recipeType(GTRecipeTypes.DUMMY_RECIPES)
+            .noRecipeModifier()
+            .nonYAxisRotation()
+            .tooltips(GTOMachineTooltips.CoolerMachineTooltips)
+            .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 750))
+            .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 2))
             .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.2))
             .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
-            .renderer(() -> new HeaterRenderer(ULV))
+            .tooltips(Component.translatable(HeatInterfaceCover.CONSUMPTION_RATE, 0.4))
+            .workableTieredHullRenderer(GTOCore.id("block/machines/cooler"))
             .register();
 
     public static final MachineDefinition BOILER = machine("boiler", "外置热源锅炉", BoilWaterMachine::new)
@@ -232,6 +248,7 @@ public final class GTOMachines {
             .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 2))
             .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.6))
             .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
+            .tooltips(Component.translatable(HeatInterfaceCover.CONSUMPTION_RATE, 0.5))
             .workableTieredHullRenderer(GTCEu.id("block/generators/boiler/lava"))
             .register();
 
@@ -251,8 +268,9 @@ public final class GTOMachines {
             .tooltips(GTOMachineTooltips.ElectricHeaterMachineTooltips)
             .tooltips(Component.translatable(HeatInterfaceCover.MAX_TEMPERATURE, 1200))
             .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 2))
-            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.3))
+            .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.4))
             .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
+            .tooltips(Component.translatable(HeatInterfaceCover.GENERATION_RATE, 1.6))
             .renderer(() -> new HeaterRenderer(LV))
             .register();
 

@@ -60,16 +60,6 @@ final class AssemblerA {
                 .EUt(7)
                 .save();
 
-        ASSEMBLER_RECIPES.builder("heat_sink")
-                .inputItems(TagPrefix.plate, GTMaterials.Steel, 1)
-                .inputItems(TagPrefix.plate, GTMaterials.Copper, 2)
-                .inputItems(TagPrefix.plate, GTMaterials.Invar, 1)
-                .circuitMeta(18)
-                .outputItems(GTOItems.HEAT_SINK.asItem())
-                .duration(200)
-                .EUt(7)
-                .save();
-
         ASSEMBLER_RECIPES.builder("control_hatch")
                 .inputItems(GTMachines.HULL[GTValues.MV].asItem())
                 .inputItems(GTItems.COVER_MACHINE_CONTROLLER)

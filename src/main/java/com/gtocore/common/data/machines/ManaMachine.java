@@ -152,6 +152,7 @@ public final class ManaMachine {
             .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 0.5))
             .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 1))
             .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.02))
+            .tooltips(Component.translatable(HeatInterfaceCover.CONSUMPTION_RATE, 0.25))
             .nonYAxisRotation()
             .modelRenderer(() -> GTOCore.id("block/machine/alchemy_cauldron"))
             .blockProp(p -> p.noOcclusion().isViewBlocking((state, level, pos) -> false))
@@ -179,6 +180,7 @@ public final class ManaMachine {
             .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 4))
             .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 0.4))
             .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
+            .tooltips(Component.translatable(HeatInterfaceCover.GENERATION_RATE, 1.6))
             .renderer(() -> new ManaHeaterRenderer(MV))
             .register();
 

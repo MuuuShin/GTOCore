@@ -2,14 +2,12 @@ package com.gtocore.common.machine.multiblock.noenergy;
 
 import com.gtocore.api.machine.part.IHeatContainerPart;
 import com.gtocore.api.pattern.GTOPredicates;
-import com.gtocore.common.machine.multiblock.part.SensorPartMachine;
 
 import com.gtolib.api.machine.multiblock.NoEnergyMultiblockMachine;
 import com.gtolib.api.recipe.IdleReason;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
-import com.gregtechceu.gtceu.api.machine.ConditionalSubscriptionHandler;
 import com.gregtechceu.gtceu.api.machine.feature.IDummyEnergyMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistillationTower;
@@ -41,25 +39,15 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
     @Getter
     private final List<IFluidHandler> fluidOutputs = new ArrayList<>();
 
-    private final ConditionalSubscriptionHandler tickSubs;
-    private SensorPartMachine sensorMachine;
     private IHeatContainerPart heatMachineA;
     private IHeatContainerPart heatMachineB;
 
     public PrimitiveDistillationTowerMachine(MetaMachineBlockEntity holder) {
         super(holder);
-        tickSubs = new ConditionalSubscriptionHandler(this, this::tickUpdate, 20, this::shouldTick);
     }
 
     private boolean shouldTick() {
         return isFormed && heatMachineA != null && heatMachineB != null;
-    }
-
-    private void tickUpdate() {
-        if (sensorMachine != null && heatMachineB != null) {
-            sensorMachine.update((float) heatMachineB.getHeatContainer().getTemperature());
-        }
-        tickSubs.updateSubscription();
     }
 
     @Nullable
@@ -84,8 +72,9 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
         if (heatMachineB.getHeatContainer().removeHeatUnrestricted(1, false) == 1) {
             if (getOffsetTimer() % 2 == 0 && a < b - 100) heatMachineA.getHeatContainer().addHeatUnrestricted(1, false);
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     private double getDurationMultiplier(double temperatureA, double temperatureB) {
@@ -106,9 +95,7 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
     @Override
     public void onPartScan(IMultiPart part) {
         super.onPartScan(part);
-        if (sensorMachine == null && part instanceof SensorPartMachine sensorPartMachine) {
-            sensorMachine = sensorPartMachine;
-        } else if (part instanceof IHeatContainerPart heatContainerPart) {
+        if (part instanceof IHeatContainerPart heatContainerPart) {
             if (getMultiblockState().getMatchContext().getOrDefault(GTOPredicates.DataKeys.A, Collections.emptySet()).contains(heatContainerPart.self().getPos())) {
                 this.heatMachineA = heatContainerPart;
             } else {
@@ -126,13 +113,11 @@ public final class PrimitiveDistillationTowerMachine extends NoEnergyMultiblockM
     public void onStructureFormed() {
         super.onStructureFormed();
         addOutputs();
-        tickSubs.initialize(getLevel());
     }
 
     @Override
     public void onStructureInvalid() {
         super.onStructureInvalid();
-        sensorMachine = null;
         heatMachineA = null;
         heatMachineB = null;
         fluidOutputs.clear();
