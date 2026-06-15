@@ -61,6 +61,7 @@ public final class GTOConfig {
         if (INSTANCE.devMode.dev) Configurator.setRootLevel(Level.INFO);
         if (INSTANCE.devMode.detailedLogging) Configurator.setRootLevel(Level.DEBUG);
         int difficulty = INSTANCE.gamePlay.difficulty.ordinal() + 1;
+        ConfigHolder.GENERATE_ENERGY_NO_MATCH = difficulty == 3;
         ConfigHolder.INSTANCE.recipes.generateLowQualityGems = false;
         ConfigHolder.INSTANCE.recipes.disableManualCompression = difficulty > 1;
         ConfigHolder.INSTANCE.recipes.harderRods = difficulty == 3;

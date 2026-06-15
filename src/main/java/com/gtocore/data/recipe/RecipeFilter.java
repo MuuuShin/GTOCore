@@ -54,7 +54,7 @@ public final class RecipeFilter {
     }
 
     private static void addFilter(List<Predicate<ResourceLocation>> filters) {
-        ObjectOpenHashSet<ResourceLocation> ids = new OpenCacheHashSet<>(2048);
+        ObjectOpenHashSet<ResourceLocation> ids = new OpenCacheHashSet<>(8192, 0.25F);
         initIdFilter(ids);
         RecipeRemoval.init(ids::add);
         filters.add(ids::contains);

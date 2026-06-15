@@ -146,10 +146,9 @@ dependencies {
 
     modCompileOnly("curse.maven:open-parties-and-claims-636608:8091479")
 
-    modCompileOnly("curse.maven:sophisticated-backpacks-422301:6539219")
-    modCompileOnly("curse.maven:sophisticated-core-618298:6545102")
-    modRuntimeOnly("curse.maven:sophisticated-backpacks-422301:6539219")
-    modRuntimeOnly("curse.maven:sophisticated-core-618298:6545102")
+    modImplementation("curse.maven:sophisticated-backpacks-422301:8249823")
+    modImplementation("curse.maven:sophisticated-core-618298:8249804")
+    modImplementation("curse.maven:sophisticated-storage-619320:8249841")
     modImplementation("curse.maven:construction-wand-399558:4684054")
 
     modImplementation("curse.maven:pipez-443900:6945379")
