@@ -1133,4 +1133,8 @@ public final class GTORecipeTypes {
             .setSlotOverlay(false, false, GuiTextures.SLOT)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT)
             .setXEIVisible(false);
+
+    public static final RecipeType F1A1B = register("f1a1b", "通用", MAGIC)
+            .setMaxIOSize(0, 0, 1, 1)
+            .setSound(GTSoundEntries.FURNACE);
 }

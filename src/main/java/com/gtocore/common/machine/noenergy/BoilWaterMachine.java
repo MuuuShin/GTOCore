@@ -1,5 +1,6 @@
 package com.gtocore.common.machine.noenergy;
 
+import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.data.IdleReason;
 
 import com.gtolib.api.machine.SimpleNoEnergyMachine;
@@ -14,7 +15,6 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.handler.ICustomRecipeLogicHolder;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
-import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.material.Fluids;
@@ -39,7 +39,7 @@ public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IHe
     @Override
     @NotNull
     public GTRecipeType getRecipeType() {
-        return GTRecipeTypes.STEAM_TURBINE_FUELS;
+        return GTORecipeTypes.F1A1B;
     }
 
     @Override

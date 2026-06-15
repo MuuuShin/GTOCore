@@ -222,7 +222,7 @@ public final class GTOMachines {
 
     public static final MachineDefinition COOLER = machine("cooler", "冷却器", CoolerMachine::new)
             .tier(ULV)
-            .editableUI(SimpleNoEnergyMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id("cooler"), GTRecipeTypes.STEAM_TURBINE_FUELS))
+            .editableUI(SimpleNoEnergyMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id("cooler"), GTORecipeTypes.F1A1B))
             .recipeType(GTRecipeTypes.DUMMY_RECIPES)
             .noRecipeModifier()
             .nonYAxisRotation()
@@ -237,7 +237,7 @@ public final class GTOMachines {
 
     public static final MachineDefinition BOILER = machine("boiler", "外置热源锅炉", BoilWaterMachine::new)
             .tier(ULV)
-            .editableUI(SimpleNoEnergyMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id("boiler"), GTRecipeTypes.STEAM_TURBINE_FUELS))
+            .editableUI(SimpleNoEnergyMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id("boiler"), GTORecipeTypes.F1A1B))
             .recipeType(GTRecipeTypes.DUMMY_RECIPES)
             .noRecipeModifier()
             .nonYAxisRotation()
