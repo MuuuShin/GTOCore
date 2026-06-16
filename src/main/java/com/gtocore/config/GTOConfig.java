@@ -330,6 +330,11 @@ public final class GTOConfig {
         public boolean gtmStyleVoltageDisplay = false;
 
         @Configurable
+        @Configurable.Comment({ "启用后，AE2 合成任务完成时将发送系统桌面通知（仅支持 Windows 与 macOS）", "When enabled, a desktop notification is sent when an AE2 crafting job finishes (Windows and macOS only)" })
+        @RegisterLanguage(namePrefix = "config.gtocore.option", en = "Crafting Job Finished Notification", cn = "合成任务完成桌面通知")
+        public boolean craftingJobFinishedNotification = true;
+
+        @Configurable
         @RegisterLanguage(namePrefix = "config.gtocore.option", en = "HUD Settings", cn = "HUD 设置")
         public HUDConfig hud = new HUDConfig();
 
