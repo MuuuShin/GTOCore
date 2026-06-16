@@ -1,7 +1,7 @@
 package com.gtocore.common.machine.multiblock.part.ae.slots;
 
-import com.gtolib.api.ae2.stacks.IAEItemKey;
 import com.gtolib.api.recipe.RecipeType;
+import com.gtolib.api.recipe.lookup.IIngredientConvertible;
 import com.gtolib.utils.MathUtil;
 
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
@@ -177,7 +177,7 @@ public class ExportOnlyAEItemList extends NotifiableContentHandler implements IC
                 if (specialConverter) {
                     type.convertItem(i.getReadOnlyStack(), stock.amount(), map);
                 } else {
-                    ((IAEItemKey) (Object) itemKey).gtolib$convert(stock.amount(), map);
+                    ((IIngredientConvertible) (Object) itemKey).gtolib$convert(stock.amount(), map);
                 }
             }
         }

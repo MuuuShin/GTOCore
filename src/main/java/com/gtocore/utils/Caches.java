@@ -1,7 +1,7 @@
 package com.gtocore.utils;
 
 import com.glodblock.github.extendedae.common.me.taglist.TagPriorityList;
-import com.gto.fastcollection.cache.WeakValueCache;
+import com.gto.fastcollection.cache.WeakValueHashCache;
 
 import java.util.function.Function;
 
@@ -14,7 +14,7 @@ public final class Caches {
         return new TagPriorityList(s.a, s.b);
     };
 
-    private static final WeakValueCache<BiString, TagPriorityList> TAG_FILTER_CACHE = new WeakValueCache<>();
+    private static final WeakValueHashCache<BiString, TagPriorityList> TAG_FILTER_CACHE = new WeakValueHashCache<>();
 
     public static TagPriorityList getTagPriorityList(String white, String black) {
         return TAG_FILTER_CACHE.getCache(new BiString(white, black), FUNCTION);
