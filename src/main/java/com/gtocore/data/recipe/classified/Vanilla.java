@@ -536,6 +536,11 @@ final class Vanilla {
                 "CDC",
                 "AEA",
                 'A', new MaterialEntry(TagPrefix.plate, GTMaterials.Bronze), 'B', new MaterialEntry(TagPrefix.ring, GTMaterials.WroughtIron), 'C', new MaterialEntry(TagPrefix.spring, GTMaterials.Iron), 'D', RegistriesUtils.getItemStack("gtceu:lp_steam_forge_hammer"), 'E', new MaterialEntry(TagPrefix.plateDouble, GTMaterials.WroughtIron));
+        VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("large_steam_forge_hammer"), MultiBlockA.LARGE_STEAM_FORGE_HAMMER.asItem(),
+                "ABA",
+                "CDC",
+                "AEA",
+                'A', new MaterialEntry(TagPrefix.plateDouble, GTMaterials.Bronze), 'B', new MaterialEntry(TagPrefix.spring, GTMaterials.Steel), 'C', GTOItems.PRECISION_STEAM_MECHANISM.asItem(), 'D', MultiBlockA.STEAM_PISTON_HAMMER.asItem(), 'E', new MaterialEntry(TagPrefix.block, GTMaterials.WroughtIron));
         VanillaRecipeHelper.addShapedRecipe(GTOCore.id("shrieker"), new ItemStack(Blocks.SCULK_SHRIEKER.asItem()),
                 " A ",
                 "ABA",
