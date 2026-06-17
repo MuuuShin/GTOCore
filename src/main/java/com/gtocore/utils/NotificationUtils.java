@@ -8,6 +8,8 @@ import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
 
+import net.minecraftforge.fml.ModList;
+
 /**
  * Sends desktop notifications through the OS-native {@code gtonotify} JNI library.
  * <p>
@@ -26,7 +28,8 @@ import javax.imageio.ImageIO;
  */
 public final class NotificationUtils {
 
-    private NotificationUtils() {}
+    private NotificationUtils() {
+    }
 
     /**
      * Balloon icon shown by the OS; maps to the Windows {@code NIIF_*} flags. Ignored on macOS.
@@ -55,6 +58,7 @@ public final class NotificationUtils {
      * Classpath PNG used as the default tray icon.
      */
     public static final String DEFAULT_ICON = "assets/gtocore/textures/item/tools/iv_vajra.png";
+    private static final int MIN_ICON_SIZE = 64;
 
     private static final boolean LOADED = loadNative();
     private static long handle;
@@ -69,7 +73,8 @@ public final class NotificationUtils {
     /**
      * Decoded icon pixels in packed {@code 0xAARRGGBB} form.
      */
-    private record Icon(int[] argb, int width, int height) {}
+    private record Icon(int[] argb, int width, int height) {
+    }
 
     /**
      * Registers the persistent tray icon. Safe to call again to replace it; the previous
@@ -121,7 +126,7 @@ public final class NotificationUtils {
      *                     overrides {@code type} as a large balloon icon, on macOS it becomes the
      *                     content image
      * @return {@code true} if the native call completed, {@code false} on an unsupported platform or
-     *         any failure
+     * any failure
      */
     public static synchronized boolean notify(String title, String subtitle, String text, Type type, String iconResource) {
         if (!LOADED) return false;
@@ -153,17 +158,58 @@ public final class NotificationUtils {
         if (resource == null || resource.isEmpty()) return null;
         String path = resource.startsWith("/") ? resource : "/" + resource;
         try (InputStream in = NotificationUtils.class.getResourceAsStream(path)) {
-            if (in == null) return null;
-            BufferedImage img = ImageIO.read(in);
-            if (img == null) return null;
-            int w = img.getWidth();
-            int h = img.getHeight();
-            // getRGB always yields packed 0xAARRGGBB regardless of the source image type.
-            int[] argb = img.getRGB(0, 0, w, h, null, 0, w);
-            return new Icon(argb, w, h);
+            if (in == null) return loadModResourceIcon(resource);
+            return readIcon(in);
         } catch (Throwable t) {
             return null;
         }
+    }
+
+    private static Icon loadModResourceIcon(String resource) {
+        String normalized = resource.startsWith("/") ? resource.substring(1) : resource;
+        String[] parts = normalized.split("/");
+        if (parts.length < 3 || !"assets".equals(parts[0])) return null;
+        try {
+            var modList = ModList.get();
+            if (modList == null) return null;
+            var modFile = modList.getModFileById(parts[1]);
+            if (modFile == null) return null;
+            Path modResource = modFile.getFile().findResource(parts);
+            if (!Files.exists(modResource)) return null;
+            try (InputStream in = Files.newInputStream(modResource)) {
+                return readIcon(in);
+            }
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    private static Icon readIcon(InputStream in) throws Exception {
+        BufferedImage img = ImageIO.read(in);
+        if (img == null) return null;
+        int w = img.getWidth();
+        int h = img.getHeight();
+        // getRGB always yields packed 0xAARRGGBB regardless of the source image type.
+        int[] argb = img.getRGB(0, 0, w, h, null, 0, w);
+        return upscaleSmallIcon(new Icon(argb, w, h));
+    }
+
+    private static Icon upscaleSmallIcon(Icon icon) {
+        int max = Math.max(icon.width(), icon.height());
+        if (max >= MIN_ICON_SIZE) return icon;
+        int scale = (MIN_ICON_SIZE + max - 1) / max;
+        int w = icon.width();
+        int h = icon.height();
+        int scaledW = w * scale;
+        int scaledH = h * scale;
+        int[] scaled = new int[scaledW * scaledH];
+        for (int y = 0; y < scaledH; y++) {
+            int srcY = y / scale;
+            for (int x = 0; x < scaledW; x++) {
+                scaled[y * scaledW + x] = icon.argb()[srcY * w + x / scale];
+            }
+        }
+        return new Icon(scaled, scaledW, scaledH);
     }
 
     private static String safe(String s) {
