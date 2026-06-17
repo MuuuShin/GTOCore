@@ -38,8 +38,6 @@ public final class HeatInterfaceCover extends CoverBehavior {
     @RegisterLanguage(cn = "耗热速度：%s HU/t", en = "Heat Consumption Rate：%s HU/t")
     public static final String CONSUMPTION_RATE = "gtocore.machine.heat_consumption_rate";
 
-    private MetaMachine machine;
-
     @SaveToDisk
     private final HeatHandler handler;
 
@@ -49,7 +47,7 @@ public final class HeatInterfaceCover extends CoverBehavior {
         handler = new HeatHandler(coverHolder.holder(), 400L + (400L * tier), tier, tier, 0.01);
         handler.setSideIOCondition(s -> s == attachedSide);
         handler.addChangedListener(() -> {
-            if (machine instanceof IRecipeLogicMachine recipeLogicMachine) {
+            if (MetaMachine.getMachine(coverHolder.holder()) instanceof IRecipeLogicMachine recipeLogicMachine) {
                 recipeLogicMachine.getRecipeLogic().updateTickSubscription();
             }
         });
@@ -65,7 +63,7 @@ public final class HeatInterfaceCover extends CoverBehavior {
 
     @Override
     public boolean canAttach() {
-        return super.canAttach() && (machine = MetaMachine.getMachine(coverHolder.holder())) != null && machine.holder.getGTCapability(IHeatContainer.class, null) == null;
+        return super.canAttach() && MetaMachine.getMachine(coverHolder.holder()) != null && coverHolder.holder().getGTCapability(IHeatContainer.class, null) == null;
     }
 
     @Override

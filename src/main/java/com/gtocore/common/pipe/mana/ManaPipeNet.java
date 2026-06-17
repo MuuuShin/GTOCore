@@ -3,27 +3,29 @@ package com.gtocore.common.pipe.mana;
 import com.gregtechceu.gtceu.api.pipenet.LevelPipeNet;
 import com.gregtechceu.gtceu.api.pipenet.Node;
 import com.gregtechceu.gtceu.api.pipenet.PipeNet;
+import com.gregtechceu.gtceu.utils.collection.LoopIterator;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public final class ManaPipeNet extends PipeNet<ManaPipeProperties> {
 
-    private final Long2ObjectOpenHashMap<ManaRoutePath> netData = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<LoopIterator<ManaRoutePath>> netData = new Long2ObjectOpenHashMap<>();
 
     public ManaPipeNet(LevelPipeNet<ManaPipeProperties, ? extends PipeNet<ManaPipeProperties>> world) {
         super(world);
     }
 
-    @Nullable
-    public ManaRoutePath getNetData(long pipePos, BlockPos pos) {
+    @NotNull
+    public LoopIterator<ManaRoutePath> getNetData(long pipePos, BlockPos pos) {
         var path = netData.get(pipePos);
         if (path != null) return path;
-        path = ManaNetWalker.createNetData(this, pos);
-        if (path == null) return null;
+        var paths = ManaNetWalker.createNetData(this, pos);
+        if (paths == null) return LoopIterator.EMPTY;
+        path = new LoopIterator<>(paths.toArray(new ManaRoutePath[0]));
         netData.put(pipePos, path);
         return path;
     }

@@ -16,6 +16,7 @@ import vazkii.botania.api.mana.ManaReceiver;
 
 public final class ManaRoutePath implements IRoutePath<ManaReceiver> {
 
+    @Getter
     private final ManaPipeBlockEntity targetPipe;
     private final Direction targetFacing;
     @Getter

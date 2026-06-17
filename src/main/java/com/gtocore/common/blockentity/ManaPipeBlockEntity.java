@@ -2,15 +2,16 @@ package com.gtocore.common.blockentity;
 
 import com.gtocore.common.pipe.mana.*;
 
+import com.gtolib.utils.MathUtil;
+
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
+import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.utils.GTUtil;
-import com.gregtechceu.gtceu.utils.LazyOptionalUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -35,22 +36,10 @@ public final class ManaPipeBlockEntity extends PipeBlockEntity<ManaPipeType, Man
     }
 
     @Override
-    public void setConnection(@NotNull Direction side, boolean connected, boolean fromNeighbor) {
-        if (!getLevel().isClientSide && connected && !fromNeighbor) {
-            if (getNumConnections() >= 2) return;
-            BlockEntity tile = getLevel().getBlockEntity(getPipePos().relative(side));
-            if (tile instanceof PipeBlockEntity<?, ?> pipeTile && pipeTile.getPipeType().getClass() == this.getPipeType().getClass()) {
-                if (pipeTile.getNumConnections() >= 2) return;
-            }
-        }
-        super.setConnection(side, connected, fromNeighbor);
-    }
-
-    @Override
     @NotNull
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == BotaniaForgeCapabilities.MANA_RECEIVER) {
-            if ((side == null || isConnected(side)) && !level.isClientSide && getManaPipeNet() != null) {
+            if ((side == null || isConnected(side)) && getManaPipeNet() != null) {
                 return BotaniaForgeCapabilities.MANA_RECEIVER.orEmpty(cap, LazyOptional.of(() -> this));
             }
             return LazyOptional.empty();
@@ -72,20 +61,26 @@ public final class ManaPipeBlockEntity extends PipeBlockEntity<ManaPipeType, Man
     }
 
     @Override
+    protected void updateNetworkConnection(@NotNull Direction side, boolean connected) {
+        super.updateNetworkConnection(side, connected);
+        this.updateTransferTick(this.blockedSide != null && this.isBlocked(this.blockedSide), this::autoTransfer);
+    }
+
+    @Override
     public void onNeighborChanged() {
         super.onNeighborChanged();
         updateTransferTick(blockedSide != null && isBlocked(blockedSide), this::autoTransfer);
     }
 
     private void autoTransfer() {
-        if (getManaReceiver() == null) return;
+        if (getManaPipeNet() == null) return;
         boolean hasHandler = false;
         autoTransfer = true;
         for (var facing : GTUtil.DIRECTIONS) {
             if (facing != blockedSide && isConnected(facing)) {
                 var be = getNeighborBlockEntity(facing);
                 if (be == null || be instanceof PipeBlockEntity<?, ?>) continue;
-                if (LazyOptionalUtil.get(be.getCapability(BotaniaForgeCapabilities.MANA_RECEIVER, facing.getOpposite())) instanceof ManaPool pool) {
+                if (GTCapabilityHelper.getBlockEntityCapability(BotaniaForgeCapabilities.MANA_RECEIVER, be, facing.getOpposite()) instanceof ManaPool pool) {
                     hasHandler = true;
                     var self = this;
                     var manaInPool = pool.getCurrentMana();
@@ -117,15 +112,6 @@ public final class ManaPipeBlockEntity extends PipeBlockEntity<ManaPipeType, Man
         return currentPipeNet;
     }
 
-    @Nullable
-    private ManaReceiver getManaReceiver() {
-        var net = getManaPipeNet();
-        if (net == null || remove) return null;
-        var inv = net.getNetData(longPos, worldPosition);
-        if (inv == null) return null;
-        return inv.getHandler(level);
-    }
-
     @Override
     public void onClientDisplayTick() {}
 
@@ -146,40 +132,78 @@ public final class ManaPipeBlockEntity extends PipeBlockEntity<ManaPipeType, Man
 
     @Override
     public int getCurrentMana() {
-        var handler = getManaReceiver();
-        if (handler == null) return 0;
-        return handler.getCurrentMana();
+        var net = getManaPipeNet();
+        if (net == null) return 0;
+        long mana = 0;
+        for (var path : net.getNetData(longPos, worldPosition)) {
+            if (this.autoTransfer && path.getTargetPipe() == this && this.blockedSide != path.getTargetFacing()) continue;
+            var handler = path.getHandler(level);
+            if (handler == null) continue;
+            mana += handler.getCurrentMana();
+        }
+        return MathUtil.saturatedCast(mana);
     }
 
     @Override
     public boolean isFull() {
-        var handler = getManaReceiver();
-        if (handler == null) return true;
-        return handler.isFull();
+        var net = getManaPipeNet();
+        if (net == null) return true;
+        for (var path : net.getNetData(longPos, worldPosition)) {
+            if (this.autoTransfer && path.getTargetPipe() == this && this.blockedSide != path.getTargetFacing()) continue;
+            var handler = path.getHandler(level);
+            if (handler == null) continue;
+            if (!handler.isFull()) return false;
+        }
+        return true;
     }
 
     @Override
     public void receiveMana(int mana) {
-        var handler = getManaReceiver();
-        if (handler == null) return;
-        handler.receiveMana(mana);
+        if (mana > 0) {
+            var net = getManaPipeNet();
+            if (net == null) return;
+            for (var path : net.getNetData(longPos, worldPosition)) {
+                if (this.autoTransfer && path.getTargetPipe() == this && this.blockedSide != path.getTargetFacing()) continue;
+                var handler = path.getHandler(level);
+                if (handler == null || handler.isFull() || !handler.canReceiveManaFromBursts()) continue;
+                var canReceive = Math.min(mana, getMaxMana(handler) - handler.getCurrentMana());
+                if (canReceive > 0) {
+                    handler.receiveMana(canReceive);
+                    mana -= canReceive;
+                    if (mana <= 0) break;
+                }
+            }
+        }
     }
 
     @Override
     public boolean canReceiveManaFromBursts() {
-        var handler = getManaReceiver();
-        if (handler == null) return false;
-        return handler.canReceiveManaFromBursts();
+        var net = getManaPipeNet();
+        if (net == null) return false;
+        for (var path : net.getNetData(longPos, worldPosition)) {
+            if (this.autoTransfer && path.getTargetPipe() == this && this.blockedSide != path.getTargetFacing()) continue;
+            var handler = path.getHandler(level);
+            if (handler == null) continue;
+            if (handler.canReceiveManaFromBursts()) return true;
+        }
+        return false;
     }
 
     @Override
     public int getMaxMana() {
-        return getMaxMana(getManaReceiver());
+        var net = getManaPipeNet();
+        if (net == null) return 0;
+        long mana = 0;
+        for (var path : net.getNetData(longPos, worldPosition)) {
+            if (this.autoTransfer && path.getTargetPipe() == this && this.blockedSide != path.getTargetFacing()) continue;
+            mana += getMaxMana(path.getHandler(level));
+        }
+        return MathUtil.saturatedCast(mana);
     }
 
     private static int getMaxMana(@Nullable ManaReceiver receiver) {
         if (receiver instanceof ManaCollector collector) return collector.getMaxMana();
         if (receiver instanceof ManaPool pool) return pool.getMaxMana();
-        return receiver == null ? 0 : 1000000;
+        return receiver == null ? 0 : Integer.MAX_VALUE;
     }
 }
