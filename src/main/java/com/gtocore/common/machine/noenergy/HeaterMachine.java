@@ -56,12 +56,21 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        updateEnabled();
+    }
+
+    @Override
     public void onNeighborChanged(@NotNull Block block, @NotNull BlockPos fromPos, boolean isMoving) {
         super.onNeighborChanged(block, fromPos, isMoving);
+        updateEnabled();
+    }
+
+    private void updateEnabled() {
         Level level = getLevel();
         if (level == null) return;
-        var enabled = level.getBlockState(getPos().relative(getFrontFacing())).isAir();
-        setEnabled(enabled);
+        setEnabled(level.getBlockState(getPos().relative(getFrontFacing())).isAir());
     }
 
     @Override

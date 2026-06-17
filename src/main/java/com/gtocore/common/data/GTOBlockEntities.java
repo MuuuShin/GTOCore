@@ -18,6 +18,6 @@ public class GTOBlockEntities {
 
     public static final BlockEntityEntry<ManaPipeBlockEntity> MANA_PIPE = GTO
             .blockEntity("mana_pipe", ManaPipeBlockEntity::new)
-            .validBlocks(GTOBlocks.HEAT_PIPES)
+            .validBlocks(GTOBlocks.MANA_PIPES)
             .register();
 }
