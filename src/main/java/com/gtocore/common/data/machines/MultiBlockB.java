@@ -10,6 +10,7 @@ import com.gtocore.common.data.GTOMaterials;
 import com.gtocore.common.data.GTORecipeDataKeys;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
+import com.gtocore.common.machine.multiblock.electric.DigestionTankMachine;
 import com.gtocore.common.machine.multiblock.electric.nano.NanoPhagocytosisPlantMachine;
 import com.gtocore.common.machine.multiblock.electric.space.SuperSpaceElevatorMachine;
 import com.gtocore.common.machine.multiblock.water.*;
@@ -50,7 +51,7 @@ public final class MultiBlockB {
 
     public static void init() {}
 
-    public static final MultiblockMachineDefinition DIGESTION_TANK = multiblock("digestion_tank", "煮解池", CoilMultiblockMachine.createCoilMachine(false, true))
+    public static final MultiblockMachineDefinition DIGESTION_TANK = multiblock("digestion_tank", "煮解池", DigestionTankMachine::new)
             .nonYAxisRotation()
             .tooltips(GTOMachineStories.DigestionTankTooltips)
             .parallelizableTooltips()
@@ -70,7 +71,8 @@ public final class MultiBlockB {
                     .where('A', air())
                     .where('#', any())
                     .build())
-            .workableCasingRenderer(GTCEu.id("block/casings/solid/machine_casing_robust_tungstensteel"), GTCEu.id("block/multiblock/gcym/large_maceration_tower"))
+            .renderer(FluidRenderer.create(GTCEu.id("block/casings/solid/machine_casing_robust_tungstensteel"), GTCEu.id("block/multiblock/gcym/large_maceration_tower")))
+            .hasTESR(true)
             .register();
 
     public static final MultiblockMachineDefinition WOOD_DISTILLATION = multiblock("wood_distillation", "木化工厂", CoilCrossRecipeMultiblockMachine::createCoilParallel)
