@@ -38,6 +38,18 @@ public class AlchemyCauldron extends SimpleManaMachine implements IHeatContainer
         heatContainer.addChangedListener(getRecipeLogic()::updateTickSubscription);
     }
 
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        heatContainer.onLoad();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        heatContainer.onUnLoad();
+    }
+
     @Nullable
     @Override
     public GTRecipe doModifyRecipe(RecipeHandlerUnit unit, @NotNull GTRecipe recipe) {

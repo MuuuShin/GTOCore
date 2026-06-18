@@ -37,6 +37,18 @@ public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IHe
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        heatContainer.onLoad();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        heatContainer.onUnLoad();
+    }
+
+    @Override
     @NotNull
     public GTRecipeType getRecipeType() {
         return GTORecipeTypes.F1A1B;

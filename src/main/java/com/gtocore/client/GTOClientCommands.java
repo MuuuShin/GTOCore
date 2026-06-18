@@ -12,11 +12,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import appeng.core.localization.GuiText;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import appeng.core.localization.GuiText;
 import org.embeddedt.modernfix.spark.SparkLaunchProfiler;
 
 @OnlyIn(Dist.CLIENT)
@@ -36,10 +37,10 @@ public final class GTOClientCommands {
                             ClientCache.machineNotFormedHighlight = true;
                             return 1;
                         })).then(
-                        Commands.literal("off").executes((ctx) -> {
-                            ClientCache.machineNotFormedHighlight = false;
-                            return 1;
-                        })))
+                                Commands.literal("off").executes((ctx) -> {
+                                    ClientCache.machineNotFormedHighlight = false;
+                                    return 1;
+                                })))
                 .then(Commands.literal("notify")
                         .then(Commands.literal("test").executes(ctx -> sendNotification(ctx, "GTO Notification Test", "Runtime notification test", NotificationUtils.Type.INFO, NotificationUtils.DEFAULT_ICON)))
                         .then(Commands.literal("ae2").executes(ctx -> sendNotification(ctx, GuiText.ToastCraftingJobFinishedTitle.text().getString(), "Test AE2 Crafting Job", NotificationUtils.Type.INFO, "assets/ae2/textures/block/controller.png")))

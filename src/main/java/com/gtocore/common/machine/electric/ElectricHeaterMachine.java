@@ -48,6 +48,18 @@ public final class ElectricHeaterMachine extends WorkableTieredMachine implement
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        heatContainer.onLoad();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        heatContainer.onUnLoad();
+    }
+
+    @Override
     public @Nullable <T> Object getGTCapability(@NotNull Class<T> cap, @Nullable Direction side) {
         if (cap == IHeatContainer.class) {
             if (testHeatCapability(side)) return heatContainer;

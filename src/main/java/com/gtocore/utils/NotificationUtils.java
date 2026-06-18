@@ -1,5 +1,7 @@
 package com.gtocore.utils;
 
+import net.minecraftforge.fml.ModList;
+
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -7,8 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
-
-import net.minecraftforge.fml.ModList;
 
 /**
  * Sends desktop notifications through the OS-native {@code gtonotify} JNI library.
@@ -28,8 +28,7 @@ import net.minecraftforge.fml.ModList;
  */
 public final class NotificationUtils {
 
-    private NotificationUtils() {
-    }
+    private NotificationUtils() {}
 
     /**
      * Balloon icon shown by the OS; maps to the Windows {@code NIIF_*} flags. Ignored on macOS.
@@ -73,8 +72,7 @@ public final class NotificationUtils {
     /**
      * Decoded icon pixels in packed {@code 0xAARRGGBB} form.
      */
-    private record Icon(int[] argb, int width, int height) {
-    }
+    private record Icon(int[] argb, int width, int height) {}
 
     /**
      * Registers the persistent tray icon. Safe to call again to replace it; the previous
@@ -126,7 +124,7 @@ public final class NotificationUtils {
      *                     overrides {@code type} as a large balloon icon, on macOS it becomes the
      *                     content image
      * @return {@code true} if the native call completed, {@code false} on an unsupported platform or
-     * any failure
+     *         any failure
      */
     public static synchronized boolean notify(String title, String subtitle, String text, Type type, String iconResource) {
         if (!LOADED) return false;

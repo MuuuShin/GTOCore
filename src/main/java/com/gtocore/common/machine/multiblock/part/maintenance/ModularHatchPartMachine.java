@@ -111,6 +111,18 @@ public class ModularHatchPartMachine extends ACMHatchPartMachine implements IMod
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        heatContainer.onLoad();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        heatContainer.onUnLoad();
+    }
+
+    @Override
     public int getCurrentGravity() {
         return gravityMode ? currentGravity : 1;
     }

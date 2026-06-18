@@ -28,4 +28,16 @@ public class HeatHatchPartMachine extends MultiblockPartMachine implements IHeat
             }
         });
     }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        heatContainer.onLoad();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        heatContainer.onUnLoad();
+    }
 }

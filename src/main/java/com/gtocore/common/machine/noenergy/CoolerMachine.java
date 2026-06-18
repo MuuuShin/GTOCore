@@ -40,6 +40,18 @@ public final class CoolerMachine extends SimpleNoEnergyMachine implements IHeatC
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        heatContainer.onLoad();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        heatContainer.onUnLoad();
+    }
+
+    @Override
     @NotNull
     public GTRecipeType getRecipeType() {
         return GTORecipeTypes.F1A1B;

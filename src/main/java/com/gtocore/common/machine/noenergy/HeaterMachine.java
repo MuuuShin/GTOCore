@@ -37,6 +37,19 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        heatContainer.onLoad();
+        updateEnabled();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        heatContainer.onUnLoad();
+    }
+
+    @Override
     @NotNull
     public GTRecipeType getRecipeType() {
         return GTRecipeTypes.STEAM_BOILER_RECIPES;
@@ -53,12 +66,6 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
     private void setEnabled(boolean isWorkingAllowed) {
         if (!isWorkingAllowed) getRecipeLogic().interruptRecipe();
         super.setWorkingEnabled(isWorkingAllowed);
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        updateEnabled();
     }
 
     @Override

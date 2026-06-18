@@ -45,6 +45,18 @@ public class ManaHeaterMachine extends SimpleManaMachine implements IHeatContain
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        heatContainer.onLoad();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        heatContainer.onUnLoad();
+    }
+
+    @Override
     @NotNull
     public GTRecipeType getRecipeType() {
         return GTORecipeTypes.MANA_HEATER_RECIPES;

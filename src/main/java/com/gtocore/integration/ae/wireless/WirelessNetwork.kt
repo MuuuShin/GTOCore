@@ -108,11 +108,8 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
             WirelessMachine.NodeType.CHILD -> {
                 outputNodes.add(node)
                 val pathingService: IPathingService? = node.mainNode?.grid?.pathingService
-                if (pathingService?.channelMode === ChannelMode.INFINITE) {
-                    connectionAvailableInput(node)
-                } else {
-                    needsRefresh = true
-                }
+                if (pathingService?.channelMode === ChannelMode.INFINITE && connectionAvailableInput(node)) return
+                needsRefresh = true
             }
         }
     }
@@ -143,12 +140,13 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
         nodeInfoTable.remove(node)
     }
 
-    fun connectionAvailableInput(output: WirelessMachine) {
+    fun connectionAvailableInput(output: WirelessMachine): Boolean {
         for (input in inputNodes) {
             if (isNodeValid(input) && connections.getInt(input) < maxOutputsPerInput) {
-                if (createConnection(input, output)) return
+                if (createConnection(input, output)) return true
             }
         }
+        return false
     }
 
     fun createConnection(input: WirelessMachine, output: WirelessMachine): Boolean {
