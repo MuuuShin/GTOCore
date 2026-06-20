@@ -7,6 +7,7 @@ import com.gtocore.client.forge.GTORender;
 import com.gtocore.client.hud.AdAstraHUD;
 import com.gtocore.client.hud.WirelessEnergyHUD;
 import com.gtocore.client.hud.attribute.PlayerAttrHUD;
+import com.gtocore.client.renderer.GTORenderTypes;
 import com.gtocore.client.renderer.item.MonitorItemDecorations;
 import com.gtocore.common.CommonProxy;
 import com.gtocore.common.data.GTOAEParts;
@@ -48,6 +49,7 @@ import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterItemDecorationsEvent;
+import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -84,6 +86,7 @@ public final class ClientProxy extends CommonProxy {
         eventBus.addListener(ClientProxy::registerGeometryLoaders);
         eventBus.addListener(ClientProxy::registerMenuScreen);
         eventBus.addListener(ClientProxy::registerItemColors);
+        eventBus.addListener(ClientProxy::registerShaders);
         eventBus.register(GTOComponentRegistry.class);
         MinecraftForge.EVENT_BUS.register(ForgeClientEvent.class);
         MinecraftForge.EVENT_BUS.register(GTOComponentHandler.class);
@@ -190,6 +193,17 @@ public final class ClientProxy extends CommonProxy {
 
     private static void registerGeometryLoaders(ModelEvent.RegisterGeometryLoaders event) {
         event.register("y_layered", YLayeredModelLoader.INSTANCE);
+    }
+
+    private static void registerShaders(RegisterShadersEvent event) {
+        try {
+            event.registerShader(new net.minecraft.client.renderer.ShaderInstance(
+                    event.getResourceProvider(),
+                    GTORenderTypes.blackHoleEventHorizonShaderLocation(),
+                    com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR), GTORenderTypes::setBlackHoleEventHorizonShader);
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Failed to register black hole shader", e);
+        }
     }
 
     private static void registerAEModels() {

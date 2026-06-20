@@ -7,6 +7,7 @@ import com.gtocore.common.data.*;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
 import com.gtocore.common.machine.multiblock.electric.FastNeutronBreederReactor;
+import com.gtocore.common.machine.multiblock.electric.KerrNewmanHomogenizer;
 import com.gtocore.common.machine.multiblock.electric.space.MegaSpaceElevatorModuleMachine;
 import com.gtocore.common.machine.multiblock.electric.space.SpaceElevatorModuleMachine;
 import com.gtocore.common.machine.multiblock.steam.LargeSteamSolarBoilerMachine;
@@ -464,7 +465,7 @@ public final class MultiBlockH {
             .workableCasingRenderer(GTOCore.id("block/casings/iridium_casing"), GTCEu.id("block/multiblock/fusion_reactor"))
             .register();
 
-    public static final MultiblockMachineDefinition KERR_NEWMAN_HOMOGENIZER = multiblock("kerr_newman_homogenizer", "克尔-纽曼均质仪", CrossRecipeMultiblockMachine::createHatchParallel)
+    public static final MultiblockMachineDefinition KERR_NEWMAN_HOMOGENIZER = multiblock("kerr_newman_homogenizer", "克尔-纽曼均质仪", KerrNewmanHomogenizer::new)
             .nonYAxisRotation()
             .tooltips(GTOMachineStories.KerrNewmanHomogenizerTooltips)
             .parallelizableTooltips()

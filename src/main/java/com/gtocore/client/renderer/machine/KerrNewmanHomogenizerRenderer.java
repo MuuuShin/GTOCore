@@ -69,7 +69,6 @@ public final class KerrNewmanHomogenizerRenderer extends WorkableCasingMachineRe
         alignToDirection(poseStack, back, up);
 
         VertexConsumer light = buffer.getBuffer(GTORenderTypes.LIGHT_TRIANGLES);
-        renderSphere(poseStack, light, 4.5F, 24, 12, 0.0F, 0.0F, 0.0F, 0.95F);
 
         float rotation = tick * 1.2F;
         poseStack.mulPose(new Quaternionf().fromAxisAngleDeg(1.0F, 1.0F, 1.0F, rotation));
