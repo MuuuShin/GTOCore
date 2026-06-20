@@ -37,8 +37,8 @@ public class KerrNewmanHomogenizer extends CrossRecipeMultiblockMachine {
     }
 
     @Override
-    public void onStructureInvalid() {
-        super.onStructureInvalid();
+    public void onStructureInvalidClient() {
+        super.onStructureInvalidClient();
         fxActive = false;
     }
 
