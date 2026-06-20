@@ -34,7 +34,10 @@ public final class DysonSphereReceivingStationMcahine extends ElectricMultiblock
     }
 
     private ResourceKey<Level> getDimension() {
-        if (dimension == null) dimension = Objects.requireNonNull(getLevel()).dimension();
+        if (dimension == null) {
+            var currentDimension = Objects.requireNonNull(getLevel()).dimension();
+            dimension = GTODimensions.isOverworld(currentDimension) ? Level.OVERWORLD : currentDimension;
+        }
         return dimension;
     }
 
