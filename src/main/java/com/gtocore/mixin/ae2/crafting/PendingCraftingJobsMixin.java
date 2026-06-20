@@ -6,6 +6,7 @@ import com.gtocore.utils.NotificationUtils;
 import com.gtolib.utils.GTOUtils;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
@@ -25,7 +26,7 @@ public class PendingCraftingJobsMixin {
 
     @Inject(method = "jobStatus", at = @At(value = "INVOKE", target = "Lappeng/core/AEConfig;isNotifyForFinishedCraftingJobs()Z"), remap = false)
     private static void notify(UUID id, AEKey what, long requestedAmount, long remainingAmount, CraftingJobStatusPacket.Status status, CallbackInfo ci) {
-        if (!GTOConfig.INSTANCE.client.craftingJobFinishedNotification) return;
+        if (!GTOConfig.INSTANCE.client.craftingJobFinishedNotification || Minecraft.getInstance().isWindowActive()) return;
         GTOUtils.asyncExecute(() -> NotificationUtils.notify(
                 GuiText.ToastCraftingJobFinishedTitle.text().getString(),
                 null,
