@@ -807,12 +807,12 @@ public final class MultiBlockH {
             .register();
 
     // 雾化冷凝器
-    public static final MultiblockMachineDefinition ATOMIZING_CONDENSER = multiblock("atomizing_condenser", "雾化冷凝器", TierCasingParallelMultiblockMachine.createParallel(m -> (4L * (m.getCasingTier(GTORecipeDataKeys.HERMETIC_CASING_TIER))), false, GTORecipeDataKeys.HERMETIC_CASING_TIER))
+    public static final MultiblockMachineDefinition ATOMIZING_CONDENSER = multiblock("atomizing_condenser", "雾化冷凝器", TierCasingParallelMultiblockMachine.createParallel(m -> (4L * (m.getCasingTier(GTORecipeDataKeys.HERMETIC_CASING_TIER))), true, GTORecipeDataKeys.HERMETIC_CASING_TIER))
             .nonYAxisRotation()
             .specialParallelizableTooltips()
             .tooltips(GTOMachineStories.atomizingCondenserTooltips)
             .recipeTypes(GTORecipeTypes.ATOMIZATION_CONDENSATION_RECIPES)
-            .recipeModifier(GTORecipeModifiers.UPGRADE_GCYM_OVERCLOCKING)
+            .recipeModifier(GTORecipeModifiers.UPGRADE_OVERCLOCK)
             .block(GTBlocks.CASING_ALUMINIUM_FROSTPROOF)
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(h -> h.addLines("(密封机械方块等级)×4", "(Hermetic Mechanical Casing tier)×4")))
             .pattern(definition -> MultiBlockFileReader.start(definition)
