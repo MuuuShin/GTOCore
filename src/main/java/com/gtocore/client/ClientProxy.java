@@ -9,6 +9,7 @@ import com.gtocore.client.hud.WirelessEnergyHUD;
 import com.gtocore.client.hud.attribute.PlayerAttrHUD;
 import com.gtocore.client.renderer.GTORenderTypes;
 import com.gtocore.client.renderer.item.MonitorItemDecorations;
+import com.gtocore.client.renderer.item.model.ShaderItemModelLoader;
 import com.gtocore.common.CommonProxy;
 import com.gtocore.common.data.GTOAEParts;
 import com.gtocore.common.data.GTOFluids;
@@ -193,17 +194,27 @@ public final class ClientProxy extends CommonProxy {
 
     private static void registerGeometryLoaders(ModelEvent.RegisterGeometryLoaders event) {
         event.register("y_layered", YLayeredModelLoader.INSTANCE);
+        event.register("custom_shader", ShaderItemModelLoader.INSTANCE);
     }
 
     private static void registerShaders(RegisterShadersEvent event) {
         try {
             event.registerShader(new net.minecraft.client.renderer.ShaderInstance(
                     event.getResourceProvider(),
-                    GTORenderTypes.blackHoleEventHorizonShaderLocation(),
+                    GTORenderTypes.BLACK_HOLE_EVENT_HORIZON_SHADER_LOCATION,
                     com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR), GTORenderTypes::setBlackHoleEventHorizonShader);
+            registerCustomItemShader(event, GTORenderTypes.CRUPTIX);
+            registerCustomItemShader(event, GTORenderTypes.ITEM_RESONANCE_WAVE);
         } catch (java.io.IOException e) {
-            throw new RuntimeException("Failed to register black hole shader", e);
+            throw new RuntimeException("Failed to register client shaders", e);
         }
+    }
+
+    private static void registerCustomItemShader(RegisterShadersEvent event, net.minecraft.resources.ResourceLocation shaderLocation) throws java.io.IOException {
+        event.registerShader(new net.minecraft.client.renderer.ShaderInstance(
+                event.getResourceProvider(),
+                shaderLocation,
+                com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX), shader -> GTORenderTypes.setShader(shaderLocation, shader));
     }
 
     private static void registerAEModels() {

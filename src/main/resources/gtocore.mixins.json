@@ -29,6 +29,7 @@
     "inventoryessentials.ClientOnlyInventoryControlsMixin",
     "mc.GameRendererMixin",
     "mc.GuiGraphicsMixin",
+    "mc.ItemRendererMixin",
     "mc.OpenContainerMixin",
     "merequester.NumberFieldMixin",
     "sodium.SodiumWorldRendererMixin"
@@ -142,6 +143,7 @@
     "deeperdarker.DDItemsMixin",
     "endremastered.EREnderEyeMixin",
     "farmersdelight.CuttingBoardBlockEntityMixin",
+    "forge.ModelBuilderMixin",
     "ftbq.FTBQuestsCommandsMixin",
     "ftbq.ItemRewardMixin",
     "ftbq.QuestMixin",
