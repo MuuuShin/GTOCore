@@ -421,7 +421,7 @@ public final class LangHandler {
         addCNEN("gtocore.ae.appeng.craft.pause_job.desc", "暂停正在进行中的发配；已推送的样板不会被撤回", "Pause the ongoing crafting; pushed patterns will not be withdrawn");
         addCNEN("gtocore.ae.appeng.craft.resume_job.desc", "继续已暂停的发配", "Resume the paused crafting");
         addCNEN("gtocore.ae.appeng.craft.temp_order", "中键点击以创建临时合成订单，下单一份该配方的原材料", "Middle-click: order one set of materials for this recipe");
-        addCNEN("gtocore.ae.appeng.craft.encode_send", "§o[右键点击] 编码并发送样板§r", "§o[Right Click] Encode and send pattern§r");
+        addCNEN("gtocore.ae.appeng.craft.encode_send", "§a§o[右键点击] 编码并发送样板§r", "§a§o[Right Click] Encode and send pattern§r");
         addCNEN("gtocore.ae.appeng.craft.encode_send.desc", "点击将样板发送至该目的地", "Click to send the pattern to this destination");
         addCNEN("gtocore.ae.appeng.craft.encode_send.full", "满", "Full");
         addCNEN("gtocore.ae.appeng.craft.encode_send.full.desc", "该目的地样板槽已满", "This destination has no empty pattern slot");

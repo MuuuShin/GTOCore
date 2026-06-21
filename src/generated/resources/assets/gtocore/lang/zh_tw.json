@@ -2331,7 +2331,7 @@
   "gtocore.adv_terminal.setting_already_existed": "存在已有設置",
   "gtocore.ae.appeng.craft.add_missing_to_emi": "收藏缺失",
   "gtocore.ae.appeng.craft.add_missing_to_emi.desc": "將缺失的物品添加到EMI書籤頁",
-  "gtocore.ae.appeng.craft.encode_send": "§o[右鍵點擊] 編碼併發送樣板§r",
+  "gtocore.ae.appeng.craft.encode_send": "§a§o[右鍵點擊] 編碼併發送樣板§r",
   "gtocore.ae.appeng.craft.encode_send.desc": "點擊將樣板發送至該目的地",
   "gtocore.ae.appeng.craft.encode_send.full": "滿",
   "gtocore.ae.appeng.craft.encode_send.full.desc": "該目的地樣板槽已滿",

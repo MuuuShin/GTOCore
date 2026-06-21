@@ -2203,7 +2203,7 @@
   "gtocore.adv_terminal.setting_already_existed": "Setting Already Existed",
   "gtocore.ae.appeng.craft.add_missing_to_emi": "Bookmark Missing",
   "gtocore.ae.appeng.craft.add_missing_to_emi.desc": "Add missing items to EMI bookmark page",
-  "gtocore.ae.appeng.craft.encode_send": "§o[Right Click] Encode and send pattern§r",
+  "gtocore.ae.appeng.craft.encode_send": "§a§o[Right Click] Encode and send pattern§r",
   "gtocore.ae.appeng.craft.encode_send.desc": "Click to send the pattern to this destination",
   "gtocore.ae.appeng.craft.encode_send.full": "Full",
   "gtocore.ae.appeng.craft.encode_send.full.desc": "This destination has no empty pattern slot",
