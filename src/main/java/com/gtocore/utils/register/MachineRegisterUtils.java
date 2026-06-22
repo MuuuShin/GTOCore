@@ -149,10 +149,10 @@ public final class MachineRegisterUtils {
     }
 
     public static MachineDefinition[] registerSimpleGenerator(String name, String cn, GTRecipeType recipeType, Int2IntFunction tankScalingFunction, int... tiers) {
-        return registerTieredMachines(name, tier -> "%s%s %s".formatted(GTOValues.VLVHCN[tier], cn, VLVT[tier]),
+        return registerTieredMachines(name, tier -> "%s%s%s".formatted(GTOValues.VLVHCN[tier], cn, VLVT[tier]),
                 (holder, tier) -> new SimpleGeneratorMachine(holder, tier, 0.1F * tier, tankScalingFunction),
                 (tier, builder) -> builder
-                        .langValue("%s %s %s".formatted(VLVH[tier], FormattingUtil.toEnglishName(name), VLVT[tier]))
+                        .langValue("%s %s%s".formatted(VLVH[tier], FormattingUtil.toEnglishName(name), VLVT[tier]))
                         .editableUI(SimpleGeneratorMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id(name), recipeType))
                         .allRotation()
                         .recipeType(recipeType)
@@ -168,10 +168,10 @@ public final class MachineRegisterUtils {
     }
 
     public static MachineDefinition[] registerRocketSimpleGenerator(String name, String cn, GTRecipeType recipeType, Int2IntFunction tankScalingFunction, int... tiers) {
-        return registerTieredMachines(name, tier -> "%s%s %s".formatted(GTOValues.VLVHCN[tier], cn, VLVT[tier]),
+        return registerTieredMachines(name, tier -> "%s%s%s".formatted(GTOValues.VLVHCN[tier], cn, VLVT[tier]),
                 (holder, tier) -> new SimpleGeneratorMachine(holder, tier, 0.1F * tier, tankScalingFunction),
                 (tier, builder) -> builder
-                        .langValue("%s %s %s".formatted(VLVH[tier], FormattingUtil.toEnglishName(name), VLVT[tier]))
+                        .langValue("%s %s%s".formatted(VLVH[tier], FormattingUtil.toEnglishName(name), VLVT[tier]))
                         .editableUI(SimpleGeneratorMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id(name), recipeType))
                         .allRotation()
                         .workableInSpace()
@@ -203,11 +203,11 @@ public final class MachineRegisterUtils {
                                                              GTRecipeType recipeType,
                                                              Int2IntFunction tankScalingFunction,
                                                              ResourceLocation workableModel, int... tiers) {
-        return registerTieredMachines(name, tier -> "%s%s %s".formatted(GTOValues.VLVHCN[tier], cn, VLVT[tier]),
+        return registerTieredMachines(name, tier -> "%s%s%s".formatted(GTOValues.VLVHCN[tier], cn, VLVT[tier]),
                 (holder, tier) -> new SimpleTieredMachine(holder, tier, tankScalingFunction), (tier, builder) -> {
                     builder.recipeModifier(GTORecipeModifiers.UPGRADE_OVERCLOCK);
                     return builder
-                            .langValue("%s %s %s".formatted(VLVH[tier], FormattingUtil.toEnglishName(name), VLVT[tier]))
+                            .langValue("%s %s%s".formatted(VLVH[tier], FormattingUtil.toEnglishName(name), VLVT[tier]))
                             .editableUI(SimpleTieredMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id(name), recipeType))
                             .nonYAxisRotation()
                             .recipeType(recipeType)
@@ -230,9 +230,9 @@ public final class MachineRegisterUtils {
                                                                       GTRecipeType recipeType,
                                                                       Int2IntFunction tankScalingFunction,
                                                                       ResourceLocation workableModel, int... tiers) {
-        return registerTieredMachines(name, tier -> "%s%s %s".formatted(GTOValues.VLVHCN[tier], cn, VLVT[tier]),
+        return registerTieredMachines(name, tier -> "%s%s%s".formatted(GTOValues.VLVHCN[tier], cn, VLVT[tier]),
                 (holder, tier) -> new SimpleNoEnergyMachine(holder, tier, tankScalingFunction), (tier, builder) -> builder
-                        .langValue("%s %s %s".formatted(VLVH[tier], FormattingUtil.toEnglishName(name), VLVT[tier]))
+                        .langValue("%s %s%s".formatted(VLVH[tier], FormattingUtil.toEnglishName(name), VLVT[tier]))
                         .editableUI(SimpleNoEnergyMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id(name), recipeType))
                         .nonYAxisRotation()
                         .recipeType(recipeType)

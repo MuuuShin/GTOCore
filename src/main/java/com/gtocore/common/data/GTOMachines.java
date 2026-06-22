@@ -156,9 +156,9 @@ public final class GTOMachines {
     public static final MachineDefinition[] ULV_UNPACKER = registerSimpleMachines("unpacker", "解包机", GTORecipeTypes.UNPACKER_RECIPES, GTMachineUtils.defaultTankSizeFunction, ULV);
     public static final MachineDefinition[] ULV_LOOM = registerSimpleMachines("loom", "织布机", GTORecipeTypes.LOOM_RECIPES, GTMachineUtils.defaultTankSizeFunction, ULV);
 
-    public static final MachineDefinition[] VACUUM_PUMP = registerTieredMachines("vacuum_pump", tier -> "%s真空泵 %s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]), VacuumPumpMachine::new,
+    public static final MachineDefinition[] VACUUM_PUMP = registerTieredMachines("vacuum_pump", tier -> "%s真空泵%s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]), VacuumPumpMachine::new,
             (tier, builder) -> builder
-                    .langValue("%s Vacuum Pump %s".formatted(VLVH[tier], VLVT[tier]))
+                    .langValue("%s Vacuum Pump%s".formatted(VLVH[tier], VLVT[tier]))
                     .nonYAxisRotation()
                     .editableUI(SimpleTieredMachine.EDITABLE_UI_CREATOR.apply(GTCEu.id("vacuum_pump"), GTORecipeTypes.VACUUM_PUMP_RECIPES))
                     .recipeType(GTORecipeTypes.VACUUM_PUMP_RECIPES)
@@ -169,10 +169,10 @@ public final class GTOMachines {
                     .register(),
             LV, MV, HV);
     public static final MachineDefinition[] LIGHTNING_ROD = registerTieredMachines(
-            "lightning_rod", tier -> "%s避雷针 %s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]),
+            "lightning_rod", tier -> "%s避雷针%s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]),
             LightningRodMachine::new,
             (tier, builder) -> builder
-                    .langValue("%s Lightning Rod %s".formatted(VLVH[tier], VLVT[tier]))
+                    .langValue("%s Lightning Rod%s".formatted(VLVH[tier], VLVT[tier]))
                     .nonYAxisRotation()
                     .renderer(() -> new SimpleGeneratorMachineRenderer(tier, GTOCore.id("block/generators/lightning_rod")))
                     .tooltips(Component.translatable("gtocore.machine.lightning_rod.tooltip.0"))
@@ -188,10 +188,10 @@ public final class GTOMachines {
             EV, IV, LuV);
 
     public static final MachineDefinition[] WIND_MILL_TURBINE = registerTieredMachines(
-            "wind_mill_turbine", tier -> "%s风力发电机 %s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]),
+            "wind_mill_turbine", tier -> "%s风力发电机%s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]),
             WindMillTurbineMachine::new,
             (tier, builder) -> builder
-                    .langValue("%s Wind Mill Turbine %s".formatted(VLVH[tier], VLVT[tier]))
+                    .langValue("%s Wind Mill Turbine%s".formatted(VLVH[tier], VLVT[tier]))
                     .nonYAxisRotation()
                     .renderer(() -> new WindMillTurbineRenderer(tier))
                     .addTooltipsFromClass(WindMillTurbineMachine.class)
@@ -1027,9 +1027,9 @@ public final class GTOMachines {
                     .register(),
             GTValues.tiersBetween(1, 8));
 
-    public static final MachineDefinition[] DIGITAL_MINER = registerTieredMachines("digital_miner", tier -> "%s数字型采矿机 %s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]), SingleDigitalMiner::new,
+    public static final MachineDefinition[] DIGITAL_MINER = registerTieredMachines("digital_miner", tier -> "%s数字型采矿机%s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]), SingleDigitalMiner::new,
             (tier, builder) -> builder
-                    .langValue("%s DIGITAL_MINER %s".formatted(VLVH[tier], VLVT[tier]))
+                    .langValue("%s DIGITAL_MINER%s".formatted(VLVH[tier], VLVT[tier]))
                     .nonYAxisRotation()
                     .recipeType(GTORecipeTypes.DIGITAL_MINER_RECIPE)
                     .workableTieredHullRenderer(GTCEu.id("block/machines/miner"))

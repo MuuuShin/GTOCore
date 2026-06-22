@@ -54,10 +54,10 @@ public final class ManaMachine {
     public static final MachineDefinition[] MANA_ASSEMBLER = registerSimpleManaMachines("mana_assembler", "魔力组装机", GTRecipeTypes.ASSEMBLER_RECIPES, GTMachineUtils.defaultTankSizeFunction, GTCEu.id("block/machines/assembler"), MANA_TIERS);
 
     public static final MachineDefinition[] PRIMITIVE_MAGIC_ENERGY = registerTieredManaMachines(
-            "primitive_magic_energy", tier -> "%s原始魔法能源吸收器 %s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]),
+            "primitive_magic_energy", tier -> "%s原始魔法能源吸收器%s".formatted(GTOValues.VLVHCN[tier], VLVT[tier]),
             MagicEnergyMachine::new,
             (tier, builder) -> builder
-                    .langValue("%s Primitive Magic Energy %s".formatted(VLVH[tier], VLVT[tier]))
+                    .langValue("%s Primitive Magic Energy%s".formatted(VLVH[tier], VLVT[tier]))
                     .nonYAxisRotation()
                     .renderer(() -> new SimpleGeneratorMachineRenderer(tier,
                             GTOCore.id("block/generators/primitive_magic_energy")))
