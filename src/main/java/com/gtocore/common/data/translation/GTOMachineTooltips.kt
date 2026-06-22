@@ -1537,7 +1537,7 @@ object GTOMachineTooltips {
 
         section(ComponentSlang.EfficiencyBonus)
         content("线圈温度越高，运行速度越快" translatedTo "Higher coil temperature → faster operation")
-        info("时间倍率: log(900) / log(温度)" translatedTo "Time Multiplier: log(900) / log(Temperature)")
+        info("时间倍率: 0.8x0.4^((线圈温度-5400)/9000)" translatedTo "Time Multiplier: 0.8x0.4^((Temperature-5400)/9000)")
         section(ComponentSlang.ParallelBonus)
         content("由电压等级决定" translatedTo "Determined by Voltage Tier")
         info("公式 : 4^(电压等级 - 1)" translatedTo "Formula: 4^(Voltage Tier - 1)")

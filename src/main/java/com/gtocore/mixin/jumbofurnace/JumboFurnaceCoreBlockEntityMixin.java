@@ -36,12 +36,12 @@ public abstract class JumboFurnaceCoreBlockEntityMixin {
      * (Fuel-slot container return is handled separately in consumeFuel() and is unaffected.)
      */
     @Redirect(
-            method = "craft",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/crafting/Recipe;getRemainingItems(Lnet/minecraft/world/Container;)Lnet/minecraft/core/NonNullList;",
-                    remap = true),
-            remap = false)
+              method = "craft",
+              at = @At(
+                       value = "INVOKE",
+                       target = "Lnet/minecraft/world/item/crafting/Recipe;getRemainingItems(Lnet/minecraft/world/Container;)Lnet/minecraft/core/NonNullList;",
+                       remap = true),
+              remap = false)
     private NonNullList<ItemStack> gtocore$noSmeltingInputRefund(Recipe<?> recipe, Container inv) {
         return NonNullList.create();
     }

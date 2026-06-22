@@ -3111,7 +3111,7 @@
   "gtocore.lang.chemical_factory.1.406619192": "The chairman holds an electron microscope, attempting to unravel the secrets of elements",
   "gtocore.lang.chemical_factory.2.1210434775": "But his subordinates know he's just posing for the camera",
   "gtocore.lang.chemical_vapor_deposition.1.-313104118": "Higher coil temperature → faster operation",
-  "gtocore.lang.chemical_vapor_deposition.2.-1925517796": "Time Multiplier: log(900) / log(Temperature)",
+  "gtocore.lang.chemical_vapor_deposition.2.1722661780": "Time Multiplier: 0.8x0.4^((Temperature-5400)/9000)",
   "gtocore.lang.chemical_vapor_deposition.4.-1330067650": "Determined by Voltage Tier",
   "gtocore.lang.chemical_vapor_deposition.5.3538389": "Formula: 4^(Voltage Tier - 1)",
   "gtocore.lang.circuit_assembly_line.0.1744020393": "Precision circuit manufacturing system designed by GTO Universe GregTech's top engineers",

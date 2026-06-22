@@ -520,7 +520,7 @@ public final class MultiBlockC {
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.ChemicalVaporDepositionTooltips)
             .recipeTypes(GTORecipeTypes.CHEMICAL_VAPOR_DEPOSITION_RECIPES)
-            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.log(900) / Math.log(((ICoilMachine) m).getTemperature())), GTORecipeModifiers.UPGRADE_OVERCLOCK)
+            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.max(0.2, 0.8 * Math.pow(0.4, (((ICoilMachine) m).getTemperature() - 5400D) / 9000D))), GTORecipeModifiers.UPGRADE_OVERCLOCK)
             .block(GTBlocks.CASING_PTFE_INERT)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get()))
@@ -535,7 +535,7 @@ public final class MultiBlockC {
                     .where('H', controller(definition))
                     .where(' ', any())
                     .build())
-            .additionalDisplay((controller, components) -> components.add(Component.translatable("gtocore.machine.duration_multiplier.tooltip", Component.literal(FormattingUtil.formatNumbers(Math.log(900) / Math.log(((ICoilMachine) controller).getTemperature()))))))
+            .additionalDisplay((controller, components) -> components.add(Component.translatable("gtocore.machine.duration_multiplier.tooltip", Component.literal(FormattingUtil.formatNumbers(Math.max(0.2, 0.8 * Math.pow(0.4, (((ICoilMachine) controller).getTemperature() - 5400D) / 9000D)))))))
             .workableCasingRenderer(GTCEu.id("block/casings/solid/machine_casing_inert_ptfe"), GTCEu.id("block/multiblock/gcym/large_chemical_bath"))
             .register();
 
