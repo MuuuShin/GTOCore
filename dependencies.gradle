@@ -10,7 +10,7 @@ dependencies {
     implementation("com.github.houbb:opencc4j:1.14.0")//用来datagen繁中的
 
 
-    if (project.publishingBuild == "true"){
+    if (findProperty('publishingBuild') == "true") {
         jarJar(modImplementation("com.gto:gtolib-forge-1.20.1:$project.gtolib_version"))
         jarJar(implementation("dev:fastcollection:1.2"))
         // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
@@ -25,7 +25,7 @@ dependencies {
         modImplementation("appeng:appliedenergistics2-forge:${project.ae2_version}")
         modImplementation("com.gregtechceu.gtceu:gtceu-1.20.1-forge-1.20.1:$project.gtceu_version")
         modImplementation("dev:gtmthings:1.5.5-GTO-Port")
-        modImplementation("dev:gtolib:1.0-debug")
+        modImplementation("com.gto:gtolib-forge-1.20.1:$project.gtolib_version")
     }
 
 

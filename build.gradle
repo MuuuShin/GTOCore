@@ -111,7 +111,7 @@ afterEvaluate {
     tasks.register("signJar") {
         doLast {
             def destDir = "$buildDir/libs"
-            def originalJar = "${buildDir}/libs/${mod_id}-${version}.jar"
+            def originalJar = "${buildDir}/libs/${mod_id}-forge-1.20.1-${version}.jar"
             mkdir(destDir)
             ant.signjar(
                     jar: originalJar,
