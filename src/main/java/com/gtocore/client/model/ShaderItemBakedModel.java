@@ -1,11 +1,11 @@
-package com.gtocore.client.renderer.item.model;
+package com.gtocore.client.model;
 
+import com.gtocore.client.model.ShaderItemModelLoader.UniformValue;
 import com.gtocore.client.renderer.GTORenderTypes;
-import com.gtocore.client.renderer.item.model.ShaderItemModelLoader.UniformValue;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -15,19 +15,18 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 import com.mojang.blaze3d.shaders.AbstractUniform;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Matrix4f;
 
 import java.util.Map;
 
 public class ShaderItemBakedModel extends WrappedItemModel {
 
-    private static final float OVERLAY_Z = 0.533F;
+    private static final float ITEM_FRONT_Z = 8.5F / 16.0F;
+    private static final float ITEM_BACK_Z = 7.5F / 16.0F;
+    private static final float OVERLAY_Z_OFFSET = 0.001F;
 
     private final ResourceLocation maskSprite;
     private final ResourceLocation shaderLocation;
@@ -55,37 +54,22 @@ public class ShaderItemBakedModel extends WrappedItemModel {
 
         var minecraft = Minecraft.getInstance();
         TextureAtlasSprite maskAtlasSprite = minecraft.getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(maskSprite);
+        RenderType overlayRenderType = GTORenderTypes.getItemShaderOverlay(shaderLocation);
 
         applyParams(shader, maskAtlasSprite);
 
-        poseStack.pushPose();
-        poseStack.translate(0.0F, 0.0F, OVERLAY_Z);
         float overlayPadding = getOverlayPadding();
         float min = -overlayPadding;
         float max = 1.0F + overlayPadding;
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableCull();
-        RenderSystem.depthMask(false);
-        RenderSystem.setShader(() -> shader);
-        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-
-        var tesselator = Tesselator.getInstance();
-        BufferBuilder builder = tesselator.getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        MultiBufferSource.BufferSource overlayBuffer = MultiBufferSource.immediate(new BufferBuilder(256));
+        VertexConsumer consumer = overlayBuffer.getBuffer(overlayRenderType);
         Matrix4f matrix = poseStack.last().pose();
-        builder.vertex(matrix, max, max, 0.0F).uv(1.0F, 0.0F).endVertex();
-        builder.vertex(matrix, min, max, 0.0F).uv(0.0F, 0.0F).endVertex();
-        builder.vertex(matrix, min, min, 0.0F).uv(0.0F, 1.0F).endVertex();
-        builder.vertex(matrix, max, min, 0.0F).uv(1.0F, 1.0F).endVertex();
-        tesselator.end();
-
-        RenderSystem.depthMask(true);
-        RenderSystem.enableCull();
-        RenderSystem.disableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        poseStack.popPose();
+        // Vanilla generated items have distinct front/back faces, so the shader overlay
+        // needs to be drawn on both sides instead of only the front plane.
+        renderOverlayQuad(consumer, matrix, min, max, ITEM_FRONT_Z + OVERLAY_Z_OFFSET);
+        renderOverlayQuad(consumer, matrix, min, max, ITEM_BACK_Z - OVERLAY_Z_OFFSET);
+        overlayBuffer.endBatch(overlayRenderType);
     }
 
     @Override
@@ -143,5 +127,14 @@ public class ShaderItemBakedModel extends WrappedItemModel {
             case 4 -> uniform.set(values[0], values[1], values[2], values[3]);
             default -> uniform.set(values);
         }
+    }
+
+    private static void renderOverlayQuad(VertexConsumer consumer, Matrix4f matrix, float min, float max, float z) {
+        float minU = 0.0F;
+        float maxU = 1.0F;
+        consumer.vertex(matrix, max, max, z).uv(maxU, 0.0F).endVertex();
+        consumer.vertex(matrix, min, max, z).uv(minU, 0.0F).endVertex();
+        consumer.vertex(matrix, min, min, z).uv(minU, 1.0F).endVertex();
+        consumer.vertex(matrix, max, min, z).uv(maxU, 1.0F).endVertex();
     }
 }

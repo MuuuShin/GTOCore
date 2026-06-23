@@ -1,6 +1,6 @@
 package com.gtocore.mixin.mc;
 
-import com.gtocore.client.renderer.item.model.PerspectiveModel;
+import com.gtocore.client.model.PerspectiveModel;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;

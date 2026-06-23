@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -20,6 +21,7 @@ public final class GTORenderTypes extends RenderType {
 
     private static ShaderInstance blackHoleEventHorizonShader;
     private static final Map<ResourceLocation, ShaderInstance> SHADERS = new ConcurrentHashMap<>();
+    private static final Map<ResourceLocation, RenderType> ITEM_SHADER_OVERLAYS = new ConcurrentHashMap<>();
 
     private static final ShaderStateShard BLACK_HOLE_EVENT_HORIZON_SHADER = new ShaderStateShard(() -> Objects.requireNonNull(blackHoleEventHorizonShader, "Black hole shader not loaded"));
 
@@ -88,5 +90,24 @@ public final class GTORenderTypes extends RenderType {
     @OnlyIn(Dist.CLIENT)
     public static ShaderInstance getShader(ResourceLocation shaderLocation) {
         return SHADERS.get(shaderLocation);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static RenderType getItemShaderOverlay(ResourceLocation shaderLocation) {
+        return ITEM_SHADER_OVERLAYS.computeIfAbsent(shaderLocation, GTORenderTypes::createItemShaderOverlay);
+    }
+
+    private static RenderType createItemShaderOverlay(ResourceLocation shaderLocation) {
+        ShaderStateShard shaderState = new ShaderStateShard(() -> Objects.requireNonNull(SHADERS.get(shaderLocation), "Shader not loaded: " + shaderLocation));
+        CompositeState state = RenderType.CompositeState.builder()
+                .setShaderState(shaderState)
+                .setTextureState(new TextureStateShard(InventoryMenu.BLOCK_ATLAS, false, false))
+                .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                .setCullState(NO_CULL)
+                .setOutputState(ITEM_ENTITY_TARGET)
+                .setWriteMaskState(COLOR_WRITE)
+                .createCompositeState(true);
+        String renderTypeName = "gto_shader_item_overlay_" + shaderLocation.toString().replace(':', '_').replace('/', '_');
+        return RenderType.create(renderTypeName, DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS, 256, true, true, state);
     }
 }

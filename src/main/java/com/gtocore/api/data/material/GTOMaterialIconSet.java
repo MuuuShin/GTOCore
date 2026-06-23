@@ -1,7 +1,7 @@
 package com.gtocore.api.data.material;
 
+import com.gtocore.client.model.ShaderItemModelBuilder;
 import com.gtocore.client.renderer.item.*;
-import com.gtocore.client.renderer.item.model.ShaderItemModelBuilder;
 
 import com.gtolib.GTOCore;
 import com.gtolib.utils.RLUtils;

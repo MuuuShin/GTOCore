@@ -1,4 +1,4 @@
-package com.gtocore.client.renderer.item.model;
+package com.gtocore.client.model;
 
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.world.item.ItemDisplayContext;

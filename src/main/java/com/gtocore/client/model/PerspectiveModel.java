@@ -1,4 +1,4 @@
-package com.gtocore.client.renderer.item.model;
+package com.gtocore.client.model;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
