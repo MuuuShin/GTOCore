@@ -40,7 +40,6 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
     public void onLoad() {
         super.onLoad();
         heatContainer.onLoad();
-        updateEnabled();
     }
 
     @Override
