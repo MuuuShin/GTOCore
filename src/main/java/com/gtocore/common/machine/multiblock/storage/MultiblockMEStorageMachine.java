@@ -171,7 +171,7 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
         int interiorHeight = height - 1;
         int interiorDepth = depth - 1;
         long cells = (long) interiorWidth * interiorHeight * interiorDepth;
-        return cells * 400 * (type == null ? 8 : type.getAmountPerByte()) * (getMultiblockState().getMatchContext().getOrDefault(GTORecipeDataKeys.HERMETIC_CASING_TIER, 0) + 1);
+        return cells * 100 * (type == null ? 8 : type.getAmountPerByte()) * (getMultiblockState().getMatchContext().getOrDefault(GTORecipeDataKeys.HERMETIC_CASING_TIER, 0) + 1);
     }
 
     @Override

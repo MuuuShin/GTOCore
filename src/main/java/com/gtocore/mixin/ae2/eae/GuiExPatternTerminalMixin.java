@@ -158,7 +158,8 @@ public abstract class GuiExPatternTerminalMixin<T extends ContainerExPatternTerm
               method = "drawFG",
               at = @At(
                        value = "INVOKE",
-                       target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;IIIZ)I"),
+                       target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;IIIZ)I",
+                       remap = true),
               remap = false)
     private int gto$drawScrollingGroupName(GuiGraphics guiGraphics, Font font, FormattedCharSequence originalText,
                                            int x, int y, int color, boolean shadow) {
