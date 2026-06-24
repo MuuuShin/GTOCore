@@ -436,6 +436,15 @@ public final class GTOConfig {
         public boolean sendMultiblockErrorMessages = true;
 
         @Configurable
+        @Configurable.Comment({
+                "样板供应器/样板总成显示名称格式。可用占位符：%m 机器名，%t 等级，%s 自定义后缀，%r 配方类型（仅多配方类型机器），%R 配方类型（始终显示）。移除占位符即可隐藏对应部分。",
+                "Pattern Provider/Pattern Assembly display name format. Placeholders: %m machine name, %t tier, %s custom suffix, %r recipe type (multi-recipe machines only), %R recipe type (always). Remove a placeholder to hide that part."
+        })
+        @RegisterLanguage(namePrefix = "config.gtocore.option", en = "Pattern Container Name Format", cn = "样板容器名称格式")
+        @Configurable.Gui.CharacterLimit(256)
+        public String patternContainerNameFormat = "%m %t %s %r";
+
+        @Configurable
         @Configurable.Comment({ "一些机器内容会以服务器语言的翻译呈现", "Some machine contents will be presented in the server language translation" })
         @RegisterLanguage(namePrefix = "config.gtocore.option", en = "Server language", cn = "服务器语言")
         public String serverLang = "en_us";

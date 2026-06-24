@@ -1,5 +1,6 @@
 package com.gtocore.common.data.machines;
 
+import appeng.api.stacks.AEKeyType;
 import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.client.renderer.machine.ArrayMachineRenderer;
@@ -17,10 +18,7 @@ import com.gtocore.common.machine.multiblock.electric.space.SatelliteControlCent
 import com.gtocore.common.machine.multiblock.electric.voidseries.VoidTransporterMachine;
 import com.gtocore.common.machine.multiblock.noenergy.AlgaeFarmMachine;
 import com.gtocore.common.machine.multiblock.noenergy.LargeCokeOvenMachine;
-import com.gtocore.common.machine.multiblock.storage.MEStorageMachine;
-import com.gtocore.common.machine.multiblock.storage.MultiblockCrateMachine;
-import com.gtocore.common.machine.multiblock.storage.WirelessDimensionRepeaterMachine;
-import com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine;
+import com.gtocore.common.machine.multiblock.storage.*;
 
 import com.gtolib.GTOCore;
 import com.gtolib.api.GTOValues;
@@ -812,8 +810,21 @@ public final class MultiBlockG {
             .allRotation()
             .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
             .block(GTBlocks.STEEL_HULL)
-            .tooltips(GTOMachineTooltips.MultiblockCrateMachineTooltips)
+            .tooltips(GTOMachineTooltips.deprecatedStructureTooltips)
             .pattern(definition -> MultiBlockFileReader.start(definition)
+                    .where('a', blocks(GTBlocks.STEEL_HULL.get()))
+                    .where('i', controller(definition))
+                    .where('c', air())
+                    .build())
+            .workableCasingRenderer(GTCEu.id("block/casings/steam/steel/side"), GTCEu.id("block/multiblock/multiblock_tank"))
+            .register();
+
+    public static final MultiblockMachineDefinition ITEM_VAULT = multiblock("item_vault", "物品保险库", h->new MultiblockMEStorageMachine(h, AEKeyType.items()))
+            .allRotation()
+            .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
+            .block(GTBlocks.STEEL_HULL)
+            .tooltips(GTOMachineTooltips.ItemVaultTooltips)
+            .pattern(definition -> MultiBlockFileReader.start(definition, "multiblock_crate")
                     .where('a', blocks(GTBlocks.STEEL_HULL.get()))
                     .where('i', controller(definition))
                     .where('c', air())

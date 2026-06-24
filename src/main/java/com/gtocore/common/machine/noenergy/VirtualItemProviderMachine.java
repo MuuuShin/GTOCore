@@ -79,20 +79,20 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
         inventory.addChangedListener(() -> {
             change = true;
             storage.getStoredMap().clear();
-            storage.getStoredMap().addTo(EMPTY_STACK, IParallelMachine.MAX_PARALLEL << 6);
+            storage.getStoredMap().insert(EMPTY_STACK, IParallelMachine.MAX_PARALLEL << 6);
             for (var i = 0; i < inventory.storage.size; i++) {
                 var stack = inventory.storage.stacks[i];
                 if (stack.isEmpty()) continue;
                 if (stack.getItem() == VIRTUAL_ITEM_PROVIDER.asItem() && stack.hasTag()) {
                     stack = stack.copyWithCount(1);
                     stack.getOrCreateTag().putBoolean("marked", true);
-                    storage.getStoredMap().addTo(AEItemKey.of(stack), IParallelMachine.MAX_PARALLEL);
+                    storage.getStoredMap().insert(AEItemKey.of(stack), IParallelMachine.MAX_PARALLEL);
                 } else {
                     int count = stack.getCount();
                     stack = VirtualItemProviderBehavior.setVirtualItem(new ItemStack(VIRTUAL_ITEM_PROVIDER.asItem()), stack);
                     stack = stack.copyWithCount(1);
                     stack.getOrCreateTag().putBoolean("marked", true);
-                    storage.getStoredMap().addTo(AEItemKey.of(stack), IParallelMachine.MAX_PARALLEL * count);
+                    storage.getStoredMap().insert(AEItemKey.of(stack), IParallelMachine.MAX_PARALLEL * count);
                 }
 
             }
@@ -207,7 +207,7 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
     @Override
     public void getAvailableStacks(KeyCounter out) {
         var map = storage.getStoredMap();
-        out.addAll(map.size(), m -> map.fastForEach(m::addTo));
+        out.addAll(map.size(), m -> map.fastForEach(m::insert));
     }
 
     @Override

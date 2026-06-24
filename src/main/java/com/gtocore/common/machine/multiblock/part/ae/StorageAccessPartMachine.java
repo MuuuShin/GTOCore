@@ -275,7 +275,7 @@ public abstract class StorageAccessPartMachine extends AmountConfigurationPartMa
             if (data == CellDataStorage.EMPTY) return;
             var map = data.getStoredMap();
             if (map == null) return;
-            out.addAll(map.size(), m -> map.fastForEach(m::addTo));
+            out.addAll(map.size(), m -> map.fastForEach(m::insert));
         }
 
         @Override
@@ -572,7 +572,7 @@ public abstract class StorageAccessPartMachine extends AmountConfigurationPartMa
             if (data == BigCellDataStorage.EMPTY) return;
             var map = data.getStoredMap();
             if (map == null) return;
-            out.addAll(map.size(), m -> map.reference2ReferenceEntrySet().fastForEach(e -> m.addTo(e.getKey(), BigIntegerUtils.getLongValue(e.getValue()))));
+            out.addAll(map.size(), m -> map.reference2ReferenceEntrySet().fastForEach(e -> m.insert(e.getKey(), BigIntegerUtils.getLongValue(e.getValue()))));
         }
 
         @Override

@@ -190,7 +190,7 @@ public final class InternalSlotRecipeHandler {
 
         @Override
         public boolean forEachItems(ObjLongPredicate<ItemStack> function) {
-            for (var it = slot.itemInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
+            for (var it = slot.itemInventory.iterator(); it.hasNext();) {
                 var e = it.next();
                 var a = e.getLongValue();
                 if (a < 1) {
@@ -204,16 +204,15 @@ public final class InternalSlotRecipeHandler {
 
         @Override
         public void fastForEachItems(ObjLongConsumer<ItemStack> function) {
-            slot.itemInventory.reference2LongEntrySet().fastForEach(e -> {
-                var a = e.getLongValue();
-                if (a < 1) return;
-                function.accept(e.getKey().getReadOnlyStack(), a);
+            slot.itemInventory.fastForEach((k, v) -> {
+                if (v < 1) return;
+                function.accept(k.getReadOnlyStack(), v);
             });
         }
 
         @Override
         public boolean forEachFluids(ObjLongPredicate<FluidStack> function) {
-            for (var it = slot.fluidInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
+            for (var it = slot.fluidInventory.iterator(); it.hasNext();) {
                 var e = it.next();
                 var a = e.getLongValue();
                 if (a < 1) {
@@ -227,10 +226,9 @@ public final class InternalSlotRecipeHandler {
 
         @Override
         public void fastForEachFluids(ObjLongConsumer<FluidStack> function) {
-            slot.fluidInventory.reference2LongEntrySet().fastForEach(e -> {
-                var a = e.getLongValue();
-                if (a < 1) return;
-                function.accept(e.getKey().getReadOnlyStack(), a);
+            slot.fluidInventory.fastForEach((k, v) -> {
+                if (v < 1) return;
+                function.accept(k.getReadOnlyStack(), v);
             });
         }
 
@@ -238,15 +236,13 @@ public final class InternalSlotRecipeHandler {
         public IntLongMap getSearchMap(@NotNull GTRecipeType type) {
             if (slot.isContentsChanged()) {
                 slot.ingredientMap.clear();
-                slot.fluidInventory.reference2LongEntrySet().fastForEach(e -> {
-                    var a = e.getLongValue();
-                    if (a < 1) return;
-                    ((IIngredientConvertible) (Object) e.getKey()).gtolib$convert(a, slot.ingredientMap);
+                slot.fluidInventory.fastForEach((k, v) -> {
+                    if (v < 1) return;
+                    ((IIngredientConvertible) (Object) k).gtolib$convert(v, slot.ingredientMap);
                 });
-                slot.itemInventory.reference2LongEntrySet().fastForEach(e -> {
-                    var a = e.getLongValue();
-                    if (a < 1) return;
-                    ((IIngredientConvertible) (Object) e.getKey()).gtolib$convert(a, slot.ingredientMap);
+                slot.itemInventory.fastForEach((k, v) -> {
+                    if (v < 1) return;
+                    ((IIngredientConvertible) (Object) k).gtolib$convert(v, slot.ingredientMap);
                 });
             }
             return slot.ingredientMap;

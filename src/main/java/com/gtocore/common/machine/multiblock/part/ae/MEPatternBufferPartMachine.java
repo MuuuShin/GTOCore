@@ -4,6 +4,7 @@ import com.gtocore.api.gui.configurators.MultiMachineModeFancyConfigurator;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.data.machines.GTAEMachines;
 import com.gtocore.common.machine.trait.InternalSlotRecipeHandler;
+import com.gtocore.integration.ae.PatternContainerGroupHelper;
 
 import com.gtolib.api.ae2.MyPatternDetailsHelper;
 import com.gtolib.api.annotation.DataGeneratorScanned;
@@ -12,7 +13,6 @@ import com.gtolib.api.machine.trait.NotifiableNotConsumableFluidHandler;
 import com.gtolib.api.machine.trait.NotifiableNotConsumableItemHandler;
 import com.gtolib.api.recipe.RecipeBuilder;
 import com.gtolib.api.recipe.RecipeType;
-import com.gtolib.utils.GTOUtils;
 import com.gtolib.utils.RLUtils;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
@@ -20,7 +20,6 @@ import com.gregtechceu.gtceu.api.capability.IWailaDisplayProvider;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.gui.fancy.TabsWidget;
-import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.ButtonConfigurator;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.FancyInvConfigurator;
@@ -50,7 +49,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -92,7 +90,6 @@ import snownee.jade.api.fluid.JadeFluidObject;
 import snownee.jade.api.ui.IElementHelper;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -380,32 +377,10 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
     public PatternContainerGroup getTerminalGroup() {
         if (isFormed()) {
             IMultiController controller = getController();
-            MultiblockMachineDefinition controllerDefinition = controller.self().getDefinition();
-            GTRecipeType rt = this.recipeType;
-            MutableComponent lidComp = null;
-
-            if (rt == null)
-                rt = controller instanceof IRecipeLogicMachine rlm ? rlm.getRecipeType() : null;
-            if (rt == null || rt == GTORecipeTypes.HATCH_COMBINED) {
-                rt = null;
-                lidComp = (controller instanceof IRecipeLogicMachine rlm ? Stream.of(rlm.getAvailableRecipeTypes()) : Stream.<GTRecipeType>empty())
-                        .map(r -> Component.translatable("gtceu." + r.registryName.getPath()))
-                        .collect(GTOUtils.joiningComponent(Component.literal("/")));
-
-            }
-
-            String lid = rt != null ? rt.registryName.toLanguageKey() : controllerDefinition.getDescriptionId();
-
-            if (!getCustomName().isEmpty()) {
-                return new PatternContainerGroup(AEItemKey.of(controllerDefinition.asStack()), Component.literal(getCustomName()), Collections.emptyList());
-            } else {
-                ItemStack circuitStack = circuitInventorySimulated.storage.getStackInSlot(0);
-                int circuitConfiguration = circuitStack.isEmpty() ? -1 : IntCircuitBehaviour.getCircuitConfiguration(circuitStack);
-                MutableComponent groupName = lidComp != null ? lidComp : Component.translatable(lid);
-                if (circuitConfiguration != -1) groupName = groupName.append(" - " + circuitConfiguration);
-                return new PatternContainerGroup(AEItemKey.of(controllerDefinition.asStack()), groupName,
-                        lidComp != null ? List.of(Component.translatable(lid)) : Collections.emptyList());
-            }
+            Collection<GTRecipeType> availableRecipeTypes = controller instanceof IRecipeLogicMachine recipeMachine ?
+                    Arrays.asList(recipeMachine.getAvailableRecipeTypes()) : List.of();
+            return PatternContainerGroupHelper.forPatternAssembly(
+                    controller.self(), this, getCustomName(), recipeType, availableRecipeTypes);
         } else {
             if (!getCustomName().isEmpty()) {
                 return new PatternContainerGroup(AEItemKey.of(GTAEMachines.ME_PATTERN_BUFFER.asItem()), Component.literal(getCustomName()), Collections.emptyList());
@@ -413,6 +388,21 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                 return new PatternContainerGroup(AEItemKey.of(GTAEMachines.ME_PATTERN_BUFFER.asItem()), GTAEMachines.ME_PATTERN_BUFFER.get().getDefinition().asItem().getDescription(), Collections.emptyList());
             }
         }
+    }
+
+    @Override
+    public Component gto$getTerminalGroupSearchName() {
+        if (!isFormed()) {
+            return getTerminalGroup().name();
+        }
+        if (!getCustomName().isEmpty() && !getCustomName().startsWith("+")) {
+            return Component.literal(getCustomName());
+        }
+        IMultiController controller = getController();
+        Collection<GTRecipeType> availableRecipeTypes = controller instanceof IRecipeLogicMachine recipeMachine ?
+                Arrays.asList(recipeMachine.getAvailableRecipeTypes()) : List.of();
+        String extraSuffix = getCustomName().startsWith("+") ? getCustomName().substring(1).strip() : "";
+        return PatternContainerGroupHelper.getSearchName(controller.self(), extraSuffix, recipeType, availableRecipeTypes);
     }
 
     @Override
@@ -499,12 +489,12 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
         var items = new AEKeyMap<AEItemKey>();
         var fluids = new AEKeyMap<AEFluidKey>();
         for (InternalSlot slot : buffer.getInternalInventory()) {
-            slot.itemInventory.reference2LongEntrySet().fastForEach(e -> items.addTo(e.getKey(), e.getLongValue()));
-            slot.fluidInventory.reference2LongEntrySet().fastForEach(e -> fluids.addTo(e.getKey(), e.getLongValue()));
+            slot.itemInventory.fastForEach(items::insert);
+            slot.fluidInventory.fastForEach(fluids::insert);
         }
 
         ListTag itemsTag = new ListTag();
-        for (var entry : items.reference2LongEntrySet()) {
+        for (var entry : items) {
             var ct = entry.getKey().toTag();
             ct.putLong("real", entry.getLongValue());
             itemsTag.add(ct);
@@ -512,7 +502,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
         if (!itemsTag.isEmpty()) data.put("items", itemsTag);
 
         ListTag fluidsTag = new ListTag();
-        for (var entry : fluids.reference2LongEntrySet()) {
+        for (var entry : fluids) {
             var ct = entry.getKey().toTag();
             ct.putLong("real", entry.getLongValue());
             fluidsTag.add(ct);
@@ -622,7 +612,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
             if (network != null) {
                 MEStorage networkInv = network.getStorageService().getInventory();
                 var energy = network.getEnergyService();
-                for (var it = itemInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
+                for (var it = itemInventory.iterator(); it.hasNext();) {
                     var entry = it.next();
 
                     var count = entry.getLongValue();
@@ -639,7 +629,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                         else entry.setValue(count);
                     }
                 }
-                for (var it = fluidInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
+                for (var it = fluidInventory.iterator(); it.hasNext();) {
                     var entry = it.next();
                     var amount = entry.getLongValue();
                     if (amount == 0) {
@@ -680,7 +670,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                     it.remove();
                     continue;
                 }
-                for (var it2 = itemInventory.reference2LongEntrySet().fastIterator(); it2.hasNext();) {
+                for (var it2 = itemInventory.iterator(); it2.hasNext();) {
                     var entry = it2.next();
                     if (!ingredient.inner.testAeKay(entry.getKey())) continue;
                     var count = entry.getLongValue();
@@ -714,7 +704,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                     it.remove();
                     continue;
                 }
-                for (var it2 = fluidInventory.reference2LongEntrySet().fastIterator(); it2.hasNext();) {
+                for (var it2 = fluidInventory.iterator(); it2.hasNext();) {
                     var entry = it2.next();
                     if (!ingredient.inner.testAeKay(entry.getKey())) continue;
                     var count = entry.getLongValue();
@@ -747,16 +737,14 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                 tag.putByteArray("recipe", GTRecipeDefinition.DATA_CODEC.encode(recipe).writeToBytes());
             }
             ListTag itemsTag = new ListTag();
-            for (var it = itemInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
-                var entry = it.next();
+            for (var entry : itemInventory) {
                 var ct = entry.getKey().toTag();
                 ct.putLong("real", entry.getLongValue());
                 itemsTag.add(ct);
             }
             if (!itemsTag.isEmpty()) tag.put("inventory", itemsTag);
             ListTag fluidsTag = new ListTag();
-            for (var it = fluidInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
-                var entry = it.next();
+            for (var entry : fluidInventory) {
                 var ct = entry.getKey().toTag();
                 ct.putLong("real", entry.getLongValue());
                 fluidsTag.add(ct);
@@ -827,9 +815,9 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
         public void pushInput(AEKey key, long amount) {
             if (amount < 1) return;
             if (key instanceof AEItemKey itemKey) {
-                slot.itemInventory.addTo(itemKey, amount);
+                slot.itemInventory.insert(itemKey, amount);
             } else if (key instanceof AEFluidKey fluidKey) {
-                slot.fluidInventory.addTo(fluidKey, amount);
+                slot.fluidInventory.insert(fluidKey, amount);
             }
         }
     }
