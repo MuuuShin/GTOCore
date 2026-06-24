@@ -1,5 +1,7 @@
 package com.gtocore.common.machine.multiblock.storage;
 
+import com.gtocore.api.ae2.stacks.AEFluidKeyStackHandler;
+import com.gtocore.api.ae2.stacks.AEItemKeyStackHandler;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.common.block.BlockMap;
 import com.gtocore.common.data.GTORecipeDataKeys;
@@ -11,6 +13,8 @@ import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
 import com.gregtechceu.gtceu.api.pattern.BlockPattern;
 import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
+import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler;
+import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
@@ -33,6 +37,7 @@ import appeng.capabilities.Capabilities;
 import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.datasream.data.Data;
 import it.unimi.dsi.fastutil.longs.LongIterator;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
@@ -42,6 +47,7 @@ import snownee.jade.api.config.IPluginConfig;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+@Slf4j
 public final class MultiblockMEStorageMachine extends MultiblockControllerMachine implements MEStorage, IDropSaveMachine, IWailaDisplayProvider {
 
     public static final int MIN_DEPTH = 2;
@@ -61,10 +67,38 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
 
     @Nullable
     private final AEKeyType type;
+    private final AEItemKeyStackHandler itemStackHandler;
+    private final AEFluidKeyStackHandler fluidStackHandler;
 
     public MultiblockMEStorageMachine(MetaMachineBlockEntity holder, @Nullable AEKeyType type) {
         super(holder);
         this.type = type;
+        if (type == AEKeyType.items() || type == null) {
+            itemStackHandler = new AEItemKeyStackHandler();
+            itemStackHandler.setMap(keyMap);
+            itemStackHandler.setStorage(this);
+        } else {
+            itemStackHandler = null;
+        }
+        if (type == AEKeyType.fluids() || type == null) {
+            fluidStackHandler = new AEFluidKeyStackHandler();
+            fluidStackHandler.setMap(keyMap);
+            fluidStackHandler.setStorage(this);
+        } else {
+            fluidStackHandler = null;
+        }
+    }
+
+    @Override
+    @Nullable
+    public ICustomItemStackHandler getItemHandlerCap(@Nullable Direction side, boolean useCoverCapability) {
+        return itemStackHandler;
+    }
+
+    @Override
+    @Nullable
+    public ICustomFluidStackHandler getFluidHandlerCap(@Nullable Direction side, boolean useCoverCapability) {
+        return fluidStackHandler;
     }
 
     @Override
@@ -170,7 +204,7 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
         int interiorHeight = height - 1;
         int interiorDepth = depth - 1;
         long cells = (long) interiorWidth * interiorHeight * interiorDepth;
-        return cells * 100 * (type == null ? 8 : type.getAmountPerByte()) * (getMultiblockState().getMatchContext().getOrDefault(GTORecipeDataKeys.HERMETIC_CASING_TIER, 0) + 1);
+        return cells * 800 * (getMultiblockState().getMatchContext().getOrDefault(GTORecipeDataKeys.HERMETIC_CASING_TIER, 0) + 1);
     }
 
     @Override
@@ -267,9 +301,8 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
     private void saveChanges() {
         holder.setChanged();
         long totalAmount = 0;
-        for (LongIterator it = keyMap.values().iterator(); it.hasNext();) {
-            long amount = it.nextLong();
-            totalAmount += amount;
+        for (var e : keyMap) {
+            totalAmount += e.getLongValue() / (e.getKey().getAmountPerByte() / 8);
         }
         this.storage = totalAmount;
     }
