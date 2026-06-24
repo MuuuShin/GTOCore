@@ -314,6 +314,7 @@ public final class ForgeCommonEvent {
                 player.displayClientMessage(Component.translatable("gtocore.dev", Component.literal("GitHub").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/GregTech-Odyssey/GregTech-Odyssey/issues")))), false);
                 Configurator.setRootLevel(org.apache.logging.log4j.Level.INFO);
             }
+            player.displayClientMessage(Component.translatable("gtocore.lang." + COMMON_HOTKEY_HINT).withStyle(ChatFormatting.GREEN), false);
             showVoidTimeHint(player);
             WirelessNetworkSavedData.write(player);
         }
@@ -389,6 +390,9 @@ public final class ForgeCommonEvent {
 
     @RegisterLanguage(valuePrefix = "gtocore.lang", en = "Channel mode command banned in expert", cn = "在专家模式下，频道模式命令被禁止")
     private static final String CHANNEL_MODE_COMMAND_BANNED = "banned";
+
+    @RegisterLanguage(valuePrefix = "gtocore.lang", en = "Common default hotkeys: [~] Ultimine, [Tab] Quest Book, [M] Map.", cn = "常用默认快捷键：[~] 连锁挖掘，[Tab] 打开任务书，[M] 打开地图。")
+    public static final String COMMON_HOTKEY_HINT = "common_hotkey_hint";
 
     @RegisterLanguage(valuePrefix = "gtocore.lang", en = "Use /gtocore void time to toggle whether the void world stays fixed at 1000.", cn = "使用 /gtocore void time 切换虚空世界是否固定在 1000。")
     public static final String VOID_WORLD_TIME_HINT = "void_world_time_hint";
