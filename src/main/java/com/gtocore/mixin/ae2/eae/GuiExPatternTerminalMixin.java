@@ -1,11 +1,12 @@
 package com.gtocore.mixin.ae2.eae;
 
-import com.gtolib.api.ae2.gui.hooks.IExtendedGuiEx;
-import com.gtolib.api.ae2.me2in1.Me2in1Menu;
-import com.gtolib.api.ae2.me2in1.Me2in1Screen;
 import com.gtocore.integration.ae.PatternEncoderStats;
 import com.gtocore.integration.ae.client.PatternEncoderStatsButton;
 import com.gtocore.integration.ae.client.PatternEncoderStatsScreen;
+
+import com.gtolib.api.ae2.gui.hooks.IExtendedGuiEx;
+import com.gtolib.api.ae2.me2in1.Me2in1Menu;
+import com.gtolib.api.ae2.me2in1.Me2in1Screen;
 
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;

@@ -25,10 +25,7 @@ import appeng.api.networking.IGrid;
 import appeng.api.networking.crafting.*;
 import appeng.api.networking.energy.IEnergyService;
 import appeng.api.networking.security.IActionSource;
-import appeng.api.stacks.AEItemKey;
-import appeng.api.stacks.AEKey;
-import appeng.api.stacks.GenericStack;
-import appeng.api.stacks.KeyCounter;
+import appeng.api.stacks.*;
 import appeng.core.AEConfig;
 import appeng.core.sync.network.NetworkHandler;
 import appeng.core.sync.packets.CraftingJobStatusPacket;
@@ -251,13 +248,12 @@ public class OptimizedCraftingCpuLogic extends CraftingCpuLogic {
                 for (var kc : craftingContainer.value) {
                     if (kc == null) continue;
                     for (var entry : kc) {
-                        job.totalConsumed.addTo(entry.getKey(), entry.getLongValue());
+                        job.totalConsumed.insert(entry.getKey(), entry.getLongValue());
                     }
                 }
                 long minAllowedUnits = Long.MAX_VALUE;
                 var patternDefinition = details.getDefinition();
-                for (var eIt = job.totalConsumed.reference2LongEntrySet().fastIterator(); eIt.hasNext();) {
-                    var e = eIt.next();
+                for (var e : job.totalConsumed) {
                     var consumedKey = e.getKey();
                     long consumedTotal = e.getLongValue();
                     var allocMap = job.allocations.get(consumedKey);
@@ -324,7 +320,7 @@ public class OptimizedCraftingCpuLogic extends CraftingCpuLogic {
                 for (var kc : craftingContainer.value) {
                     if (kc == null) continue;
                     for (var entry : kc) {
-                        job.currentConsumed.addTo(entry.getKey(), entry.getLongValue());
+                        job.currentConsumed.insert(entry.getKey(), entry.getLongValue());
                     }
                 }
                 long finalParallelValue = cappedParallel;
@@ -346,8 +342,7 @@ public class OptimizedCraftingCpuLogic extends CraftingCpuLogic {
                     }
 
                     job.purgeDefsLocal.clear();
-                    for (var ceIt = job.currentConsumed.reference2LongEntrySet().fastIterator(); ceIt.hasNext();) {
-                        var ce = ceIt.next();
+                    for (var ce : job.currentConsumed) {
                         var key = ce.getKey();
                         var map = job.allocations.get(key);
                         if (map == null || map.isEmpty()) continue;
@@ -724,14 +719,14 @@ public class OptimizedCraftingCpuLogic extends CraftingCpuLogic {
         return inputHolder;
     }
 
-    private static long getMaxParallel(long maxParallel, IPatternDetails details, Reference2LongOpenHashMap<AEKey> sourceInv) {
+    private static long getMaxParallel(long maxParallel, IPatternDetails details, AEKeyMap<AEKey> sourceInv) {
         if (sourceInv.isEmpty()) return 0;
         for (IPatternDetails.IInput input : details.getInputs()) {
             long extracted = 0;
             var seen = new ReferenceOpenHashSet<AEKey>();
             for (var stack : input.getPossibleInputs()) {
                 if (seen.add(stack.what())) {
-                    extracted += sourceInv.getLong(stack.what()) / stack.amount();
+                    extracted += sourceInv.getAmount(stack.what()) / stack.amount();
                 }
             }
             maxParallel = Math.min(maxParallel, extracted / input.getMultiplier());

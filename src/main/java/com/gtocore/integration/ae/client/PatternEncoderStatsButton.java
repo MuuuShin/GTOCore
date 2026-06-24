@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import appeng.client.gui.widgets.IconButton;
 
 import gto_ae.hooks.gui.IIcon;
+
 import org.jetbrains.annotations.Nullable;
 
 public final class PatternEncoderStatsButton extends IconButton {

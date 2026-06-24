@@ -249,31 +249,29 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
     // ==================== PatternContainer 接口实现 ====================
     override fun getTerminalPatternInventory(): InternalInventory = internalPatternInventory
 
-    override fun getTerminalGroup(): PatternContainerGroup {
-        return when {
-            isFormed -> {
-                val controller = getController()
-                val availableRecipeTypes =
-                    if (controller is IRecipeLogicMachine) controller.availableRecipeTypes.asList() else emptyList()
-                PatternContainerGroupHelper.forPatternAssembly(
-                    controller.self(),
-                    this,
-                    customName,
-                    null,
-                    availableRecipeTypes,
-                )
-            }
+    override fun getTerminalGroup(): PatternContainerGroup = when {
+        isFormed -> {
+            val controller = getController()
+            val availableRecipeTypes =
+                if (controller is IRecipeLogicMachine) controller.availableRecipeTypes.asList() else emptyList()
+            PatternContainerGroupHelper.forPatternAssembly(
+                controller.self(),
+                this,
+                customName,
+                null,
+                availableRecipeTypes,
+            )
+        }
 
-            else -> {
-                val itemKey = AEItemKey.of(GTAEMachines.ME_PATTERN_BUFFER.asItem())
-                val description =
-                    if (customName.isNotEmpty()) {
-                        Component.literal(customName)
-                    } else {
-                        GTAEMachines.ME_PATTERN_BUFFER.get().definition.asItem().description
-                    }
-                PatternContainerGroup(itemKey, description, emptyList())
-            }
+        else -> {
+            val itemKey = AEItemKey.of(GTAEMachines.ME_PATTERN_BUFFER.asItem())
+            val description =
+                if (customName.isNotEmpty()) {
+                    Component.literal(customName)
+                } else {
+                    GTAEMachines.ME_PATTERN_BUFFER.get().definition.asItem().description
+                }
+            PatternContainerGroup(itemKey, description, emptyList())
         }
     }
 

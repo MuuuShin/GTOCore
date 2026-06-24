@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class PatternEncoderStatsScreen<C extends AEBaseMenu, P extends AEBaseScreen<C>>
-                                      extends AESubScreen<C, P> {
+                                            extends AESubScreen<C, P> {
 
     private static final int CONTENT_LEFT = 10;
     private static final int CONTENT_TOP = 26;

@@ -489,12 +489,12 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
         var items = new AEKeyMap<AEItemKey>();
         var fluids = new AEKeyMap<AEFluidKey>();
         for (InternalSlot slot : buffer.getInternalInventory()) {
-            slot.itemInventory.reference2LongEntrySet().fastForEach(e -> items.addTo(e.getKey(), e.getLongValue()));
-            slot.fluidInventory.reference2LongEntrySet().fastForEach(e -> fluids.addTo(e.getKey(), e.getLongValue()));
+            slot.itemInventory.fastForEach(items::insert);
+            slot.fluidInventory.fastForEach(fluids::insert);
         }
 
         ListTag itemsTag = new ListTag();
-        for (var entry : items.reference2LongEntrySet()) {
+        for (var entry : items) {
             var ct = entry.getKey().toTag();
             ct.putLong("real", entry.getLongValue());
             itemsTag.add(ct);
@@ -502,7 +502,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
         if (!itemsTag.isEmpty()) data.put("items", itemsTag);
 
         ListTag fluidsTag = new ListTag();
-        for (var entry : fluids.reference2LongEntrySet()) {
+        for (var entry : fluids) {
             var ct = entry.getKey().toTag();
             ct.putLong("real", entry.getLongValue());
             fluidsTag.add(ct);
@@ -612,7 +612,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
             if (network != null) {
                 MEStorage networkInv = network.getStorageService().getInventory();
                 var energy = network.getEnergyService();
-                for (var it = itemInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
+                for (var it = itemInventory.iterator(); it.hasNext();) {
                     var entry = it.next();
 
                     var count = entry.getLongValue();
@@ -629,7 +629,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                         else entry.setValue(count);
                     }
                 }
-                for (var it = fluidInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
+                for (var it = fluidInventory.iterator(); it.hasNext();) {
                     var entry = it.next();
                     var amount = entry.getLongValue();
                     if (amount == 0) {
@@ -670,7 +670,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                     it.remove();
                     continue;
                 }
-                for (var it2 = itemInventory.reference2LongEntrySet().fastIterator(); it2.hasNext();) {
+                for (var it2 = itemInventory.iterator(); it2.hasNext();) {
                     var entry = it2.next();
                     if (!ingredient.inner.testAeKay(entry.getKey())) continue;
                     var count = entry.getLongValue();
@@ -704,7 +704,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                     it.remove();
                     continue;
                 }
-                for (var it2 = fluidInventory.reference2LongEntrySet().fastIterator(); it2.hasNext();) {
+                for (var it2 = fluidInventory.iterator(); it2.hasNext();) {
                     var entry = it2.next();
                     if (!ingredient.inner.testAeKay(entry.getKey())) continue;
                     var count = entry.getLongValue();
@@ -737,16 +737,14 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                 tag.putByteArray("recipe", GTRecipeDefinition.DATA_CODEC.encode(recipe).writeToBytes());
             }
             ListTag itemsTag = new ListTag();
-            for (var it = itemInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
-                var entry = it.next();
+            for (var entry : itemInventory) {
                 var ct = entry.getKey().toTag();
                 ct.putLong("real", entry.getLongValue());
                 itemsTag.add(ct);
             }
             if (!itemsTag.isEmpty()) tag.put("inventory", itemsTag);
             ListTag fluidsTag = new ListTag();
-            for (var it = fluidInventory.reference2LongEntrySet().fastIterator(); it.hasNext();) {
-                var entry = it.next();
+            for (var entry : fluidInventory) {
                 var ct = entry.getKey().toTag();
                 ct.putLong("real", entry.getLongValue());
                 fluidsTag.add(ct);
@@ -817,9 +815,9 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
         public void pushInput(AEKey key, long amount) {
             if (amount < 1) return;
             if (key instanceof AEItemKey itemKey) {
-                slot.itemInventory.addTo(itemKey, amount);
+                slot.itemInventory.insert(itemKey, amount);
             } else if (key instanceof AEFluidKey fluidKey) {
-                slot.fluidInventory.addTo(fluidKey, amount);
+                slot.fluidInventory.insert(fluidKey, amount);
             }
         }
     }

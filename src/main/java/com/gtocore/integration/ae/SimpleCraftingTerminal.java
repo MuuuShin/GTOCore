@@ -2,6 +2,9 @@ package com.gtocore.integration.ae;
 
 import com.gtolib.GTOCore;
 import com.gtolib.api.ae2.ExternalStorageCacheStrategy;
+import com.gtolib.api.blockentity.IDirectionCacheBlockEntity;
+
+import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -30,6 +33,7 @@ import appeng.api.stacks.AEKeyType;
 import appeng.api.storage.IStorageMounts;
 import appeng.api.storage.IStorageProvider;
 import appeng.api.storage.MEStorage;
+import appeng.capabilities.Capabilities;
 import appeng.core.AppEng;
 import appeng.core.stats.AdvancementTriggers;
 import appeng.helpers.InterfaceLogicHost;
@@ -168,26 +172,25 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
     }
 
     private void updateTarget() {
-        if (isClientSide()) {
-            return; // Part is not part of level yet or its client-side
-        }
+        if (isClientSide()) return;
         var side = getSide();
         if (side == null) return;
-
-        var foundExternalApi = new Reference2ReferenceOpenHashMap<AEKeyType, MEStorage>(2);
-        findExternalStorages(foundExternalApi);
-
-        if (this.handler.getDelegate() instanceof CompositeStorage compositeStorage && !foundExternalApi.isEmpty()) {
-            compositeStorage.setStorages(foundExternalApi);
-            return;
-        }
-
-        // Update inventory
-        MEStorage newInventory;
-        if (!foundExternalApi.isEmpty()) {
-            newInventory = new CompositeStorage(foundExternalApi);
-        } else {
-            newInventory = NullInventory.of();
+        var host = getHost().getBlockEntity();
+        var adjacent = IDirectionCacheBlockEntity.getBlockEntityDirectionCache(host).getAdjacentBlockEntity(host.getLevel(), host.getBlockPos().relative(side), side);
+        if (adjacent == null) return;
+        var newInventory = GTCapabilityHelper.getBlockEntityCapability(Capabilities.STORAGE, adjacent, side.getOpposite());
+        if (newInventory == null) {
+            var foundExternalApi = new Reference2ReferenceOpenHashMap<AEKeyType, MEStorage>(2);
+            findExternalStorages(foundExternalApi);
+            if (this.handler.getDelegate() instanceof CompositeStorage compositeStorage && !foundExternalApi.isEmpty()) {
+                compositeStorage.setStorages(foundExternalApi);
+                return;
+            }
+            if (!foundExternalApi.isEmpty()) {
+                newInventory = foundExternalApi.size() > 1 ? new CompositeStorage(foundExternalApi) : foundExternalApi.reference2ReferenceEntrySet().fastIterator().next().getValue();
+            } else {
+                newInventory = NullInventory.of();
+            }
         }
         this.handler.setDelegate(newInventory);
     }

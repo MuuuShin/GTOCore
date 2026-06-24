@@ -335,10 +335,10 @@ public final class PatternContainerGroupHelper {
                                       List<Component> tooltip) {}
 
     private record NameParts(Component machine,
-                            @Nullable Component tier,
-                            @Nullable Component suffix,
-                            @Nullable Component recipeType,
-                            boolean multipleRecipeTypes) {
+                             @Nullable Component tier,
+                             @Nullable Component suffix,
+                             @Nullable Component recipeType,
+                             boolean multipleRecipeTypes) {
 
         private @Nullable Component get(char placeholder) {
             return switch (placeholder) {
@@ -350,6 +350,5 @@ public final class PatternContainerGroupHelper {
                 default -> null;
             };
         }
-
     }
 }
