@@ -46,7 +46,6 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
 
     public static final int MIN_DEPTH = 2;
     public static final int MAX_DEPTH = 14;
-    public static final int MAX_RADIUS = 7;
 
     private int lDist = 0, rDist = 0, uDist = 0, dDist = 0, bDist = 0;
 
@@ -134,13 +133,13 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
         var right = left.getOpposite();
         var up = Direction.UP;
         var down = Direction.DOWN;
-        lDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, left, MAX_RADIUS);
+        lDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, left, MAX_DEPTH);
         if (lDist < 1) return false;
-        rDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, right, MAX_RADIUS);
+        rDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, right, MAX_DEPTH - lDist);
         if (rDist < 1) return false;
-        uDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, up, MAX_RADIUS);
+        uDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, up, MAX_DEPTH);
         if (uDist < 1) return false;
-        dDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, down, MAX_RADIUS);
+        dDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, down, MAX_DEPTH - uDist);
         if (dDist < 1) return false;
         bDist = getBlockDistance(world, controllerPos, s -> {
             if (GTBlocks.STEEL_HULL.has(s)) return true;
@@ -281,7 +280,7 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
         if (ints.length != 0) iTooltip.add(Component.translatable("gtceu.multiblock.dimensions.1", ints[0], ints[1], ints[2]));
         var capacity = compoundTag.getLong("capacity");
         var storage = compoundTag.getLong("storage");
-        iTooltip.add(Component.translatable("gtocore.lang.template.capacity.-990262758", capacity));
+        iTooltip.add(Component.translatable("gtocore.lang.template.capacity.-990262758", FormattingUtil.formatNumbers(capacity)));
         iTooltip.add(Component.translatable("ae2.gto_extension.craft_used_percent", FormattingUtil.formatNumbers(storage * 100D / capacity)));
     }
 
