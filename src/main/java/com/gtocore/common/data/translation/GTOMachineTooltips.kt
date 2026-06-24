@@ -680,26 +680,16 @@ object GTOMachineTooltips {
         guide("在机器内GUI界面收藏某个网络后，按下Shift放置以自动连接收藏的网络" translatedTo "After favoriting a network in the machine's GUI interface, place it while holding Shift to automatically connect to the favorited network")
     }
 
-    // 物品保险库
+    // 保险库
     @JvmField
-    val ItemVaultTooltips = ComponentListSupplier {
-        setTranslationPrefix("item_vault")
+    val VaultTooltips = ComponentListSupplier {
+        setTranslationPrefix("vault")
 
         section(ComponentSlang.MainFunction)
-        function("可以存储大量物品" translatedTo "Can store many many items")
-        guide("使用简易合成终端或者存储总线读取内部物品" translatedTo "Use a simple terminal or a storage bus to read internal items")
+        function("可以存储大量资源" translatedTo "Can store many many resources")
+        guide("使用简易合成终端或者存储总线读取内部资源" translatedTo "Use a simple terminal or a storage bus to read internal resources")
         info("容量由多方块大小决定" translatedTo "The capacity is determined by the multiblock size")
-    }
-
-    // 流体保险库
-    @JvmField
-    val FluidVaultTooltips = ComponentListSupplier {
-        setTranslationPrefix("fluid_vault")
-
-        section(ComponentSlang.MainFunction)
-        function("可以存储大量流体" translatedTo "Can store many many fluids")
-        guide("使用简易合成终端或者存储总线读取内部流体" translatedTo "Use a simple terminal or a storage bus to read internal fluids")
-        info("容量由多方块大小决定" translatedTo "The capacity is determined by the multiblock size")
+        info("大小: 3x3x3到15x15x15" translatedTo "Size: 3x3x3 to 15x15x15")
     }
 
     @JvmField

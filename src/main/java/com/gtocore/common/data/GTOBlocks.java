@@ -196,6 +196,7 @@ public final class GTOBlocks {
     public static final BlockEntry<Block> DYSON_DEPLOYMENT_MAGNET = createSidedCasingBlock("dyson_deployment_magnet", "戴森球模块部署单元超导磁体", GTOCore.id("block/casings/dyson_deployment_magnet"));
     public static final BlockEntry<Block> HIGH_STRENGTH_SPACE_ELEVATOR_CABLE = createCasingBlock("high_strength_space_elevator_cable", "高强度太空电梯绳索", GTOCore.id("block/casings/high_strength_space_elevator_cable"));
 
+    public static final BlockEntry<Block> HERMETIC_CASING_ULV = createHermeticCasing(GTValues.ULV);
     public static final BlockEntry<Block> HERMETIC_CASING_UEV = createHermeticCasing(GTValues.UEV);
     public static final BlockEntry<Block> HERMETIC_CASING_UIV = createHermeticCasing(GTValues.UIV);
     public static final BlockEntry<Block> HERMETIC_CASING_UXV = createHermeticCasing(GTValues.UXV);

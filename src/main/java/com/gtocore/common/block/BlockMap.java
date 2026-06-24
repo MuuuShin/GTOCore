@@ -61,6 +61,13 @@ public final class BlockMap {
 
     public static final Reference2ObjectOpenHashMap<Block, String> BLOCK_CATEGORY_MAP = new Reference2ObjectOpenHashMap<>();
 
+    public static boolean test(Block block, Int2ObjectMap<Supplier<?>> map) {
+        for (var supplier : map.values()) {
+            if (supplier.get() == block) return true;
+        }
+        return false;
+    }
+
     public static void init() {
         GLASSMAP.put(2, GTBlocks.CASING_TEMPERED_GLASS);
         COMPUTER_CASING_MAP.put(1, GTBlocks.COMPUTER_CASING);
@@ -193,8 +200,8 @@ public final class BlockMap {
         LIGHT = GTBlocks.LAMPS.values().stream().map(RegistryEntry::get).toArray(Block[]::new);
         MAP.put(light, LIGHT);
 
-        AtomicInteger idx = new AtomicInteger(1);
-        Block[] hermeticCasings = GTOUtils.array(GTBlocks.HERMETIC_CASING_LV.get(), GTBlocks.HERMETIC_CASING_MV.get(), GTBlocks.HERMETIC_CASING_HV.get(), GTBlocks.HERMETIC_CASING_EV.get(), GTBlocks.HERMETIC_CASING_IV.get(), GTBlocks.HERMETIC_CASING_LuV.get(), GTBlocks.HERMETIC_CASING_ZPM.get(), GTBlocks.HERMETIC_CASING_UV.get(), GTBlocks.HERMETIC_CASING_UHV.get(), GTOBlocks.HERMETIC_CASING_UEV.get(), GTOBlocks.HERMETIC_CASING_UIV.get(), GTOBlocks.HERMETIC_CASING_UXV.get(), GTOBlocks.HERMETIC_CASING_OpV.get());
+        AtomicInteger idx = new AtomicInteger();
+        Block[] hermeticCasings = GTOUtils.array(GTOBlocks.HERMETIC_CASING_ULV.get(), GTBlocks.HERMETIC_CASING_LV.get(), GTBlocks.HERMETIC_CASING_MV.get(), GTBlocks.HERMETIC_CASING_HV.get(), GTBlocks.HERMETIC_CASING_EV.get(), GTBlocks.HERMETIC_CASING_IV.get(), GTBlocks.HERMETIC_CASING_LuV.get(), GTBlocks.HERMETIC_CASING_ZPM.get(), GTBlocks.HERMETIC_CASING_UV.get(), GTBlocks.HERMETIC_CASING_UHV.get(), GTOBlocks.HERMETIC_CASING_UEV.get(), GTOBlocks.HERMETIC_CASING_UIV.get(), GTOBlocks.HERMETIC_CASING_UXV.get(), GTOBlocks.HERMETIC_CASING_OpV.get());
         Stream.of(hermeticCasings).forEach(b -> HERMETIC_CASING.put(idx.getAndIncrement(), () -> b));
         MAP.put(hermetic_casing, hermeticCasings);
 

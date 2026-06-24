@@ -1,13 +1,26 @@
 package com.gtocore.common.machine.multiblock.storage;
 
+import com.gtocore.api.pattern.GTOPredicates;
+import com.gtocore.common.block.BlockMap;
+import com.gtocore.common.data.GTORecipeDataKeys;
+
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
+import com.gregtechceu.gtceu.api.capability.IWailaDisplayProvider;
 import com.gregtechceu.gtceu.api.machine.feature.IDropSaveMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
+import com.gregtechceu.gtceu.api.pattern.BlockPattern;
+import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
+import com.gregtechceu.gtceu.api.pattern.Predicates;
+import com.gregtechceu.gtceu.common.data.GTBlocks;
+import com.gregtechceu.gtceu.utils.FormattingUtil;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -22,49 +35,174 @@ import com.gto.datasynclib.datasream.data.Data;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.config.IPluginConfig;
 
-public final class MultiblockMEStorageMachine extends MultiblockControllerMachine implements MEStorage, IDropSaveMachine {
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public final class MultiblockMEStorageMachine extends MultiblockControllerMachine implements MEStorage, IDropSaveMachine, IWailaDisplayProvider {
+
+    public static final int MIN_DEPTH = 2;
+    public static final int MAX_DEPTH = 14;
+    public static final int MAX_RADIUS = 7;
+
+    private int lDist = 0, rDist = 0, uDist = 0, dDist = 0, bDist = 0;
 
     @SaveToDisk
     private final AEKeyMap<AEKey> keyMap = new AEKeyMap<>();
+
     @SaveToDisk
-    private long totalAmount;
+    private long storage;
     @SaveToDisk
-    private long capacity = 100;
-    private boolean changes;
+    private long capacity;
+
     private LazyOptional<MEStorage> capabilityStorage = LazyOptional.of(() -> this);
 
+    @Nullable
     private final AEKeyType type;
 
-    public MultiblockMEStorageMachine(MetaMachineBlockEntity holder, AEKeyType type) {
+    public MultiblockMEStorageMachine(MetaMachineBlockEntity holder, @Nullable AEKeyType type) {
         super(holder);
         this.type = type;
     }
 
     @Override
+    public Supplier<BlockPattern>[] getPattern() {
+        if (getLevel() != null && updateStructureDimensions()) {
+            if (lDist < 1) lDist = 1;
+            if (rDist < 1) rDist = 1;
+            if (uDist < 1) uDist = 1;
+            if (dDist < 1) dDist = 1;
+            if (bDist < MIN_DEPTH) bDist = MIN_DEPTH;
+            var iWidth = lDist + rDist;
+            var iHeight = uDist + dDist;
+            var width = iWidth + 1;
+            var height = iHeight + 1;
+            var backLayer = new String[height];
+            for (int y = 0; y < height; y++) {
+                var row = new StringBuilder(width);
+                row.repeat("W", width);
+                backLayer[y] = row.toString();
+            }
+            var storageLayer = new String[height];
+            for (int y = 0; y < height; y++) {
+                var row = new StringBuilder(width);
+                for (int x = 0; x < width; x++) {
+                    if (x == 0 || x == iWidth || y == 0 || y == iHeight) {
+                        row.append('W');
+                    } else {
+                        row.append('S');
+                    }
+                }
+                storageLayer[y] = row.toString();
+            }
+            var frontLayer = new String[height];
+            for (int y = 0; y < height; y++) {
+                var row = new StringBuilder(width);
+                for (int x = 0; x < width; x++) {
+                    if (x == lDist && y == dDist) {
+                        row.append('C');
+                    } else {
+                        row.append('W');
+                    }
+                }
+                frontLayer[y] = row.toString();
+            }
+
+            return new Supplier[] { () -> FactoryBlockPattern.start()
+                    .aisle(backLayer)
+                    .aisle(storageLayer).setRepeatable(bDist - 1)
+                    .aisle(frontLayer)
+                    .where('C', Predicates.controller(getDefinition()))
+                    .where('W', Predicates.blocks(GTBlocks.STEEL_HULL.get()))
+                    .where('S', GTOPredicates.hermeticCasing())
+                    .build()
+            };
+        }
+        return super.getPattern();
+    }
+
+    private boolean updateStructureDimensions() {
+        var world = getLevel();
+        if (world == null) return false;
+        var controllerPos = getPos();
+        var front = getFrontFacing();
+        var back = front.getOpposite();
+        var left = front.getCounterClockWise();
+        var right = left.getOpposite();
+        var up = Direction.UP;
+        var down = Direction.DOWN;
+        lDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, left, MAX_RADIUS);
+        if (lDist < 1) return false;
+        rDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, right, MAX_RADIUS);
+        if (rDist < 1) return false;
+        uDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, up, MAX_RADIUS);
+        if (uDist < 1) return false;
+        dDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, down, MAX_RADIUS);
+        if (dDist < 1) return false;
+        bDist = getBlockDistance(world, controllerPos, s -> {
+            if (GTBlocks.STEEL_HULL.has(s)) return true;
+            return BlockMap.test(s.getBlock(), BlockMap.HERMETIC_CASING);
+        }, back, MAX_DEPTH);
+        return bDist >= MIN_DEPTH;
+    }
+
+    private static int getBlockDistance(Level world, BlockPos pos, Predicate<BlockState> predicate, Direction direction, int maxDepth) {
+        var mutable = pos.mutable();
+        var distance = 0;
+        for (int i = 1; i <= maxDepth; i++) {
+            if (predicate.test(world.getBlockState(mutable.move(direction)))) {
+                distance = i;
+            } else {
+                break;
+            }
+        }
+        return distance;
+    }
+
+    private long calculateCapacity() {
+        int width = lDist + rDist;
+        int height = uDist + dDist;
+        int depth = bDist;
+
+        int interiorWidth = width - 1;
+        int interiorHeight = height - 1;
+        int interiorDepth = depth - 1;
+        long cells = (long) interiorWidth * interiorHeight * interiorDepth;
+        return cells * 400 * (type == null ? 8 : type.getAmountPerByte()) * (getMultiblockState().getMatchContext().getOrDefault(GTORecipeDataKeys.HERMETIC_CASING_TIER, 0) + 1);
+    }
+
+    @Override
     public void onStructureFormed() {
         super.onStructureFormed();
-        changes = false;
+        capacity = calculateCapacity();
+        notifyNeighborsUpdate();
     }
 
     @Override
     public void onStructureInvalid() {
         super.onStructureInvalid();
-        changes = false;
+        capacity = 0;
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
         capabilityStorage = LazyOptional.of(() -> this);
-        changes = false;
+        long totalAmount = 0;
+        for (LongIterator it = keyMap.values().iterator(); it.hasNext();) {
+            long amount = it.nextLong();
+            totalAmount += amount;
+        }
+        this.storage = totalAmount;
     }
 
     @Override
     public void onUnload() {
         super.onUnload();
         capabilityStorage.invalidate();
-        changes = false;
     }
 
     @Override
@@ -94,13 +232,13 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
 
     @Override
     public boolean isPreferredStorageFor(AEKey what, IActionSource source) {
-        return capacity > totalAmount;
+        return capacity > storage;
     }
 
     @Override
     public long insert(AEKey what, long amount, Actionable mode, IActionSource source) {
-        if (capacity == 0 || !type.contains(what)) return 0;
-        amount = Math.min(capacity - totalAmount, amount);
+        if (!isFormed || (type != null && !type.contains(what))) return 0;
+        amount = Math.min(capacity - storage, amount);
         if (amount < 1) return 0;
         if (mode == Actionable.MODULATE) {
             keyMap.insert(what, amount);
@@ -124,7 +262,7 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
     public void getAvailableStacks(KeyCounter out) {
         var map = keyMap;
         if (map.isEmpty()) return;
-        out.addAll(map.size(), m -> map.fastForEach(m::addTo));
+        out.addAll(map.size(), m -> map.fastForEach(m::insert));
     }
 
     private void saveChanges() {
@@ -134,6 +272,24 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
             long amount = it.nextLong();
             totalAmount += amount;
         }
-        this.totalAmount = totalAmount;
+        this.storage = totalAmount;
+    }
+
+    @Override
+    public void appendWailaTooltip(CompoundTag compoundTag, ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
+        var ints = compoundTag.getIntArray("dimensions");
+        if (ints.length != 0) iTooltip.add(Component.translatable("gtceu.multiblock.dimensions.1", ints[0], ints[1], ints[2]));
+        var capacity = compoundTag.getLong("capacity");
+        var storage = compoundTag.getLong("storage");
+        iTooltip.add(Component.translatable("gtocore.lang.template.capacity.-990262758", capacity));
+        iTooltip.add(Component.translatable("ae2.gto_extension.craft_used_percent", FormattingUtil.formatNumbers(storage * 100D / capacity)));
+    }
+
+    @Override
+    public void appendWailaData(CompoundTag compoundTag, BlockAccessor blockAccessor) {
+        compoundTag.putLong("capacity", capacity);
+        compoundTag.putLong("storage", storage);
+        if (!isFormed) return;
+        compoundTag.putIntArray("dimensions", new int[] { lDist + rDist + 1, uDist + dDist + 1, bDist + 1 });
     }
 }

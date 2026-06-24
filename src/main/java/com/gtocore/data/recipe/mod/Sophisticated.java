@@ -297,7 +297,7 @@ public final class Sophisticated {
                         "AB ",
                         "   ",
                         "   ",
-                        'A', RegistriesUtils.getItem("sophisticatedstorage:upgrade_base"), 'B', MultiBlockG.MULTIBLOCK_CRATE.asItem());
+                        'A', RegistriesUtils.getItem("sophisticatedstorage:upgrade_base"), 'B', MultiBlockG.ITEM_VAULT.asItem());
             }
             /* 工作台"堆叠升级T1P","堆叠升级T1 超级箱I" */
             VanillaRecipeHelper.addShapedRecipe(GTOCore.id("stack_upgrade_tier_1_plus"), RegistriesUtils.getItem("sophisticatedstorage:stack_upgrade_tier_1_plus"),

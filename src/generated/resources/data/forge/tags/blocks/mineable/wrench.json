@@ -72,6 +72,7 @@
     "gtocore:dyson_receiver_casing",
     "gtocore:dyson_deployment_magnet",
     "gtocore:high_strength_space_elevator_cable",
+    "gtocore:ulv_hermetic_casing",
     "gtocore:uev_hermetic_casing",
     "gtocore:uiv_hermetic_casing",
     "gtocore:uxv_hermetic_casing",

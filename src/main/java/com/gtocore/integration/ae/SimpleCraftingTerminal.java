@@ -176,7 +176,7 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
         var side = getSide();
         if (side == null) return;
         var host = getHost().getBlockEntity();
-        var adjacent = IDirectionCacheBlockEntity.getBlockEntityDirectionCache(host).getAdjacentBlockEntity(host.getLevel(), host.getBlockPos().relative(side), side);
+        var adjacent = IDirectionCacheBlockEntity.getBlockEntityDirectionCache(host).getAdjacentBlockEntity(host.getLevel(), host.getBlockPos(), side);
         if (adjacent == null) return;
         var newInventory = GTCapabilityHelper.getBlockEntityCapability(Capabilities.STORAGE, adjacent, side.getOpposite());
         if (newInventory == null) {

@@ -1,6 +1,5 @@
 package com.gtocore.common.data.machines;
 
-import appeng.api.stacks.AEKeyType;
 import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.client.renderer.machine.ArrayMachineRenderer;
@@ -48,6 +47,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.Shapes;
+
+import appeng.api.stacks.AEKeyType;
 
 import earth.terrarium.adastra.common.registry.ModBlocks;
 
@@ -806,6 +807,7 @@ public final class MultiBlockG {
             .workableCasingRenderer(GTOCore.id("block/casings/iridium_casing"), GTCEu.id("block/multiblock/fusion_reactor"))
             .register();
 
+    @Deprecated(forRemoval = true, since = "0.5.6")
     public static final MultiblockMachineDefinition MULTIBLOCK_CRATE = multiblock("multiblock_crate", "多方块板条箱", MultiblockCrateMachine::new)
             .allRotation()
             .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
@@ -815,20 +817,50 @@ public final class MultiBlockG {
                     .where('a', blocks(GTBlocks.STEEL_HULL.get()))
                     .where('i', controller(definition))
                     .where('c', air())
+                    .info(GTOMachineTooltips.deprecatedStructureTooltips.get().getFirst())
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/steam/steel/side"), GTCEu.id("block/multiblock/multiblock_tank"))
             .register();
 
-    public static final MultiblockMachineDefinition ITEM_VAULT = multiblock("item_vault", "物品保险库", h->new MultiblockMEStorageMachine(h, AEKeyType.items()))
-            .allRotation()
+    public static final MultiblockMachineDefinition ITEM_VAULT = multiblock("item_vault", "物品保险库", h -> new MultiblockMEStorageMachine(h, AEKeyType.items()))
+            .nonYAxisRotation()
             .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
             .block(GTBlocks.STEEL_HULL)
-            .tooltips(GTOMachineTooltips.ItemVaultTooltips)
+            .tooltips(GTOMachineTooltips.VaultTooltips)
             .pattern(definition -> MultiBlockFileReader.start(definition, "multiblock_crate")
                     .where('a', blocks(GTBlocks.STEEL_HULL.get()))
                     .where('i', controller(definition))
-                    .where('c', air())
+                    .where('c', GTOPredicates.hermeticCasing())
                     .build())
+            .blockBuilder(b -> b.properties(p -> p.explosionResistance(100)))
+            .workableCasingRenderer(GTCEu.id("block/casings/steam/steel/side"), GTCEu.id("block/multiblock/multiblock_tank"))
+            .register();
+
+    public static final MultiblockMachineDefinition FLUID_VAULT = multiblock("fluid_vault", "流体保险库", h -> new MultiblockMEStorageMachine(h, AEKeyType.fluids()))
+            .nonYAxisRotation()
+            .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
+            .block(GTBlocks.STEEL_HULL)
+            .tooltips(GTOMachineTooltips.VaultTooltips)
+            .pattern(definition -> MultiBlockFileReader.start(definition, "multiblock_crate")
+                    .where('a', blocks(GTBlocks.STEEL_HULL.get()))
+                    .where('i', controller(definition))
+                    .where('c', GTOPredicates.hermeticCasing())
+                    .build())
+            .blockBuilder(b -> b.properties(p -> p.explosionResistance(100)))
+            .workableCasingRenderer(GTCEu.id("block/casings/steam/steel/side"), GTCEu.id("block/multiblock/multiblock_tank"))
+            .register();
+
+    public static final MultiblockMachineDefinition GENERAL_VAULT = multiblock("general_vault", "通用保险库", h -> new MultiblockMEStorageMachine(h, null))
+            .nonYAxisRotation()
+            .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
+            .block(GTBlocks.STEEL_HULL)
+            .tooltips(GTOMachineTooltips.VaultTooltips)
+            .pattern(definition -> MultiBlockFileReader.start(definition, "multiblock_crate")
+                    .where('a', blocks(GTBlocks.STEEL_HULL.get()))
+                    .where('i', controller(definition))
+                    .where('c', GTOPredicates.hermeticCasing())
+                    .build())
+            .blockBuilder(b -> b.properties(p -> p.explosionResistance(100)))
             .workableCasingRenderer(GTCEu.id("block/casings/steam/steel/side"), GTCEu.id("block/multiblock/multiblock_tank"))
             .register();
 
