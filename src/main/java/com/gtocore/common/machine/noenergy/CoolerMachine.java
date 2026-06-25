@@ -5,6 +5,7 @@ import com.gtocore.common.data.GTORecipeTypes;
 import com.gtolib.api.machine.SimpleNoEnergyMachine;
 import com.gtolib.api.machine.heat.HeatHandler;
 import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
+import com.gtolib.api.recipe.IdleReason;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
@@ -76,7 +77,10 @@ public final class CoolerMachine extends SimpleNoEnergyMachine implements IHeatC
 
     @Override
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
-        if (heatContainer.getCurrentHeat() < 8) return null;
+        if (heatContainer.getCurrentHeat() < 8) {
+            setIdleReason(IdleReason.INSUFFICIENT_TEMPERATURE);
+            return null;
+        }
         if (unit.getFluidAmount(true, Fluids.WATER)[0] < 1000) {
             setIdleReason(ActionResult.failInsufficientIn(Fluids.WATER.getFluidType().getDescription()));
             return null;

@@ -779,7 +779,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                 if (stack == null) continue;
                 var amount = ct.getLong("real");
                 if (amount > 0) {
-                    itemInventory.put(stack, amount);
+                    itemInventory.set(stack, amount);
                 }
             }
             ListTag fluids = tag.getList("fluidInventory", Tag.TAG_COMPOUND);
@@ -789,7 +789,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
                 if (stack == null) continue;
                 var amount = ct.getLong("real");
                 if (amount > 0) {
-                    fluidInventory.put(stack, amount);
+                    fluidInventory.set(stack, amount);
                 }
             }
             if (tag.tags.get("inv") instanceof CompoundTag inv) {

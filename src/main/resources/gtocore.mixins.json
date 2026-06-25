@@ -33,6 +33,8 @@
     "mc.GuiGraphicsMixin",
     "mc.ItemRendererMixin",
     "mc.OpenContainerMixin",
+    "mc.client.ClientPacketListenerMixin",
+    "mc.client.LevelRendererMixin",
     "merequester.NumberFieldMixin",
     "ftbxmodcompat.WrappedQuestCacheMixin",
     "sodium.SodiumWorldRendererMixin"
@@ -210,6 +212,7 @@
     "jumbofurnace.JumboFurnaceCoreBlockEntityMixin",
     "map.BlockStateShortShapeCacheMixin",
     "mc.BlockBehaviourMixin",
+    "mc.ItemEntityMixin",
     "mc.LanguageMixin",
     "mc.SharedConstantsMixin",
     "mc.mob.AbstractSkeletonMixin",

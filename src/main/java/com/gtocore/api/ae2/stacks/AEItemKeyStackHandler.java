@@ -1,5 +1,7 @@
 package com.gtocore.api.ae2.stacks;
 
+import com.gtolib.utils.MathUtil;
+
 import com.gregtechceu.gtceu.api.transfer.item.ICustomItemStackHandler;
 
 import net.minecraft.world.item.ItemStack;
@@ -34,6 +36,12 @@ public class AEItemKeyStackHandler implements ICustomItemStackHandler {
 
     @Override
     public @NotNull ItemStack getStackInSlot(int slot) {
+        if (map == null) return ItemStack.EMPTY;
+        for (var e : map) {
+            if (e.getKey() instanceof AEItemKey key) {
+                return key.toStack(MathUtil.saturatedCast(e.getLongValue()));
+            }
+        }
         return ItemStack.EMPTY;
     }
 

@@ -92,7 +92,7 @@ public class MEInputHatchPartMachine extends StatusTrackedMEPartMachine implemen
     /////////////////////////////////
 
     private void autoIO() {
-        setStatus(throughputCounter.isEmpty() ? WorkingStatus.IDLE : WorkingStatus.WORKING);
+        setStatus(throughputCounter.map.isEmpty() ? WorkingStatus.IDLE : WorkingStatus.WORKING);
         throughputCounter.tickRefresh();
         if (this.updateMEStatus()) {
             this.syncME();

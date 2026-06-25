@@ -13,7 +13,7 @@ dependencies {
     if (findProperty('devBuild') == "true") {
         implementation("dev:fastcollection:1.2")
         implementation("org.apache.commons:commons-math3:3.6.1")
-        modImplementation("appeng:appliedenergistics2-forge:${project.ae2_version}")
+        modImplementation("appeng:appliedenergistics2-forge-1.20.1:${project.ae2_version}")
         modImplementation("com.gregtechceu.gtceu:gtceu-1.20.1-forge-1.20.1:$project.gtceu_version")
         modImplementation("dev:gtmthings:1.5.5-GTO-Port")
         modImplementation("dev:gtolib:$project.gtolib_version-debug")
@@ -21,7 +21,7 @@ dependencies {
         jarJar(modImplementation("com.gto:gtolib-forge-1.20.1:$project.gtolib_version"))
         jarJar(implementation("dev:fastcollection:1.2"))
         jarJar(implementation("org.apache.commons:commons-math3:3.6.1"))
-        jarJar(modImplementation("appeng:appliedenergistics2-forge:${project.ae2_version}"))
+        jarJar(modImplementation("appeng:appliedenergistics2-forge-1.20.1:${project.ae2_version}"))
         jarJar(modImplementation("com.gregtechceu.gtceu:gtceu-1.20.1-forge-1.20.1:$project.gtceu_version"))
         jarJar(modImplementation("dev:gtmthings:1.5.5-GTO-Port"))
     }

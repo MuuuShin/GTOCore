@@ -198,7 +198,7 @@ public final class VirtualItemProviderMachine extends MetaMachine implements IUI
 
     @Override
     public long extract(AEKey what, long amount, Actionable mode, IActionSource source) {
-        if (amount > 0 && what instanceof AEItemKey itemKey && itemKey.getItem() == VIRTUAL_ITEM_PROVIDER && storage.getStoredMap().containsKey(itemKey)) {
+        if (amount > 0 && what instanceof AEItemKey itemKey && itemKey.getItem() == VIRTUAL_ITEM_PROVIDER && storage.getStoredMap().contains(itemKey)) {
             return amount;
         }
         return 0;

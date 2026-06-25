@@ -1,5 +1,7 @@
 package com.gtocore.api.ae2.stacks;
 
+import com.gtolib.utils.MathUtil;
+
 import com.gregtechceu.gtceu.api.transfer.fluid.ICustomFluidStackHandler;
 
 import net.minecraftforge.fluids.FluidStack;
@@ -34,6 +36,12 @@ public class AEFluidKeyStackHandler implements ICustomFluidStackHandler {
 
     @Override
     public @NotNull FluidStack getFluidInTank(int tank) {
+        if (map == null) return FluidStack.EMPTY;
+        for (var e : map) {
+            if (e.getKey() instanceof AEFluidKey key) {
+                return key.toStack(MathUtil.saturatedCast(e.getLongValue()));
+            }
+        }
         return FluidStack.EMPTY;
     }
 

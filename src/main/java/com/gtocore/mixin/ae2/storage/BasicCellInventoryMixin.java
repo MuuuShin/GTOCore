@@ -308,17 +308,15 @@ public abstract class BasicCellInventoryMixin implements StorageCell {
         var data = gtolib$getCellStorage();
         if (data == CellDataStorage.EMPTY) return 0;
         var map = gtolib$getCellStoredMap();
-        if (maxItemsPerType < gtolib$totalAmount) {
-            amount = Math.min(amount, maxItemsPerType - map.getAmount(what));
-        }
         amount = Math.min(gtolib$totalAmount - (long) (data.getBytes() * keyType.getAmountPerByte()), amount);
         if (amount < 1) return 0;
         if (mode == Actionable.MODULATE) {
-            map.insert(what, amount);
+            amount = map.insert(what, amount, maxItemsPerType);
             data.setDirty();
             saveChanges();
+        } else if (maxItemsPerType < gtolib$totalAmount) {
+            amount = Math.min(amount, maxItemsPerType - map.getAmount(what));
         }
-
         return amount;
     }
 
