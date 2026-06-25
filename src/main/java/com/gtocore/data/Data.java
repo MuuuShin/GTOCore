@@ -1,9 +1,6 @@
 package com.gtocore.data;
 
-import com.gtocore.common.data.GTOLoots;
-import com.gtocore.common.data.GTOOres;
-import com.gtocore.common.data.GTORecipeDataKeys;
-import com.gtocore.common.data.GTORecipeTypes;
+import com.gtocore.common.data.*;
 import com.gtocore.data.recipe.*;
 import com.gtocore.data.recipe.ae2.AE2;
 import com.gtocore.data.recipe.ae2.Ae2wtlibRecipes;
@@ -21,6 +18,7 @@ import com.gtocore.data.recipe.misc.SpaceStationRecipes;
 import com.gtocore.data.recipe.mod.*;
 import com.gtocore.data.recipe.processing.*;
 import com.gtocore.data.recipe.research.ResearchRecipes;
+import com.gtocore.data.tag.TagsHandler;
 import com.gtocore.data.transaction.data.GTOTrade;
 import com.gtocore.integration.emi.GTEMIRecipe;
 import com.gtocore.integration.emi.NanitesIntegratedProcessingEmiCategory;
@@ -171,6 +169,9 @@ public final class Data {
         });
         GTOLoots.init();
         GTTags.registryGTDynamicTags();
+        TagsHandler.initItem();
+        TagsHandler.initBlock();
+        TagsHandler.initFluid();
 
         GTOTrade.init();
 

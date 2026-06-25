@@ -42,6 +42,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import com.google.common.collect.ObjectArrays;
+import com.gto.fastcollection.O2OOpenCacheHashMap;
 import com.gto.registrate.ICustomfCategoryFill;
 import com.lowdragmc.lowdraglib.client.scene.WorldSceneRenderer;
 import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;
@@ -59,7 +60,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.emi.emi.screen.RecipeScreen;
 import it.unimi.dsi.fastutil.longs.*;
-import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -104,7 +104,7 @@ public final class PatternPreview extends WidgetGroup {
     private boolean showAllModules;
     @Nullable
     private IMultiController overlayController;
-    private final Map<BlockPos, OverlayOriginalBlock> overlayOriginalBlocks = new Object2ReferenceOpenHashMap<>();
+    private final O2OOpenCacheHashMap<BlockPos, OverlayOriginalBlock> overlayOriginalBlocks = new O2OOpenCacheHashMap<>();
     private PatternSlotWidget[] slotWidgets;
     private SlotWidget[] candidates;
 
@@ -473,9 +473,7 @@ public final class PatternPreview extends WidgetGroup {
     }
 
     private void recordOverlayOriginalBlock(BlockPos pos) {
-        if (!overlayOriginalBlocks.containsKey(pos)) {
-            overlayOriginalBlocks.put(pos.immutable(), new OverlayOriginalBlock(LEVEL.renderedBlocks.get(pos), LEVEL.blockEntities.get(pos)));
-        }
+        overlayOriginalBlocks.computeIfAbsent(pos.immutable(), k -> new OverlayOriginalBlock(LEVEL.renderedBlocks.get(pos), LEVEL.blockEntities.get(pos)));
     }
 
     void restoreOverlayBlocks() {
