@@ -85,7 +85,7 @@ public class SimpleCraftingTerminal extends AbstractTerminalPart
     @Override
     public void onMenuOpen() {
         if (getLevel() instanceof ServerLevel serverLevel) {
-            subscription = TaskHandler.enqueueTick(serverLevel, subscription, () -> this.getHost().getBlockEntity().isRemoved(), () -> {
+            subscription = TaskHandler.enqueueTick(serverLevel, subscription, () -> this.getBlockEntity() == null || this.getBlockEntity().isRemoved(), () -> {
                 GridNode node = (GridNode) this.getMainNode().getNode();
                 if (node != null) {
                     var storageService = (StorageService) node.getGrid().getStorageService();
