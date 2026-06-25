@@ -28,19 +28,17 @@
       "count": 4,
       "values": [1.0, 1.0, 1.0, 1.0]
     },
-    { "name": "maskUvMin", "type": "float", "count": 2, "values": [0.0, 0.0] },
-    { "name": "maskUvMax", "type": "float", "count": 2, "values": [1.0, 1.0] },
     {
-      "name": "maskUvShrinkRatio",
-      "type": "float",
-      "count": 1,
-      "values": [0.0]
-    },
-    {
-      "name": "maskFrameSize",
+      "name": "maskTextureSize",
       "type": "float",
       "count": 2,
-      "values": [16.0, 16.0]
+      "values": [1.0, 1.0]
+    },
+    {
+      "name": "maskViewportOrigin",
+      "type": "float",
+      "count": 2,
+      "values": [0.0, 0.0]
     },
     { "name": "time", "type": "float", "count": 1, "values": [0.0] },
     {
@@ -62,14 +60,14 @@
       "count": 4,
       "values": [0.72, 0.95, 1.0, 0.7]
     },
-    { "name": "outlineWidth", "type": "float", "count": 1, "values": [0.5] },
+    { "name": "outlineWidth", "type": "float", "count": 1, "values": [0.75] },
     { "name": "waveStart", "type": "float", "count": 1, "values": [0.25] },
-    { "name": "waveWidth", "type": "float", "count": 1, "values": [0.02] },
-    { "name": "waveSpacing", "type": "float", "count": 1, "values": [5.0] },
+    { "name": "waveWidth", "type": "float", "count": 1, "values": [0.03] },
+    { "name": "waveSpacing", "type": "float", "count": 1, "values": [6.0] },
     { "name": "waveSpeed", "type": "float", "count": 1, "values": [6.6] },
     { "name": "waveLifetime", "type": "float", "count": 1, "values": [0.45] },
     { "name": "waveDecay", "type": "float", "count": 1, "values": [0.9] },
-    { "name": "waveStrength", "type": "float", "count": 1, "values": [0.45] },
+    { "name": "waveStrength", "type": "float", "count": 1, "values": [0.6] },
     { "name": "maxDistance", "type": "float", "count": 1, "values": [8.0] },
     { "name": "edgeSoftness", "type": "float", "count": 1, "values": [0.95] },
     { "name": "alphaCutoff", "type": "float", "count": 1, "values": [0.1] },

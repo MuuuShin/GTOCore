@@ -22,7 +22,6 @@ public class ShaderItemModelBuilder<T extends ModelBuilder<T>> extends CustomLoa
     }
 
     private ResourceLocation shader;
-    private ResourceLocation mask;
     private final Map<String, JsonElement> params = new LinkedHashMap<>();
 
     protected ShaderItemModelBuilder(T parent, ExistingFileHelper existingFileHelper) {
@@ -32,12 +31,6 @@ public class ShaderItemModelBuilder<T extends ModelBuilder<T>> extends CustomLoa
     public ShaderItemModelBuilder<T> shader(ResourceLocation shader) {
         Preconditions.checkNotNull(shader, "shader must not be null");
         this.shader = shader;
-        return this;
-    }
-
-    public ShaderItemModelBuilder<T> mask(ResourceLocation mask) {
-        Preconditions.checkNotNull(mask, "mask must not be null");
-        this.mask = mask;
         return this;
     }
 
@@ -71,9 +64,6 @@ public class ShaderItemModelBuilder<T extends ModelBuilder<T>> extends CustomLoa
 
         JsonObject shaderObject = new JsonObject();
         shaderObject.addProperty("shader", shader.toString());
-        if (mask != null) {
-            shaderObject.addProperty("mask", mask.toString());
-        }
         if (!params.isEmpty()) {
             JsonObject paramsObject = new JsonObject();
             params.forEach(paramsObject::add);

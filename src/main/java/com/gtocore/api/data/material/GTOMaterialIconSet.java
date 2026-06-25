@@ -72,17 +72,31 @@ public final class GTOMaterialIconSet extends MaterialIconSet {
     public static final GTOMaterialIconSet ASTRAL = new GTOMaterialIconSet("cosmic_translucent", BRIGHT, false, HaloItemRenderer.ASTRIUM);
 
     public static final MaterialIconSet CRUPTIX = new GTOMaterialIconSet("cruptix", DULL, false, null,
-            (t, m) -> (ctx, provider) -> provider.generated(ctx.lazy(), getTextureLocation(t, DULL, provider))
-                    .customLoader(ShaderItemModelBuilder::begin)
-                    .shader(GTOCore.id("cruptix"))
-                    .param("resolution", 64f, 64f)
-                    .end());
+            (t, m) -> (ctx, provider) -> {
+                if (!t.doGenerateBlock()) {
+                    provider.generated(ctx.lazy(), getTextureLocation(t, DULL, provider))
+                            .customLoader(ShaderItemModelBuilder::begin)
+                            .shader(GTOCore.id("cruptix"))
+                            .param("resolution", 64f, 64f)
+                            .end();
+                }
+            });
     public static final MaterialIconSet ENDERITE = new GTOMaterialIconSet("enderite", DULL, false, null,
-            (t, m) -> (ctx, provider) -> provider.generated(ctx.lazy(), getTextureLocation(t, METALLIC, provider))
-                    .customLoader(ShaderItemModelBuilder::begin)
-                    .shader(GTOCore.id("item_resonance_wave"))
-                    .param("maxDistance", 8f)
-                    .end());
+            (t, m) -> (ctx, provider) -> {
+                if (t.doGenerateBlock()) {
+                    provider.withExistingParent(ctx.getName(), GTCEu.id("block/material_sets/" + DULL.name + "/" + t.materialIconType()))
+                            .customLoader(ShaderItemModelBuilder::begin)
+                            .shader(GTOCore.id("item_resonance_wave"))
+                            .param("maxDistance", 32f)
+                            .end();
+                } else {
+                    provider.generated(ctx.lazy(), getTextureLocation(t, METALLIC, provider))
+                            .customLoader(ShaderItemModelBuilder::begin)
+                            .shader(GTOCore.id("item_resonance_wave"))
+                            .param("maxDistance", 8f)
+                            .end();
+                }
+            });
 
     private static ResourceLocation[] getTextureLocation(TagPrefix tagPrefix, MaterialIconSet iconSet, RegistrateItemModelProvider provider) {
         ResourceLocation location = GTCEu.id("item/material_sets/" + iconSet.name + "/" + tagPrefix.materialIconType());

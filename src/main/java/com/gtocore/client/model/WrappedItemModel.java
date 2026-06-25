@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.ItemModelGenerator;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
@@ -28,6 +27,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public abstract class WrappedItemModel implements PerspectiveModel {
@@ -76,19 +76,46 @@ public abstract class WrappedItemModel implements PerspectiveModel {
     protected void renderWrapped(ItemStack stack, PoseStack poseStack, MultiBufferSource buffer, int packedLight,
                                  int packedOverlay, boolean fabulous,
                                  Function<com.mojang.blaze3d.vertex.VertexConsumer, com.mojang.blaze3d.vertex.VertexConsumer> consumerWrapper) {
-        BakedModel resolved = wrapped.getOverrides().resolve(wrapped, stack, world, entity, 0);
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel resolved = resolveWrappedModel(stack);
+        forEachRenderLayer(resolved, stack, fabulous, (renderPass, renderType) -> renderWrappedPass(
+                renderPass,
+                stack,
+                poseStack,
+                buffer,
+                packedLight,
+                packedOverlay,
+                renderType,
+                consumerWrapper));
+    }
+
+    protected BakedModel resolveWrappedModel(ItemStack stack) {
+        return wrapped.getOverrides().resolve(wrapped, stack, world, entity, 0);
+    }
+
+    protected void forEachRenderLayer(BakedModel resolved, ItemStack stack, boolean fabulous,
+                                      BiConsumer<BakedModel, RenderType> renderer) {
         for (BakedModel renderPass : resolved.getRenderPasses(stack, fabulous)) {
             for (RenderType renderType : renderPass.getRenderTypes(stack, fabulous)) {
-                itemRenderer.renderModelLists(
-                        renderPass,
-                        stack,
-                        packedLight,
-                        packedOverlay,
-                        poseStack,
-                        consumerWrapper.apply(buffer.getBuffer(renderType)));
+                renderer.accept(renderPass, renderType);
             }
         }
+    }
+
+    protected void renderWrappedPass(BakedModel renderPass, ItemStack stack, PoseStack poseStack, MultiBufferSource buffer,
+                                     int packedLight, int packedOverlay, RenderType renderType) {
+        renderWrappedPass(renderPass, stack, poseStack, buffer, packedLight, packedOverlay, renderType, Function.identity());
+    }
+
+    protected void renderWrappedPass(BakedModel renderPass, ItemStack stack, PoseStack poseStack, MultiBufferSource buffer,
+                                     int packedLight, int packedOverlay, RenderType renderType,
+                                     Function<com.mojang.blaze3d.vertex.VertexConsumer, com.mojang.blaze3d.vertex.VertexConsumer> consumerWrapper) {
+        Minecraft.getInstance().getItemRenderer().renderModelLists(
+                renderPass,
+                stack,
+                packedLight,
+                packedOverlay,
+                poseStack,
+                consumerWrapper.apply(buffer.getBuffer(renderType)));
     }
 
     @Override

@@ -2,9 +2,8 @@
 
 uniform sampler2D Sampler0;
 uniform vec4 ColorModulator;
-uniform vec2 maskUvMin;
-uniform vec2 maskUvMax;
-uniform float maskUvShrinkRatio;
+uniform vec2 maskTextureSize;
+uniform vec2 maskViewportOrigin;
 uniform float time;
 uniform vec2 resolution;
 uniform vec2 mousePos;
@@ -64,17 +63,16 @@ float fbm(vec2 pos) {
     return value;
 }
 
-vec2 shrinkMaskUv(vec2 uv) {
-    return mix(vec2(0.5), uv, 1.0 - clamp(maskUvShrinkRatio, 0.0, 1.0));
+vec2 screenMaskUv() {
+    return (gl_FragCoord.xy - maskViewportOrigin) / max(maskTextureSize, vec2(1.0));
 }
 
-vec4 sampleMask(vec2 uv) {
-    vec2 atlasUv = mix(maskUvMin, maskUvMax, shrinkMaskUv(uv));
-    return texture(Sampler0, atlasUv);
+vec4 sampleMask() {
+    return texture(Sampler0, screenMaskUv());
 }
 
 void main() {
-    vec4 mask = sampleMask(texCoord0);
+    vec4 mask = sampleMask();
     if (mask.a < 0.001) {
         discard;
     }

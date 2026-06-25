@@ -41,9 +41,10 @@ public class ShaderItemModelLoader implements IGeometryLoader<ShaderItemModelLoa
         if (!glslItem.has("shader")) {
             throw new IllegalStateException("Missing 'custom_shader.shader' property.");
         }
+        if (glslItem.has("mask")) {
+            throw new IllegalStateException("'custom_shader.mask' is no longer supported. Runtime projected masks are used automatically.");
+        }
 
-        ResourceLocation fallbackMask = readLayer0Texture(jsonObject);
-        ResourceLocation mask = glslItem.has("mask") ? RLUtils.parse(GsonHelper.getAsString(glslItem, "mask")) : fallbackMask;
         ResourceLocation shader = RLUtils.parse(GsonHelper.getAsString(glslItem, "shader"));
         Map<String, UniformValue> params = readParams(glslItem);
 
@@ -51,15 +52,7 @@ public class ShaderItemModelLoader implements IGeometryLoader<ShaderItemModelLoa
         baseModelJson.remove("custom_shader");
         baseModelJson.remove("loader");
         BlockModel baseModel = context.deserialize(baseModelJson, BlockModel.class);
-        return new ShaderItemGeometry(baseModel, mask, shader, params);
-    }
-
-    private static ResourceLocation readLayer0Texture(JsonObject jsonObject) {
-        JsonObject textures = GsonHelper.getAsJsonObject(jsonObject, "textures");
-        if (!textures.has("layer0")) {
-            throw new IllegalStateException("Missing 'textures.layer0' fallback for custom_shader mask.");
-        }
-        return RLUtils.parse(GsonHelper.getAsString(textures, "layer0"));
+        return new ShaderItemGeometry(baseModel, shader, params);
     }
 
     private static Map<String, UniformValue> readParams(JsonObject glslItem) {
@@ -77,13 +70,11 @@ public class ShaderItemModelLoader implements IGeometryLoader<ShaderItemModelLoa
     public static class ShaderItemGeometry implements IUnbakedGeometry<ShaderItemGeometry> {
 
         private final BlockModel baseModel;
-        private final ResourceLocation maskSprite;
         private final ResourceLocation shaderLocation;
         private final Map<String, UniformValue> params;
 
-        public ShaderItemGeometry(BlockModel baseModel, ResourceLocation maskSprite, ResourceLocation shaderLocation, Map<String, UniformValue> params) {
+        public ShaderItemGeometry(BlockModel baseModel, ResourceLocation shaderLocation, Map<String, UniformValue> params) {
             this.baseModel = baseModel;
-            this.maskSprite = maskSprite;
             this.shaderLocation = shaderLocation;
             this.params = params;
         }
@@ -92,7 +83,7 @@ public class ShaderItemModelLoader implements IGeometryLoader<ShaderItemModelLoa
         public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter,
                                ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation) {
             BakedModel bakedBase = baseModel.bake(baker, baseModel, spriteGetter, modelState, modelLocation, true);
-            return new ShaderItemBakedModel(bakedBase, maskSprite, shaderLocation, params);
+            return new ShaderItemBakedModel(bakedBase, ProjectedItemMaskProvider.INSTANCE, shaderLocation, params);
         }
 
         @Override

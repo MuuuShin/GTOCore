@@ -4,37 +4,32 @@ import com.gtocore.client.model.ShaderItemModelLoader.UniformValue;
 import com.gtocore.client.renderer.GTORenderTypes;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 import com.mojang.blaze3d.shaders.AbstractUniform;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import org.joml.Matrix4f;
 
 import java.util.Map;
 
 public class ShaderItemBakedModel extends WrappedItemModel {
 
-    private static final float ITEM_FRONT_Z = 8.5F / 16.0F;
-    private static final float ITEM_BACK_Z = 7.5F / 16.0F;
-    private static final float OVERLAY_Z_OFFSET = 0.001F;
+    private static final float OVERLAY_Z = 0.533F;
 
-    private final ResourceLocation maskSprite;
+    private final ShaderItemMaskProvider maskProvider;
     private final ResourceLocation shaderLocation;
     private final Map<String, UniformValue> params;
 
-    public ShaderItemBakedModel(BakedModel wrapped, ResourceLocation maskSprite, ResourceLocation shaderLocation, Map<String, UniformValue> params) {
+    public ShaderItemBakedModel(BakedModel wrapped, ShaderItemMaskProvider maskProvider, ResourceLocation shaderLocation, Map<String, UniformValue> params) {
         super(wrapped);
-        this.maskSprite = maskSprite;
+        this.maskProvider = maskProvider;
         this.shaderLocation = shaderLocation;
         this.params = params;
     }
@@ -52,24 +47,42 @@ public class ShaderItemBakedModel extends WrappedItemModel {
             return;
         }
 
-        var minecraft = Minecraft.getInstance();
-        TextureAtlasSprite maskAtlasSprite = minecraft.getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(maskSprite);
-        RenderType overlayRenderType = GTORenderTypes.getItemShaderOverlay(shaderLocation);
+        ShaderItemMaskProvider.RuntimeMask runtimeMask = maskProvider.capture(this, stack, poseStack, packedLight, packedOverlay);
+        if (runtimeMask == null) {
+            return;
+        }
 
-        applyParams(shader, maskAtlasSprite);
+        applyParams(shader, runtimeMask);
+        shader.setSampler("Sampler0", runtimeMask.textureId());
 
+        poseStack.pushPose();
+        poseStack.translate(0.0F, 0.0F, OVERLAY_Z);
         float overlayPadding = getOverlayPadding();
         float min = -overlayPadding;
         float max = 1.0F + overlayPadding;
 
-        MultiBufferSource.BufferSource overlayBuffer = MultiBufferSource.immediate(new BufferBuilder(256));
-        VertexConsumer consumer = overlayBuffer.getBuffer(overlayRenderType);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableCull();
+        RenderSystem.depthMask(false);
+        RenderSystem.setShader(() -> shader);
+        RenderSystem.setShaderTexture(0, runtimeMask.textureId());
+
+        var tesselator = Tesselator.getInstance();
+        BufferBuilder builder = tesselator.getBuilder();
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         Matrix4f matrix = poseStack.last().pose();
-        // Vanilla generated items have distinct front/back faces, so the shader overlay
-        // needs to be drawn on both sides instead of only the front plane.
-        renderOverlayQuad(consumer, matrix, min, max, ITEM_FRONT_Z + OVERLAY_Z_OFFSET);
-        renderOverlayQuad(consumer, matrix, min, max, ITEM_BACK_Z - OVERLAY_Z_OFFSET);
-        overlayBuffer.endBatch(overlayRenderType);
+        builder.vertex(matrix, max, max, 0.0F).uv(1.0F, 0.0F).endVertex();
+        builder.vertex(matrix, min, max, 0.0F).uv(0.0F, 0.0F).endVertex();
+        builder.vertex(matrix, min, min, 0.0F).uv(0.0F, 1.0F).endVertex();
+        builder.vertex(matrix, max, min, 0.0F).uv(1.0F, 1.0F).endVertex();
+        tesselator.end();
+
+        RenderSystem.depthMask(true);
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        poseStack.popPose();
     }
 
     @Override
@@ -80,7 +93,7 @@ public class ShaderItemBakedModel extends WrappedItemModel {
         return PerspectiveModelState.IDENTITY;
     }
 
-    private void applyParams(ShaderInstance shader, TextureAtlasSprite maskAtlasSprite) {
+    private void applyParams(ShaderInstance shader, ShaderItemMaskProvider.RuntimeMask runtimeMask) {
         for (Map.Entry<String, UniformValue> entry : params.entrySet()) {
             applyParam(entry.getKey(), shader, entry.getValue());
         }
@@ -94,10 +107,8 @@ public class ShaderItemBakedModel extends WrappedItemModel {
         float mouseY = (float) (minecraft.mouseHandler.ypos() * guiHeight / screenHeight);
         applyParam("mousePos", shader, new UniformValue(new float[] { mouseX, mouseY }));
         applyParam("resolution", shader, new UniformValue(new float[] { screenWidth, screenHeight }));
-        applyParam("maskUvMin", shader, new UniformValue(new float[] { maskAtlasSprite.getU0(), maskAtlasSprite.getV0() }));
-        applyParam("maskUvMax", shader, new UniformValue(new float[] { maskAtlasSprite.getU1(), maskAtlasSprite.getV1() }));
-        applyParam("maskUvShrinkRatio", shader, new UniformValue(new float[] { maskAtlasSprite.uvShrinkRatio() }));
-        applyParam("maskFrameSize", shader, new UniformValue(new float[] { maskAtlasSprite.contents().width(), maskAtlasSprite.contents().height() }));
+        applyParam("maskTextureSize", shader, new UniformValue(new float[] { runtimeMask.textureWidth(), runtimeMask.textureHeight() }));
+        applyParam("maskViewportOrigin", shader, new UniformValue(new float[] { runtimeMask.viewportX(), runtimeMask.viewportY() }));
         applyParam("overlayPadding", shader, new UniformValue(new float[] { getOverlayPadding() }));
     }
 
@@ -127,14 +138,5 @@ public class ShaderItemBakedModel extends WrappedItemModel {
             case 4 -> uniform.set(values[0], values[1], values[2], values[3]);
             default -> uniform.set(values);
         }
-    }
-
-    private static void renderOverlayQuad(VertexConsumer consumer, Matrix4f matrix, float min, float max, float z) {
-        float minU = 0.0F;
-        float maxU = 1.0F;
-        consumer.vertex(matrix, max, max, z).uv(maxU, 0.0F).endVertex();
-        consumer.vertex(matrix, min, max, z).uv(minU, 0.0F).endVertex();
-        consumer.vertex(matrix, min, min, z).uv(minU, 1.0F).endVertex();
-        consumer.vertex(matrix, max, min, z).uv(maxU, 1.0F).endVertex();
     }
 }

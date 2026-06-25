@@ -3,10 +3,8 @@
 uniform sampler2D Sampler0;
 uniform vec4 ColorModulator;
 uniform float time;
-uniform vec2 maskUvMin;
-uniform vec2 maskUvMax;
-uniform float maskUvShrinkRatio;
-uniform vec2 maskFrameSize;
+uniform vec2 maskTextureSize;
+uniform vec2 maskViewportOrigin;
 uniform vec4 outlineColor;
 uniform vec4 waveColor;
 uniform float outlineWidth;
@@ -51,29 +49,19 @@ bool insideUv(vec2 uv) {
     return uv.x >= 0.0 && uv.y >= 0.0 && uv.x <= 1.0 && uv.y <= 1.0;
 }
 
-vec2 toMaskUv(vec2 overlayUv, float padding) {
-    float scale = 1.0 + padding * 2.0;
-    return overlayUv * scale - vec2(padding);
+vec2 screenMaskUv() {
+    return (gl_FragCoord.xy - maskViewportOrigin) / max(maskTextureSize, vec2(1.0));
 }
 
-vec2 shrinkMaskUv(vec2 uv) {
-    return mix(vec2(0.5), uv, 1.0 - clamp(maskUvShrinkRatio, 0.0, 1.0));
-}
-
-vec2 toAtlasUv(vec2 maskUv) {
-    return mix(maskUvMin, maskUvMax, shrinkMaskUv(maskUv));
-}
-
-float sampleMaskAlpha(vec2 overlayUv, float cutoff, float padding) {
-    vec2 maskUv = toMaskUv(overlayUv, padding);
-    if (!insideUv(maskUv)) {
+float sampleMaskAlpha(vec2 screenUv, float cutoff) {
+    if (!insideUv(screenUv)) {
         return 0.0;
     }
-    float alpha = texture(Sampler0, toAtlasUv(maskUv)).a;
+    float alpha = texture(Sampler0, screenUv).a;
     return alpha >= cutoff ? alpha : 0.0;
 }
 
-float findOuterDistance(vec2 uv, vec2 texelSize, float cutoff, float limitPx, float padding) {
+float findOuterDistance(vec2 uv, vec2 texelSize, float cutoff, float limitPx) {
     for (int step = 1; step <= MAX_DISTANCE_STEPS; step++) {
         float radius = float(step);
         if (radius > limitPx) {
@@ -81,7 +69,7 @@ float findOuterDistance(vec2 uv, vec2 texelSize, float cutoff, float limitPx, fl
         }
         for (int i = 0; i < DIRECTION_COUNT; i++) {
             vec2 sampleUv = uv + DIRECTIONS[i] * texelSize * radius;
-            if (sampleMaskAlpha(sampleUv, cutoff, padding) > 0.0) {
+            if (sampleMaskAlpha(sampleUv, cutoff) > 0.0) {
                 return radius;
             }
         }
@@ -91,15 +79,15 @@ float findOuterDistance(vec2 uv, vec2 texelSize, float cutoff, float limitPx, fl
 
 void main() {
     float cutoff = clamp(alphaCutoff, 0.001, 0.999);
-    float padding = max(overlayPadding, 0.0);
-    float centerAlpha = sampleMaskAlpha(texCoord0, cutoff, padding);
+    vec2 maskUv = screenMaskUv();
+    float centerAlpha = sampleMaskAlpha(maskUv, cutoff);
     if (centerAlpha >= cutoff) {
         discard;
     }
 
-    vec2 texelSize = 1.0 / ((1.0 + padding * 2.0) * max(maskFrameSize, vec2(1.0)));
+    vec2 texelSize = 1.0 / max(maskTextureSize, vec2(1.0));
     float searchLimit = min(maxDistance, float(MAX_DISTANCE_STEPS));
-    float distancePx = findOuterDistance(texCoord0, texelSize, cutoff, searchLimit, padding);
+    float distancePx = findOuterDistance(maskUv, texelSize, cutoff, searchLimit);
     if (distancePx > searchLimit) {
         discard;
     }
