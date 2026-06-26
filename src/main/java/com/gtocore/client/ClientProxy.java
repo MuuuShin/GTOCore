@@ -203,6 +203,10 @@ public final class ClientProxy extends CommonProxy {
                     event.getResourceProvider(),
                     GTORenderTypes.BLACK_HOLE_EVENT_HORIZON_SHADER_LOCATION,
                     com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR), GTORenderTypes::setBlackHoleEventHorizonShader);
+            event.registerShader(new net.minecraft.client.renderer.ShaderInstance(
+                    event.getResourceProvider(),
+                    GTORenderTypes.DIMENSIONALLY_TRANSCENDENT_OVERLAY_SHADER_LOCATION,
+                    com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR), GTORenderTypes::setDimensionallyTranscendentOverlayShader);
             registerCustomItemShader(event, GTORenderTypes.CRUPTIX);
             registerCustomItemShader(event, GTORenderTypes.ITEM_RESONANCE_WAVE);
         } catch (java.io.IOException e) {
