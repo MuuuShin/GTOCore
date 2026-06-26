@@ -761,6 +761,7 @@ public final class MultiBlockD {
                     .allRotation()
                     .langValue("Fusion Reactor Computer MK %s".formatted(FormattingUtil.toRomanNumeral(tier - 5)))
                     .recipeTypes(GTRecipeTypes.FUSION_RECIPES)
+                    .recipeModifiers(FusionReactorMachine::recipeModifier)
                     .tooltipsKey("gtceu.machine.fusion_reactor.capacity", FusionReactorMachine.calculateEnergyStorageFactor(tier, 16) / 1000000L)
                     .tooltipsKey("gtceu.machine.fusion_reactor.overclocking")
                     .tooltipsKey("gtocore.machine.%s_fusion_reactor.description".formatted(GTValues.VN[tier].toLowerCase(Locale.ROOT)))
