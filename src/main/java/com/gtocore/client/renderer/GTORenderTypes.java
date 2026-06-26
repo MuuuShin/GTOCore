@@ -19,9 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class GTORenderTypes extends RenderType {
 
     private static ShaderInstance blackHoleEventHorizonShader;
+    private static ShaderInstance dimensionallyTranscendentOverlayShader;
     private static final Map<ResourceLocation, ShaderInstance> SHADERS = new ConcurrentHashMap<>();
 
     private static final ShaderStateShard BLACK_HOLE_EVENT_HORIZON_SHADER = new ShaderStateShard(() -> Objects.requireNonNull(blackHoleEventHorizonShader, "Black hole shader not loaded"));
+    private static final ShaderStateShard DIMENSIONALLY_TRANSCENDENT_OVERLAY_SHADER = new ShaderStateShard(() -> Objects.requireNonNull(dimensionallyTranscendentOverlayShader, "Dimensionally transcendent overlay shader not loaded"));
 
     public static final RenderType LIGHT_CYLINDER = RenderType.create("light_cylinder",
             DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP, 256, false, false,
@@ -58,6 +60,14 @@ public final class GTORenderTypes extends RenderType {
                     .setShaderState(BLACK_HOLE_EVENT_HORIZON_SHADER)
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(false));
+    public static final RenderType DIMENSIONALLY_TRANSCENDENT_OVERLAY = RenderType.create("dimensionally_transcendent_overlay",
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES, 131072, false, false,
+            RenderType.CompositeState.builder()
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setCullState(NO_CULL)
+                    .setShaderState(DIMENSIONALLY_TRANSCENDENT_OVERLAY_SHADER)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
 
     private GTORenderTypes(String name, VertexFormat format, VertexFormat.Mode mode, int bufferSize,
                            boolean affectsCrumbling, boolean sortOnUpload, Runnable setupState, Runnable clearState) {
@@ -65,6 +75,7 @@ public final class GTORenderTypes extends RenderType {
     }
 
     public static final ResourceLocation BLACK_HOLE_EVENT_HORIZON_SHADER_LOCATION = GTOCore.id("black_hole_event_horizon");
+    public static final ResourceLocation DIMENSIONALLY_TRANSCENDENT_OVERLAY_SHADER_LOCATION = GTOCore.id("dimensionally_transcendent_overlay");
 
     public static final ResourceLocation CRUPTIX = GTOCore.id("cruptix");
     public static final ResourceLocation ITEM_RESONANCE_WAVE = GTOCore.id("item_resonance_wave");
@@ -78,6 +89,17 @@ public final class GTORenderTypes extends RenderType {
     @OnlyIn(Dist.CLIENT)
     public static ShaderInstance getBlackHoleEventHorizonShader() {
         return blackHoleEventHorizonShader;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void setDimensionallyTranscendentOverlayShader(ShaderInstance shader) {
+        dimensionallyTranscendentOverlayShader = shader;
+        SHADERS.put(DIMENSIONALLY_TRANSCENDENT_OVERLAY_SHADER_LOCATION, shader);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static ShaderInstance getDimensionallyTranscendentOverlayShader() {
+        return dimensionallyTranscendentOverlayShader;
     }
 
     @OnlyIn(Dist.CLIENT)

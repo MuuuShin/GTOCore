@@ -4,7 +4,6 @@ import com.gtocore.client.renderer.GTORenderTypes;
 import com.gtocore.client.renderer.RenderHelper;
 
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
@@ -15,14 +14,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import org.joml.Matrix4f;
-import org.joml.Vector4f;
 
 @OnlyIn(Dist.CLIENT)
 public class BlackHole extends AbstractFX {
@@ -49,9 +43,6 @@ public class BlackHole extends AbstractFX {
             new SphereMesh(40, 80),
             new SphereMesh(64, 128)
     };
-
-    private static TextureTarget sceneTarget;
-    private static boolean sceneCopiedThisFrame;
 
     public Vec3 center;
     public double coreRadius;
@@ -95,14 +86,13 @@ public class BlackHole extends AbstractFX {
         Vec3 cameraPos = camera.getPosition();
         worldStack.translate(this.center.x - cameraPos.x, this.center.y - cameraPos.y, this.center.z - cameraPos.z);
 
-        ScreenSpaceSphere screenSphere = ScreenSpaceSphere.project(this.center, core, eventHorizon, camera, poseStack, projectionMatrix);
+        ScreenSpaceProjection.Sphere screenSphere = ScreenSpaceProjection.projectSphere(this.center, core, eventHorizon, camera, poseStack, projectionMatrix);
         if (screenSphere == null) {
             return;
         }
 
-        ensureSceneTarget();
-        copySceneToTarget(levelRenderer, partialTick);
-        renderEventHorizon(worldStack, eventHorizon, screenSphere);
+        var sceneTarget = ScreenSpaceSceneCapture.capture(levelRenderer);
+        renderEventHorizon(worldStack, eventHorizon, screenSphere, sceneTarget);
         renderCore(worldStack, core, screenSphere);
     }
 
@@ -120,66 +110,31 @@ public class BlackHole extends AbstractFX {
         return 0.0F;
     }
 
-    public static void beginFrame() {
-        sceneCopiedThisFrame = false;
-    }
-
-    private static void renderCore(PoseStack poseStack, float coreRadius, ScreenSpaceSphere screenSphere) {
-        renderSphereMesh(poseStack, coreRadius, pickSphereMesh(CORE_MESHES, screenSphere.coreRadius),
+    private static void renderCore(PoseStack poseStack, float coreRadius, ScreenSpaceProjection.Sphere screenSphere) {
+        ScreenSpaceMeshRenderer.renderScaled(poseStack, pickSphereMesh(CORE_MESHES, screenSphere.innerRadius()).getBuffer(),
                 GTORenderTypes.BLACK_HOLE_CORE, GameRenderer.getPositionColorShader(),
+                coreRadius, coreRadius, coreRadius,
                 0.0F, 0.0F, 0.0F, 1.0F);
     }
 
-    private static void renderEventHorizon(PoseStack poseStack, float eventHorizonRadius, ScreenSpaceSphere screenSphere) {
+    private static void renderEventHorizon(PoseStack poseStack, float eventHorizonRadius, ScreenSpaceProjection.Sphere screenSphere,
+                                           com.mojang.blaze3d.pipeline.TextureTarget sceneTarget) {
         ShaderInstance shader = GTORenderTypes.getBlackHoleEventHorizonShader();
         if (shader == null || sceneTarget == null) {
             return;
         }
 
         shader.setSampler("DiffuseSampler", sceneTarget.getColorTextureId());
-        shader.safeGetUniform("BlackHoleCenterScreen").set(screenSphere.centerX, screenSphere.centerY);
+        shader.safeGetUniform("BlackHoleCenterScreen").set(screenSphere.centerX(), screenSphere.centerY());
         shader.safeGetUniform("BlackHoleRadiusScreen").set(getCoreMaskRadius(screenSphere));
-        shader.safeGetUniform("EventHorizonRadiusScreen").set(screenSphere.eventHorizonRadius);
+        shader.safeGetUniform("EventHorizonRadiusScreen").set(screenSphere.outerRadius());
         shader.safeGetUniform("DistortionStrength").set(DISTORTION_STRENGTH);
         shader.safeGetUniform("ScreenSize").set((float) sceneTarget.viewWidth, (float) sceneTarget.viewHeight);
 
-        renderSphereMesh(poseStack, eventHorizonRadius, pickSphereMesh(EVENT_HORIZON_MESHES, screenSphere.eventHorizonRadius),
+        ScreenSpaceMeshRenderer.renderScaled(poseStack, pickSphereMesh(EVENT_HORIZON_MESHES, screenSphere.outerRadius()).getBuffer(),
                 GTORenderTypes.BLACK_HOLE_EVENT_HORIZON, shader,
+                eventHorizonRadius, eventHorizonRadius, eventHorizonRadius,
                 1.0F, 1.0F, 1.0F, 1.0F);
-    }
-
-    private static void ensureSceneTarget() {
-        Minecraft minecraft = Minecraft.getInstance();
-        RenderTarget mainTarget = minecraft.getMainRenderTarget();
-        if (sceneTarget == null || sceneTarget.width != mainTarget.width || sceneTarget.height != mainTarget.height) {
-            if (sceneTarget != null) {
-                sceneTarget.destroyBuffers();
-            }
-            sceneTarget = new TextureTarget(mainTarget.width, mainTarget.height, false, Minecraft.ON_OSX);
-            sceneTarget.setClearColor(0.0F, 0.0F, 0.0F, 0.0F);
-            sceneTarget.setFilterMode(9729);
-        }
-    }
-
-    private static void copySceneToTarget(LevelRenderer levelRenderer, float partialTick) {
-        if (sceneCopiedThisFrame) {
-            return;
-        }
-
-        RenderTarget mainTarget = Minecraft.getInstance().getMainRenderTarget();
-        RenderTarget outputTarget = Minecraft.useShaderTransparency() && levelRenderer.getWeatherTarget() != null ? levelRenderer.getWeatherTarget() : mainTarget;
-        sceneTarget.clear(Minecraft.ON_OSX);
-        GlStateManager._glBindFramebuffer(36008, outputTarget.frameBufferId);
-        GlStateManager._glBindFramebuffer(36009, sceneTarget.frameBufferId);
-        GlStateManager._glBlitFrameBuffer(
-                0, 0, outputTarget.width, outputTarget.height,
-                0, 0, sceneTarget.width, sceneTarget.height,
-                16384, 9728);
-        GlStateManager._glBindFramebuffer(36160, 0);
-        outputTarget.bindWrite(true);
-        Minecraft minecraft = Minecraft.getInstance();
-        RenderSystem.viewport(0, 0, minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
-        sceneCopiedThisFrame = true;
     }
 
     private static SphereMesh pickSphereMesh(SphereMesh[] meshes, float projectedRadiusPixels) {
@@ -195,40 +150,9 @@ public class BlackHole extends AbstractFX {
         return meshes[0];
     }
 
-    private static void renderSphereMesh(PoseStack poseStack, float radius, SphereMesh mesh,
-                                         net.minecraft.client.renderer.RenderType renderType, ShaderInstance shader,
-                                         float red, float green, float blue, float alpha) {
-        VertexBuffer vertexBuffer = mesh.getBuffer();
-        if (vertexBuffer == null) {
-            return;
-        }
-
-        renderType.setupRenderState();
-        RenderSystem.setShader(() -> shader);
-        RenderSystem.setShaderColor(red, green, blue, alpha);
-        poseStack.pushPose();
-        poseStack.scale(radius, radius, radius);
-        vertexBuffer.bind();
-        vertexBuffer.drawWithShader(poseStack.last().pose(), RenderSystem.getProjectionMatrix(), shader);
-        VertexBuffer.unbind();
-        poseStack.popPose();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        renderType.clearRenderState();
-    }
-
-    private static float getCoreMaskRadius(ScreenSpaceSphere screenSphere) {
-        float inset = Mth.clamp(screenSphere.coreRadius * 0.01F, CORE_MASK_INSET_MIN, CORE_MASK_INSET_MAX);
-        return Math.max(screenSphere.coreRadius - inset, MIN_VISIBLE_RADIUS);
-    }
-
-    @Override
-    protected void onDiscard() {
-        super.onDiscard();
-        if (FXManager.FX_LIST.stream().noneMatch(BlackHole.class::isInstance) && sceneTarget != null) {
-            sceneTarget.destroyBuffers();
-            sceneTarget = null;
-            sceneCopiedThisFrame = false;
-        }
+    private static float getCoreMaskRadius(ScreenSpaceProjection.Sphere screenSphere) {
+        float inset = Mth.clamp(screenSphere.innerRadius() * 0.01F, CORE_MASK_INSET_MIN, CORE_MASK_INSET_MAX);
+        return Math.max(screenSphere.innerRadius() - inset, MIN_VISIBLE_RADIUS);
     }
 
     private static final class SphereMesh {
@@ -247,83 +171,6 @@ public class BlackHole extends AbstractFX {
                 buffer = RenderHelper.buildUnitSphereBuffer(latitudeSegments, longitudeSegments);
             }
             return buffer;
-        }
-    }
-
-    private record ScreenSpaceSphere(float centerX, float centerY, float coreRadius, float eventHorizonRadius) {
-
-        private static ScreenSpaceSphere project(Vec3 center, float coreRadius, float eventHorizonRadius, Camera camera, PoseStack poseStack, Matrix4f projectionMatrix) {
-            Minecraft minecraft = Minecraft.getInstance();
-            int screenWidth = minecraft.getWindow().getWidth();
-            int screenHeight = minecraft.getWindow().getHeight();
-            if (screenWidth <= 0 || screenHeight <= 0) {
-                return null;
-            }
-
-            Vec3 cameraRelative = center.subtract(camera.getPosition());
-            Matrix4f viewProjection = new Matrix4f(projectionMatrix);
-            viewProjection.mul(poseStack.last().pose());
-
-            Vector4f centerClip = new Vector4f((float) cameraRelative.x, (float) cameraRelative.y, (float) cameraRelative.z, 1.0F);
-            viewProjection.transform(centerClip);
-            if (centerClip.w <= 0.0F) {
-                return null;
-            }
-
-            Vector4f horizonClip = createOffsetPoint(cameraRelative, camera, eventHorizonRadius);
-            viewProjection.transform(horizonClip);
-            if (horizonClip.w <= 0.0F) {
-                return null;
-            }
-
-            Vector4f coreClip = createOffsetPoint(cameraRelative, camera, coreRadius);
-            viewProjection.transform(coreClip);
-            if (coreClip.w <= 0.0F) {
-                return null;
-            }
-
-            float centerNdcX = centerClip.x / centerClip.w;
-            float centerNdcY = centerClip.y / centerClip.w;
-
-            float centerScreenX = (centerNdcX * 0.5F + 0.5F) * screenWidth;
-            float centerScreenY = (centerNdcY * 0.5F + 0.5F) * screenHeight;
-
-            float eventRadiusPixels = projectRadiusPixels(cameraRelative, camera, eventHorizonRadius, viewProjection, centerNdcX, centerNdcY, screenWidth, screenHeight);
-            float coreRadiusPixels = projectRadiusPixels(cameraRelative, camera, coreRadius, viewProjection, centerNdcX, centerNdcY, screenWidth, screenHeight);
-            if (eventRadiusPixels <= MIN_VISIBLE_RADIUS || coreRadiusPixels >= eventRadiusPixels) {
-                return null;
-            }
-
-            return new ScreenSpaceSphere(centerScreenX, centerScreenY, coreRadiusPixels, eventRadiusPixels);
-        }
-
-        private static float projectRadiusPixels(Vec3 cameraRelative, Camera camera, float radius, Matrix4f viewProjection,
-                                                 float centerNdcX, float centerNdcY, int screenWidth, int screenHeight) {
-            float horizontalRadius = projectAxisRadiusPixels(cameraRelative, camera.getLeftVector(), radius, viewProjection, centerNdcX, centerNdcY, screenWidth, screenHeight);
-            float verticalRadius = projectAxisRadiusPixels(cameraRelative, camera.getUpVector(), radius, viewProjection, centerNdcX, centerNdcY, screenWidth, screenHeight);
-            return Math.max(horizontalRadius, verticalRadius);
-        }
-
-        private static float projectAxisRadiusPixels(Vec3 cameraRelative, org.joml.Vector3f axis, float radius, Matrix4f viewProjection,
-                                                     float centerNdcX, float centerNdcY, int screenWidth, int screenHeight) {
-            Vector4f clip = new Vector4f((float) (cameraRelative.x + axis.x() * radius),
-                    (float) (cameraRelative.y + axis.y() * radius),
-                    (float) (cameraRelative.z + axis.z() * radius), 1.0F);
-            viewProjection.transform(clip);
-            if (clip.w <= 0.0F) {
-                return 0.0F;
-            }
-
-            float ndcX = clip.x / clip.w;
-            float ndcY = clip.y / clip.w;
-            return (float) Math.hypot((ndcX - centerNdcX) * 0.5F * screenWidth,
-                    (ndcY - centerNdcY) * 0.5F * screenHeight);
-        }
-
-        private static Vector4f createOffsetPoint(Vec3 cameraRelative, Camera camera, float radius) {
-            return new Vector4f((float) (cameraRelative.x + camera.getLeftVector().x() * radius),
-                    (float) (cameraRelative.y + camera.getLeftVector().y() * radius),
-                    (float) (cameraRelative.z + camera.getLeftVector().z() * radius), 1.0F);
         }
     }
 }

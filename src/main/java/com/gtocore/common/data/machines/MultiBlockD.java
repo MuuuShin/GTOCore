@@ -186,7 +186,8 @@ public final class MultiBlockD {
                     .where('U', controller(definition))
                     .where(' ', any())
                     .build())
-            .workableCasingRenderer(GTOCore.id("block/casings/dimensionally_transcendent_casing"), GTOCore.id("block/multiblock/dimensionally_transcendent_plasma_forge"))
+            .renderer(DimensionallyTranscendentRenderer::new)
+            .hasTESR(true)
             .register();
 
     public static final MultiblockMachineDefinition CIRCUIT_ASSEMBLY_LINE = multiblock("circuit_assembly_line", "电路装配线", CircuitAssemblyLineMachine::new)

@@ -236,6 +236,20 @@ public final class RenderHelper {
         return vertexBuffer;
     }
 
+    public static VertexBuffer buildUnitCylinderBuffer(int sides) {
+        VertexBuffer vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
+        PoseStack poseStack = new PoseStack();
+
+        bufferBuilder.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+        renderCylinder(poseStack, bufferBuilder, 0.0F, 0.0F, 0.0F, 1.0F, 1.0F, sides, 1.0F, 1.0F, 1.0F, 1.0F);
+
+        vertexBuffer.bind();
+        vertexBuffer.upload(bufferBuilder.end());
+        VertexBuffer.unbind();
+        return vertexBuffer;
+    }
+
     public static void renderCameraFacingQuad(PoseStack poseStack, VertexConsumer buffer,
                                               Vector3f left, Vector3f up,
                                               float halfWidth, float halfHeight,
