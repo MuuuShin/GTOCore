@@ -276,14 +276,14 @@ public final class MultiBlockF {
             .workableCasingRenderer(GTCEu.id("block/casings/hpca/high_power_casing"), GTOCore.id("block/multiblock/general1"))
             .register();
 
-    public static final MultiblockMachineDefinition SWARM_CORE = multiblock("swarm_core", "蜂群之心", CustomParallelMultiblockMachine.createParallel(m -> 8192, true))
+    public static final MultiblockMachineDefinition SWARM_CORE = multiblock("swarm_core", "蜂群之心", CustomParallelMultiblockMachine.createParallel(m -> 8192))
             .nonYAxisRotation()
             .tooltips(GTOMachineStories.SwarmCoreTooltips)
             .tooltips(GTOMachineTooltips.SwarmCoreTooltips)
             .perfectOCTooltips()
             .laserTooltips()
             .recipeTypes(GTORecipeTypes.NANO_FORGE_RECIPES)
-            .recipeModifiers(GTORecipeModifiers.POWER_AMPLIFIER, RecipeModifier.overclocking(0.5, 1, 0.05))
+            .recipeModifiers(GTORecipeModifiers.POWER_AMPLIFIER, GTORecipeModifiers.PARALLEL, RecipeModifier.overclocking(0.5, 1, 0.05))
             .block(GTOBlocks.NAQUADAH_ALLOY_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', GTOPredicates.frame(GTOMaterials.Amprosium))

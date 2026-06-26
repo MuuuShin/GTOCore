@@ -417,7 +417,7 @@ public final class GCYMMachines {
                     return 1L << (long) (m.getTemperature() / 900.0D);
                 }
                 return 1;
-            }, false, true, false))
+            }, true, false))
             .genLang("合金冶炼炉")
             .tooltipsKey("gtocore.machine.recipe.run", Component.translatable("gtceu.alloy_blast_smelter"))
             .tooltipsKey("gtceu.machine.electric_blast_furnace.tooltip.0")

@@ -516,11 +516,11 @@ public final class MultiBlockC {
             .register();
 
     public static final MultiblockMachineDefinition CHEMICAL_VAPOR_DEPOSITION = multiblock("chemical_vapor_deposition", "化学气相沉积系统",
-            CoilCustomParallelMultiblockMachine.createParallelCoil(m -> 1L << (2 * (m.getTier() - 1)), true, false, false))
+            CoilCustomParallelMultiblockMachine.createParallelCoil(m -> 1L << (2 * (m.getTier() - 1)), false, false))
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.ChemicalVaporDepositionTooltips)
             .recipeTypes(GTORecipeTypes.CHEMICAL_VAPOR_DEPOSITION_RECIPES)
-            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.max(0.2, 0.8 * Math.pow(0.4, (((ICoilMachine) m).getTemperature() - 5400D) / 9000D))), GTORecipeModifiers.UPGRADE_OVERCLOCK)
+            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.max(0.2, 0.8 * Math.pow(0.4, (((ICoilMachine) m).getTemperature() - 5400D) / 9000D))), GTORecipeModifiers.UPGRADE_PARALLELIZABLE_OVERCLOCK)
             .block(GTBlocks.CASING_PTFE_INERT)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STAINLESS_CLEAN.get()))
@@ -540,11 +540,11 @@ public final class MultiBlockC {
             .register();
 
     public static final MultiblockMachineDefinition PHYSICAL_VAPOR_DEPOSITION = multiblock("physical_vapor_deposition", "物理气相沉积系统",
-            TierCasingParallelMultiblockMachine.createParallel(m -> 1L << (2 * (m.getTier() - 1)), true, GTORecipeDataKeys.GLASS_TIER))
+            TierCasingParallelMultiblockMachine.createParallel(m -> 1L << (2 * (m.getTier() - 1)), GTORecipeDataKeys.GLASS_TIER))
             .nonYAxisRotation()
             .tooltips(GTOMachineTooltips.PhysicalVaporDepositionTooltips)
             .recipeTypes(GTORecipeTypes.PHYSICAL_VAPOR_DEPOSITION_RECIPES)
-            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.sqrt(1.0D / ((ITierCasingMachine) m).getCasingTier(GTORecipeDataKeys.GLASS_TIER))), GTORecipeModifiers.UPGRADE_OVERCLOCK)
+            .recipeModifiers((m, u, r) -> RecipeModifier.multiplier(r, 1, Math.sqrt(1.0D / ((ITierCasingMachine) m).getCasingTier(GTORecipeDataKeys.GLASS_TIER))), GTORecipeModifiers.UPGRADE_PARALLELIZABLE_OVERCLOCK)
             .block(GTBlocks.PLASTCRETE)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_TUNGSTENSTEEL_ROBUST.get()))

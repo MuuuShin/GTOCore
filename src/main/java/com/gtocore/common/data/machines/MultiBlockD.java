@@ -336,7 +336,7 @@ public final class MultiBlockD {
             .tooltips(GTOMachineStories.ColdIceFreezerTooltips)
             .tooltips(GTOMachineTooltips.ColdIceFreezerTooltips)
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(64))
-            .recipeModifiers(GTORecipeModifiers.POWER_AMPLIFIER, RecipeModifier.overclocking(0.5, 1, 0.5))
+            .recipeModifiers(GTORecipeModifiers.POWER_AMPLIFIER, GTORecipeModifiers.PARALLEL, RecipeModifier.overclocking(0.5, 1, 0.5))
             .block(GTOBlocks.COLD_ICE_CASING)
             .pattern(definition -> FactoryBlockPattern.start(definition, RelativeDirection.RIGHT, RelativeDirection.UP, RelativeDirection.BACK)
                     .aisle("AAAAA", " BBB ", " BGB ", " BBB ", "AAAAA")

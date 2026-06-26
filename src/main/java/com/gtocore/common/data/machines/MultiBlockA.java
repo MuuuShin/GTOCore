@@ -437,7 +437,7 @@ public final class MultiBlockA {
             .tooltips(GTOMachineTooltips.ChemicalFactoryTooltips)
             .parallelizableTooltips()
             .perfectOCTooltips()
-            .recipeModifier(RecipeModifier.coilReductionOverclock(0.25))
+            .recipeModifier(GTORecipeModifiers.coilReductionOverclock(0.25))
             .block(GTBlocks.CASING_PTFE_INERT)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('a', controller(definition))
@@ -480,7 +480,7 @@ public final class MultiBlockA {
             .workableCasingRenderer(GTOCore.id("block/casings/hyper_mechanical_casing"), GTCEu.id("block/multiblock/data_bank"))
             .register();
 
-    public static final MultiblockMachineDefinition RECYCLER = multiblock("recycler", "回收机", CustomParallelMultiblockMachine.createParallel(m -> 1L << Math.max(0, (2 * (m.getTier() - 4))), true))
+    public static final MultiblockMachineDefinition RECYCLER = multiblock("recycler", "回收机", CustomParallelMultiblockMachine.createParallel(m -> 1L << Math.max(0, (2 * (m.getTier() - 4)))))
             .allRotation()
             .recipeTypes(GTORecipeTypes.RECYCLER_RECIPES)
             .tooltips(GTOMachineStories.RecyclingMachineTooltips)
@@ -488,7 +488,7 @@ public final class MultiBlockA {
             .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(
                     h -> h.addLines("自EV起，每升一级电压，获得的并行x4", "From EV, every voltage tier increase grants x4 parallelism"),
                     c -> c.addCommentLines("公式 : max(1, 4^(tier-4)), 算去吧", "Formula: max(1, 4^(tier-4)), do the math")))
-            .overclock()
+            .parallelizableOverclock()
             .block(GTBlocks.STEEL_HULL)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STEEL_SOLID.get()))
@@ -568,7 +568,7 @@ public final class MultiBlockA {
             .lossyOCTooltips()
             .glassParallelTooltips()
             .laserTooltips()
-            .recipeModifier(RecipeModifier::laserLossOverclocking)
+            .recipeModifiers(GTORecipeModifiers.PARALLEL, RecipeModifier::laserLossOverclocking)
             .block(GTOBlocks.OXIDATION_RESISTANT_HASTELLOY_N_MECHANICAL_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('a', controller(definition))
@@ -627,11 +627,11 @@ public final class MultiBlockA {
             .recoveryStaticItems(() -> ChemicalHelper.get(TagPrefix.dustTiny, GTMaterials.Obsidian).getItem())
             .register();
 
-    public static final MultiblockMachineDefinition LARGE_GAS_COLLECTOR = multiblock("large_gas_collector", "大型集气室", CustomParallelMultiblockMachine.createParallel(m -> 100000, true))
+    public static final MultiblockMachineDefinition LARGE_GAS_COLLECTOR = multiblock("large_gas_collector", "大型集气室", CustomParallelMultiblockMachine.createParallel(m -> 100000))
             .noneRotation()
             .tooltips(GTOMachineStories.AtmosphereCollectorRoomTooltips)
             .recipeTypes(GTORecipeTypes.LARGE_GAS_COLLECTOR_RECIPES)
-            .overclock()
+            .parallelizableOverclock()
             .block(GTBlocks.CASING_STEEL_SOLID)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('d', controller(definition))
@@ -667,10 +667,10 @@ public final class MultiBlockA {
             .recipeModifiers((m, u, r) -> {
                 if (m instanceof ElectricMultiblockMachine workableElectricMultiblockMachine) {
                     if (r.definition.recipeType == GTRecipeTypes.LASER_ENGRAVER_RECIPES)
-                        return RecipeModifier.hatchParallel(workableElectricMultiblockMachine, u, r);
+                        return GTORecipeModifiers.parallel(workableElectricMultiblockMachine, u, r);
                     if (r.definition.recipeType == GTORecipeTypes.LASER_WELDER_RECIPES) {
                         r.duration = r.duration / 5;
-                        return RecipeModifier.hatchParallel(workableElectricMultiblockMachine, u, r);
+                        return GTORecipeModifiers.parallel(workableElectricMultiblockMachine, u, r);
                     }
                 }
                 return r;
@@ -889,7 +889,7 @@ public final class MultiBlockA {
             .recipeTypes(GTRecipeTypes.CRACKING_RECIPES)
             .tooltips(Component.translatable("gtceu.machine.cracker.tooltip.1"))
             .parallelizableTooltips()
-            .recipeModifiers(RecipeModifier.HATCH_PARALLEL, RecipeModifier.CRACKER_OVERCLOCK)
+            .recipeModifiers(GTORecipeModifiers.PARALLEL, RecipeModifier.CRACKER_OVERCLOCK)
             .block(GTBlocks.CASING_STAINLESS_CLEAN)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('~', controller(definition))
@@ -1397,7 +1397,7 @@ public final class MultiBlockA {
             .nonYAxisRotation()
             .recipeTypes(GTRecipeTypes.PYROLYSE_RECIPES)
             .parallelizableTooltips()
-            .recipeModifiers(RecipeModifier.HATCH_PARALLEL, RecipeModifier.PYROLYSE_OVEN_OVERCLOCK)
+            .recipeModifiers(GTORecipeModifiers.PARALLEL, RecipeModifier.PYROLYSE_OVEN_OVERCLOCK)
             .block(GTBlocks.CASING_STAINLESS_CLEAN)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', frames(GTMaterials.Ruridit))
@@ -1707,7 +1707,7 @@ public final class MultiBlockA {
             return 1L << (long) (m.getTemperature() / 900.0D);
         }
         return 1;
-    }, false, false, false))
+    }, false, false))
             .allRotation()
             .recipeTypes(GTORecipeTypes.VACUUM_DRYING_RECIPES)
             .recipeTypes(GTORecipeTypes.DEHYDRATOR_RECIPES)

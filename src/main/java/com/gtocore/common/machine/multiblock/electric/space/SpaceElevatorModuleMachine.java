@@ -46,7 +46,7 @@ public class SpaceElevatorModuleMachine extends CustomParallelMultiblockMachine 
     }
 
     SpaceElevatorModuleMachine(MetaMachineBlockEntity holder, boolean powerModuleTier, ToLongFunction<CustomParallelMultiblockMachine> getParallel) {
-        super(holder, false, getParallel);
+        super(holder, getParallel);
         this.powerModuleTier = powerModuleTier;
     }
 

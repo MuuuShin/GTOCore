@@ -8,6 +8,7 @@ import com.gtocore.common.data.GTOMaterials;
 import com.gtocore.common.data.GTORecipeDataKeys;
 
 import com.gtolib.api.machine.trait.ElectricTrait;
+import com.gtolib.api.recipe.GTORecipeModifiers;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
@@ -21,7 +22,6 @@ import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
-import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 
 import net.minecraft.network.chat.Component;
@@ -61,7 +61,7 @@ public final class NeutronVortexMachine extends NeutronActivatorMachine implemen
             eV = ev * 100000;
             recipe.duration = recipe.duration / 5;
             recipe.eut = ev;
-            return RecipeModifier.hatchParallel(this, unit, recipe);
+            return GTORecipeModifiers.parallel(this, unit, recipe);
         }
         return super.getRealRecipe(unit, recipe);
     }

@@ -8,6 +8,7 @@ import com.gtocore.common.machine.multiblock.part.ae.MESimplePatternBufferPartMa
 import com.gtocore.integration.Mods;
 
 import com.gtolib.GTOCore;
+import com.gtolib.api.recipe.GTORecipeModifiers;
 import com.gtolib.utils.MultiBlockFileReader;
 
 import com.gregtechceu.gtceu.GTCEu;
@@ -47,6 +48,7 @@ public final class OptionalMachine {
             .allRotation()
             .tooltips(GTOMachineTooltips.CarvingCenterTooltips)
             .recipeTypes(DUMMY_RECIPES)
+            .recipeModifier(GTORecipeModifiers.PARALLEL)
             .block(GTBlocks.CASING_STEEL_SOLID)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.CASING_STEEL_SOLID.get())

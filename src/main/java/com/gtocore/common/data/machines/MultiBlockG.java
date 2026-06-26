@@ -29,6 +29,7 @@ import com.gtolib.api.machine.impl.DroneControlCenterMachine;
 import com.gtolib.api.machine.impl.MECPUMachine;
 import com.gtolib.api.machine.impl.WirelessChargerMachine;
 import com.gtolib.api.machine.multiblock.*;
+import com.gtolib.api.recipe.GTORecipeModifiers;
 import com.gtolib.utils.MultiBlockFileReader;
 import com.gtolib.utils.RLUtils;
 import com.gtolib.utils.RegistriesUtils;
@@ -191,7 +192,7 @@ public final class MultiBlockG {
     public static final MultiblockMachineDefinition POLYMERIZATION_REACTOR = multiblock("polymerization_reactor", "聚合反应器", CoilMultiblockMachine.createCoilMachine(false, false))
             .nonYAxisRotation()
             .recipeTypes(GTORecipeTypes.POLYMERIZATION_REACTOR_RECIPES)
-            .recipeModifier(RecipeModifier.coilReductionOverclock(0.5))
+            .recipeModifier(GTORecipeModifiers.coilReductionOverclock(0.5))
             .tooltips(GTOMachineStories.PolymerizationReactorTooltips)
             .tooltips(GTOMachineTooltips.PolymerizationReactorTooltips)
             .parallelizableTooltips()

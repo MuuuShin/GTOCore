@@ -33,7 +33,7 @@ abstract class WaterPurificationUnitMachine extends NoEnergyCustomParallelMultib
     private final ConditionalSubscriptionHandler tickSubs;
 
     WaterPurificationUnitMachine(MetaMachineBlockEntity holder, long multiple) {
-        super(holder, false, m -> IParallelMachine.MAX_PARALLEL, m -> 1000L);
+        super(holder, m -> IParallelMachine.MAX_PARALLEL, m -> 1000L);
         this.multiple = multiple;
         tickSubs = new ConditionalSubscriptionHandler(this, this::tickUpdate, 80, this::isFormed);
         customParallelTrait.setDefaultMax(false);
