@@ -14,7 +14,6 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 
-import dev.shadowsoffire.placebo.util.EnchantmentUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -22,6 +21,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 
+import dev.shadowsoffire.placebo.util.EnchantmentUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public final class UpgradeModuleItem extends Item implements GTOTooltipComponent
     public @NotNull InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         if (context.getPlayer() instanceof ServerPlayer player) {
             var item = player.getItemInHand(context.getHand());
-            if (player.experienceLevel > 10) {
+            if (player.experienceLevel >= 10) {
                 var machine = MetaMachine.getMachine(context.getLevel(), context.getClickedPos());
                 if (machine instanceof IUpgradeMachine upgradeMachine && upgradeMachine.gtolib$canUpgraded()) {
                     var randomMultiple = randomMultiple(Math.min(10, player.experienceLevel / 10));
