@@ -14,6 +14,7 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 
+import dev.shadowsoffire.placebo.util.EnchantmentUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -54,7 +55,7 @@ public final class UpgradeModuleItem extends Item implements GTOTooltipComponent
                 var machine = MetaMachine.getMachine(context.getLevel(), context.getClickedPos());
                 if (machine instanceof IUpgradeMachine upgradeMachine && upgradeMachine.gtolib$canUpgraded()) {
                     var randomMultiple = randomMultiple(Math.min(10, player.experienceLevel / 10));
-                    player.giveExperiencePoints(-20000);
+                    player.giveExperiencePoints(-EnchantmentUtils.getTotalExperienceForLevel(100));
                     if (this == GTOItems.SPEED_UPGRADE_MODULE.get()) {
                         double speed = upgradeMachine.gtolib$getSpeed();
                         if (speed < 1) {
