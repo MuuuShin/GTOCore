@@ -331,9 +331,8 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         setTranslationPrefix("virtual_item_supply_machine")
 
         section(MainFunction)
-        command("为ME网络提供虚拟物品" translatedTo "Provides virtual items for the ME network")
+        function("为ME网络提供虚拟物品" translatedTo "Provides virtual items for the ME network")
         increase("虚拟物品可用于替代样板中不消耗的物品" translatedTo "Virtual items can be used to replace items in the blueprint that do not consume resources")
-        content("将物品放入供应机中即可转换为虚拟物品" translatedTo "Place items in it to convert them into virtual items")
-        info("任何物品都可转换为虚拟物品" translatedTo "Any item can be converted into a virtual item")
+        content("将任何物品放入供应机中均可转换为虚拟物品" translatedTo "Place any item into the supply machine to convert it into a virtual item")
     }
 }

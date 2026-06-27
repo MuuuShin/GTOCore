@@ -1912,15 +1912,18 @@ object GTOMachineTooltips {
     @JvmField
     val WaterPurificationPlantTooltips = ComponentListSupplier {
         setTranslationPrefix("water_purification_plant")
+        section(ComponentSlang.MainFunction)
+        function("链接净化单元，同步所有净化单元的控制器的处理周期并供电" translatedTo "Link purification units, synchronize the processing cycles of all controllers, and provide power")
 
         section("处理单元链接系统" translatedTo "Processing Unit Link System")
-        function("可在§e32§r个方块半径内自由放置处理单元控制器" translatedTo "Processing unit controllers can be placed freely within a §e32§r block radius")
-        function("为链接的处理单元控制器提供电力" translatedTo "Provide power to linked processing unit controllers")
+        function("可在§e32§r个方块半径内自由放置净化单元的控制器" translatedTo "Purification unit controllers can be placed freely within a §e32§r block radius")
+        function("为链接的单元控制器提供电力" translatedTo "Provide power to linked unit controllers")
         info("默认耗能 = 输出水量 × 2^(净化水等级 - 2)" translatedTo "Default energy = output water × 2^(purification tier - 2)")
 
         section("处理周期系统" translatedTo "Processing Cycle System")
         content("固定处理周期: 120 秒" translatedTo "Fixed processing cycle: 120 seconds")
-        info("所有控制器同步周期，净化水输出 = 输入水量 × 0.9mB" translatedTo "All controllers sync cycle — purified output = input water × 0.9mB")
+        increase("所有控制器同步周期，净化水输出转化率 = 输入水量 × 90%" translatedTo "All controllers sync cycle — purified output = input water × 90%")
+        error("前三道净化工序概率判定失败时，返还90%的输入水；其余工序判定失败时不返还净化水" translatedTo "If the chance roll fails during the first three purification steps, 90% of the input water is returned; failed rolls in later steps return no purified water")
     }
 
     // 澄清器净化装置
