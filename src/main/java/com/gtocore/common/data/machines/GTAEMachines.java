@@ -27,7 +27,7 @@ public final class GTAEMachines {
     public static final MachineDefinition VIRTUAL_ITEM_SUPPLY_MACHINE = machine("virtual_item_supply_machine", "虚拟物品供应机", VirtualItemProviderMachine::new)
             .tier(MV)
             .allRotation()
-            .notAllowSharedTooltips()
+            .tooltips(GTOMachineTooltipsA.virtualItemSupplyMachineTooltips)
             .renderer(() -> new OverlayTieredMachineRenderer(MV, GTCEu.id("block/machine/part/me_pattern_buffer_proxy")))
             .register();
 

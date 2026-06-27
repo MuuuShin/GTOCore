@@ -1335,7 +1335,7 @@ object GTOMachineStories : AutoInitialize<GTOMachineStories>() {
         highlight("农业科技的绿洲" translatedTo "Oasis of agricultural technology")
     }
 
-    // 狂飙巨型聚变反应堆控制电脑
+    // 狂飙一号巨型聚变反应堆控制电脑
     @JvmField
     val KuangbiaoGiantNuclearFusionReactorTooltips = ComponentListSupplier {
         setTranslationPrefix("kuangbiao_giant_nuclear_fusion_reactor")

@@ -9,6 +9,7 @@ import com.gtocore.common.data.GTOItems
 import com.gtocore.config.GTOConfig
 import com.gtocore.utils.setTooltips
 
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
@@ -22,6 +23,8 @@ import com.glodblock.github.extendedae.common.EPPItemAndBlock
 import com.gregtechceu.gtceu.GTCEu
 import com.gregtechceu.gtceu.common.data.GTItems
 import com.gregtechceu.gtceu.common.data.GTMachines
+import com.gregtechceu.gtceu.common.machine.multiblock.part.SteamHatchPartMachine
+import com.gregtechceu.gtceu.common.machine.multiblock.steam.SteamParallelMultiblockMachine
 import com.gregtechceu.gtceu.utils.FormattingUtil
 import com.hepdd.gtmthings.data.CustomItems
 import com.hepdd.gtmthings.data.CustomMachines
@@ -349,12 +352,21 @@ object GTOItemTooltips : AutoInitialize<GTOItemTooltips>() {
         CustomMachines.ME_EXPORT_BUFFER.setTooltipBuilder { _, components ->
             components.addAll(
                 ComponentListSupplier {
-                    setTranslationPrefix("gtmt_me_export_buffer")
                     addTranslatable("gtceu.machine.dual_hatch.export.tooltip")
                     addTranslatable("gtceu.machine.me.export.tooltip")
                     addTranslatable("gtceu.part_sharing.enabled")
                     add(GTOMachineTooltips.AutoConnectMETooltips)
                 }.editionByGTONormal().get(),
+            )
+        }
+
+        GTMachines.STEAM_HATCH.setTooltipBuilder { _, components ->
+            components.addAll(
+                ComponentListSupplier {
+                    addTranslatable("gtceu.universal.tooltip.fluid_storage_capacity", FormattingUtil.formatNumbers(SteamHatchPartMachine.INITIAL_TANK_CAPACITY))
+                    addTranslatable("gtceu.machine.steam.steam_hatch.tooltip")
+                    addTranslatable("gtocore.machine.conversion_rate", Component.literal(FormattingUtil.formatNumbers(SteamParallelMultiblockMachine.CONVERSION_RATE)).withStyle(ChatFormatting.RED))
+                }.get(),
             )
         }
     }

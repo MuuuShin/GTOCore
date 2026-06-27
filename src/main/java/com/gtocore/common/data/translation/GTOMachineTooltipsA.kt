@@ -160,6 +160,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         command("若高能模块与超频模块存在冲突，请先安装高能模块，再安装超频模块" translatedTo "If there is a conflict between the high-energy module and the overclock module, please install the high-energy module first, then install the overclock module")
     }
 
+    // 狂飙一号巨型聚变反应堆控制电脑
     @JvmField
     val KuangbiaoGiantNuclearFusionReactorEnergyStorageTooltip = { eut: Long ->
         ComponentListSupplier {
@@ -172,6 +173,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         }
     }
 
+    // 工业空间站六向衔接舱
     @JvmField
     val SpaceStationDockingModule = ComponentListSupplier {
         setTranslationPrefix("space_station_docking_module")
@@ -262,6 +264,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         }
     }
 
+    // 蒸汽裂化机
     @JvmField
     val LargeSteamCrackerTooltips = ComponentListSupplier {
         setTranslationPrefix("large_steam_cracker")
@@ -269,6 +272,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         increase("每使用高一等级的蒸汽输入仓，配方产出提升100mb" translatedTo "For each higher level of steam input hatch used, the output increases by 100mb")
     }
 
+    // 魔力流合成台
     @JvmField
     val ManaFlowAssemblerTooltips = ComponentListSupplier {
         setTranslationPrefix("mana_flow_assembler")
@@ -287,6 +291,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         important("无法运行电力配方" translatedTo "Cannot run recipes that require EU")
     }
 
+    // 磁流体发电机
     @JvmField
     val magneticFluidGeneratorTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("magnetic_fluid_generator")
@@ -302,6 +307,7 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         increase("如果使用激光仓，则提升发电量 x 4^等级" translatedTo "If a laser hatch is used, power generation is increased by x 4^tier")
     }
 
+    // 戴森球接收站
     @JvmField
     val dysonSphereReceivingStationTooltips: ComponentListSupplier = ComponentListSupplier {
         setTranslationPrefix("dyson_sphere_receiving_station")
@@ -317,5 +323,17 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
         important("当损坏高于60%时，输出效率随损坏值由100%逐渐降低到20%，并输出随损坏值增强的红石信号" translatedTo "When damage exceeds 60%, output efficiency gradually decreases from 100% to 20% with damage value, and outputs a redstone signal enhanced by the damage value")
         info("当损坏达到100%时减少一次模块发射数量，并重置损坏值" translatedTo "When damage reaches 100%, it reduces the number of module launches by one and resets the damage value")
         info("在损坏值高于60%时发射不会增加发射次数，但会重置损坏值" translatedTo "When damage value is above 60%, launching will not increase the launch count but will reset the damage value")
+    }
+
+    // 虚拟物品供应机
+    @JvmField
+    val virtualItemSupplyMachineTooltips: ComponentListSupplier = ComponentListSupplier {
+        setTranslationPrefix("virtual_item_supply_machine")
+
+        section(MainFunction)
+        command("为ME网络提供虚拟物品" translatedTo "Provides virtual items for the ME network")
+        increase("虚拟物品可用于替代样板中不消耗的物品" translatedTo "Virtual items can be used to replace items in the blueprint that do not consume resources")
+        content("将物品放入供应机中即可转换为虚拟物品" translatedTo "Place items in it to convert them into virtual items")
+        info("任何物品都可转换为虚拟物品" translatedTo "Any item can be converted into a virtual item")
     }
 }
