@@ -210,7 +210,7 @@ public final class ClientProxy extends CommonProxy {
             event.registerShader(new net.minecraft.client.renderer.ShaderInstance(
                     event.getResourceProvider(),
                     GTORenderTypes.STELLAR_FORGE_VORTEX_SHADER_LOCATION,
-                    com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR), GTORenderTypes::setStellarForgeVortexShader);
+                    com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR_NORMAL), GTORenderTypes::setStellarForgeVortexShader);
             registerCustomItemShader(event, GTORenderTypes.CRUPTIX);
             registerCustomItemShader(event, GTORenderTypes.ITEM_RESONANCE_WAVE);
         } catch (java.io.IOException e) {

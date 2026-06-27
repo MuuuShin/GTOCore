@@ -21,11 +21,15 @@ public class FXManager {
     public static void dispatchFXs(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) {
             ScreenSpaceSceneCapture.beginFrame();
+            StellarForgeVortexFX.beginBatchFrame();
         }
         for (AbstractFX fx : FX_LIST) {
             if (!fx.isDiscarded()) {
                 fx.render(event.getStage(), event.getLevelRenderer(), event.getPoseStack(), event.getProjectionMatrix(), event.getPartialTick(), event.getCamera(), event.getFrustum());
             }
+        }
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) {
+            StellarForgeVortexFX.flushBatch(event.getLevelRenderer());
         }
     }
 

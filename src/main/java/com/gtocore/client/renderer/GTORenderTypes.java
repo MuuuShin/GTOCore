@@ -71,7 +71,7 @@ public final class GTORenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(false));
     public static final RenderType STELLAR_FORGE_VORTEX = RenderType.create("stellar_forge_vortex",
-            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES, 262144, false, false,
+            DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.TRIANGLES, 262144, false, false,
             RenderType.CompositeState.builder()
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setDepthTestState(NO_DEPTH_TEST)

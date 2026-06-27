@@ -1,7 +1,7 @@
 {
   "vertex": "gtocore:stellar_forge_vortex",
   "fragment": "gtocore:stellar_forge_vortex",
-  "attributes": ["Position", "Color"],
+  "attributes": ["Position", "Color", "Normal"],
   "samplers": [{ "name": "DiffuseSampler" }],
   "uniforms": [
     {

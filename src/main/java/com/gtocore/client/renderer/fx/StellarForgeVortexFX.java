@@ -21,6 +21,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -29,13 +30,20 @@ import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StellarForgeVortexFX extends AbstractFX {
 
     private static final int STALE_TICKS = 12;
     private static final int STARTUP_FADE_TICKS = 12;
     private static final float MIN_VISIBLE_RADIUS = 0.001F;
-    private static final VortexMesh MESH = new VortexMesh(3, 24, 96);
+    private static final VortexMesh MESH = new VortexMesh(24, 96);
+    private static final List<Submission> BATCH = new ArrayList<>();
+    private static final Matrix4f IDENTITY = new Matrix4f();
+    private static VertexBuffer batchBuffer;
 
     private final ResourceKey<Level> dimension;
     private final BlockPos machinePos;
@@ -81,6 +89,58 @@ public class StellarForgeVortexFX extends AbstractFX {
         return !(metaMachine instanceof StellarForgeMachine machine) || !machine.isFormed();
     }
 
+    public static void beginBatchFrame() {
+        BATCH.clear();
+    }
+
+    public static void flushBatch(LevelRenderer levelRenderer) {
+        if (BATCH.isEmpty()) {
+            return;
+        }
+
+        ShaderInstance shader = GTORenderTypes.getStellarForgeVortexShader();
+        if (shader == null) {
+            return;
+        }
+        var sceneTarget = ScreenSpaceSceneCapture.capture(levelRenderer);
+        if (sceneTarget == null) {
+            return;
+        }
+
+        Submission first = BATCH.getFirst();
+        shader.setSampler("DiffuseSampler", sceneTarget.getColorTextureId());
+        shader.safeGetUniform("ScreenSize").set((float) sceneTarget.viewWidth, (float) sceneTarget.viewHeight);
+        float time = (System.currentTimeMillis() - load) / timeScale;
+        shader.safeGetUniform("Time").set(time);
+        shader.safeGetUniform("BandAngle").set(first.bandAngle());
+        shader.safeGetUniform("DecayRadius").set(first.decayRadius());
+        shader.safeGetUniform("DisappearRadius").set(first.disappearRadius());
+        shader.safeGetUniform("VortexIntensity").set(1.0F);
+
+        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
+        bufferBuilder.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+        for (Submission submission : BATCH) {
+            MESH.appendTo(bufferBuilder, submission);
+        }
+
+        if (batchBuffer == null) {
+            batchBuffer = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
+        }
+
+        GTORenderTypes.STELLAR_FORGE_VORTEX.setupRenderState();
+        try {
+            RenderSystem.setShader(() -> shader);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            batchBuffer.bind();
+            batchBuffer.upload(bufferBuilder.end());
+            batchBuffer.drawWithShader(IDENTITY, RenderSystem.getProjectionMatrix(), shader);
+        } finally {
+            VertexBuffer.unbind();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            GTORenderTypes.STELLAR_FORGE_VORTEX.clearRenderState();
+        }
+    }
+
     @Override
     public void render(RenderLevelStageEvent.Stage stage, LevelRenderer levelRenderer, PoseStack poseStack, Matrix4f projectionMatrix,
                        float partialTick, Camera camera, Frustum frustum) {
@@ -96,35 +156,15 @@ public class StellarForgeVortexFX extends AbstractFX {
             return;
         }
 
-        ShaderInstance shader = GTORenderTypes.getStellarForgeVortexShader();
-        if (shader == null) {
-            return;
-        }
-        var sceneTarget = ScreenSpaceSceneCapture.capture(levelRenderer);
-        if (sceneTarget == null) {
-            return;
-        }
-
-        shader.setSampler("DiffuseSampler", sceneTarget.getColorTextureId());
-        shader.safeGetUniform("ScreenSize").set((float) sceneTarget.viewWidth, (float) sceneTarget.viewHeight);
-        float time = (System.currentTimeMillis() - load) / timeScale;
-        shader.safeGetUniform("Time").set(time);
-        shader.safeGetUniform("BandAngle").set(bandAngle);
-        shader.safeGetUniform("DecayRadius").set(decayRadius);
-        shader.safeGetUniform("DisappearRadius").set(disappearRadius);
-        shader.safeGetUniform("VortexIntensity").set(1.0F);
-
         PoseStack worldStack = new PoseStack();
         worldStack.mulPoseMatrix(poseStack.last().pose());
         Vec3 cameraPos = camera.getPosition();
         worldStack.translate(center.x - cameraPos.x, center.y - cameraPos.y, center.z - cameraPos.z);
         rotateFromLocalUpToFacing(worldStack, facing);
+        worldStack.scale(disappearRadius, disappearRadius, disappearRadius);
 
         float startupFade = Mth.clamp((age + partialTick) / STARTUP_FADE_TICKS, 0.0F, 1.0F);
-        ScreenSpaceMeshRenderer.renderScaled(worldStack, MESH.getBuffer(bandAngle),
-                GTORenderTypes.STELLAR_FORGE_VORTEX, shader,
-                disappearRadius, disappearRadius, disappearRadius,
-                1.0F, 1.0F, 1.0F, 0.9F * startupFade);
+        BATCH.add(new Submission(new Matrix4f(worldStack.last().pose()), bandAngle, decayRadius, disappearRadius, 0.9F * startupFade));
     }
 
     private static void rotateFromLocalUpToFacing(PoseStack poseStack, Direction facing) {
@@ -145,69 +185,72 @@ public class StellarForgeVortexFX extends AbstractFX {
         }
     }
 
+    private record Submission(Matrix4f matrix, float bandAngle, float decayRadius, float disappearRadius, float alpha) {}
+
+    private record TemplateVertex(float x, float y, float z, float alpha) {}
+
     private static final class VortexMesh {
 
-        private final int phiSlices;
         private final int radialSegments;
         private final int angularSegments;
-        private VertexBuffer buffer;
+        private float cachedBandAngle = Float.NaN;
+        private List<TemplateVertex> vertices = List.of();
 
-        private VortexMesh(int phiSlices, int radialSegments, int angularSegments) {
-            this.phiSlices = phiSlices;
+        private VortexMesh(int radialSegments, int angularSegments) {
             this.radialSegments = radialSegments;
             this.angularSegments = angularSegments;
         }
 
-        private VertexBuffer getBuffer(float bandAngle) {
-            if (buffer == null) {
-                buffer = buildBuffer(bandAngle);
+        private void appendTo(BufferBuilder bufferBuilder, Submission submission) {
+            for (TemplateVertex vertex : getVertices(submission.bandAngle())) {
+                Vector3f transformed = submission.matrix().transformPosition(vertex.x(), vertex.y(), vertex.z(), new Vector3f());
+                bufferBuilder.vertex(transformed.x(), transformed.y(), transformed.z())
+                        .color(1.0F, 1.0F, 1.0F, vertex.alpha() * submission.alpha())
+                        .normal(vertex.x(), vertex.y(), vertex.z())
+                        .endVertex();
             }
-            return buffer;
         }
 
-        private VertexBuffer buildBuffer(float bandAngle) {
-            VertexBuffer vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-            BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-            PoseStack poseStack = new PoseStack();
-            Matrix4f matrix = poseStack.last().pose();
+        private List<TemplateVertex> getVertices(float bandAngle) {
+            if (Float.compare(cachedBandAngle, bandAngle) != 0) {
+                vertices = buildVertices(bandAngle);
+                cachedBandAngle = bandAngle;
+            }
+            return vertices;
+        }
 
-            bufferBuilder.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+        private List<TemplateVertex> buildVertices(float bandAngle) {
+            List<TemplateVertex> builtVertices = new ArrayList<>();
             float safeBandAngle = Math.max(bandAngle, 0.001F);
-            for (int phiIndex = 0; phiIndex < phiSlices; phiIndex++) {
-                float phiStep = phiSlices == 1 ? 0.0F : phiIndex / (float) (phiSlices - 1);
-                float phi = Mth.lerp(phiStep, -safeBandAngle, safeBandAngle);
-                float layer = 1.0F - Math.abs(phi / safeBandAngle);
-                float alpha = 0.018F + layer * 0.028F;
-                for (int radialIndex = 0; radialIndex < radialSegments; radialIndex++) {
-                    float r0 = radialIndex / (float) radialSegments;
-                    float r1 = (radialIndex + 1) / (float) radialSegments;
-                    for (int angularIndex = 0; angularIndex < angularSegments; angularIndex++) {
-                        float theta0 = (float) (Math.PI * 2.0D * angularIndex / angularSegments);
-                        float theta1 = (float) (Math.PI * 2.0D * (angularIndex + 1) / angularSegments);
+            float phiStep = 0.5f;
+            float phi = Mth.lerp(phiStep, -safeBandAngle, safeBandAngle);
+            float layer = 1.0F - Math.abs(phi / safeBandAngle);
+            float alpha = 0.018F + layer * 0.028F;
+            for (int radialIndex = 0; radialIndex < radialSegments; radialIndex++) {
+                float r0 = radialIndex / (float) radialSegments;
+                float r1 = (radialIndex + 1) / (float) radialSegments;
+                for (int angularIndex = 0; angularIndex < angularSegments; angularIndex++) {
+                    float theta0 = (float) (Math.PI * 2.0D * angularIndex / angularSegments);
+                    float theta1 = (float) (Math.PI * 2.0D * (angularIndex + 1) / angularSegments);
 
-                        putVertex(bufferBuilder, matrix, r0, theta0, phi, alpha);
-                        putVertex(bufferBuilder, matrix, r1, theta0, phi, alpha);
-                        putVertex(bufferBuilder, matrix, r1, theta1, phi, alpha);
+                    putVertex(builtVertices, r0, theta0, phi, alpha);
+                    putVertex(builtVertices, r1, theta0, phi, alpha);
+                    putVertex(builtVertices, r1, theta1, phi, alpha);
 
-                        putVertex(bufferBuilder, matrix, r0, theta0, phi, alpha);
-                        putVertex(bufferBuilder, matrix, r1, theta1, phi, alpha);
-                        putVertex(bufferBuilder, matrix, r0, theta1, phi, alpha);
-                    }
+                    putVertex(builtVertices, r0, theta0, phi, alpha);
+                    putVertex(builtVertices, r1, theta1, phi, alpha);
+                    putVertex(builtVertices, r0, theta1, phi, alpha);
                 }
             }
-
-            vertexBuffer.bind();
-            vertexBuffer.upload(bufferBuilder.end());
-            VertexBuffer.unbind();
-            return vertexBuffer;
+            return builtVertices;
         }
 
-        private static void putVertex(BufferBuilder bufferBuilder, Matrix4f matrix, float r, float theta, float phi, float alpha) {
+        private static void putVertex(List<TemplateVertex> vertices, float r, float theta, float phi, float alpha) {
             float planeRadius = Mth.cos(phi) * r;
             float x = Mth.cos(theta) * planeRadius;
             float y = Mth.sin(phi) * r;
             float z = Mth.sin(theta) * planeRadius;
-            bufferBuilder.vertex(matrix, x, y, z).color(1.0F, 1.0F, 1.0F, alpha).endVertex();
+            vertices.add(new TemplateVertex(x, y, z, alpha));
         }
     }
 }
