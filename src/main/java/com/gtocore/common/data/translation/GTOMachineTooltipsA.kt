@@ -169,8 +169,6 @@ object GTOMachineTooltipsA : AutoInitialize<GTOMachineTooltipsA>() {
                 ComponentSupplier(Component.translatable("gtceu.machine.fusion_reactor.capacity", eut)) +
                     (" [可安装模块扩容]" translatedTo " [can be expanded by installing modules]").rainbowFast(),
             )
-
-            command(ComponentSupplier(Component.translatable("gtceu.machine.fusion_reactor.overclocking")))
         }
     }
 
