@@ -4,6 +4,7 @@ import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.common.data.GTOMachines;
 
+import com.gtolib.api.annotation.NewDataAttributes;
 import com.gtolib.api.data.GTODimensions;
 import com.gtolib.api.misc.PlanetManagement;
 import com.gtolib.api.recipe.GTORecipeModifiers;
@@ -26,6 +27,7 @@ import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
 import com.gregtechceu.gtceu.common.data.machines.GTMultiMachines;
+import com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.ChatFormatting;
@@ -36,6 +38,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static com.gregtechceu.gtceu.api.pattern.Predicates.*;
@@ -183,6 +186,15 @@ public final class GTMachineModify {
                         .withStyle(ChatFormatting.GRAY));
             });
             GTMachines.AIR_SCRUBBER[tier].setRecipeModifier(GTORecipeModifiers.UPGRADE_OVERCLOCK);
+        }
+
+        for (int tier : new int[] { GTValues.LuV, GTValues.ZPM, GTValues.UV }) {
+            GTMultiMachines.FUSION_REACTOR[tier].setTooltipBuilder((itemStack, components) -> {
+                components.add(Component.translatable("gtceu.machine.fusion_reactor.capacity", FusionReactorMachine.calculateEnergyStorageFactor(tier, 16) / 1000000L));
+                components.add(Component.translatable("gtceu.multiblock.%s_fusion_reactor.description".formatted(GTValues.VN[tier].toLowerCase(Locale.ROOT))));
+                components.addAll(NewDataAttributes.PREFECT_OVERCLOCK.create().get());
+                components.addAll(NewDataAttributes.RECIPES_TYPE.create(Component.translatable(GTRecipeTypes.FUSION_RECIPES.registryName.toLanguageKey()).withStyle(ChatFormatting.WHITE)).get());
+            });
         }
     }
 
