@@ -3,6 +3,7 @@ package com.gtocore.common.data.machines;
 import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.client.renderer.machine.DigitalMinerRenderer;
+import com.gtocore.client.renderer.machine.StellarForgeRenderer;
 import com.gtocore.common.data.*;
 import com.gtocore.common.data.translation.GTOMachineStories;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
@@ -1918,7 +1919,8 @@ public final class MultiBlockA {
                     .where('G', controller(definition))
                     .where(' ', any())
                     .build())
-            .workableCasingRenderer(GTCEu.id("block/casings/gcym/atomic_casing"), GTCEu.id("block/multiblock/fusion_reactor"))
+            .renderer(StellarForgeRenderer::new)
+            .hasTESR(true)
             .register();
 
     public static final MultiblockMachineDefinition COMPONENT_ASSEMBLY_LINE = multiblock("component_assembly_line", "部件装配车间", TierCasingCrossRecipeMultiblockMachine.createParallel(MachineUtils::getHatchParallel, GTORecipeDataKeys.COMPONENT_ASSEMBLY_CASING_TIER))

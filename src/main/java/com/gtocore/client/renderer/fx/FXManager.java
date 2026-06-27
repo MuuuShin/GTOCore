@@ -19,7 +19,9 @@ public class FXManager {
     private static final Map<Object, AbstractFX> KEYED_FX = new ConcurrentHashMap<>();
 
     public static void dispatchFXs(RenderLevelStageEvent event) {
-        ScreenSpaceSceneCapture.beginFrame();
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) {
+            ScreenSpaceSceneCapture.beginFrame();
+        }
         for (AbstractFX fx : FX_LIST) {
             if (!fx.isDiscarded()) {
                 fx.render(event.getStage(), event.getLevelRenderer(), event.getPoseStack(), event.getProjectionMatrix(), event.getPartialTick(), event.getCamera(), event.getFrustum());

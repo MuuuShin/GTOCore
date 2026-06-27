@@ -38,7 +38,8 @@ void main() {
     vec2 surfacePosition = fromCenter / patternRadius * 0.5 + vec2(0.5);
     vec2 p0 = surfacePosition * 5.0 - vec2(10.0);
     float rotateSpeed = 0.5 * OverlayStrength;
-    vec2 p = vec2(p0.x * cos(Time * rotateSpeed) - p0.y * sin(Time * rotateSpeed), p0.x * sin(Time * rotateSpeed) + p0.y * cos(Time * rotateSpeed));
+    float scSqTime = Time * Time * 0.1;
+    vec2 p = vec2(p0.x * cos(scSqTime * rotateSpeed) - p0.y * sin(scSqTime * rotateSpeed), p0.x * sin(scSqTime * rotateSpeed) + p0.y * cos(scSqTime * rotateSpeed));
     vec2 i = p;
     float c = 1.0;
     float inten = 0.01;
