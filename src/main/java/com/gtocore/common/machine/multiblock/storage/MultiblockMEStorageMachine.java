@@ -225,9 +225,8 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
         super.onLoad();
         capabilityStorage = LazyOptional.of(() -> this);
         long totalAmount = 0;
-        for (LongIterator it = keyMap.values().iterator(); it.hasNext();) {
-            long amount = it.nextLong();
-            totalAmount += amount;
+        for (var e : keyMap) {
+            totalAmount += e.getLongValue() / (e.getKey().getAmountPerByte() / 8);
         }
         this.storage = totalAmount;
     }
@@ -270,8 +269,9 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
 
     @Override
     public long insert(AEKey what, long amount, Actionable mode, IActionSource source) {
-        if (!isFormed || (type != null && !type.contains(what))) return 0;
-        amount = Math.min(capacity - storage, amount);
+        var type = what.getType();
+        if (!isFormed || (this.type != null && type != this.type)) return 0;
+        amount = Math.min((type.getAmountPerByte() / 8) * (capacity - storage), amount);
         if (amount < 1) return 0;
         if (mode == Actionable.MODULATE) {
             keyMap.insert(what, amount);
