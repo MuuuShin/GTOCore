@@ -137,7 +137,7 @@ public final class GTAEMachines {
             .tooltips(GTOMachineTooltips.AutoConnectMETooltips)
             .tier(LuV)
             .allRotation()
-            .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS)
+            .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS, GTOPartAbility.DUAL_INPUT)
             .notAllowSharedTooltips()
             .renderer(() -> new OverlayTieredMachineRenderer(LuV, GTCEu.id("block/machine/part/me_pattern_buffer_proxy")))
             .register();
