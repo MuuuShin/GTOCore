@@ -1766,6 +1766,7 @@ object GTOMachineTooltips {
         section("蒸汽产出" translatedTo "Steam Production")
         content("根据集热管数量决定蒸汽产量" translatedTo "Steam production determined by number of collector tubes")
         important("只能在太阳下工作" translatedTo "Can only operate under the sun")
+        important("供水不足时将爆炸" translatedTo "It will explode when the water supply is insufficient")
 
         section("可用大小" translatedTo "Usable Size")
         command("最小：5x5" translatedTo "Minimum: 5x5")

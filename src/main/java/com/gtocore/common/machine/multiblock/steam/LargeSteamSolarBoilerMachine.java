@@ -142,7 +142,7 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
                     .aisle(boundaryRow)
                     .aisle(middleRow).setRepeatable(safeBDist)
                     .aisle(controllerRow)
-                    .where('a', blocks(GTBlocks.STEEL_HULL.get()).or(abilities(EXPORT_FLUIDS).setMaxGlobalLimited(1)).or(abilities(IMPORT_FLUIDS)))
+                    .where('a', blocks(GTBlocks.STEEL_HULL.get()).or(abilities(EXPORT_FLUIDS)).or(abilities(IMPORT_FLUIDS)))
                     .where('b', blocks(GTOBlocks.SOLAR_HEAT_COLLECTOR_PIPE_CASING.get()))
                     .where('~', controller(this.getDefinition()))
                     .build() };
@@ -194,7 +194,7 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
         int waterAmount = (int) Math.ceil((double) steamAmount / ConfigHolder.INSTANCE.machines.largeBoilers.steamPerWater);
 
         if (waterAmount <= 0 || steamAmount <= 0) return null;
-        if (waterAmount > getFluidAmount(true, Fluids.WATER)[0]) {
+        if (!matchFluid(Fluids.WATER, waterAmount)) {
             doExplosion(2);
             return null;
         }
