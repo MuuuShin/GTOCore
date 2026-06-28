@@ -254,7 +254,7 @@ abstract class MEPatternPartMachineKt<T : MEPatternPartMachineKt.AbstractInterna
             val controller = getController()
             val availableRecipeTypes =
                 if (controller is IRecipeLogicMachine) controller.availableRecipeTypes.asList() else emptyList()
-            PatternContainerGroupHelper.forPatternAssembly(
+            PatternContainerGroupHelper.forPatternBuffer(
                 controller.self(),
                 this,
                 customName,

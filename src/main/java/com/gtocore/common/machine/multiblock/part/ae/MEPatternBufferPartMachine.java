@@ -6,7 +6,6 @@ import com.gtocore.common.data.machines.GTAEMachines;
 import com.gtocore.common.machine.trait.InternalSlotRecipeHandler;
 import com.gtocore.integration.ae.PatternContainerGroupHelper;
 
-import com.gtolib.api.ae2.MyPatternDetailsHelper;
 import com.gtolib.api.annotation.DataGeneratorScanned;
 import com.gtolib.api.annotation.language.RegisterLanguage;
 import com.gtolib.api.machine.trait.NotifiableNotConsumableFluidHandler;
@@ -38,7 +37,6 @@ import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
 import com.gregtechceu.gtceu.api.transfer.item.LockableItemStackHandler;
 import com.gregtechceu.gtceu.client.util.TooltipHelper;
-import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
 import com.gregtechceu.gtceu.integration.jade.GTElementHelper;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
@@ -53,15 +51,12 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import appeng.api.config.Actionable;
 import appeng.api.crafting.IPatternDetails;
-import appeng.api.crafting.PatternDetailsHelper;
 import appeng.api.implementations.blockentities.PatternContainerGroup;
 import appeng.api.networking.crafting.ICraftingProvider;
 import appeng.api.stacks.*;
 import appeng.api.storage.MEStorage;
 import appeng.api.storage.StorageHelper;
-import appeng.crafting.pattern.AEProcessingPattern;
 import appeng.crafting.pattern.EncodedPatternItem;
 import appeng.crafting.pattern.ProcessingPatternItem;
 
@@ -72,8 +67,6 @@ import com.gto.datasynclib.annotations.SyncToServer;
 import com.gto.datasynclib.datasream.data.Data;
 import com.gto.datasynclib.listener.IntNotifiableHolder;
 import com.gto.fastcollection.OpenCacheHashSet;
-import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior;
-import com.hepdd.gtmthings.data.CustomItems;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
@@ -292,59 +285,20 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
     public @Nullable IPatternDetails decodePattern(ItemStack stack, int index) {
         var pattern = super.decodePattern(stack, index);
         if (pattern == null) return null;
-        if (!caches[index] && stack.getOrCreateTag().tags.get("recipe") instanceof StringTag stringTag) {
-            var recipe = RecipeBuilder.get(RLUtils.parse(stringTag.getAsString()));
-            getInternalInventory()[index].setRecipe(recipe);
+        if (!caches[index]) {
+            MEPatternVirtualInputHelper.readRecipeTag(stack, getInternalInventory()[index]::setRecipe);
         }
         return pattern;
     }
 
     @Override
     public IPatternDetails convertPattern(IPatternDetails pattern, int index) {
-        if (pattern instanceof AEProcessingPattern processingPattern) {
-            var sparseInput = processingPattern.getSparseInputs();
-            var input = new ArrayList<GenericStack>(sparseInput.length);
-            var in = 0;
-            var slot = getInternalInventory()[index];
-            var locked = false;
-            for (var stack : sparseInput) {
-                if (stack != null && stack.what() instanceof AEItemKey what && what.getItem() == CustomItems.VIRTUAL_ITEM_PROVIDER.get() && what.getTag() != null && what.getTag().tags.containsKey("n")) {
-                    ItemStack virtualItem = VirtualItemProviderBehavior.getVirtualItem(what.getReadOnlyStack());
-                    if (virtualItem.isEmpty()) continue;
-                    if (!locked) {
-                        slot.setLock(true);
-                        locked = true;
-                    }
-                    if (GTItems.PROGRAMMED_CIRCUIT.isIn(virtualItem)) {
-                        slot.circuitInventory.storage.setStackInSlot(0, virtualItem);
-                    } else {
-                        virtualItem.setCount(Math.clamp(stack.amount(), 1, virtualItem.getMaxStackSize()));
-                        var grid = getGrid();
-                        if (grid != null && grid.getStorageService().getInventory().extract(what, 1, Actionable.SIMULATE, getActionSource()) == 1) {
-                            var storage = slot.shareInventory.storage;
-                            var inSlot = storage.getStackInSlot(in);
-                            if (!inSlot.isEmpty()) {
-                                storage.setStackInSlot(in, ItemStack.EMPTY);
-                                grid.getStorageService().getInventory().insert(AEItemKey.of(inSlot), inSlot.getCount(), Actionable.MODULATE, getActionSource());
-                            }
-                            storage.setStackInSlot(in, virtualItem);
-                            in++;
-                            if (in > storage.getSlots()) break;
-                        }
-                    }
-                    continue;
-                }
-                input.add(stack);
-            }
-            if (input.size() < sparseInput.length) {
-                if (input.isEmpty()) {
-                    return pattern;
-                }
-                var stack = PatternDetailsHelper.encodeProcessingPattern(input.toArray(new GenericStack[0]), processingPattern.getSparseOutputs());
-                return MyPatternDetailsHelper.decode(AEItemKey.of(stack));
-            }
-        }
-        return pattern;
+        var slot = getInternalInventory()[index];
+        return MEPatternVirtualInputHelper.convertPattern(pattern, this::getGrid, this::getActionSource,
+                slot.circuitInventory, slot.shareInventory.storage, () -> {
+                    slot.setLock(true);
+                    return true;
+                });
     }
 
     @Override
@@ -379,7 +333,7 @@ public abstract class MEPatternBufferPartMachine extends MEPatternPartMachineKt<
             IMultiController controller = getController();
             Collection<GTRecipeType> availableRecipeTypes = controller instanceof IRecipeLogicMachine recipeMachine ?
                     Arrays.asList(recipeMachine.getAvailableRecipeTypes()) : List.of();
-            return PatternContainerGroupHelper.forPatternAssembly(
+            return PatternContainerGroupHelper.forPatternBuffer(
                     controller.self(), this, getCustomName(), recipeType, availableRecipeTypes);
         } else {
             if (!getCustomName().isEmpty()) {

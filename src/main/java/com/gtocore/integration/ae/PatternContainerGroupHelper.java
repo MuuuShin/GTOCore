@@ -56,10 +56,10 @@ public final class PatternContainerGroupHelper {
                 getAvailableRecipeTypes(context.recipeMachine()), context.showAllRecipeTypes(), context.tooltip());
     }
 
-    public static PatternContainerGroup forPatternAssembly(MetaMachine displayMachine, MetaMachine actualMachine,
-                                                           String customName,
-                                                           @Nullable GTRecipeType selectedRecipeType,
-                                                           Collection<GTRecipeType> availableRecipeTypes) {
+    public static PatternContainerGroup forPatternBuffer(MetaMachine displayMachine, MetaMachine actualMachine,
+                                                         String customName,
+                                                         @Nullable GTRecipeType selectedRecipeType,
+                                                         Collection<GTRecipeType> availableRecipeTypes) {
         var icon = AEItemKey.of(displayMachine.getDefinition().asStack());
         List<Component> tooltip = List.of(
                 Component.translatable(actualMachine.getDefinition().getDescriptionId()));
