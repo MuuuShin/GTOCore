@@ -214,6 +214,7 @@
     "mc.BlockBehaviourMixin",
     "mc.ItemEntityMixin",
     "mc.LanguageMixin",
+    "mc.LevelMixin",
     "mc.SharedConstantsMixin",
     "mc.mob.AbstractSkeletonMixin",
     "mc.mob.LivingEntityMixin",
