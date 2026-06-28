@@ -356,6 +356,7 @@ public final class GTOPredicates {
         public static final DataComponentKey<int[]> FISSION_COMPONENT = DataComponentKey.createNoCodec("fissionComponent");
 
         public static final DataComponentKey<Integer> STEEL_FRAME = DataComponentKey.createNoCodec("SteelFrame");
+        public static final DataComponentKey<Set<BlockPos>> BLAST_FURNACE_HEAT = DataComponentKey.create("blastFurnaceHeat", DataComponentKey.collectionBuilder(OpenCacheHashSet::new));
         public static final DataComponentKey<Integer> SPEED_PIPE = DataComponentKey.createNoCodec("SpeedPipe");
         public static final DataComponentKey<Integer> LAMINATED_GLASS = DataComponentKey.createNoCodec("laminated_glass");
 
