@@ -276,6 +276,14 @@ object GTOItemTooltips : AutoInitialize<GTOItemTooltips>() {
             )
         }
 
+        listOf(ModBlocks.OXYGEN_LOADER.get().asItem(), ModBlocks.NASA_WORKBENCH.get().asItem()).forEach {
+            it.setTooltips(
+                ComponentListSupplier {
+                    command("仅作为合成材料使用" translatedTo "Used only as a crafting ingredient")
+                }.editionByGTONormal(),
+            )
+        }
+
         listOf(Adventure.Items.BOSS_SUMMONER.get()).forEach {
             it.setTooltips(
                 ComponentListSupplier {
@@ -325,7 +333,7 @@ object GTOItemTooltips : AutoInitialize<GTOItemTooltips>() {
                             ),
                         )
                     }
-                },
+                }.editionByGTONormal(),
             )
         }
 
@@ -345,7 +353,7 @@ object GTOItemTooltips : AutoInitialize<GTOItemTooltips>() {
                     setTranslationPrefix("wireless_energy_binding")
                     add("右键可绑定电池箱或蓄能变电站" translatedTo "Right-click to bind a Battery Buffer or Power Substation")
                     add("绑定目标决定了单个无线设备的传输上限" translatedTo "Binding target determines the transmission limit of a single wireless device") { gray() }
-                },
+                }.editionByGTONormal(),
             )
         }
 
