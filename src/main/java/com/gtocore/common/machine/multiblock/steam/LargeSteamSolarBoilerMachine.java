@@ -42,7 +42,7 @@ import static com.gregtechceu.gtceu.common.data.GTMaterials.Steam;
 @Scanned
 public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine implements IExplosionMachine, IDisplayUIMachine, IEnhancedRecipeLogicMachine, ICustomRecipeLogicHolder {
 
-    @DynamicInitialValue(key = "gtocore.machine.large_steam_solar_boiler", typeKey = DynamicInitialValueTypes.KEY_MULTIPLY, easyValue = "30", normalValue = "18", expertValue = "12", cn = "单集热管产率 : %s / t", en = "Steam production per tube : %s / t")
+    @DynamicInitialValue(key = "gtocore.machine.large_steam_solar_boiler", typeKey = DynamicInitialValueTypes.KEY_MULTIPLY, easyValue = "20", normalValue = "15", expertValue = "10", cn = "单集热管产率 : %s / t", en = "Steam production per tube : %s / t")
     private static int basicSteamProduction = 10;
 
     private static final int MAX_LR_DIST = 14, MAX_B_DIST = 29;
@@ -73,7 +73,7 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
             this.lDist = newLDist;
             this.rDist = newRDist;
             this.bDist = newBDist;
-           return true;
+            return true;
         }
         return false;
     }
@@ -124,7 +124,7 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
     @NotNull
     @Override
     public Supplier<BlockPattern>[] getPattern() {
-        if (getLevel() != null &&  updateStructureDimensions()) {
+        if (getLevel() != null && updateStructureDimensions()) {
             if (lDist < MIN_LR_DIST) lDist = MIN_LR_DIST;
             if (rDist < MIN_LR_DIST) rDist = MIN_LR_DIST;
             if (bDist < MIN_B_DIST) bDist = MIN_B_DIST;
@@ -138,14 +138,14 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
             String middleRow = "a" + "b".repeat(totalWidth - 2) + "a";
             String controllerRow = "a".repeat(safeLDist + 1) + "~" + "a".repeat(safeRDist + 1);
 
-            return new Supplier[]{() -> FactoryBlockPattern.start(RelativeDirection.LEFT, RelativeDirection.UP, RelativeDirection.FRONT)
+            return new Supplier[] { () -> FactoryBlockPattern.start(RelativeDirection.LEFT, RelativeDirection.UP, RelativeDirection.FRONT)
                     .aisle(boundaryRow)
                     .aisle(middleRow).setRepeatable(safeBDist)
                     .aisle(controllerRow)
-                    .where('a', blocks(GTBlocks.STEEL_HULL.get()).or(abilities(EXPORT_FLUIDS)).or(abilities(IMPORT_FLUIDS)))
+                    .where('a', blocks(GTBlocks.STEEL_HULL.get()).or(abilities(EXPORT_FLUIDS).setMaxGlobalLimited(1)).or(abilities(IMPORT_FLUIDS)))
                     .where('b', blocks(GTOBlocks.SOLAR_HEAT_COLLECTOR_PIPE_CASING.get()))
                     .where('~', controller(this.getDefinition()))
-                    .build()};
+                    .build() };
         }
         return super.getPattern();
     }
@@ -194,6 +194,10 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
         int waterAmount = (int) Math.ceil((double) steamAmount / ConfigHolder.INSTANCE.machines.largeBoilers.steamPerWater);
 
         if (waterAmount <= 0 || steamAmount <= 0) return null;
+        if (waterAmount > getFluidAmount(true, Fluids.WATER)[0]) {
+            doExplosion(2);
+            return null;
+        }
 
         steamGenerated = steamAmount;
         return getRecipeBuilder()
