@@ -326,9 +326,9 @@ public final class SupercomputingCenterMachine extends StorageMultiblockMachine 
     }
 
     @Override
-    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
+    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipeDefinition definition) {
         // prevent any modification to mock the original behavior of setupRecipe
-        return recipe;
+        return definition.toRuntime();
     }
 
     private long requestCWUt(boolean simulate, long cwu) {

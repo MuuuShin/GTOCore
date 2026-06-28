@@ -7,6 +7,7 @@ import com.gtolib.api.machine.heat.feature.IHeatContainerMachine;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
@@ -55,8 +56,8 @@ public final class HeaterMachine extends SimpleNoEnergyMachine implements IHeatC
     }
 
     @Override
-    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
-        return recipe;
+    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipeDefinition definition) {
+        return definition.toRuntime();
     }
 
     @Override

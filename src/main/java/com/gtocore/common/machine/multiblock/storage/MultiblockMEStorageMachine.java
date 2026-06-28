@@ -36,7 +36,6 @@ import appeng.capabilities.Capabilities;
 
 import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.datasream.data.Data;
-import it.unimi.dsi.fastutil.longs.LongIterator;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

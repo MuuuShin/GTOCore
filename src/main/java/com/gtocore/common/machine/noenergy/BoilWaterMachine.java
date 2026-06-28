@@ -55,8 +55,8 @@ public final class BoilWaterMachine extends SimpleNoEnergyMachine implements IHe
     }
 
     @Override
-    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
-        return recipe;
+    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipeDefinition definition) {
+        return definition.toRuntime();
     }
 
     @Override

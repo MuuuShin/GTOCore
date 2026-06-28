@@ -59,8 +59,8 @@ public final class CoolerMachine extends SimpleNoEnergyMachine implements IHeatC
     }
 
     @Override
-    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipe recipe) {
-        return recipe;
+    public GTRecipe fullModifyRecipe(RecipeHandlerUnit unit, GTRecipeDefinition definition) {
+        return definition.toRuntime();
     }
 
     @Override
