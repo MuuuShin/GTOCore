@@ -41,9 +41,9 @@ public final class MachineRecipe {
         VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("fluid_vault"), MultiBlockG.FLUID_VAULT.asItem(), "RPR",
                 "PCP", "RPR", 'P', new MaterialEntry(plateDouble, GTMaterials.Steel), 'R', new MaterialEntry(TagPrefix.rodLong, GTMaterials.Steel), 'C', GTMachines.BRONZE_DRUM.asItem());
         VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("general_vault"), MultiBlockG.GENERAL_VAULT.asItem(), "PAP",
-                "RPR", "PBP", 'P', new MaterialEntry(plateDouble, GTMaterials.Steel), 'R', new MaterialEntry(TagPrefix.rodLong, GTMaterials.Steel), 'A', GTMachines.BRONZE_CRATE.asItem(), 'B', GTMachines.BRONZE_DRUM.asItem());
+                "RPR", "PBP", 'P', new MaterialEntry(plateDouble, GTMaterials.Steel), 'R', new MaterialEntry(TagPrefix.rodLong, GTMaterials.Steel), 'A', MultiBlockG.ITEM_VAULT.asItem(), 'B', MultiBlockG.FLUID_VAULT.asItem());
         VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("vault_hatch"), GTOMachines.VAULT_HATCH.asItem(), " P ",
-                "PVP", " P ", 'P', new MaterialEntry(plateDouble, GTMaterials.Steel), 'V', MultiBlockG.GENERAL_VAULT.asItem());
+                "PVP", " P ", 'P', new MaterialEntry(plateDouble, WroughtIron), 'V', MultiBlockG.GENERAL_VAULT.asItem());
         VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("evaporation_plant"),
                 MultiBlockA.EVAPORATION_PLANT.asItem(), "CBC", "FMF", "CBC", 'M', GTMachines.HULL[HV].asItem(),
                 'B', new MaterialEntry(TagPrefix.wireGtDouble, GTMaterials.Kanthal), 'C', CustomTags.HV_CIRCUITS,

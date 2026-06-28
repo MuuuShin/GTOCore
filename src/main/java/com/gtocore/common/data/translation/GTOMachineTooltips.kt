@@ -694,7 +694,7 @@ object GTOMachineTooltips {
 
         section(ComponentSlang.MainFunction)
         content("可为保险库IO" translatedTo "Can serve as vault IO")
-        info("最大安装数：取决于内部空间大小" translatedTo "Maximum installations: depends on the internal space size")
+        info("最大安装数 = 密封外壳数" translatedTo "Maximum installations = hermetic casing amount")
     }
 
     @JvmField
