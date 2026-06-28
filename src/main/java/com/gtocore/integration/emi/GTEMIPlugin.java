@@ -142,6 +142,9 @@ public final class GTEMIPlugin implements EmiPlugin {
             if (Mods.MYTHICBOTANY.isLoaded()) {
                 c.add(RegistriesUtils.getItem("mythicbotany:feysythia"));
                 c.add(RegistriesUtils.getItem("mythicbotany:feysythia_floating"));
+                c.add(RegistriesUtils.getItem("mythicbotany:raw_elementium"));
+                c.add(RegistriesUtils.getItem("mythicbotany:raw_elementium_block"));
+                c.add(RegistriesUtils.getItem("mythicbotany:elementium_ore"));
             }
 
             if (Mods.BIOMESWEVEGONE.isLoaded()) {
