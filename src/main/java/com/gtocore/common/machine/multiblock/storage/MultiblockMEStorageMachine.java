@@ -60,6 +60,11 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
     public static final int MIN_DEPTH = 2;
     public static final int MAX_DEPTH = 14;
 
+    private static final Predicate<BlockState> PREDICATE = s -> {
+        var block = s.getBlock();
+        return block == GTBlocks.STEEL_HULL.get() || block == GTOMachines.VAULT_HATCH.get();
+    };
+
     private int lDist = 0, rDist = 0, uDist = 0, dDist = 0, bDist = 0;
 
     @SaveToDisk
@@ -210,16 +215,16 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
         var right = left.getOpposite();
         var up = Direction.UP;
         var down = Direction.DOWN;
-        lDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, left, MAX_DEPTH);
+        lDist = getBlockDistance(world, controllerPos, PREDICATE, left, MAX_DEPTH);
         if (lDist < 1) return false;
-        rDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, right, MAX_DEPTH - lDist);
+        rDist = getBlockDistance(world, controllerPos, PREDICATE, right, MAX_DEPTH - lDist);
         if (rDist < 1) return false;
-        uDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, up, MAX_DEPTH);
+        uDist = getBlockDistance(world, controllerPos, PREDICATE, up, MAX_DEPTH);
         if (uDist < 1) return false;
-        dDist = getBlockDistance(world, controllerPos, GTBlocks.STEEL_HULL::has, down, MAX_DEPTH - uDist);
+        dDist = getBlockDistance(world, controllerPos, PREDICATE, down, MAX_DEPTH - uDist);
         if (dDist < 1) return false;
         bDist = getBlockDistance(world, controllerPos, s -> {
-            if (GTBlocks.STEEL_HULL.has(s)) return true;
+            if (PREDICATE.test(s)) return true;
             return BlockMap.test(s.getBlock(), BlockMap.HERMETIC_CASING);
         }, back, MAX_DEPTH);
         return bDist >= MIN_DEPTH;

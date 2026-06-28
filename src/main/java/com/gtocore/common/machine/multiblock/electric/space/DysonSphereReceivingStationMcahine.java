@@ -66,7 +66,7 @@ public final class DysonSphereReceivingStationMcahine extends ElectricMultiblock
     public void customText(@NotNull List<Component> textList) {
         super.customText(textList);
         IntIntImmutablePair pair = DysonSphereSavaedData.getDimensionData(getDimension());
-        textList.add(Component.translatable("gtocore.machine.dyson_sphere.number", pair.leftInt()));
+        textList.add(Component.translatable("gtocore.machine.dyson_sphere.amount", pair.leftInt()));
         textList.add(Component.translatable("gtocore.machine.dyson_sphere.voltage", (pair.leftInt() > 0 ? getOverclockVoltage() : 0)));
         textList.add(Component.translatable("gtocore.machine.fission_reactor.damaged", pair.rightInt()).append("%"));
     }
@@ -79,7 +79,7 @@ public final class DysonSphereReceivingStationMcahine extends ElectricMultiblock
         int integer = GTODimensions.getPlanetDistances(getDimension());
         if (integer == 0) return null;
         return getRecipeBuilder().duration(20)
-                .CWUt(Math.max(1, pair.leftInt() * integer / 2))
+                .CWUt(Math.max(1, pair.leftInt() * integer / 10))
                 .EUt(-GTValues.V[GTValues.MAX] * pair.leftInt() * (50 - Math.max(0, pair.rightInt() - 60)) / 50)
                 .inputFluids(GTOFluids.GELID_CRYOTHEUM.get(), Math.max(1, (int) Math.sqrt(pair.leftInt())))
                 .build();
