@@ -102,7 +102,8 @@ public class PlayerAttrHUD implements IMoveableHUD {
     @Override
     public void render(ForgeGui forgeGui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getInstance();
-        if (!isEnabled() || mc.level == null || mc.options.renderDebug || mc.options.hideGui || isEditorActive()) {
+        if (!isEnabled() || GTOConfig.INSTANCE.client.hud.clientAttributesHUDHideInGame ||
+                mc.level == null || mc.options.renderDebug || mc.options.hideGui || isEditorActive()) {
             return;
         }
         renderGeneral(guiGraphics, partialTick, screenWidth, screenHeight);
@@ -123,13 +124,13 @@ public class PlayerAttrHUD implements IMoveableHUD {
         cursorY += font.lineHeight + EDITOR_HEADER_GAP;
 
         var entries = PlayerAttrEntry.getEntries();
-        if (entries.stream().noneMatch(PlayerAttrEntry::isVisible)) {
+        if (entries.stream().noneMatch(PlayerAttrEntry::isEditorVisible)) {
             guiGraphics.drawString(font, Component.translatable(EMPTY_MESSAGE), contentX, cursorY, 0xFFB8C2CC, false);
             return;
         }
 
         for (PlayerAttrEntry entry : entries) {
-            if (!entry.isVisible()) {
+            if (!entry.isEditorVisible()) {
                 continue;
             }
             Rect2i entryBounds = getEntryBounds(bounds, entries, entry);
@@ -177,7 +178,7 @@ public class PlayerAttrHUD implements IMoveableHUD {
 
         List<PlayerAttrEntry> entries = PlayerAttrEntry.getEntries();
         for (PlayerAttrEntry entry : entries) {
-            if (!entry.isVisible()) {
+            if (!entry.isEditorVisible()) {
                 continue;
             }
             Rect2i entryBounds = getEntryBounds(bounds, entries, entry);
@@ -253,7 +254,7 @@ public class PlayerAttrHUD implements IMoveableHUD {
         List<Component> lines = new ArrayList<>();
         lines.add(getDisplayName());
         for (PlayerAttrEntry entry : PlayerAttrEntry.getEntries()) {
-            if (entry.isVisible()) {
+            if (entry.isPreviewVisible()) {
                 lines.add(entry.createPreviewLine());
             }
         }
@@ -290,13 +291,13 @@ public class PlayerAttrHUD implements IMoveableHUD {
     private int getEditorHeight() {
         Font font = Minecraft.getInstance().font;
         List<PlayerAttrEntry> entries = PlayerAttrEntry.getEntries();
-        if (entries.stream().noneMatch(PlayerAttrEntry::isVisible)) {
+        if (entries.stream().noneMatch(PlayerAttrEntry::isEditorVisible)) {
             return EDITOR_PADDING * 2 + font.lineHeight * 2 + EDITOR_HEADER_GAP;
         }
 
         int height = EDITOR_PADDING * 2 + font.lineHeight + EDITOR_HEADER_GAP;
         for (PlayerAttrEntry entry : entries) {
-            if (!entry.isVisible()) {
+            if (!entry.isEditorVisible()) {
                 continue;
             }
             height += entry.getEditorHeight() + EDITOR_ENTRY_SPACING;
@@ -311,7 +312,7 @@ public class PlayerAttrHUD implements IMoveableHUD {
         int width = panelBounds.getWidth() - EDITOR_PADDING * 2;
 
         for (PlayerAttrEntry entry : entries) {
-            if (!entry.isVisible()) {
+            if (!entry.isEditorVisible()) {
                 continue;
             }
             Rect2i entryBounds = new Rect2i(x, y, width, entry.getEditorHeight());

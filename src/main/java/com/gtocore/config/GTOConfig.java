@@ -393,11 +393,16 @@ public final class GTOConfig {
             public int clientAttributesHUDDefaultX = 8;
 
             @Configurable
-            @Configurable.Comment({ "客户端属性 HUD 的默认 Y 相对位置", "0意味着屏幕顶部，100意味着屏幕底部", "The default Y relative position of the Client Attributes HUD", "0 means the top of the screen, 100 means the bottom of the screen" })
+            @Configurable.Comment({ "客户端属性HUD的默认Y相对位置", "0意味着屏幕顶部，100意味着屏幕底部", "The default Y relative position of the Client Attributes HUD", "0 means the top of the screen, 100 means the bottom of the screen" })
             @RegisterLanguage(namePrefix = "config.gtocore.option", en = "Client Attributes HUD Default Y", cn = "客户端属性 HUD 默认 Y 位置")
             @Configurable.Range(min = 0, max = 100)
             @Configurable.Gui.Slider
             public int clientAttributesHUDDefaultY = 12;
+
+            @Configurable
+            @Configurable.Comment({ "启用后，仅在调出HUD配置界面时显示客户端属性HUD，游戏中将隐藏", "When enabled, the Client Attributes HUD will only be displayed when the HUD configuration interface is called up, and will be hidden in the game" })
+            @RegisterLanguage(namePrefix = "config.gtocore.option", en = "Hide Client Attributes HUD In Game", cn = "游戏中隐藏客户端属性 HUD")
+            public boolean clientAttributesHUDHideInGame = false;
 
             @Configurable
             @Configurable.Comment({ "无线能量 HUD 显示的历史秒数", "例如：设为30则显示过去30秒的能量变化情况", "The number of historical seconds displayed by the Wireless Energy HUD", "For example: setting it to 30 will show the energy changes over the past 30 seconds" })
