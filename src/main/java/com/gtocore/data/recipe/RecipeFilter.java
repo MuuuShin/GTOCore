@@ -450,6 +450,10 @@ public final class RecipeFilter {
         filters.add(RLUtils.fromNamespaceAndPath("apotheosis", "sigil_of_withdrawal"));
         filters.add(RLUtils.fromNamespaceAndPath("apotheosis", "salvaging_table"));
 
+        filters.add(RLUtils.fromNamespaceAndPath("effortlessbuilding", "randomizer_bag"));
+        filters.add(RLUtils.fromNamespaceAndPath("effortlessbuilding", "golden_randomizer_bag"));
+        filters.add(RLUtils.fromNamespaceAndPath("effortlessbuilding", "diamond_randomizer_bag"));
+
         // 去除简单模式下的原版末影珍珠配方
         filters.add(RLUtils.mc("ender_eye"));
 

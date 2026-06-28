@@ -22,6 +22,7 @@ public enum Mods {
     CONSTRUCTION_WAND("constructionwand"),
     JECHARACTERS("jecharacters"),
     LANG("moremorelang"),
+    EFFORTLESS("effortlessbuilding"),
     FACTORY_BLOCKS("factory_blocks"),
     MYTHICBOTANY("mythicbotany");
 

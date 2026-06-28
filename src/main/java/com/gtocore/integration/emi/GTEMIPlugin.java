@@ -139,6 +139,12 @@ public final class GTEMIPlugin implements EmiPlugin {
             c.add(EPPItemAndBlock.CIRCUIT_CUTTER.asItem());
             c.add(EPPItemAndBlock.SILICON_BLOCK.asItem());
 
+            if (Mods.EFFORTLESS.isLoaded()) {
+                c.add(RegistriesUtils.getItem("effortlessbuilding:randomizer_bag"));
+                c.add(RegistriesUtils.getItem("effortlessbuilding:golden_randomizer_bag"));
+                c.add(RegistriesUtils.getItem("effortlessbuilding:diamond_randomizer_bag"));
+            }
+
             if (Mods.MYTHICBOTANY.isLoaded()) {
                 c.add(RegistriesUtils.getItem("mythicbotany:feysythia"));
                 c.add(RegistriesUtils.getItem("mythicbotany:feysythia_floating"));
