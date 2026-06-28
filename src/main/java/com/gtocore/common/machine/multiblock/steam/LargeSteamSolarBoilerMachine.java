@@ -42,29 +42,24 @@ import static com.gregtechceu.gtceu.common.data.GTMaterials.Steam;
 @Scanned
 public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine implements IExplosionMachine, IDisplayUIMachine, IEnhancedRecipeLogicMachine, ICustomRecipeLogicHolder {
 
-    @DynamicInitialValue(key = "gtocore.machine.large_steam_solar_boiler", typeKey = DynamicInitialValueTypes.KEY_MULTIPLY, easyValue = "30", normalValue = "18", expertValue = "12", cn = "单集热管产率 : %s / t", en = "Steam production per tube : %s / t")
+    @DynamicInitialValue(key = "gtocore.machine.large_steam_solar_boiler", typeKey = DynamicInitialValueTypes.KEY_MULTIPLY, easyValue = "20", normalValue = "15", expertValue = "10", cn = "单集热管产率 : %s / t", en = "Steam production per tube : %s / t")
     private static int basicSteamProduction = 10;
 
-    private static final int MAX_LR_DIST = 62, MAX_B_DIST = 125;
+    private static final int MAX_LR_DIST = 14, MAX_B_DIST = 29;
     private static final int MIN_LR_DIST = 1, MIN_B_DIST = 3;
     private static final int STEAM_GENERATION_INTERVAL = 20;
 
     private int lDist, rDist, bDist, sunlit;
     private int steamGenerated;
     private int timing;
-    private boolean formed;
 
     public LargeSteamSolarBoilerMachine(MetaMachineBlockEntity holder) {
         super(holder);
     }
 
-    private void updateStructureDimensions() {
+    private boolean updateStructureDimensions() {
         Level world = getLevel();
-        if (world == null) {
-            resetStructure();
-            return;
-        }
-
+        if (world == null) return false;
         Direction front = getFrontFacing();
         Direction back = front.getOpposite();
         Direction left = front.getCounterClockWise();
@@ -78,10 +73,9 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
             this.lDist = newLDist;
             this.rDist = newRDist;
             this.bDist = newBDist;
-            this.formed = true;
-        } else {
-            resetStructure();
+            return true;
         }
+        return false;
     }
 
     private static int calculateDistance(Level world, BlockPos startPos, Direction direction, int maxDistance) {
@@ -114,8 +108,8 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
     }
 
     private void resetStructure() {
-        lDist = rDist = bDist = 0;
-        formed = false;
+        lDist = rDist = MIN_LR_DIST;
+        bDist = MIN_B_DIST;
     }
 
     private static boolean isBlockSolar(@NotNull Level world, @NotNull BlockPos pos) {
@@ -130,26 +124,30 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
     @NotNull
     @Override
     public Supplier<BlockPattern>[] getPattern() {
-        if (getLevel() != null) updateStructureDimensions();
+        if (getLevel() != null && updateStructureDimensions()) {
+            if (lDist < MIN_LR_DIST) lDist = MIN_LR_DIST;
+            if (rDist < MIN_LR_DIST) rDist = MIN_LR_DIST;
+            if (bDist < MIN_B_DIST) bDist = MIN_B_DIST;
+            int safeLDist = lDist;
+            int safeRDist = rDist;
+            int safeBDist = bDist;
 
-        int safeLDist = formed ? lDist : MIN_LR_DIST;
-        int safeRDist = formed ? rDist : MIN_LR_DIST;
-        int safeBDist = formed ? bDist : MIN_B_DIST;
+            int totalWidth = safeLDist + safeRDist + 3;
 
-        int totalWidth = safeLDist + safeRDist + 3;
+            String boundaryRow = "a".repeat(totalWidth);
+            String middleRow = "a" + "b".repeat(totalWidth - 2) + "a";
+            String controllerRow = "a".repeat(safeLDist + 1) + "~" + "a".repeat(safeRDist + 1);
 
-        String boundaryRow = "a".repeat(totalWidth);
-        String middleRow = "a" + "b".repeat(totalWidth - 2) + "a";
-        String controllerRow = "a".repeat(safeLDist + 1) + "~" + "a".repeat(safeRDist + 1);
-
-        return new Supplier[] { () -> FactoryBlockPattern.start(RelativeDirection.LEFT, RelativeDirection.UP, RelativeDirection.FRONT)
-                .aisle(boundaryRow)
-                .aisle(middleRow).setRepeatable(safeBDist)
-                .aisle(controllerRow)
-                .where('a', blocks(GTBlocks.STEEL_HULL.get()).or(abilities(EXPORT_FLUIDS)).or(abilities(IMPORT_FLUIDS)))
-                .where('b', blocks(GTOBlocks.SOLAR_HEAT_COLLECTOR_PIPE_CASING.get()))
-                .where('~', controller(this.getDefinition()))
-                .build() };
+            return new Supplier[] { () -> FactoryBlockPattern.start(RelativeDirection.LEFT, RelativeDirection.UP, RelativeDirection.FRONT)
+                    .aisle(boundaryRow)
+                    .aisle(middleRow).setRepeatable(safeBDist)
+                    .aisle(controllerRow)
+                    .where('a', blocks(GTBlocks.STEEL_HULL.get()).or(abilities(EXPORT_FLUIDS).setMaxGlobalLimited(1)).or(abilities(IMPORT_FLUIDS)))
+                    .where('b', blocks(GTOBlocks.SOLAR_HEAT_COLLECTOR_PIPE_CASING.get()))
+                    .where('~', controller(this.getDefinition()))
+                    .build() };
+        }
+        return super.getPattern();
     }
 
     @Override
@@ -158,7 +156,6 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
     }
 
     private int calculateSunlit(Level level) {
-        if (!isAppropriateDimensionAndTime(level, getPos())) return 0;
         int count = 0;
         Direction front = getFrontFacing();
         Direction back = front.getOpposite();
@@ -174,7 +171,7 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
         return count;
     }
 
-    private boolean isAppropriateDimensionAndTime(Level world, BlockPos pos) {
+    private boolean isAppropriateDimensionAndTime(Level world) {
         if (GTODimensions.isVoid(world.dimension())) return true;
         if (!world.isDay()) {
             setIdleReason(Component.translatable("gtceu.recipe_logic.condition_fails")
@@ -197,6 +194,10 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
         int waterAmount = (int) Math.ceil((double) steamAmount / ConfigHolder.INSTANCE.machines.largeBoilers.steamPerWater);
 
         if (waterAmount <= 0 || steamAmount <= 0) return null;
+        if (waterAmount > getFluidAmount(true, Fluids.WATER)[0]) {
+            doExplosion(2);
+            return null;
+        }
 
         steamGenerated = steamAmount;
         return getRecipeBuilder()
@@ -221,6 +222,7 @@ public class LargeSteamSolarBoilerMachine extends WorkableMultiblockMachine impl
     public GTRecipeDefinition createCustomRecipe(RecipeHandlerUnit unit) {
         Level level = getLevel();
         if (level != null && isFormed()) {
+            if (!isAppropriateDimensionAndTime(level)) return null;
             if (timing == 0) {
                 sunlit = calculateSunlit(level);
                 timing = 10;
