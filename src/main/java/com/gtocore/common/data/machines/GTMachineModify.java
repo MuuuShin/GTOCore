@@ -27,6 +27,7 @@ import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
 import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
 import com.gregtechceu.gtceu.common.data.machines.GTMultiMachines;
+import com.gregtechceu.gtceu.common.data.machines.GTResearchMachines;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
@@ -196,6 +197,13 @@ public final class GTMachineModify {
                 components.addAll(NewDataAttributes.RECIPES_TYPE.create(Component.translatable(GTRecipeTypes.FUSION_RECIPES.registryName.toLanguageKey()).withStyle(ChatFormatting.WHITE)).get());
             });
         }
+
+        GTResearchMachines.HIGH_PERFORMANCE_COMPUTING_ARRAY.setTooltipBuilder((itemStack, components) -> {
+            components.add(Component.translatable("gtceu.machine.high_performance_computation_array.tooltip.0"));
+            components.add(Component.translatable("gtceu.machine.high_performance_computation_array.tooltip.1"));
+            components.add(Component.translatable("gtceu.machine.high_performance_computation_array.tooltip.2"));
+            components.add(Component.translatable("gtceu.machine.high_performance_computation_array.tooltip.3"));
+        });
     }
 
     private static double getAirScrubberAshTransferChance(int tier) {
