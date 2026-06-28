@@ -1018,6 +1018,11 @@ final class Vanilla {
                 'A', new MaterialEntry(TagPrefix.foil, GTOMaterials.Livingsteel), 'B', new MaterialEntry(TagPrefix.plate, GTMaterials.Steel));
         VanillaRecipeHelper.addShapelessRecipe(GTOCore.id("gem_item_filter"), GTOItems.GEM_ITEM_FILTER.asItem(),
                 GTOItems.GEM_ITEM_FILTER.asItem());
+        VanillaRecipeHelper.addShapedRecipe(GTOCore.id("sigil_of_socketing"), RegistriesUtils.getItemStack("apotheosis:sigil_of_socketing", 3),
+                "ABA",
+                "CCC",
+                "ADA",
+                'A', RegistriesUtils.getItem("apotheosis:gem_dust"), 'B', RegistriesUtils.getItem("endrem:magical_eye"), 'C', RegistriesUtils.getItem("apotheosis:gem_fused_slate"), 'D', new MaterialEntry(TagPrefix.gem, GTMaterials.Amethyst));
 
         addUpg(GTAEMachines.ME_PATTERN_BUFFER.asItem(), GTOItems.PATTERN_BUFFER_UPGRADER0.asStack());
         addUpg(GTAEMachines.ME_EXTEND_PATTERN_BUFFER.asItem(), GTOItems.PATTERN_BUFFER_UPGRADER1.asStack());
