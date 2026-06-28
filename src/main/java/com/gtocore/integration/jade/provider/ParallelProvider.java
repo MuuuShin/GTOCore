@@ -58,7 +58,7 @@ public final class ParallelProvider implements IBlockComponentProvider, IServerD
                 compoundTag.putBoolean("exact", true);
             }
             long originParallel = getOriginParallel(machine);
-            if (parallel > 1) compoundTag.putLong("parallel", parallel);
+            if (parallel > 0) compoundTag.putLong("parallel", parallel);
             else if (originParallel > 1) compoundTag.putLong("parallel", originParallel);
             if (batchParallel > 1) compoundTag.putLong("batch_parallel", batchParallel);
             else if (parallel / originParallel > 1) compoundTag.putLong("batch_parallel", parallel / originParallel);
