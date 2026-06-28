@@ -1769,7 +1769,7 @@ object GTOMachineTooltips {
 
         section("可用大小" translatedTo "Usable Size")
         command("最小：5x5" translatedTo "Minimum: 5x5")
-        command("最大：127x127" translatedTo "Maximum: 127x127")
+        command("最大：31x31" translatedTo "Maximum: 31x31")
     }
 
     // 部件组装机
