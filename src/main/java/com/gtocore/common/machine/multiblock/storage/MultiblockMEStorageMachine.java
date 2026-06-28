@@ -2,8 +2,10 @@ package com.gtocore.common.machine.multiblock.storage;
 
 import com.gtocore.api.ae2.stacks.AEFluidKeyStackHandler;
 import com.gtocore.api.ae2.stacks.AEItemKeyStackHandler;
+import com.gtocore.api.ae2.stacks.AEManaKeyHandler;
 import com.gtocore.api.pattern.GTOPredicates;
 import com.gtocore.common.block.BlockMap;
+import com.gtocore.common.data.GTOMachines;
 import com.gtocore.common.data.GTORecipeDataKeys;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
@@ -36,15 +38,21 @@ import appeng.capabilities.Capabilities;
 
 import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.datasream.data.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
+import vazkii.botania.api.BotaniaForgeCapabilities;
+import vazkii.botania.api.mana.ManaReceiver;
 
+import java.util.function.LongSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import static com.gregtechceu.gtceu.api.pattern.Predicates.blocks;
 
 @Slf4j
 public final class MultiblockMEStorageMachine extends MultiblockControllerMachine implements MEStorage, IDropSaveMachine, IWailaDisplayProvider {
@@ -55,19 +63,37 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
     private int lDist = 0, rDist = 0, uDist = 0, dDist = 0, bDist = 0;
 
     @SaveToDisk
+    @Getter
+    @NotNull
     private final AEKeyMap<AEKey> keyMap = new AEKeyMap<>();
 
     @SaveToDisk
+    private int cells;
+    @SaveToDisk
     private long storage;
+    @Getter
     @SaveToDisk
     private long capacity;
 
-    private LazyOptional<MEStorage> capabilityStorage = LazyOptional.of(() -> this);
+    @Getter
+    @NotNull
+    private final LongSupplier storageSupplier = () -> storage;
+    @Getter
+    private final Runnable onChange = this::saveChanges;
 
     @Nullable
     private final AEKeyType type;
+    @Nullable
     private final AEItemKeyStackHandler itemStackHandler;
+    @Nullable
     private final AEFluidKeyStackHandler fluidStackHandler;
+    @Nullable
+    private final AEManaKeyHandler manaHandler;
+
+    @NotNull
+    private LazyOptional<MEStorage> capabilityStorage = LazyOptional.of(() -> this);
+    @NotNull
+    private LazyOptional<ManaReceiver> capabilityMana;
 
     public MultiblockMEStorageMachine(MetaMachineBlockEntity holder, @Nullable AEKeyType type) {
         super(holder);
@@ -76,6 +102,8 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
             itemStackHandler = new AEItemKeyStackHandler();
             itemStackHandler.setMap(keyMap);
             itemStackHandler.setStorage(this);
+            itemStackHandler.setStorageSupplier(storageSupplier);
+            itemStackHandler.setOnChange(onChange);
         } else {
             itemStackHandler = null;
         }
@@ -83,8 +111,20 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
             fluidStackHandler = new AEFluidKeyStackHandler();
             fluidStackHandler.setMap(keyMap);
             fluidStackHandler.setStorage(this);
+            fluidStackHandler.setStorageSupplier(storageSupplier);
+            fluidStackHandler.setOnChange(onChange);
         } else {
             fluidStackHandler = null;
+        }
+        if (type == null) {
+            manaHandler = new AEManaKeyHandler();
+            manaHandler.setMap(keyMap);
+            manaHandler.setStorageSupplier(storageSupplier);
+            manaHandler.setOnChange(onChange);
+            capabilityMana = LazyOptional.of(() -> manaHandler);
+        } else {
+            manaHandler = null;
+            capabilityMana = LazyOptional.empty();
         }
     }
 
@@ -143,12 +183,16 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
                 frontLayer[y] = row.toString();
             }
 
+            int interiorWidth = iWidth - 1;
+            int interiorHeight = iHeight - 1;
+            int interiorDepth = bDist - 1;
+            cells = interiorWidth * interiorHeight * interiorDepth;
             return new Supplier[] { () -> FactoryBlockPattern.start()
                     .aisle(backLayer)
-                    .aisle(storageLayer).setRepeatable(bDist - 1)
+                    .aisle(storageLayer).setRepeatable(interiorDepth)
                     .aisle(frontLayer)
                     .where('C', Predicates.controller(getDefinition()))
-                    .where('W', Predicates.blocks(GTBlocks.STEEL_HULL.get()))
+                    .where('W', Predicates.blocks(GTBlocks.STEEL_HULL.get()).or(blocks(GTOMachines.VAULT_HATCH.get()).setMaxGlobalLimited(cells)))
                     .where('S', GTOPredicates.hermeticCasing())
                     .build()
             };
@@ -194,22 +238,13 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
         return distance;
     }
 
-    private long calculateCapacity() {
-        int width = lDist + rDist;
-        int height = uDist + dDist;
-        int depth = bDist;
-
-        int interiorWidth = width - 1;
-        int interiorHeight = height - 1;
-        int interiorDepth = depth - 1;
-        long cells = (long) interiorWidth * interiorHeight * interiorDepth;
-        return cells * 800 * (getMultiblockState().getMatchContext().getOrDefault(GTORecipeDataKeys.HERMETIC_CASING_TIER, 0) + 1);
-    }
-
     @Override
     public void onStructureFormed() {
+        capacity = cells * 800L * (getMultiblockState().getMatchContext().getOrDefault(GTORecipeDataKeys.HERMETIC_CASING_TIER, 0) + 1);
+        if (itemStackHandler != null) itemStackHandler.setCapacity(capacity);
+        if (fluidStackHandler != null) fluidStackHandler.setCapacity(capacity);
+        if (manaHandler != null) manaHandler.setCapacity(capacity);
         super.onStructureFormed();
-        capacity = calculateCapacity();
         notifyNeighborsUpdate();
     }
 
@@ -217,12 +252,20 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
     public void onStructureInvalid() {
         super.onStructureInvalid();
         capacity = 0;
+        if (itemStackHandler != null) itemStackHandler.setCapacity(0);
+        if (fluidStackHandler != null) fluidStackHandler.setCapacity(0);
+        if (manaHandler != null) manaHandler.setCapacity(0);
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
         capabilityStorage = LazyOptional.of(() -> this);
+        if (manaHandler != null) {
+            capabilityMana = LazyOptional.of(() -> manaHandler);
+            manaHandler.setPos(getPos());
+            manaHandler.setLevel(getLevel());
+        }
         long totalAmount = 0;
         for (var e : keyMap) {
             totalAmount += e.getLongValue() / (e.getKey().getAmountPerByte() / 8);
@@ -233,7 +276,9 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
     @Override
     public void onUnload() {
         super.onUnload();
+        if (manaHandler != null) manaHandler.setLevel(null);
         capabilityStorage.invalidate();
+        capabilityMana.invalidate();
     }
 
     @Override
@@ -250,8 +295,16 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
 
     @Override
     public @Nullable <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == Capabilities.STORAGE && side == getFrontFacing()) {
-            return capabilityStorage.cast();
+        if (cap == Capabilities.STORAGE) {
+            if (side == null || side == getFrontFacing()) {
+                return capabilityStorage.cast();
+            }
+            return LazyOptional.empty();
+        } else if (cap == BotaniaForgeCapabilities.MANA_RECEIVER) {
+            if (side == null || side == getFrontFacing()) {
+                return capabilityMana.cast();
+            }
+            return LazyOptional.empty();
         }
         return null;
     }

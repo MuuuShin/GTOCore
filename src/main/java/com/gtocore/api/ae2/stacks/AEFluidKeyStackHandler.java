@@ -17,6 +17,8 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.LongSupplier;
+
 public class AEFluidKeyStackHandler implements ICustomFluidStackHandler {
 
     @Nullable
@@ -24,19 +26,26 @@ public class AEFluidKeyStackHandler implements ICustomFluidStackHandler {
     protected MEStorage storage;
     @Setter
     protected AEKeyMap<AEKey> map;
+    @Setter
+    protected Runnable onChange;
+
+    @Setter
+    protected long capacity;
+    @Setter
+    protected LongSupplier storageSupplier;
 
     @Override
     public void setFluidInTank(int i, FluidStack fluidStack) {}
 
     @Override
     public int getTanks() {
-        if (storage == null) return 0;
-        return 1;
+        if (storageSupplier == null) return 0;
+        return storageSupplier.getAsLong() < capacity ? 2 : 1;
     }
 
     @Override
     public @NotNull FluidStack getFluidInTank(int tank) {
-        if (map == null) return FluidStack.EMPTY;
+        if (map == null || tank != 0) return FluidStack.EMPTY;
         for (var e : map) {
             if (e.getKey() instanceof AEFluidKey key) {
                 return key.toStack(MathUtil.saturatedCast(e.getLongValue()));
@@ -57,7 +66,7 @@ public class AEFluidKeyStackHandler implements ICustomFluidStackHandler {
 
     @Override
     public int fill(FluidStack resource, FluidAction action) {
-        if (storage == null) return 0;
+        if (storage == null || storageSupplier == null || storageSupplier.getAsLong() >= capacity) return 0;
         var amount = resource.getAmount();
         if (amount < 1) return 0;
         return (int) storage.insert(AEFluidKey.of(resource), amount, action.simulate() ? Actionable.SIMULATE : Actionable.MODULATE, IActionSource.empty());
@@ -75,18 +84,22 @@ public class AEFluidKeyStackHandler implements ICustomFluidStackHandler {
 
     @Override
     public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-        if (storage == null) return FluidStack.EMPTY;
+        if (storage == null || onChange == null) return FluidStack.EMPTY;
         if (maxDrain < 1) return FluidStack.EMPTY;
         for (var it = map.iterator(); it.hasNext();) {
             var e = it.next();
             if (e.getKey() instanceof AEFluidKey key) {
                 var value = e.getLongValue();
                 maxDrain = (int) Math.min(maxDrain, value);
+                if (maxDrain < 1) return FluidStack.EMPTY;
                 var stack = key.toStack(maxDrain);
-                if (value == maxDrain) {
-                    it.remove();
-                } else {
-                    e.setValue(value - maxDrain);
+                if (action.execute()) {
+                    if (value == maxDrain) {
+                        it.remove();
+                    } else {
+                        e.setValue(value - maxDrain);
+                    }
+                    onChange.run();
                 }
                 return stack;
             }

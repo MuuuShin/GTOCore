@@ -42,6 +42,8 @@ public final class MachineRecipe {
                 "PCP", "RPR", 'P', new MaterialEntry(plateDouble, GTMaterials.Steel), 'R', new MaterialEntry(TagPrefix.rodLong, GTMaterials.Steel), 'C', GTMachines.BRONZE_DRUM.asItem());
         VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("general_vault"), MultiBlockG.GENERAL_VAULT.asItem(), "PAP",
                 "RPR", "PBP", 'P', new MaterialEntry(plateDouble, GTMaterials.Steel), 'R', new MaterialEntry(TagPrefix.rodLong, GTMaterials.Steel), 'A', GTMachines.BRONZE_CRATE.asItem(), 'B', GTMachines.BRONZE_DRUM.asItem());
+        VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("vault_hatch"), GTOMachines.VAULT_HATCH.asItem(), " P ",
+                "PVP", " P ", 'P', new MaterialEntry(plateDouble, GTMaterials.Steel), 'V', MultiBlockG.GENERAL_VAULT.asItem());
         VanillaRecipeHelper.addShapedRecipe(true, GTOCore.id("evaporation_plant"),
                 MultiBlockA.EVAPORATION_PLANT.asItem(), "CBC", "FMF", "CBC", 'M', GTMachines.HULL[HV].asItem(),
                 'B', new MaterialEntry(TagPrefix.wireGtDouble, GTMaterials.Kanthal), 'C', CustomTags.HV_CIRCUITS,

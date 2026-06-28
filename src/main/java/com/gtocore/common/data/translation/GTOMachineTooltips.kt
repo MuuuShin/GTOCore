@@ -4,12 +4,8 @@ import com.gtocore.api.lang.ComponentListSupplier
 import com.gtocore.api.lang.ComponentSupplier
 import com.gtocore.api.lang.toComponentSupplier
 import com.gtocore.api.lang.toLiteralSupplier
-import com.gtocore.common.machine.electric.ElectricHeaterMachine
 import com.gtocore.common.machine.multiblock.generator.TurbineMachine
 import com.gtocore.common.machine.multiblock.storage.MEStorageMachine
-import com.gtocore.common.machine.multiblock.storage.MultiblockCrateMachine
-import com.gtocore.common.machine.noenergy.BoilWaterMachine
-import com.gtocore.common.machine.noenergy.HeaterMachine
 
 import net.minecraft.network.chat.Component
 
@@ -689,7 +685,16 @@ object GTOMachineTooltips {
         function("可以存储大量资源" translatedTo "Can store many many resources")
         guide("使用简易合成终端或者存储总线读取内部资源" translatedTo "Use a simple terminal or a storage bus to read internal resources")
         info("容量由多方块大小决定" translatedTo "The capacity is determined by the multiblock size")
-        info("大小: 3x3x3到15x15x15" translatedTo "Size: 3x3x3 to 15x15x15")
+        info("大小：3x3x3到15x15x15" translatedTo "Size: 3x3x3 to 15x15x15")
+    }
+
+    @JvmField
+    val VaultHatchTooltips = ComponentListSupplier {
+        setTranslationPrefix("vault_hatch")
+
+        section(ComponentSlang.MainFunction)
+        content("可为保险库IO" translatedTo "Can serve as vault IO")
+        info("最大安装数：取决于内部空间大小" translatedTo "Maximum installations: depends on the internal space size")
     }
 
     @JvmField

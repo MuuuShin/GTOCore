@@ -64,6 +64,8 @@ public final class PrimitiveBlastFurnaceHatch extends MultiblockPartMachine {
             outputInventorySubs = primitiveBlastFurnace.exportItems.addChangedListener(this::updateAutoIOSubscription);
             inputInventory.setProxy(primitiveBlastFurnace.importItems);
             outputInventory.setProxy(primitiveBlastFurnace.exportItems);
+            this.notifyNeighborsUpdate();
+            this.updateAutoIOSubscription();
         }
     }
 

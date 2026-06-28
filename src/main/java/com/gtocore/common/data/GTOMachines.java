@@ -595,7 +595,7 @@ public final class GTOMachines {
             .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 1))
             .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 1))
             .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
-            .tier(0)
+            .tier(ULV)
             .overlayTieredHullRenderer("neutron_sensor")
             .register();
 
@@ -607,7 +607,7 @@ public final class GTOMachines {
             .tooltips(Component.translatable(HeatInterfaceCover.HEAT_CAPACITY, 2))
             .tooltips(Component.translatable(HeatInterfaceCover.TRANSFER_RATE, 4))
             .tooltips(Component.translatable(HeatInterfaceCover.COOLDOWN_RATE, 0.01))
-            .tier(0)
+            .tier(IV)
             .overlayTieredHullRenderer("neutron_sensor")
             .register();
 
@@ -615,7 +615,7 @@ public final class GTOMachines {
             .allRotation()
             .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS)
             .tooltips(GTOMachineTooltips.VacuumInterfaceTooltips)
-            .tier(1)
+            .tier(LV)
             .overlayTieredHullRenderer("neutron_sensor")
             .register();
 
@@ -794,6 +794,13 @@ public final class GTOMachines {
             .notAllowSharedTooltips()
             .modelRenderer(() -> GTCEu.id("block/machine/part/primitive_blast_furnace_hatch"))
             .allowCoverOnFront(true)
+            .register();
+
+    public static final MachineDefinition VAULT_HATCH = machine("vault_hatch", "保险库仓", MEStorageHatch::new)
+            .allRotation()
+            .tooltips(GTOMachineTooltips.VaultHatchTooltips)
+            .tier(ULV)
+            .overlayTieredHullRenderer("vault_hatch")
             .register();
 
     public static final MachineDefinition BLOCK_BUS = machine("block_bus", "方块总线", BlockBusPartMachine::new)

@@ -17,6 +17,8 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.LongSupplier;
+
 public class AEItemKeyStackHandler implements ICustomItemStackHandler {
 
     @Nullable
@@ -24,19 +26,26 @@ public class AEItemKeyStackHandler implements ICustomItemStackHandler {
     protected MEStorage storage;
     @Setter
     protected AEKeyMap<AEKey> map;
+    @Setter
+    protected Runnable onChange;
+
+    @Setter
+    protected long capacity;
+    @Setter
+    protected LongSupplier storageSupplier;
 
     @Override
     public void setStackInSlot(int slot, @NotNull ItemStack stack) {}
 
     @Override
     public int getSlots() {
-        if (storage == null) return 0;
-        return 1;
+        if (storageSupplier == null) return 0;
+        return storageSupplier.getAsLong() < capacity ? 2 : 1;
     }
 
     @Override
     public @NotNull ItemStack getStackInSlot(int slot) {
-        if (map == null) return ItemStack.EMPTY;
+        if (map == null || slot != 0) return ItemStack.EMPTY;
         for (var e : map) {
             if (e.getKey() instanceof AEItemKey key) {
                 return key.toStack(MathUtil.saturatedCast(e.getLongValue()));
@@ -47,7 +56,7 @@ public class AEItemKeyStackHandler implements ICustomItemStackHandler {
 
     @Override
     public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-        if (storage == null) return stack;
+        if (storage == null || storageSupplier == null || storageSupplier.getAsLong() >= capacity) return stack;
         var count = stack.getCount();
         if (count < 1) return stack;
         var r = count - storage.insert(AEItemKey.of(stack), count, simulate ? Actionable.SIMULATE : Actionable.MODULATE, IActionSource.empty());
@@ -57,18 +66,22 @@ public class AEItemKeyStackHandler implements ICustomItemStackHandler {
 
     @Override
     public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if (storage == null) return ItemStack.EMPTY;
+        if (storage == null || slot != 0 || onChange == null) return ItemStack.EMPTY;
         if (amount < 1) return ItemStack.EMPTY;
         for (var it = map.iterator(); it.hasNext();) {
             var e = it.next();
             if (e.getKey() instanceof AEItemKey key) {
                 var value = e.getLongValue();
                 amount = (int) Math.min(amount, value);
+                if (amount < 1) return ItemStack.EMPTY;
                 var stack = key.toStack(amount);
-                if (value == amount) {
-                    it.remove();
-                } else {
-                    e.setValue(value - amount);
+                if (!simulate) {
+                    if (value == amount) {
+                        it.remove();
+                    } else {
+                        e.setValue(value - amount);
+                    }
+                    onChange.run();
                 }
                 return stack;
             }
