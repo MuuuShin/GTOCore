@@ -138,6 +138,10 @@ public final class GTEMIPlugin implements EmiPlugin {
             c.add(RegistriesUtils.getItem("morered:red_alloy_ingot"));
             c.add(EPPItemAndBlock.CIRCUIT_CUTTER.asItem());
             c.add(EPPItemAndBlock.SILICON_BLOCK.asItem());
+            c.add(RegistriesUtils.getItem("ad_astra:fuel_refinery"));
+            c.add(RegistriesUtils.getItem("ad_astra:cryo_freezer"));
+            c.add(RegistriesUtils.getItem("ad_astra:compressor"));
+            c.add(RegistriesUtils.getItem("ad_astra:etrionic_blast_furnace"));
 
             if (Mods.EFFORTLESS.isLoaded()) {
                 c.add(RegistriesUtils.getItem("effortlessbuilding:randomizer_bag"));
