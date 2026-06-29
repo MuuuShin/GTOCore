@@ -3427,7 +3427,7 @@
   "gtocore.lang.dyson_sphere_receiving_station.9.299083700": "在损坏值高于60%时发射不会增加发射次数，但会重置损坏值",
   "gtocore.lang.electric_cooking.0.-2137613478": "我就是电力烟熏炉",
   "gtocore.lang.electric_cooking.1.1255084511": "§e@§e§n电力高炉§r",
-  "gtocore.lang.electric_heater_machine.0.865534957": "使用电力对四周机器进行加热",
+  "gtocore.lang.electric_heater_machine.0.1640751783": "使用电力，热量仅从顶面输出",
   "gtocore.lang.electric_heater_machine.1.684879649": "此机器不会爆炸",
   "gtocore.lang.electroplating_bath.0.-1593425065": "掌握了从矿石中提取和分离铂系金属的技术后",
   "gtocore.lang.electroplating_bath.1.-1719177163": "GTO集团的工程师们开始尝试着这个材料混那个，那个材料混这个",

@@ -865,7 +865,7 @@ object GTOMachineTooltips {
     val ElectricHeaterMachineTooltips = ComponentListSupplier {
         setTranslationPrefix("electric_heater_machine")
 
-        section("使用电力对四周机器进行加热" translatedTo "Use electricity to heat up around machines")
+        section("使用电力，热量仅从顶面输出" translatedTo "Uses electricity. Heat is output only from the top surface")
         ok("此机器不会爆炸" translatedTo "This machine will not explode")
         danger(ComponentSlang.BeAwareOfBurn)
     }

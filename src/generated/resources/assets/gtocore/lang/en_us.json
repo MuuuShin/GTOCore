@@ -3299,7 +3299,7 @@
   "gtocore.lang.dyson_sphere_receiving_station.9.299083700": "When damage value is above 60%, launching will not increase the launch count but will reset the damage value",
   "gtocore.lang.electric_cooking.0.-2137613478": "I am the Electric Smoker",
   "gtocore.lang.electric_cooking.1.1255084511": "§e@§e§nElectric Blast Furnace§r",
-  "gtocore.lang.electric_heater_machine.0.865534957": "Use electricity to heat up around machines",
+  "gtocore.lang.electric_heater_machine.0.1640751783": "Uses electricity. Heat is output only from the top surface",
   "gtocore.lang.electric_heater_machine.1.684879649": "This machine will not explode",
   "gtocore.lang.electroplating_bath.0.-1593425065": "After mastering the technology to extract and separate platinum group metals from ores",
   "gtocore.lang.electroplating_bath.1.-1719177163": "GTO Group engineers began experimenting mixing this material with that",
