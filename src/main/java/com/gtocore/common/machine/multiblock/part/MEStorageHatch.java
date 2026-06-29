@@ -119,6 +119,7 @@ public final class MEStorageHatch extends MultiblockPartMachine {
         capabilityStorage = LazyOptional.empty();
         capabilityMana.invalidate();
         capabilityMana = LazyOptional.empty();
+        this.notifyNeighborsUpdate();
     }
 
     @Override

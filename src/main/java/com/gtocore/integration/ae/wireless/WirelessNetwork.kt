@@ -43,8 +43,8 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
     var connections = Reference2IntOpenHashMap<WirelessMachine>()
 
     companion object : CodecAbleTypedCompanion<WirelessNetwork> {
-        /** 根据游戏难度计算默认最大子节点连接数。 */
-        fun defaultMaxOutputs(): Int = if (GTOConfig.INSTANCE.gamePlay.difficulty == Difficulty.Expert) 32 else 990000
+
+        fun defaultMaxOutputs(): Int = 990000
 
         val UNKNOWN: ResourceKey<Level> = ResourceKey.create(Registries.DIMENSION, GTCEu.id("unknown"))
 
@@ -53,7 +53,7 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
                 Codec.STRING.fieldOf("id").forGetter { it.id },
                 UUIDUtil.CODEC.fieldOf("owner").forGetter { it.owner },
                 Codec.STRING.optionalFieldOf("nickname").forGetter { Optional.ofNullable(it.nickname) },
-                Codec.INT.optionalFieldOf("maxOutputsPerInput").forGetter { Optional.of(it.maxOutputsPerInput) },
+                Codec.INT.optionalFieldOf("max").forGetter { Optional.of(it.maxOutputsPerInput) },
             ).apply(b) { id, owner, nicknameOpt, maxOpt ->
                 WirelessNetwork(id, owner, nicknameOpt.orElse(id) ?: id, maxOpt.orElse(defaultMaxOutputs()) ?: defaultMaxOutputs())
             }
@@ -107,8 +107,7 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
 
             WirelessMachine.NodeType.CHILD -> {
                 outputNodes.add(node)
-                val pathingService: IPathingService? = node.mainNode?.grid?.pathingService
-                if (pathingService?.channelMode === ChannelMode.INFINITE && connectionAvailableInput(node)) return
+                if (connectionAvailableInput(node)) return
                 needsRefresh = true
             }
         }
@@ -199,19 +198,8 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
         }
         assignments.clear()
         connections.clear()
-
         if (outputNodes.isEmpty()) return
-
-        val pathingService: IPathingService? = outputNodes.firstOrNull { isNodeValid(it) }?.mainNode?.grid?.pathingService
-        val greedyFlag = pathingService?.channelMode !== ChannelMode.INFINITE
-        val controllerFlag = pathingService?.controllerState === ControllerState.CONTROLLER_ONLINE
-        if (greedyFlag || controllerFlag) {
-            if (inputNodes.isEmpty()) return
-            assignNodesGreedy()
-        } else {
-            assignNodesInfinity()
-        }
-
+        assignNodesInfinity()
         if (GTOConfig.INSTANCE.devMode.aeLog) {
             println(
                 "WirelessNetwork '$nickname': ${inputNodes.size} sources, ${outputNodes.size} children, " +
@@ -247,37 +235,6 @@ class WirelessNetwork(val id: String, val owner: UUID, var nickname: String = id
                     continue
                 }
                 if (createConnection(next, output)) {
-                    conns++
-                    break
-                }
-            }
-        }
-    }
-
-    fun assignNodesGreedy() {
-        val inputs = Reference2IntOpenHashMap<WirelessMachine>(inputNodes.size)
-        inputNodes.forEach { if (isNodeValid(it)) inputs.put(it, it.workloadChannels) }
-        val it = inputs.reference2IntEntrySet().fastIterator()
-        var conns = 0
-        var next: Reference2IntMap.Entry<WirelessMachine>? = null
-        a@ for (output in outputNodes) {
-            if (!isNodeValid(output)) continue
-            while (true) {
-                if (next === null) {
-                    if (it.hasNext()) {
-                        next = it.next()
-                        conns = 0
-                    } else {
-                        break@a
-                    }
-                }
-                val outputWorkload = output.workloadChannels
-                if (conns >= maxOutputsPerInput || next.key.maxWorkloadChannels - next.intValue < outputWorkload) {
-                    next = null
-                    continue
-                }
-                if (createConnection(next.key, output)) {
-                    next.setValue(next.intValue + outputWorkload)
                     conns++
                     break
                 }

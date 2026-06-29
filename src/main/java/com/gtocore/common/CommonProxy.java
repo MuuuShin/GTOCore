@@ -127,11 +127,7 @@ public class CommonProxy {
         BlockMap.build();
         GTOPartAbility.init();
         Algae.init();
-        if (GTOCore.isExpert()) {
-            AEConfig.instance().setChannelModel(ChannelMode.DEFAULT);
-        } else {
-            AEConfig.instance().setChannelModel(ChannelMode.INFINITE);
-        }
+        AEConfig.instance().setChannelModel(ChannelMode.INFINITE);
         PlayerAttributes.init();
 
         FusionReactorMachine.registerFusionTier(GTValues.UHV, " (MKIV)");

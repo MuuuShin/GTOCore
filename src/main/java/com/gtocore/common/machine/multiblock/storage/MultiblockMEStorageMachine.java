@@ -72,12 +72,9 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
     @NotNull
     private final AEKeyMap<AEKey> keyMap = new AEKeyMap<>();
 
-    @SaveToDisk
     private int cells;
-    @SaveToDisk
     private long storage;
     @Getter
-    @SaveToDisk
     private long capacity;
 
     @Getter
@@ -136,13 +133,13 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
     @Override
     @Nullable
     public ICustomItemStackHandler getItemHandlerCap(@Nullable Direction side, boolean useCoverCapability) {
-        return itemStackHandler;
+        return isFormed ? itemStackHandler : null;
     }
 
     @Override
     @Nullable
     public ICustomFluidStackHandler getFluidHandlerCap(@Nullable Direction side, boolean useCoverCapability) {
-        return fluidStackHandler;
+        return isFormed ? fluidStackHandler : null;
     }
 
     @Override
@@ -246,6 +243,7 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
     @Override
     public void onStructureFormed() {
         capacity = cells * 800L * (getMultiblockState().getMatchContext().getOrDefault(GTORecipeDataKeys.HERMETIC_CASING_TIER, 0) + 1);
+        if (type == AEKeyType.items()) capacity *= 4;
         if (itemStackHandler != null) itemStackHandler.setCapacity(capacity);
         if (fluidStackHandler != null) fluidStackHandler.setCapacity(capacity);
         if (manaHandler != null) manaHandler.setCapacity(capacity);
@@ -260,6 +258,7 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
         if (itemStackHandler != null) itemStackHandler.setCapacity(0);
         if (fluidStackHandler != null) fluidStackHandler.setCapacity(0);
         if (manaHandler != null) manaHandler.setCapacity(0);
+        this.notifyNeighborsUpdate();
     }
 
     @Override
@@ -300,6 +299,7 @@ public final class MultiblockMEStorageMachine extends MultiblockControllerMachin
 
     @Override
     public @Nullable <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if (!isFormed) return null;
         if (cap == Capabilities.STORAGE) {
             if (side == null || side == getFrontFacing()) {
                 return capabilityStorage.cast();

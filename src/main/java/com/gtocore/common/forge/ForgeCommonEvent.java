@@ -66,7 +66,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
@@ -393,21 +392,6 @@ public final class ForgeCommonEvent {
         }
         data.putBoolean("gtocore_void_time_hint_shown", true);
         player.displayClientMessage(Component.translatable("gtocore.lang." + VOID_WORLD_TIME_HINT).withStyle(ChatFormatting.AQUA), false);
-    }
-
-    @SuppressWarnings("all")
-    @SubscribeEvent
-    public static void onCommandExecution(CommandEvent event) {
-        var command = event.getParseResults().getReader().getString();
-        if (command.contains("ae2") && command.contains("channelmode")) {
-            if (GTOCore.isExpert()) {
-                event.setCanceled(true);
-                if (event.getParseResults().getContext().getSource().isPlayer()) {
-                    Player player = event.getParseResults().getContext().getSource().getPlayer();
-                    player.sendSystemMessage(Component.translatable("gtocore.lang." + CHANNEL_MODE_COMMAND_BANNED));
-                }
-            }
-        }
     }
 
     @SubscribeEvent
