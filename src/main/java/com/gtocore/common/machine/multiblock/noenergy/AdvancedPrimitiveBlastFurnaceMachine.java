@@ -34,7 +34,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -57,7 +57,7 @@ public final class AdvancedPrimitiveBlastFurnaceMachine extends NoEnergyCustomPa
 
     private final ConditionalSubscriptionHandler tickSubs;
     private TickableSubscription particleSubscription;
-    private final Set<BlockPos> heatPositions = new HashSet<>();
+    private Set<BlockPos> heatPositions = Collections.emptySet();
     private AABB heatBounds = new AABB(BlockPos.ZERO);
 
     public AdvancedPrimitiveBlastFurnaceMachine(MetaMachineBlockEntity holder) {
@@ -86,14 +86,15 @@ public final class AdvancedPrimitiveBlastFurnaceMachine extends NoEnergyCustomPa
             height = container;
         }
         pos = MachineUtils.getOffsetPos(7, getFrontFacing(), getPos());
-        updateHeatPositions();
         tickSubs.initialize(getLevel());
+        heatPositions = getMultiblockState().getMatchContext().getOrDefault(GTOPredicates.DataKeys.BLAST_FURNACE_HEAT, Collections.emptySet());
+        updateHeatBounds();
     }
 
     @Override
     public void onStructureInvalid() {
         super.onStructureInvalid();
-        heatPositions.clear();
+        heatPositions = Collections.emptySet();
         heatBounds = new AABB(BlockPos.ZERO);
     }
 
@@ -111,7 +112,6 @@ public final class AdvancedPrimitiveBlastFurnaceMachine extends NoEnergyCustomPa
         if (getOffsetTimer() % 40 == 0 && getLevel() != null) {
             var recipe = getRecipeLogic().getLastRecipe();
             if (recipe != null) {
-                if (heatPositions.isEmpty()) updateHeatPositions();
                 List<Entity> entities = getLevel().getEntitiesOfClass(Entity.class, heatBounds);
                 for (Entity entity : entities) {
                     if (!intersectsHeatPosition(entity)) continue;
@@ -124,12 +124,6 @@ public final class AdvancedPrimitiveBlastFurnaceMachine extends NoEnergyCustomPa
             }
         }
         super.onWorking();
-    }
-
-    private void updateHeatPositions() {
-        heatPositions.clear();
-        heatPositions.addAll(getMultiblockState().getMatchContext().getOrDefault(GTOPredicates.DataKeys.BLAST_FURNACE_HEAT, Set.of()));
-        updateHeatBounds();
     }
 
     private void updateHeatBounds() {
