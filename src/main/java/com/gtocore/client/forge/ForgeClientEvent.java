@@ -6,6 +6,7 @@ import com.gtocore.client.KeyBind;
 import com.gtocore.client.Tooltips;
 import com.gtocore.client.hud.HUDScreen;
 import com.gtocore.client.renderer.RenderHelper;
+import com.gtocore.client.renderer.fx.FXManager;
 import com.gtocore.common.data.GTOItems;
 import com.gtocore.common.item.StructureDetectBehavior;
 import com.gtocore.common.item.StructureWriteBehavior;
@@ -47,7 +48,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import com.fast.fastcollection.O2IOpenCacheHashMap;
+import com.gto.fastcollection.O2IOpenCacheHashMap;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor;
 import com.hepdd.gtmthings.data.CustomItems;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUIGuiContainer;
@@ -126,6 +127,7 @@ public final class ForgeClientEvent {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
+        FXManager.tickFXs();
         Minecraft mc = Minecraft.getInstance();
         updateHudScreen(mc);
         if (mc.player instanceof IEnhancedPlayer) {
@@ -140,6 +142,7 @@ public final class ForgeClientEvent {
     @SubscribeEvent
     public static void onRenderWorldLast(RenderLevelStageEvent event) {
         RenderLevelStageEvent.Stage stage = event.getStage();
+        FXManager.dispatchFXs(event);
         if (stage == RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS) {
             Minecraft mc = Minecraft.getInstance();
             ClientLevel level = mc.level;
@@ -231,6 +234,7 @@ public final class ForgeClientEvent {
     @SubscribeEvent
     public static void onClientDisconnect(ClientPlayerNetworkEvent.LoggingOut event) {
         WirelessNetworkSavedData.setCLIENT_INSTANCE(new WirelessNetworkSavedData());
+        FXManager.clearFXs();
     }
 
     /**

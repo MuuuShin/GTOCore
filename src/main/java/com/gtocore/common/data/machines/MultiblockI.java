@@ -26,7 +26,6 @@ import net.minecraft.world.level.material.Fluids;
 
 import static com.gregtechceu.gtceu.api.machine.multiblock.PartAbility.*;
 import static com.gregtechceu.gtceu.api.pattern.Predicates.*;
-import static com.gregtechceu.gtceu.common.data.GTBlocks.ADVANCED_COMPUTER_CASING;
 import static com.gtocore.api.pattern.GTOPredicates.glass;
 import static com.gtocore.api.pattern.GTOPredicates.recordPosition;
 import static com.gtocore.utils.register.MachineRegisterUtils.multiblock;
@@ -40,7 +39,7 @@ public class MultiblockI {
             .nonYAxisRotation()
             .parallelizableTooltips()
             .perfectOCTooltips()
-            .tooltips(GTOMachineStories.INSTANCE.getPigmentMixerTooltips().getSupplier())
+            .tooltips(GTOMachineStories.PigmentMixerTooltips)
             .recipeTypes(GTORecipeTypes.PIGMENT_MIXING_RECIPES)
             .recipeModifier(RecipeModifier.PERFECT_OVERCLOCKING)
             .block(GTOBlocks.PRESSURE_RESISTANT_HOUSING_MECHANICAL_BLOCK)
@@ -83,8 +82,8 @@ public class MultiblockI {
             .nonYAxisRotation()
             .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
             .recipeModifier(RecipeModifier.PERFECT_OVERCLOCKING)
-            .tooltipsSupplier(GTOMachineStories.INSTANCE.getLargeAlgaeFarmTooltips().getSupplier())
-            .tooltipsSupplier(GTOMachineTooltipsA.INSTANCE.getLargeAlgaeFarmTooltips().getSupplier())
+            .tooltipsSupplier(GTOMachineStories.LargeAlgaeFarmTooltips)
+            .tooltipsSupplier(GTOMachineTooltipsA.LargeAlgaeFarmTooltips)
             .block(GTOBlocks.STAINLESS_STEEL_CORROSION_RESISTANT_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTOBlocks.IRIDIUM_CASING.get()))
@@ -120,8 +119,8 @@ public class MultiblockI {
     public static final MultiblockMachineDefinition VIRTUAL_COIN_MINER = multiblock("virtual_coin_miner", "虚拟挖币机", VirtualCoinMiner::new)
             .nonYAxisRotation()
             .recipeTypes(GTORecipeTypes.DUMMY_RECIPES)
-            .tooltipsSupplier(GTOMachineStories.INSTANCE.getVirtualCoinMinerTooltips().getSupplier())
-            .tooltipsSupplier(GTOMachineTooltipsA.INSTANCE.getVirtualCoinMinerTooltips().getSupplier())
+            .tooltipsSupplier(GTOMachineStories.virtualCoinMinerTooltips)
+            .tooltipsSupplier(GTOMachineTooltipsA.virtualCoinMinerTooltips)
             .block(GTBlocks.ADVANCED_COMPUTER_CASING)
             .pattern(definition -> MultiBlockFileReader.start(definition)
                     .where('A', blocks(GTBlocks.COMPUTER_CASING.get()))
